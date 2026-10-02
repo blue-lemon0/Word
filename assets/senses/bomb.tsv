@@ -1,0 +1,5 @@
+senseId	pos	glossZh	glossEn	trap	note
+s1	n.	炸弹		0	tier=T1
+s2	vt.	轰炸		0	tier=T1
+s3	vt.	投弹于		0	tier=T1
+s4	vi.	失败		0	tier=T1

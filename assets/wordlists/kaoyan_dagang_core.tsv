@@ -1,0 +1,3001 @@
+lemma	pos	tier	senseIds	freq	gloss	alt	category	subcategory
+will	aux.	CORE	s1	6253	将、会		动作行为	身体动作
+more	adj.	CORE	s1	6132	更多的		抽象概念	数量与程度
+passage	n.	CORE	s1,s2	5643	段落、通道		空间地点	
+can	v.	CORE	s1	5333	能		动作行为	身体动作
+question	n.	CORE	s1	4834	问题		动作行为	心理活动
+people	n.	CORE	s1,s2	4812	人民、民族		人类与社会	
+there	adv.	CORE	s1	4126	那里		空间地点	
+well	adv./n./vi.	CORE	s1,s2,s3	4065	好、井、涌出		抽象概念	数量与程度
+answer	v.	CORE	s1	3908	回答		动作行为	社交交互
+make	vt.	CORE	s1,s2	3882	制作、使得		动作行为	使动与影响
+time	n.	CORE	s1	3396	时间		时间日期	
+say	vt.	CORE	s1	3372	说、说明		动作行为	心理活动
+work	n.	CORE	s1	3364	工作		动作行为	身体动作
+when	conj.	CORE	s1	3272	当		时间日期	
+part	n.	CORE	s1	3133	部分		人类与社会	
+use	vt.	CORE	s1	3066	使用		动作行为	使动与影响
+follow	vt.	CORE	s1	3014	跟随		动作行为	心理活动
+year	n.	CORE	s1	2791	年		时间日期	
+write	v.	CORE	s1	2693	写		动作行为	身体动作
+new	adj.	CORE	s1	2672	新的		抽象概念	性质与评价
+section	n.	CORE	s1,s2	2670	部分、地段		教育学习	
+word	n.	CORE	s1,s2	2552	说话、单词		教育学习	
+mark	n.	CORE	s1	2548	标记		动作行为	身体动作
+take	vt.	CORE	s1	2496	拿走、携带		动作行为	身体动作
+read	vt.	CORE	s1	2475	读		动作行为	心理活动
+only	adv.	CORE	s1	2425	仅仅		抽象概念	数量与程度
+go	vi.	CORE	s1	2394	去		动作行为	身体动作
+hear	vt.	CORE	s1	2376	听到		动作行为	身体动作
+give	vt.	CORE	s1	2373	给		动作行为	使动与影响
+base	n.	CORE	s1,s2	2332	基础、基地		空间地点	
+no	adv.	CORE	s1	2321	否定		抽象概念	数量与程度
+get	vt.	CORE	s1	2258	得到		动作行为	使动与影响
+two	num.	CORE	s1	2241	二		时间日期	
+student	n.	CORE	s1	2205	学生		教育学习	
+child	n.	CORE	s1	2149	孩子		人类与社会	
+find	vt.	CORE	s1	2070	发现		动作行为	评价与判断
+way	n.	CORE	s1	2033	方式		空间地点	
+sheet	n.	CORE	s1,s2,s3	1929	被单、（一）张、纸		日常生活	
+man	n.	CORE	s1	1925	男人		人类与社会	
+like	vt./prep.	CORE	s1,s2	1918	喜欢、像		动作行为	其他动作
+woman	n.	CORE	s1	1908	女人		人类与社会	
+school	n.	CORE	s1	1862	学校		教育学习	
+think	vt.	CORE	s1	1845	认为		动作行为	心理活动
+world	n.	CORE	s1	1842	世界		自然环境	
+choice	n.	CORE	s1	1823	选择		抽象概念	认知与抽象名词
+change	v.	CORE	s1	1810	改变		动作行为	变化趋势
+direction	n.	CORE	s1,s2	1778	方向、指令		空间地点	
+life	n.	CORE	s1,s2	1722	生命、人生		人类与社会	
+long	adj.	CORE	s1	1714	长		抽象概念	数量与程度
+study	v.	CORE	s1	1669	学习		教育学习	
+need	vt.	CORE	s1	1667	需要		动作行为	其他动作
+first	num.	CORE	s1	1659	第一		抽象概念	数量与程度
+help	v.	CORE	s1	1637	帮助		动作行为	身体动作
+four	num.	CORE	s1	1617	四		时间日期	
+job	n.	CORE	s1	1606	工作		职业工作	
+learn	vt.	CORE	s1,s2	1597	学习、了解		动作行为	身体动作
+high	adj./adv.	CORE	s1,s2	1585	高的、高		抽象概念	性质与评价
+now	adv.	CORE	s1	1575	现在		时间日期	
+good	adj./n.	CORE	s1,s2	1571	好的、货物		抽象概念	性质与评价
+then	adv.	CORE	s1	1539	然后		时间日期	
+minute	n./adj.	CORE	s1,s2	1538	分钟、微小的		时间日期	
+live	vi.	CORE	s1,s2	1524	住、生活		动作行为	其他动作
+know	vt.	CORE	s1	1511	知道		动作行为	心理活动
+line	n./vi.	CORE	s1,s2	1511	排队、线		空间地点	
+become	v.	CORE	s1,s2	1500	成为、适宜		动作行为	起始与终止
+author	n.	CORE	s1	1492	作者		职业工作	
+come	vi.	CORE	s1	1430	来		动作行为	变化趋势
+mean	vt.	CORE	s1	1424	意思是、意味着		动作行为	身体动作
+letter	n.	CORE	s1	1422	信件		教育学习	
+see	vt.	CORE	s1	1402	看		动作行为	身体动作
+three	num.	CORE	s1	1345	三		时间日期	
+end	v.	CORE	s1	1303	结束		时间日期	
+once	adv.	CORE	s1,s2	1271	曾经、一次		时间日期	
+company	n.	CORE	s1,s2	1267	公司、陪伴		商业经济	
+conversation	n.	CORE	s1	1254	对话	converzation	情感心理	
+problem	n.	CORE	s1	1246	问题		教育学习	
+university	n.	CORE	s1	1246	大学		教育学习	
+human	n.	CORE	s1	1245	人		人类与社会	
+state	vt./n.	CORE	s1,s2	1234	陈述、状态		空间地点	
+want	vt.	CORE	s1	1234	想要		动作行为	身体动作
+food	n.	CORE	s1	1217	食物		食物营养	
+country	n.	CORE	s1	1204	国家		空间地点	
+choose	vt.	CORE	s1	1201	选择		动作行为	评价与判断
+day	n.	CORE	s1	1194	日子		时间日期	
+less	adj.	CORE	s1	1190	更少		抽象概念	数量与程度
+accord	n.	CORE	s1,s2	1184	协议、符合		情感心理	
+show	vt.	CORE	s1	1177	展示、展现		动作行为	其他动作
+social	adj.	CORE	s1,s2	1170	社会的、交际的		人类与社会	
+very	adv.	CORE	s1	1167	非常		抽象概念	数量与程度
+great	adj.	CORE	s1	1166	巨大的		抽象概念	数量与程度
+thing	n.	CORE	s1	1151	事情		抽象概念	认知与抽象名词
+information	n.	CORE	s1	1146	信息		科学技术	
+look	vi.	CORE	s1	1145	看		动作行为	身体动作
+too	adv.	CORE	s1,s2	1138	太…、也		抽象概念	数量与程度
+business	n.	CORE	s1	1128	商业		商业经济	
+research	n.	CORE	s1	1115	研究		动作行为	其他动作
+number	n.	CORE	s1	1090	数字		商业经济	
+single	adj.	CORE	s1	1084	单一的		抽象概念	性质与评价
+feel	v.	CORE	s1	1077	感觉		动作行为	身体动作
+family	n.	CORE	s1	1070	家庭		人类与社会	
+often	adv.	CORE	s1	1047	经常		时间日期	
+old	adj.	CORE	s1	1044	老的		时间日期	
+parent	n.	CORE	s1	1044	父母		人类与社会	
+increase	v.	CORE	s1	1040	增加		动作行为	变化趋势
+paragraph	n.	CORE	s1	1031	段落		教育学习	
+provide	vt.	CORE	s1	1013	提供		动作行为	身体动作
+home	n.	CORE	s1	1009	家		日常生活	
+while	conj.	CORE	s1,s2,s3	1003	当…时、而、尽管		时间日期	
+different	adj.	CORE	s1	994	不同的		抽象概念	性质与评价
+last	adj./vi.	CORE	s1,s2	982	最后的、持续		时间日期	
+point	n./vt.	CORE	s1,s2	982	点、指		动作行为	其他动作
+text	n.	CORE	s1	975	文本		教育学习	
+correspond	vi.	CORE	s1	968	相符合、相当		动作行为	其他动作
+education	n.	CORE	s1	958	教育		教育学习	
+place	vt./n.	CORE	s1,s2	943	放置、地点		空间地点	
+pay	vt.	CORE	s1	934	支付		动作行为	心理活动
+language	n.	CORE	s1,s2	928	语言、风格		文化宗教	
+still	adv.	CORE	s1	926	仍然		时间日期	
+keep	vt.	CORE	s1	919	保持		动作行为	身体动作
+where	adv.	CORE	s1	899	哪里		空间地点	
+book	n./vt.	CORE	s1,s2	898	预定、书籍		教育学习	
+government	n.	CORE	s1	890	政府		政治法律	
+college	n.	CORE	s1	885	大学		教育学习	
+second	adj.	CORE	s1,s2	885	第二的、次等的		时间日期	
+listen	vi.	CORE	s1	883	听		动作行为	身体动作
+system	n.	CORE	s1	878	系统		科学技术	
+put	vt.	CORE	s1	867	放		动作行为	身体动作
+blank	adj.	CORE	s1,s2	866	空白的、失色的		抽象概念	性质与评价
+result	n.	CORE	s1	846	结果		动作行为	使动与影响
+try	vt.	CORE	s1	846	尝试		动作行为	身体动作
+money	n.	CORE	s1	841	钱		商业经济	
+ask	vt.	CORE	s1	839	问		动作行为	社交交互
+seem	vi.	CORE	s1	833	似乎		动作行为	其他动作
+speak	vi.	CORE	s1	832	说		动作行为	身体动作
+news	n.	CORE	s1	830	新闻		文化宗教	
+example	n.	CORE	s1	822	例子		教育学习	
+same	adj.	CORE	s1	820	同样的		抽象概念	性质与评价
+important	adj.	CORE	s1	816	重要的		抽象概念	性质与评价
+right	adj./n.	CORE	s1,s2	813	正确的、权利		抽象概念	性质与评价
+report	n.	CORE	s1	810	报告		动作行为	社交交互
+believe	vt.	CORE	s1	806	相信		动作行为	心理活动
+computer	n.	CORE	s1	801	电脑		科学技术	
+public	adj.	CORE	s1	800	公众的		政治法律	
+health	n.	CORE	s1	796	健康		健康医疗	
+far	adj.	CORE	s1	794	远的		空间地点	
+young	adj.	CORE	s1	793	年轻的		人类与社会	
+call	vt.	CORE	s1	790	打电话		动作行为	身体动作
+large	adj.	CORE	s1	790	大的		抽象概念	数量与程度
+city	n.	CORE	s1	789	城市		空间地点	
+develop	v.	CORE	s1	788	发展		动作行为	变化趋势
+start	v.	CORE	s1	786	开始		动作行为	身体动作
+centre	n.	CORE	s1	782	中心、中央	center	空间地点	
+idea	n.	CORE	s1	780	想法		抽象概念	认知与抽象名词
+allow	vt.	CORE	s1	773	允许		动作行为	心理活动
+science	n.	CORE	s1	773	科学		科学技术	
+age	n.	CORE	s1	771	年龄		时间日期	
+every	adj.	CORE	s1	769	每个		抽象概念	数量与程度
+leave	v.	CORE	s1	769	离开		动作行为	身体动作
+talk	v.	CORE	s1	768	说		动作行为	社交交互
+require	vt.	CORE	s1,s2	767	需要、要求		动作行为	社交交互
+car	n.	CORE	s1	765	车		交通旅行	
+statement	n.	CORE	s1	764	声明		抽象概念	认知与抽象名词
+society	n.	CORE	s1	761	社会		人类与社会	
+short	adj.	CORE	s1	756	短		抽象概念	性质与评价
+cause	vt.	CORE	s1	754	造成		动作行为	使动与影响
+technology	n.	CORE	s1	746	技术、工艺		科学技术	
+grow	vi.	CORE	s1	734	成长、增长		动作行为	变化趋势
+sentence	n.	CORE	s1,s2	732	句子、判决		动作行为	其他动作
+hour	n.	CORE	s1	728	小时		时间日期	
+back	n./vi.	CORE	s1,s2	721	背面、后退		人类与社会	
+economic	adj.	CORE	s1	715	经济上的		商业经济	
+big	adj.	CORE	s1	713	大		抽象概念	数量与程度
+begin	v.	CORE	s1	707	开始		动作行为	身体动作
+lead	vt.	CORE	s1	707	带领		动作行为	使动与影响
+build	vt.	CORE	s1	706	建造		动作行为	身体动作
+early	adj.	CORE	s1	704	早期的		时间日期	
+spend	vt.	CORE	s1	689	花		动作行为	占有与转移
+little	adj.	CORE	s1,s2	688	少、小		抽象概念	数量与程度
+bank	n.	CORE	s1	687	银行		商业经济	
+hard	adj.	CORE	s1	686	困难的		抽象概念	性质与评价
+class	n.	CORE	s1	682	班级		教育学习	
+cost	vt.	CORE	s1	682	花费		商业经济	
+group	n.	CORE	s1	681	小组		人类与社会	
+price	n.	CORE	s1	677	价格		商业经济	
+effect	n.	CORE	s1	676	效果		抽象概念	认知与抽象名词
+comprehension	n.	CORE	s1	673	理解		抽象概念	认知与抽象名词
+today	adv.	CORE	s1,s2	672	在今天、现今		时间日期	
+tell	vt.	CORE	s1	671	告诉		动作行为	社交交互
+set	vt.	CORE	s1	665	设定		动作行为	身体动作
+play	v./vt./n.	CORE	s1,s2,s3	660	玩、扮演、戏剧		运动娱乐	
+likely	adj./adv.	CORE	s1,s2	659	很可能的、大概		抽象概念	性质与评价
+turn	v.	CORE	s1	658	翻转		动作行为	身体动作
+course	n.	CORE	s1	657	课程	corse	教育学习	
+buy	vt.	CORE	s1	656	购买		商业经济	
+understand	vt.	CORE	s1	655	理解		动作行为	身体动作
+offer	vt.	CORE	s1	649	提供		动作行为	身体动作
+service	n.	CORE	s1,s2	648	服务、公共设施		商业经济	
+small	adj.	CORE	s1	647	小的		抽象概念	数量与程度
+product	n.	CORE	s1	644	产品		商业经济	
+experience	n.	CORE	s1	639	经历		动作行为	其他动作
+suggest	vt.	CORE	s1	637	建议		动作行为	身体动作
+decide	v.	CORE	s1	632	决定		动作行为	心理活动
+test	n.	CORE	s1	627	测试		动作行为	评价与判断
+scientist	n.	CORE	s1	625	科学家		职业工作	
+bring	vt.	CORE	s1	623	带来		动作行为	身体动作
+since	prep./conj.	CORE	s1,s2,s3	622	自从、因为、既然		时间日期	
+person	n.	CORE	s1	620	人		人类与社会	
+teacher	n.	CORE	s1	619	教师		职业工作	
+future	n.	CORE	s1	613	未来		时间日期	
+reason	n.	CORE	s1	611	理由		动作行为	身体动作
+view	n.	CORE	s1	610	景观		动作行为	身体动作
+water	n.	CORE	s1	610	水		自然环境	
+improve	vt.	CORE	s1	608	改进、提高		动作行为	变化趋势
+care	v.	CORE	s1	607	关心、在意		动作行为	其他动作
+benefit	n.	CORE	s1	604	益处、好处		商业经济	
+low	adj.	CORE	s1	604	低的		抽象概念	性质与评价
+program	n.	CORE	s1	603	项目	programme	科学技术	
+worker	n.	CORE	s1	601	工人		职业工作	
+market	n.	CORE	s1	600	市场		商业经济	
+teach	vt.	CORE	s1	598	教		动作行为	社交交互
+support	vt.	CORE	s1	596	支持		动作行为	社交交互
+kind	adj./n.	CORE	s1,s2	593	仁慈的、种类		情感心理	
+friend	n.	CORE	s1	589	朋友		人类与社会	
+skill	n.	CORE	s1	588	技术		抽象概念	认知与抽象名词
+yet	conj.	CORE	s1	587	然而		时间日期	
+form	n./v.	CORE	s1,s2	585	形式、形成		抽象概念	认知与抽象名词
+include	vt.	CORE	s1	582	包括		动作行为	使动与影响
+move	v.	CORE	s1	582	移动		动作行为	其他动作
+create	vt.	CORE	s1	581	创造		动作行为	身体动作
+never	adv.	CORE	s1	581	从不		时间日期	
+rather	adv.	CORE	s1	581	相当的		抽象概念	数量与程度
+century	n.	CORE	s1	577	世纪		时间日期	
+bad	adj.	CORE	s1	575	坏的		抽象概念	性质与评价
+eat	vt.	CORE	s1	571	吃		食物营养	
+always	adv.	CORE	s1	570	总是		时间日期	
+least	adj.	CORE	s1	570	最小的、最少的		抽象概念	数量与程度
+face	vt.	CORE	s1	567	面对		人类与社会	
+plan	n.	CORE	s1	564	计划		动作行为	心理活动
+consider	vt.	CORE	s1	560	考虑		动作行为	心理活动
+industry	n.	CORE	s1,s2	559	工业、行业		商业经济	
+process	n.	CORE	s1	554	过程、进程		科学技术	
+rate	n.	CORE	s1	553	比率		商业经济	
+fact	n.	CORE	s1	551	事实		抽象概念	认知与抽象名词
+house	n.	CORE	s1	550	房子		日常生活	
+culture	n.	CORE	s1	549	文化		文化宗教	
+power	n.	CORE	s1,s2	547	力、功率		科学技术	
+share	vt.	CORE	s1	545	分享		动作行为	占有与转移
+area	n.	CORE	s1,s2	542	地区、范围		空间地点	
+million	num.	CORE	s1	540	百万		商业经济	
+lot	adv./n.	CORE	s1,s2	536	很、许多		抽象概念	数量与程度
+sense	n.	CORE	s1	535	感觉		抽象概念	认知与抽象名词
+lose	vt./vi.	CORE	s1,s2	530	失去、失败		动作行为	身体动作
+rise	vi.	CORE	s1	528	上升	rize	动作行为	身体动作
+energy	n.	CORE	s1	526	精力		科学技术	
+control	vt.	CORE	s1	524	控制		动作行为	社交交互
+space	n.	CORE	s1	523	空间		自然环境	
+case	n.	CORE	s1	521	情况		抽象概念	认知与抽象名词
+hold	vt./vi.	CORE	s1,s2	518	握着、坚持		动作行为	身体动作
+possible	adj.	CORE	s1	518	可能的		抽象概念	性质与评价
+ability	n.	CORE	s1	514	能力		抽象概念	认知与抽象名词
+animal	n.	CORE	s1	511	动物		自然环境	
+enough	adj.	CORE	s1	511	足够		抽象概念	数量与程度
+value	n.	CORE	s1	510	价值		商业经济	
+role	n.	CORE	s1	507	角色		职业工作	
+week	n.	CORE	s1	505	周末		时间日期	
+individual	adj.	CORE	s1,s2	503	个人的、独特的		人类与社会	
+hand	n.	CORE	s1	502	手		人类与社会	
+open	vt.	CORE	s1	501	打开		动作行为	身体动作
+ten	num.	CORE	s1	500	十		时间日期	
+term	n.	CORE	s1,s2	497	条款、期限		教育学习	
+away	adv.	CORE	s1	496	离开		空间地点	
+happen	vi.	CORE	s1	493	发生		动作行为	身体动作
+fall	vi.	CORE	s1	492	下降、掉落		动作行为	变化趋势
+art	n.	CORE	s1	491	艺术		文化宗教	
+self	n.	CORE	s1	491	自我、自己		人类与社会	
+decision	n.	CORE	s1	490	决定、决议		抽象概念	认知与抽象名词
+drive	vt.	CORE	s1,s2	490	驾驶、驱使		动作行为	身体动作
+interest	n.	CORE	s1	490	兴趣		情感心理	
+issue	n./vt.	CORE	s1,s2,s3	489	问题、期刊、发布		动作行为	身体动作
+produce	vt.	CORE	s1	489	生产		动作行为	身体动作
+complete	adv.	CORE	s1	488	完全地		动作行为	使动与影响
+activity	n.	CORE	s1,s2	485	活跃、活动		运动娱乐	
+brain	n.	CORE	s1	481	大脑		人类与社会	
+level	n.	CORE	s1,s2	481	水平、等级		抽象概念	数量与程度
+national	adj.	CORE	s1	481	国家的		政治法律	
+able	adj.	CORE	s1	479	有能力的		抽象概念	性质与评价
+run	vi.	CORE	s1,s2	477	跑步、运转		动作行为	身体动作
+past	adj.	CORE	s1	476	过去的		时间日期	
+win	vt.	CORE	s1	476	赢		动作行为	占有与转移
+present	vt./n.	CORE	s1,s2,s3	474	呈现、提出、礼物、现在		时间日期	
+quality	n.	CORE	s1	474	质量		抽象概念	认知与抽象名词
+difficult	adj.	CORE	s1	473	困难的		抽象概念	性质与评价
+easy	adj.	CORE	s1	470	容易的		抽象概念	性质与评价
+reduce	vt.	CORE	s1	469	减少		动作行为	身体动作
+tend	vi./vt.	CORE	s1,s2	469	趋向于、照料		动作行为	身体动作
+five	num.	CORE	s1	467	五		时间日期	
+expect	vt.	CORE	s1	463	预料、期待		动作行为	身体动作
+order	n.	CORE	s1,s2,s3	462	订单、命令、顺序		动作行为	社交交互
+environment	n.	CORE	s1	459	环境、自然环境		自然环境	
+law	n.	CORE	s1,s2	459	法律、法则		政治法律	
+paper	n.	CORE	s1,s2	458	纸、试卷		教育学习	
+kid	n.	CORE	s1	457	孩子		人类与社会	
+mind	n.	CORE	s1	457	思维、想法		动作行为	心理活动
+economy	n.	CORE	s1	454	经济		商业经济	
+percent	n.	CORE	s1	454	百分之的		商业经济	
+sleep	n.	CORE	s1	454	睡眠		健康医疗	
+recent	adj.	CORE	s1	453	近来的		时间日期	
+half	n.	CORE	s1	450	一半		抽象概念	数量与程度
+close	vt./adj.	CORE	s1,s2	448	关闭、近		动作行为	起始与终止
+attention	n.	CORE	s1	445	注意		情感心理	
+free	adj.	CORE	s1	445	自由的		抽象概念	性质与评价
+poor	adj.	CORE	s1,s2,s3	445	贫穷的、可怜的、糟糕的		抽象概念	性质与评价
+body	n.	CORE	s1	442	身体		人类与社会	
+measure	vt.	CORE	s1	441	衡量、测量		动作行为	评价与判断
+office	n.	CORE	s1	441	办公室		职业工作	
+travel	v.	CORE	s1	441	旅行		交通旅行	
+major	adj.	CORE	s1	440	主要的		抽象概念	性质与评价
+professor	n.	CORE	s1	440	教授		职业工作	
+natural	adj.	CORE	s1	439	自然的		自然环境	
+remain	vi.	CORE	s1	438	保持		动作行为	其他动作
+next	adj.	CORE	s1	434	下一个		时间日期	
+design	vt.	CORE	s1	430	设计		动作行为	其他动作
+history	n.	CORE	s1	429	历史		时间日期	
+nation	n.	CORE	s1	428	国家		空间地点	
+real	adj.	CORE	s1	426	真的		抽象概念	性质与评价
+almost	adv.	CORE	s1	425	几乎		时间日期	
+customer	n.	CORE	s1	424	顾客		商业经济	
+subject	n.	CORE	s1	424	科目		教育学习	
+ago	adv.	CORE	s1	422	以前		时间日期	
+focus	n./v.	CORE	s1,s2	419	聚焦、焦点		动作行为	心理活动
+local	adj.	CORE	s1	419	当地的		空间地点	
+really	adv.	CORE	s1	418	确实		抽象概念	数量与程度
+certain	adj.	CORE	s1	417	确定的		抽象概念	性质与评价
+ever	adv.	CORE	s1	417	从来		时间日期	
+success	n.	CORE	s1	417	成功		抽象概念	认知与抽象名词
+late	adj.	CORE	s1	416	晚的		时间日期	
+true	adj.	CORE	s1	414	真实		抽象概念	性质与评价
+knowledge	n.	CORE	s1	412	知识		教育学习	
+name	n./vt.	CORE	s1,s2	412	名称、命名		人类与社会	
+matter	n./vi.	CORE	s1,s2	411	事情、问题、重要		动作行为	身体动作
+stress	n.	CORE	s1	411	压力		动作行为	身体动作
+identify	vt.	CORE	s1	410	识别、鉴定		动作行为	身体动作
+involve	vt.	CORE	s1	410	涉及		动作行为	身体动作
+raise	vt.	CORE	s1,s2	410	举起、提出	raize	动作行为	身体动作
+stay	vi.	CORE	s1,s2	404	保持、停留		动作行为	起始与终止
+population	n.	CORE	s1	402	人口		人类与社会	
+risk	n.	CORE	s1	402	风险		动作行为	其他动作
+medium	adj./n.	CORE	s1,s2	401	中等的、媒介		科学技术	
+fill	vt.	CORE	s1	400	填		动作行为	其他动作
+lack	n.	CORE	s1	400	缺乏		动作行为	占有与转移
+strong	adj.	CORE	s1,s2	400	强壮的、强烈的		抽象概念	性质与评价
+patient	adj./n.	CORE	s1,s2	399	有耐心的、病人		健康医疗	
+rule	n.	CORE	s1	397	规则		动作行为	社交交互
+until	prep./conj.	CORE	s1,s2	397	直到		时间日期	
+continue	v.	CORE	s1	396	继续		动作行为	身体动作
+receive	vt.	CORE	s1	396	收到		动作行为	社交交互
+already	adv.	CORE	s1	395	已经		时间日期	
+employee	n.	CORE	s1	395	雇工	employe	职业工作	
+record	n.	CORE	s1	395	记录		动作行为	身体动作
+sell	vt.	CORE	s1	394	卖		商业经济	
+month	n.	CORE	s1	393	月		时间日期	
+note	n.	CORE	s1	393	笔记		动作行为	身体动作
+community	n.	CORE	s1,s2	392	社区、共同体		人类与社会	
+demand	vt.	CORE	s1	391	要求		动作行为	占有与转移
+personal	adj.	CORE	s1	391	个人的		人类与社会	
+challenge	vt.	CORE	s1	389	挑战		动作行为	社交交互
+store	vt./n.	CORE	s1,s2	389	存储、商店		商业经济	
+check	v.	CORE	s1	388	检查	cheque	动作行为	评价与判断
+deal	v.	CORE	s1	387	处理		动作行为	占有与转移
+opportunity	n.	CORE	s1	387	机会		时间日期	
+relationship	n.	CORE	s1	387	关系		人类与社会	
+list	n.	CORE	s1	386	清单		教育学习	
+usually	adv.	CORE	s1	386	通常、平常		时间日期	
+average	adj.	CORE	s1	385	平均的		抽象概念	数量与程度
+break	vt.	CORE	s1	384	打破		动作行为	身体动作
+eye	n.	CORE	s1	384	眼睛		人类与社会	
+fast	adj.	CORE	s1	383	快		抽象概念	性质与评价
+common	adj.	CORE	s1	382	普通的		抽象概念	性质与评价
+condition	n.	CORE	s1,s2	382	条件、情况		抽象概念	认知与抽象名词
+behavior	n.	CORE	s1	381	行为	behaviour	情感心理	
+global	adj.	CORE	s1	381	全球的		抽象概念	性质与评价
+difference	n.	CORE	s1	379	不同		抽象概念	认知与抽象名词
+light	vt./adj.	CORE	s1,s2	378	点亮、轻的		科学技术	
+growth	n.	CORE	s1	374	生长		科学技术	
+meet	vt.	CORE	s1	374	遇见、会见		动作行为	使动与影响
+shop	vi.	CORE	s1	374	购物		日常生活	
+concern	vt.	CORE	s1,s2	373	关心、涉及		动作行为	身体动作
+task	n.	CORE	s1	373	任务		教育学习	
+effort	n.	CORE	s1	371	努力		动作行为	身体动作
+scientific	adj.	CORE	s1,s2	371	科学的、细致严谨的		科学技术	
+plant	n.	CORE	s1,s2	369	植物、工厂		自然环境	
+encourage	vt.	CORE	s1,s2	366	鼓励、发展	encorage	动作行为	使动与影响
+career	n.	CORE	s1	364	职业		职业工作	
+fail	vi.	CORE	s1,s2	363	衰退、破产		动作行为	变化趋势
+avoid	vt.	CORE	s1	362	避免		动作行为	使动与影响
+influence	n.	CORE	s1	362	影响		动作行为	使动与影响
+music	n.	CORE	s1	361	音乐		运动娱乐	
+add	vt.	CORE	s1	360	增加		动作行为	身体动作
+item	n.	CORE	s1,s2	358	物品、条款		抽象概念	认知与抽象名词
+policy	n.	CORE	s1	358	政策		政治法律	
+force	vt.	CORE	s1	357	强迫、迫使		动作行为	身体动作
+member	n.	CORE	s1	356	成员		人类与社会	
+cut	vt.	CORE	s1	355	切、砍		动作行为	身体动作
+enjoy	vt.	CORE	s1	355	享受		动作行为	占有与转移
+explain	vt.	CORE	s1	355	解释		动作行为	社交交互
+side	n.	CORE	s1	355	一边		空间地点	
+translation	n.	CORE	s1	355	翻译		教育学习	
+adult	n.	CORE	s1	353	大人、成人		人类与社会	
+general	adj./n.	CORE	s1,s2,s3	352	一般的、总的、将军		抽象概念	性质与评价
+international	adj.	CORE	s1	352	国际的		空间地点	
+training	n.	CORE	s1	352	训练		教育学习	
+nature	n.	CORE	s1,s2	350	自然界、性质		自然环境	
+type	n./vt.	CORE	s1,s2	350	类型、输入		教育学习	
+doctor	n.	CORE	s1	349	医生		职业工作	
+mother	n.	CORE	s1	349	妈妈		人类与社会	
+save	vt.	CORE	s1,s2	348	保存、拯救		动作行为	占有与转移
+situation	n.	CORE	s1	348	情况		空间地点	
+essay	n.	CORE	s1	347	论文		教育学习	
+game	n.	CORE	s1	347	游戏		运动娱乐	
+graduate	vi.	CORE	s1	346	毕业、获学位		教育学习	
+decade	n.	CORE	s1	345	十年		时间日期	
+medical	adj.	CORE	s1	345	医疗的		健康医疗	
+miss	vt.	CORE	s1,s2	345	错过、想念		动作行为	身体动作
+train	n.	CORE	s1,s2	344	列车、行列		动作行为	身体动作
+interview	n.	CORE	s1,s2	343	采访、面试		动作行为	其他动作
+third	num.	CORE	s1	343	第三		时间日期	
+stop	vt.	CORE	s1	342	阻止		动作行为	身体动作
+financial	adj.	CORE	s1	340	财政的		商业经济	
+reach	vt.	CORE	s1	340	到达、达到		动作行为	身体动作
+professional	adj.	CORE	s1	338	职业的、专业的		职业工作	
+sign	n.	CORE	s1	338	标牌		动作行为	其他动作
+earth	n.	CORE	s1,s2	337	地球、泥土		自然环境	
+project	n.	CORE	s1	334	项目、计划		动作行为	身体动作
+generation	n.	CORE	s1,s2	333	产生、一代人		人类与社会	
+rich	adj.	CORE	s1	333	丰富的		商业经济	
+standard	n.	CORE	s1	333	标准		抽象概念	认知与抽象名词
+story	n.	CORE	s1	333	故事	storey	文化宗教	
+war	n.	CORE	s1	333	战争		政治法律	
+again	adv.	CORE	s1	332	再次		时间日期	
+later	adv.	CORE	s1	332	后来、其后		时间日期	
+air	n.	CORE	s1	331	空气		自然环境	
+contain	vt.	CORE	s1	331	包含		动作行为	使动与影响
+night	n.	CORE	s1	331	夜晚		时间日期	
+main	adj.	CORE	s1	330	主要的		抽象概念	性质与评价
+love	vt.	CORE	s1	329	爱		情感心理	
+soon	adv.	CORE	s1	329	很快的		时间日期	
+sound	n.	CORE	s1	329	声音		动作行为	其他动作
+account	n.	CORE	s1	328	账户		商业经济	
+affect	vt.	CORE	s1	328	影响		动作行为	使动与影响
+return	vi.	CORE	s1	328	回归、返回		动作行为	社交交互
+sure	adj.	CORE	s1	327	肯定的		抽象概念	性质与评价
+translate	vt.	CORE	s1,s2,s3	327	解释、翻译、转变		动作行为	其他动作
+describe	vt.	CORE	s1	326	描述		动作行为	身体动作
+full	adj.	CORE	s1	325	满的		抽象概念	数量与程度
+purpose	n.	CORE	s1	325	目的		抽象概念	认知与抽象名词
+room	n.	CORE	s1	325	房间		日常生活	
+appear	vi.	CORE	s1	323	出现		动作行为	变化趋势
+impact	n.	CORE	s1	322	冲击		抽象概念	认知与抽象名词
+period	n.	CORE	s1	320	一段时间		时间日期	
+quite	adv.	CORE	s1	319	相当的		抽象概念	数量与程度
+television	n.	CORE	s1	319	电视		日常生活	
+position	n.	CORE	s1	318	位置		空间地点	
+attitude	n.	CORE	s1	317	态度		情感心理	
+machine	n.	CORE	s1	317	机器		科学技术	
+clear	adj.	CORE	s1	316	清楚的		抽象概念	性质与评价
+field	n.	CORE	s1,s2,s3	316	田地、场地、领域		自然环境	
+pass	v.	CORE	s1	315	经过		动作行为	身体动作
+communication	n.	CORE	s1	314	沟通		科学技术	
+here	adv.	CORE	s1	314	这里		空间地点	
+protect	vt.	CORE	s1	314	保护		动作行为	社交交互
+lecture	n.	CORE	s1	312	讲座		教育学习	
+performance	n.	CORE	s1	312	表演		运动娱乐	
+factor	n.	CORE	s1	311	因素、因子		抽象概念	认知与抽象名词
+top	n.	CORE	s1	311	顶端		空间地点	
+draw	v.	CORE	s1	310	画画		动作行为	身体动作
+firm	adj.	CORE	s1	310	牢固的		抽象概念	性质与评价
+memory	n.	CORE	s1	310	记忆		情感心理	
+whole	adj.	CORE	s1	310	全部的		抽象概念	数量与程度
+watch	vt.	CORE	s1	308	观看		动作行为	身体动作
+writer	n.	CORE	s1	308	作家		职业工作	
+academic	adj.	CORE	s1	307	学术的		教育学习	
+death	n.	CORE	s1	307	死亡		健康医疗	
+white	adj.	CORE	s1	307	白色的		交通旅行	
+bear	vt.	CORE	s1,s2	306	携带、承受		动作行为	其他动作
+importance	n.	CORE	s1	306	重要性		抽象概念	认知与抽象名词
+claim	vt.	CORE	s1,s2	305	索要、声称		动作行为	占有与转移
+decline	vt./vi.	CORE	s1,s2	305	拒绝、下降		动作行为	变化趋势
+model	n.	CORE	s1	305	模型		教育学习	
+wrong	adj.	CORE	s1	305	错误的		抽象概念	性质与评价
+expert	n./adj.	CORE	s1,s2	304	专家、专门的		职业工作	
+act	n./v.	CORE	s1,s2	302	行为、行动、扮演		动作行为	身体动作
+carry	vt.	CORE	s1	302	携带		动作行为	身体动作
+send	vt.	CORE	s1	302	发送		动作行为	身体动作
+accept	vt.	CORE	s1	299	接受		动作行为	评价与判断
+degree	n.	CORE	s1,s2	299	温度、程度		抽象概念	数量与程度
+potential	adj.	CORE	s1	299	潜在的		抽象概念	性质与评价
+resource	n.	CORE	s1	299	资源		自然环境	
+pause	n.	CORE	s1	298	暂停		动作行为	起始与终止
+amount	n.	CORE	s1	297	数量		商业经济	
+income	n.	CORE	s1	297	收入		商业经济	
+opinion	n.	CORE	s1	297	意见		情感心理	
+disease	n.	CORE	s1	296	疾病		健康医疗	
+stand	vi.	CORE	s1	295	站立		动作行为	身体动作
+political	adj.	CORE	s1	294	政治的		政治法律	
+popular	adj.	CORE	s1	294	受欢迎的		情感心理	
+argue	v.	CORE	s1,s2,s3	293	论述、争论、争吵		动作行为	社交交互
+physical	adj.	CORE	s1,s2	293	自然科学的、肉体的		科学技术	
+team	n.	CORE	s1	293	团队		人类与社会	
+action	n.	CORE	s1	291	行动、行为		动作行为	其他动作
+material	n.	CORE	s1	290	材料		科学技术	
+compare	vt.	CORE	s1	289	比较		动作行为	评价与判断
+prove	vt.	CORE	s1	289	证明		动作行为	评价与判断
+competition	n.	CORE	s1	287	比赛		运动娱乐	
+perhaps	adv.	CORE	s1	286	也许		抽象概念	数量与程度
+please	int./vt.	CORE	s1,s2	286	请、使愉快		情感心理	
+private	adj.	CORE	s1	286	私人的		人类与社会	
+head	vi.	CORE	s1	285	前往		人类与社会	
+street	n.	CORE	s1	285	街道		空间地点	
+available	adj.	CORE	s1	284	可行的		抽象概念	性质与评价
+boy	n.	CORE	s1	284	男孩		人类与社会	
+current	adj./n.	CORE	s1,s2,s3	284	当前、电流、趋向		商业经济	
+evidence	n.	CORE	s1	283	证据		抽象概念	认知与抽象名词
+goal	n.	CORE	s1	283	目标		运动娱乐	
+loss	n.	CORE	s1	283	丢失		抽象概念	认知与抽象名词
+speed	v.	CORE	s1	283	加速		动作行为	使动与影响
+middle	adj.	CORE	s1	281	中间的		空间地点	
+sale	n.	CORE	s1	280	销售		商业经济	
+grade	n.	CORE	s1	279	年级		教育学习	
+production	n.	CORE	s1	279	生产		商业经济	
+visit	vt.	CORE	s1	279	参观、访问		动作行为	身体动作
+content	n./adj.	CORE	s1,s2,s3	278	内容、目录、满足的		抽象概念	认知与抽象名词
+security	n.	CORE	s1	276	安全		健康医疗	
+source	n.	CORE	s1	276	来源		抽象概念	认知与抽象名词
+gap	n.	CORE	s1,s2	275	间隙、分歧		抽象概念	认知与抽象名词
+let	vt.	CORE	s1	275	让		动作行为	身体动作
+pressure	n.	CORE	s1	275	压力		动作行为	身体动作
+depend	vi.	CORE	s1	274	依赖		动作行为	心理活动
+especially	adv.	CORE	s1	274	尤其		抽象概念	数量与程度
+farm	n.	CORE	s1	274	农场		自然环境	
+modern	adj.	CORE	s1	274	现代的		时间日期	
+simply	adv.	CORE	s1	274	仅仅		抽象概念	数量与程度
+approach	v./n.	CORE	s1,s2	273	接近、方法		动作行为	其他动作
+correct	vt.	CORE	s1	273	更正、纠正		动作行为	评价与判断
+hope	n.	CORE	s1	272	希望		情感心理	
+speaker	n.	CORE	s1,s2	272	扬声器、说话人		职业工作	
+special	adj.	CORE	s1	272	特别的		抽象概念	性质与评价
+intelligence	n.	CORE	s1	271	智力		情感心理	
+picture	n.	CORE	s1	271	图片		运动娱乐	
+survey	n.	CORE	s1,s2	271	调查、测量		动作行为	身体动作
+event	n.	CORE	s1	270	事件		时间日期	
+step	n.	CORE	s1	268	步骤		动作行为	身体动作
+habit	n.	CORE	s1	267	习惯		情感心理	
+responsibility	n.	CORE	s1	267	责任		情感心理	
+similar	adj.	CORE	s1	267	相似的		抽象概念	性质与评价
+chance	n.	CORE	s1	266	机会		抽象概念	认知与抽象名词
+necessary	adj.	CORE	s1	266	必要的		抽象概念	性质与评价
+apply	vt.	CORE	s1	265	应用		动作行为	占有与转移
+father	n.	CORE	s1	265	父亲		人类与社会	
+foreign	adj.	CORE	s1	265	国外的		空间地点	
+access	n.	CORE	s1,s2	264	进入、存取		空间地点	
+driver	n.	CORE	s1	264	驾驶员		职业工作	
+oil	n.	CORE	s1	264	油		科学技术	
+sport	n.	CORE	s1	264	体育运动		运动娱乐	
+exist	vi.	CORE	s1	263	存在		动作行为	其他动作
+advantage	n.	CORE	s1	262	优势		抽象概念	认知与抽象名词
+agree	vi.	CORE	s1	261	同意		动作行为	其他动作
+manager	n.	CORE	s1	261	经理		职业工作	
+newspaper	n.	CORE	s1	261	报纸		教育学习	
+remember	vt.	CORE	s1	261	记得		动作行为	心理活动
+land	vi./n.	CORE	s1,s2	260	着陆、土地		空间地点	
+solve	vt.	CORE	s1	260	解答		动作行为	其他动作
+function	n.	CORE	s1	259	功能		科学技术	
+management	n.	CORE	s1	259	经营、管理		职业工作	
+phrase	n.	CORE	s1	259	短语		教育学习	
+experiment	n.	CORE	s1	258	实验		科学技术	
+sit	vi.	CORE	s1	258	坐在		动作行为	身体动作
+structure	n.	CORE	s1	258	结构		抽象概念	认知与抽象名词
+message	n.	CORE	s1	257	消息		情感心理	
+seek	vt.	CORE	s1	257	寻求		动作行为	占有与转移
+promote	vt.	CORE	s1	255	促进		动作行为	身体动作
+figure	v./n.	CORE	s1,s2,s3	254	算计、人物、数字		抽象概念	认知与抽象名词
+road	n.	CORE	s1	254	路		空间地点	
+limit	vt.	CORE	s1	252	限制		动作行为	使动与影响
+sometimes	adv.	CORE	s1	252	有时		时间日期	
+fear	n.	CORE	s1	251	恐惧		情感心理	
+supply	vt.	CORE	s1	251	供应		动作行为	使动与影响
+argument	n.	CORE	s1,s2	248	争论、论据		政治法律	
+effective	adj.	CORE	s1	248	有效的		抽象概念	性质与评价
+relate	vt.	CORE	s1,s2	248	讲述、使相互关联		动作行为	社交交互
+prevent	vt.	CORE	s1	247	阻止		动作行为	社交交互
+baby	n.	CORE	s1	246	宝贝		人类与社会	
+pattern	n.	CORE	s1,s2	246	模式、图案		日常生活	
+response	n.	CORE	s1	245	回应		情感心理	
+search	v.	CORE	s1	245	搜索		动作行为	其他动作
+beyond	prep.	CORE	s1	244	超越		空间地点	
+near	adj.	CORE	s1,s2	244	近的、亲近的		空间地点	
+reader	n.	CORE	s1,s2	244	读者、读物		教育学习	
+regard	vt.	CORE	s1	244	看待		动作行为	身体动作
+serious	adj.	CORE	s1,s2	244	严肃认真的、严重的		情感心理	
+black	adj.	CORE	s1	243	黑色的		交通旅行	
+climate	n.	CORE	s1	243	气候		自然环境	
+heart	n.	CORE	s1	243	心		人类与社会	
+president	n.	CORE	s1	243	总统		职业工作	
+serve	v.	CORE	s1	243	服务		动作行为	其他动作
+traffic	n.	CORE	s1	242	交通		交通旅行	
+walk	vi.	CORE	s1	242	走路		动作行为	身体动作
+award	vt.	CORE	s1	241	颁奖、奖励		文化宗教	
+determine	vt.	CORE	s1	241	决定		动作行为	心理活动
+gain	vt.	CORE	s1,s2	241	获得、增加		动作行为	身体动作
+speech	n.	CORE	s1,s2	241	演讲、言语		情感心理	
+prepare	vt.	CORE	s1	240	准备		动作行为	其他动作
+digital	adj.	CORE	s1	238	数字的、数码的		科学技术	
+publish	vt.	CORE	s1,s2	238	公布、出版		动作行为	其他动作
+suffer	vt.	CORE	s1	238	遭受		动作行为	其他动作
+mental	adj.	CORE	s1	237	精神的		情感心理	
+positive	adj.	CORE	s1	237	积极的		抽象概念	性质与评价
+outside	adj.	CORE	s1	236	外面的		空间地点	
+party	n.	CORE	s1	236	派对		政治法律	
+contribute	vt.	CORE	s1	235	贡献		动作行为	身体动作
+dream	n.	CORE	s1	235	梦想		情感心理	
+drink	vt.	CORE	s1	235	喝		食物营养	
+increasingly	adv.	CORE	s1	235	不断增加地		抽象概念	数量与程度
+trade	n.	CORE	s1	235	交易		商业经济	
+achieve	vt.	CORE	s1	232	实现		动作行为	起始与终止
+conflict	n.	CORE	s1	232	冲突		动作行为	身体动作
+trouble	n.	CORE	s1	231	麻烦		动作行为	使动与影响
+girl	n.	CORE	s1	230	女孩		人类与社会	
+nearly	adv.	CORE	s1	230	几乎		抽象概念	数量与程度
+exercise	n.	CORE	s1	229	锻炼	exercize	动作行为	社交交互
+status	n.	CORE	s1	229	状态		人类与社会	
+various	adj.	CORE	s1	229	各种各样的		抽象概念	性质与评价
+basic	adj.	CORE	s1	228	基本的、根本的		抽象概念	性质与评价
+fit	adj.	CORE	s1,s2	228	健康的、适合		动作行为	社交交互
+occur	vi.	CORE	s1	228	发生		动作行为	心理活动
+refer	vi.	CORE	s1	228	提及		动作行为	身体动作
+die	vi.	CORE	s1	227	死		动作行为	身体动作
+attend	v.	CORE	s1,s2	226	出席、照看		动作行为	心理活动
+composition	n.	CORE	s1,s2,s3	226	构成、作品、作词		教育学习	
+failure	n.	CORE	s1	226	失败		抽象概念	认知与抽象名词
+maintain	vt.	CORE	s1	226	保持、维持		动作行为	起始与终止
+town	n.	CORE	s1	226	城镇		空间地点	
+wait	vi.	CORE	s1	226	等待		动作行为	起始与终止
+critical	adj.	CORE	s1,s2	225	批评的、关键的		情感心理	
+alone	adj./adv.	CORE	s1,s2	224	单独的、仅仅		情感心理	
+meeting	n.	CORE	s1	224	会议		人类与社会	
+feature	n./vt.	CORE	s1,s2,s3	223	特征、容貌、以……为特色		人类与社会	
+tax	n./vt.	CORE	s1,s2	223	税、对……征税		商业经济	
+express	vt.	CORE	s1	222	表达		动作行为	评价与判断
+hundred	num./n.	CORE	s1,s2	221	百、许多		时间日期	
+shift	v.	CORE	s1	221	转移、转换		动作行为	变化趋势
+simple	adj.	CORE	s1	221	简单的		抽象概念	性质与评价
+successful	adj.	CORE	s1	221	成功的		抽象概念	性质与评价
+thousand	num.	CORE	s1	221	一千		时间日期	
+couple	n.	CORE	s1	220	情侣、夫妻		人类与社会	
+image	n.	CORE	s1	220	形象、肖像		人类与社会	
+key	n.	CORE	s1,s2	220	钥匙、关键		科学技术	
+theory	n.	CORE	s1	220	理论		抽象概念	认知与抽象名词
+card	n.	CORE	s1,s2	219	卡片、纸牌		文化宗教	
+catch	vt.	CORE	s1	219	抓住		动作行为	身体动作
+select	vt.	CORE	s1	219	选择		动作行为	评价与判断
+cover	vt.	CORE	s1	218	覆盖		动作行为	身体动作
+earn	vt.	CORE	s1	218	挣得		动作行为	占有与转移
+farmer	n.	CORE	s1	218	农民		职业工作	
+attract	vt.	CORE	s1	217	吸引		动作行为	身体动作
+clean	adj.	CORE	s1	217	干净的		动作行为	其他动作
+trend	n.	CORE	s1	217	趋势		动作行为	身体动作
+desire	vt.	CORE	s1	216	渴望		情感心理	
+healthy	adj.	CORE	s1,s2	216	健康的、有益健康的		健康医疗	
+lie	n./vi.	CORE	s1,s2	216	谎话、说谎		动作行为	身体动作
+method	n.	CORE	s1	216	方法		教育学习	
+promise	v.	CORE	s1	216	承诺	promize	动作行为	身体动作
+difficulty	n.	CORE	s1	215	困难		抽象概念	认知与抽象名词
+network	n.	CORE	s1	215	网络		科学技术	
+rest	n.	CORE	s1	215	休息		动作行为	身体动作
+billion	num.	CORE	s1,s2	214	十亿、万亿		商业经济	
+cook	v.	CORE	s1	214	烹饪		食物营养	
+daily	n.	CORE	s1,s2	214	破晓、开始		时间日期	
+detail	n.	CORE	s1	214	细节		抽象概念	认知与抽象名词
+normal	adj.	CORE	s1	214	正常的		抽象概念	性质与评价
+post	vt.	CORE	s1,s2	214	发布、张贴、邮寄		交通旅行	
+reward	n.	CORE	s1	214	回报、报酬		动作行为	其他动作
+behind	prep.	CORE	s1	211	在…后面		空间地点	
+device	n.	CORE	s1,s2	211	装置、方法		科学技术	
+discover	vt.	CORE	s1	211	探索、发现		动作行为	使动与影响
+drop	vi.	CORE	s1	211	掉下		动作行为	身体动作
+introduce	vt.	CORE	s1	211	介绍		动作行为	身体动作
+court	n.	CORE	s1,s2	210	法庭、球场	cort	政治法律	
+drug	n.	CORE	s1	210	药		健康医疗	
+range	n.	CORE	s1	210	范围		抽象概念	认知与抽象名词
+solution	n.	CORE	s1	210	解决方案		抽象概念	认知与抽象名词
+warm	adj.	CORE	s1	210	温暖		抽象概念	性质与评价
+accident	n.	CORE	s1	209	事故		交通旅行	
+essential	adj.	CORE	s1	209	重要的		抽象概念	性质与评价
+fashion	n.	CORE	s1	209	时尚		交通旅行	
+indicate	vt.	CORE	s1	209	表明		动作行为	社交交互
+particular	adj.	CORE	s1	209	特定的		抽象概念	性质与评价
+attach	vt.	CORE	s1	208	附上、附加		动作行为	身体动作
+six	num.	CORE	s1	208	六		时间日期	
+slow	adj.	CORE	s1	208	慢的		抽象概念	性质与评价
+credit	n.	CORE	s1	207	信用		商业经济	
+error	n.	CORE	s1	207	错误		抽象概念	认知与抽象名词
+expensive	adj.	CORE	s1	207	贵的		商业经济	
+finish	vt.	CORE	s1	207	完成		动作行为	起始与终止
+happy	adj.	CORE	s1	207	快乐的		情感心理	
+respect	vt.	CORE	s1	207	尊重		动作行为	身体动作
+bill	n.	CORE	s1	206	账单		商业经济	
+deep	adj.	CORE	s1	206	深的		抽象概念	性质与评价
+fire	n./vt.	CORE	s1,s2	206	火、开除		自然环境	
+belief	n.	CORE	s1,s2	204	信仰、相信		情感心理	
+moment	n.	CORE	s1	204	时刻		时间日期	
+museum	n.	CORE	s1	204	博物馆		文化宗教	
+site	n.	CORE	s1,s2	204	景点、站点		空间地点	
+finally	adv.	CORE	s1	203	最终地		抽象概念	数量与程度
+address	n.	CORE	s1,s2	202	演说、地址		日常生活	
+concept	n.	CORE	s1	202	概念		抽象概念	认知与抽象名词
+crime	n.	CORE	s1	202	犯罪		政治法律	
+damage	vt.	CORE	s1	202	损害		动作行为	使动与影响
+negative	adj.	CORE	s1	201	消极的		抽象概念	性质与评价
+restaurant	n.	CORE	s1	201	饭馆		食物营养	
+size	n.	CORE	s1	201	大小	sise	抽象概念	数量与程度
+federal	adj.	CORE	s1	200	联邦的		政治法律	
+labor	n.	CORE	s1	199	劳动力	labour	职业工作	
+progress	n.	CORE	s1	199	进步		动作行为	变化趋势
+mistake	n.	CORE	s1	198	错误		动作行为	心理活动
+movement	n.	CORE	s1	198	运动		动作行为	其他动作
+robot	n.	CORE	s1	198	机器人		科学技术	
+weather	n.	CORE	s1	198	天气		自然环境	
+charge	vt.	CORE	s1,s2	197	收费、索价、充电		商业经济	
+enter	vt.	CORE	s1	197	进入		动作行为	身体动作
+infer	vt.	CORE	s1	197	推断		动作行为	身体动作
+medicine	n.	CORE	s1	197	医药		健康医疗	
+engage	vt.	CORE	s1,s2	196	吸引、使参加		动作行为	使动与影响
+executive	adj./n.	CORE	s1,s2	195	实行的、经理		职业工作	
+object	n.	CORE	s1,s2	195	目标、物体		动作行为	社交交互
+race	n.	CORE	s1	195	比赛、竞速		运动娱乐	
+variety	n.	CORE	s1,s2	195	多样化、种类		抽象概念	认知与抽象名词
+wide	adj.	CORE	s1,s2	195	广泛的、宽的		抽象概念	性质与评价
+hospital	n.	CORE	s1	194	医院		健康医疗	
+manage	vt./vi.	CORE	s1,s2	194	管理、设法做到		动作行为	社交交互
+huge	adj.	CORE	s1	193	大的		抽象概念	数量与程度
+official	adj.	CORE	s1	193	官方的		职业工作	
+hire	vt.	CORE	s1	192	雇佣		动作行为	占有与转移
+hotel	n.	CORE	s1	192	酒店		日常生活	
+employer	n.	CORE	s1	191	雇主		职业工作	
+literature	n.	CORE	s1	191	文学		文化宗教	
+perform	vt.	CORE	s1,s2	191	演奏、执行		动作行为	使动与影响
+treat	vt.	CORE	s1	191	对待		动作行为	其他动作
+article	n.	CORE	s1	190	文章		教育学习	
+profit	n.	CORE	s1	190	利润		商业经济	
+trip	n.	CORE	s1	190	旅行		交通旅行	
+weight	n.	CORE	s1	190	体重		科学技术	
+aspect	n.	CORE	s1,s2	189	样子、方面		抽象概念	认知与抽象名词
+due	adj.	CORE	s1,s2	189	预期的、到期的		抽象概念	性质与评价
+investment	n.	CORE	s1	189	投资		商业经济	
+wear	vt.	CORE	s1	189	穿着		动作行为	身体动作
+balance	n.	CORE	s1	188	平衡		商业经济	
+define	vt.	CORE	s1	188	定义		动作行为	评价与判断
+enable	vt.	CORE	s1	188	使能够		动作行为	使动与影响
+character	n.	CORE	s1	187	性格		人类与社会	
+consumption	n.	CORE	s1	187	消费、消耗		商业经济	
+crisis	n.	CORE	s1	187	危机		政治法律	
+dollar	n.	CORE	s1	187	美元		商业经济	
+green	adj.	CORE	s1,s2	187	绿的、未熟的		交通旅行	
+cold	adj.	CORE	s1	186	冷的		健康医疗	
+contact	n.	CORE	s1	186	联系		动作行为	身体动作
+immigrant	n.	CORE	s1	186	移民		人类与社会	
+department	n.	CORE	s1	185	部门		政治法律	
+reality	n.	CORE	s1,s2	185	现实、真实的事物		抽象概念	认知与抽象名词
+advice	n.	CORE	s1	184	建议		情感心理	
+board	n.	CORE	s1	184	板		日常生活	
+comment	n.	CORE	s1	184	评论		动作行为	评价与判断
+consequence	n.	CORE	s1	184	后果、结果		抽象概念	认知与抽象名词
+fight	v.	CORE	s1	184	打斗		动作行为	身体动作
+meal	n.	CORE	s1	184	饭		食物营养	
+style	n.	CORE	s1	184	风格		文化宗教	
+worry	v.	CORE	s1	184	担心		动作行为	其他动作
+tool	n.	CORE	s1	182	工具		科学技术	
+waste	vt.	CORE	s1	182	浪费		动作行为	占有与转移
+morning	n.	CORE	s1	181	早晨		时间日期	
+predict	vt.	CORE	s1	181	预测		动作行为	其他动作
+operation	n.	CORE	s1,s2	180	运营、操作		科学技术	
+industrial	adj.	CORE	s1	179	工业的		商业经济	
+kill	vt.	CORE	s1	179	杀		动作行为	使动与影响
+stage	n.	CORE	s1	179	阶段		空间地点	
+director	n.	CORE	s1	178	指挥者		职业工作	
+highly	adv.	CORE	s1	178	高度地		抽象概念	数量与程度
+purchase	vt.	CORE	s1	178	购买		商业经济	
+specific	adj.	CORE	s1	178	具体的、详细的		抽象概念	性质与评价
+feeling	n.	CORE	s1	177	感受		情感心理	
+print	vt.	CORE	s1	177	打印		科学技术	
+replace	vt.	CORE	s1	177	替代		动作行为	其他动作
+shape	n.	CORE	s1	177	形状		动作行为	身体动作
+significant	adj.	CORE	s1	177	有意义的、重要的		抽象概念	性质与评价
+thirty	num.	CORE	s1	177	三十		时间日期	
+ground	n.	CORE	s1,s2	176	地面、场所		空间地点	
+screen	n.	CORE	s1	176	屏幕		日常生活	
+lay	vt./vi.	CORE	s1,s2,s3,s4	175	放置、躺、位于、说谎		动作行为	其他动作
+sea	n.	CORE	s1	175	大海		自然环境	
+struggle	vi.	CORE	s1	175	斗争、奋斗		动作行为	其他动作
+cross	vt.	CORE	s1	174	跨过、穿过		动作行为	身体动作
+expand	vt.	CORE	s1	174	扩大		动作行为	使动与影响
+forget	vt.	CORE	s1	174	忘记		动作行为	心理活动
+multiple	adj./n.	CORE	s1,s2	174	多种多样的、倍数		抽象概念	性质与评价
+wife	n.	CORE	s1	174	妻子		人类与社会	
+conduct	vt.	CORE	s1	173	实施、开展		动作行为	身体动作
+direct	adj.	CORE	s1	173	径直的、直接的		动作行为	社交交互
+ensure	vt.	CORE	s1	173	确保		动作行为	使动与影响
+fund	n.	CORE	s1	173	资金		商业经济	
+intellectual	n./adj.	CORE	s1,s2	173	知识分子、知识的		教育学习	
+region	n.	CORE	s1	173	地区		空间地点	
+safety	n.	CORE	s1	173	安全		健康医疗	
+tourist	n.	CORE	s1	173	旅行者		交通旅行	
+aim	n.	CORE	s1	172	目标		动作行为	其他动作
+husband	n.	CORE	s1	172	丈夫		人类与社会	
+legal	adj.	CORE	s1,s2	172	法律的、合法的		政治法律	
+link	vt.	CORE	s1	172	连接		动作行为	身体动作
+reflect	vt./vi.	CORE	s1,s2,s3	172	反射、反映、思考		动作行为	身体动作
+underline	n./vt.	CORE	s1,s2	171	下划线、强调		动作行为	其他动作
+worth	adj.	CORE	s1	171	值得		抽象概念	认知与抽象名词
+freedom	n.	CORE	s1	170	自由		政治法律	
+poverty	n.	CORE	s1	170	贫穷		商业经济	
+reveal	vt.	CORE	s1	170	显露、展现		动作行为	社交交互
+suppose	vt.	CORE	s1	170	假设		动作行为	心理活动
+advance	vi./vt.	CORE	s1,s2	169	前进、提高		动作行为	身体动作
+practical	adj.	CORE	s1	169	实际的		抽象概念	性质与评价
+smoke	n.	CORE	s1	169	烟		自然环境	
+south	n./adj.	CORE	s1,s2	169	南、南方的		空间地点	
+attack	vt.	CORE	s1	168	攻击		动作行为	身体动作
+commercial	adj.	CORE	s1	168	商业的		商业经济	
+holiday	n.	CORE	s1	168	假日		时间日期	
+male	n./adj.	CORE	s1,s2	168	男性、男性的		人类与社会	
+peer	vi./n.	CORE	s1,s2,s3	168	凝视、同伴、贵族		人类与社会	
+film	n.	CORE	s1	167	电影		运动娱乐	
+limited	adj.	CORE	s1,s2	167	有限的、有限责任的		抽象概念	性质与评价
+police	n.	CORE	s1	167	警察		政治法律	
+push	vt.	CORE	s1	167	推		动作行为	身体动作
+twenty	num.	CORE	s1	167	二十		时间日期	
+associate	vt./vi.	CORE	s1,s2	166	联系、结交		动作行为	心理活动
+attempt	vt.	CORE	s1	166	试图、企图		动作行为	身体动作
+prefer	vt.	CORE	s1	166	偏好		动作行为	其他动作
+review	vt./n.	CORE	s1,s2	166	复习、回顾、评论		动作行为	评价与判断
+wealth	n.	CORE	s1	166	财富		商业经济	
+creative	adj.	CORE	s1	165	有创造力的		情感心理	
+title	n.	CORE	s1	165	标题		教育学习	
+trust	n.	CORE	s1	164	信任		动作行为	身体动作
+box	n.	CORE	s1	163	盒子		日常生活	
+cry	vi.	CORE	s1	163	哭泣		动作行为	身体动作
+ill	adj.	CORE	s1,s2	163	有病的、坏的		健康医疗	
+china	n.	CORE	s1	162	瓷器		日常生活	
+derive	vt.	CORE	s1	162	取得		动作行为	占有与转移
+hardly	adv.	CORE	s1,s2	162	几乎不、仅仅		抽象概念	数量与程度
+responsible	adj.	CORE	s1,s2	162	应负责的、可靠的		情感心理	
+textbook	n.	CORE	s1	162	课本		教育学习	
+total	adj.	CORE	s1	162	总共的		抽象概念	数量与程度
+track	vt./n.	CORE	s1,s2,s3	162	追踪、足迹、痕迹		动作行为	身体动作
+warn	vt.	CORE	s1	162	警告		动作行为	社交交互
+bird	n.	CORE	s1	161	鸟		自然环境	
+electronic	adj.	CORE	s1	161	电子的		科学技术	
+extra	adj.	CORE	s1	161	额外的		抽象概念	数量与程度
+heavy	adj.	CORE	s1	161	重的		抽象概念	性质与评价
+ignore	vt.	CORE	s1	161	忽视		动作行为	其他动作
+survive	vi.	CORE	s1	161	幸存		动作行为	其他动作
+fuel	n.	CORE	s1	160	燃料		科学技术	
+magazine	n.	CORE	s1	160	杂志		教育学习	
+summer	n./adj.	CORE	s1,s2	160	夏天、夏季的		时间日期	
+complex	adj.	CORE	s1	159	复杂的		抽象概念	性质与评价
+danger	n.	CORE	s1	159	危险		健康医疗	
+library	n.	CORE	s1	159	图书馆		教育学习	
+option	n.	CORE	s1	159	选项		抽象概念	认知与抽象名词
+piece	n.	CORE	s1,s2	159	（一）件、碎片		日常生活	
+throughout	prep.	CORE	s1	159	遍及、到处		空间地点	
+institution	n.	CORE	s1	158	机构		政治法律	
+mention	vt.	CORE	s1	158	提及		动作行为	身体动作
+appeal	v.	CORE	s1,s2	157	呼吁、吸引		动作行为	身体动作
+background	n.	CORE	s1	157	背景		人类与社会	
+colleague	n.	CORE	s1	157	同事		职业工作	
+exact	adj.	CORE	s1	156	确切的、特定的		抽象概念	性质与评价
+intend	vt.	CORE	s1	156	想要（做某事）		动作行为	身体动作
+paint	v.	CORE	s1	156	绘画		运动娱乐	
+strategy	n.	CORE	s1	156	策略		政治法律	
+arrive	vi.	CORE	s1	155	到、达到		动作行为	起始与终止
+association	n.	CORE	s1	155	协会		文化宗教	
+authority	n.	CORE	s1,s2	155	权力、权威人士		政治法律	
+cheap	adj.	CORE	s1,s2	155	便宜的、不值钱的		商业经济	
+factory	n.	CORE	s1	155	工厂		商业经济	
+grant	vt.	CORE	s1,s2	155	同意、授予		动作行为	身体动作
+journal	n.	CORE	s1	155	日记		教育学习	
+ready	adj.	CORE	s1	155	准备好的		抽象概念	性质与评价
+tree	n./vt.	CORE	s1,s2	155	树、爬上树		自然环境	
+expense	n.	CORE	s1	154	花费		商业经济	
+famous	adj.	CORE	s1	154	有名的		情感心理	
+flight	n.	CORE	s1	154	航班		交通旅行	
+patent	n./adj.	CORE	s1,s2	154	专利、专利的		科学技术	
+spread	vt.	CORE	s1	154	传播		动作行为	身体动作
+chief	n./adj.	CORE	s1,s2	153	首领、主要的		职业工作	
+establish	vt.	CORE	s1,s2	153	建立、查实		动作行为	身体动作
+foot	n./v.	CORE	s1,s2	153	脚、走		人类与社会	
+indeed	adv.	CORE	s1	153	确实		抽象概念	数量与程度
+observe	vt.	CORE	s1	153	观察		动作行为	心理活动
+safe	adj.	CORE	s1	153	安全的		健康医疗	
+agency	n.	CORE	s1	152	机构		商业经济	
+compete	vi.	CORE	s1	152	竞争		动作行为	社交交互
+debate	v.	CORE	s1	152	讨论		政治法律	
+educate	vt.	CORE	s1	152	教育		动作行为	社交交互
+staff	n.	CORE	s1	152	员工		职业工作	
+wish	vt.	CORE	s1	152	希望		动作行为	身体动作
+adapt	vt./vi.	CORE	s1,s2	151	改编、适应		动作行为	身体动作
+boss	n.	CORE	s1	151	老板		职业工作	
+fix	vt.	CORE	s1,s2	150	固定、修理		动作行为	身体动作
+unemployment	n.	CORE	s1	150	失业		商业经济	
+application	n.	CORE	s1,s2	149	应用、申请		教育学习	
+participant	n.	CORE	s1	149	参与者		人类与社会	
+possibility	n.	CORE	s1,s2	149	可能、可能的事		抽象概念	认知与抽象名词
+scale	n.	CORE	s1,s2,s3	149	规模、刻度、天平		抽象概念	认知与抽象名词
+emotion	n.	CORE	s1	148	情感		情感心理	
+marriage	n.	CORE	s1,s2	148	结婚、结婚仪式		人类与社会	
+threat	n.	CORE	s1	148	威胁		动作行为	社交交互
+union	n.	CORE	s1,s2	148	一致、联合		政治法律	
+western	adj.	CORE	s1	148	西方的		空间地点	
+adopt	vt.	CORE	s1,s2	147	采用、收养		动作行为	其他动作
+capacity	n.	CORE	s1,s2,s3	147	容量、能力、生产力		抽象概念	认知与抽象名词
+lesson	n.	CORE	s1,s2	147	课、教训		教育学习	
+mile	n.	CORE	s1	147	英里		科学技术	
+movie	n.	CORE	s1	147	电影		运动娱乐	
+obvious	adj.	CORE	s1	147	明显的		抽象概念	性质与评价
+passenger	n.	CORE	s1	147	乘客		交通旅行	
+regular	adj.	CORE	s1	147	定期的、常规的		抽象概念	性质与评价
+relation	n.	CORE	s1	147	关系		人类与社会	
+represent	vt.	CORE	s1	147	代表		动作行为	身体动作
+score	n.	CORE	s1	147	分数		动作行为	其他动作
+voice	n.	CORE	s1	147	声音		动作行为	社交交互
+characteristic	n./adj.	CORE	s1,s2	146	特征、独有的		抽象概念	认知与抽象名词
+discuss	vt.	CORE	s1	146	讨论		动作行为	社交交互
+join	vt.	CORE	s1	146	参加		动作行为	使动与影响
+operate	vi.	CORE	s1,s2	146	运转、动手术		动作行为	身体动作
+pollution	n.	CORE	s1	146	污染		自然环境	
+ancient	adj.	CORE	s1	145	古老的		时间日期	
+appropriate	adj.	CORE	s1	145	恰当的		抽象概念	性质与评价
+date	n.	CORE	s1	145	日期		时间日期	
+extend	vt.	CORE	s1	145	延伸、延展		动作行为	身体动作
+match	n.	CORE	s1,s2	145	比赛、匹配		动作行为	身体动作
+audience	n.	CORE	s1	144	观众		文化宗教	
+finding	n.	CORE	s1,s2	144	发现、调查结果		抽象概念	认知与抽象名词
+forest	n.	CORE	s1	144	森林		自然环境	
+gas	n.	CORE	s1,s2	144	气体、天然气		科学技术	
+majority	n.	CORE	s1	144	多数、半数以上		抽象概念	数量与程度
+separate	vt.	CORE	s1	144	分开		动作行为	变化趋势
+station	n.	CORE	s1	144	车站		空间地点	
+unique	adj.	CORE	s1	144	独特的		抽象概念	性质与评价
+wonder	n.	CORE	s1,s2	144	好奇、奇观		动作行为	心理活动
+carbon	n.	CORE	s1,s2	143	碳、复写纸		科学技术	
+conclude	vt.	CORE	s1	143	总结		动作行为	起始与终止
+conclusion	n.	CORE	s1	143	总结		抽象概念	认知与抽象名词
+employ	vt.	CORE	s1,s2	143	雇佣、采用		动作行为	使动与影响
+female	n.	CORE	s1	143	女性、雌性		人类与社会	
+expression	n.	CORE	s1	142	表达、措词		抽象概念	认知与抽象名词
+moral	adj.	CORE	s1	142	道德的		情感心理	
+temperature	n.	CORE	s1	142	温度		健康医疗	
+wall	n.	CORE	s1	142	墙壁		日常生活	
+acquire	vt.	CORE	s1	141	获得		动作行为	占有与转移
+aware	adj.	CORE	s1	141	意识的		情感心理	
+campus	n.	CORE	s1	141	校园		教育学习	
+classroom	n.	CORE	s1	141	教室		教育学习	
+consume	vt.	CORE	s1	141	消耗、耗尽		动作行为	占有与转移
+mail	n.	CORE	s1	141	邮件		交通旅行	
+owner	n.	CORE	s1	141	物主		人类与社会	
+principle	n.	CORE	s1	141	原则		抽象概念	认知与抽象名词
+aid	n.	CORE	s1	140	援助		动作行为	身体动作
+pain	n.	CORE	s1	140	痛苦		健康医疗	
+cell	n.	CORE	s1	139	细胞		健康医疗	
+confidence	n.	CORE	s1	139	信任		情感心理	
+doubt	n.	CORE	s1	139	怀疑		情感心理	
+ice	n./vt.	CORE	s1,s2	139	冰、使结冰		自然环境	
+imagine	vt.	CORE	s1	139	想象		动作行为	心理活动
+resident	n./adj.	CORE	s1,s2	139	居民、居住的		人类与社会	
+taste	n.	CORE	s1	139	口味		动作行为	身体动作
+dinner	n.	CORE	s1	138	正餐		食物营养	
+equal	adj.	CORE	s1	138	平等的		抽象概念	性质与评价
+senior	adj.	CORE	s1,s2	138	年长的、资格老的		人类与社会	
+examine	vt.	CORE	s1	137	检查		动作行为	评价与判断
+innovation	n.	CORE	s1,s2	137	革新、新方法		科学技术	
+instruction	n.	CORE	s1,s2	137	指令、教导		教育学习	
+overall	adj./adv.	CORE	s1,s2	137	全面的、总体上		抽象概念	性质与评价
+pick	vt.	CORE	s1	137	挑		动作行为	评价与判断
+strike	vt.	CORE	s1	137	击打		动作行为	身体动作
+succeed	vi./vt.	CORE	s1,s2	137	成功、接替		动作行为	占有与转移
+cancer	n.	CORE	s1	136	癌症		健康医疗	
+divide	vt.	CORE	s1	136	划分		动作行为	变化趋势
+floor	n.	CORE	s1	136	地面		日常生活	
+former	adj./pron.	CORE	s1,s2	136	以前的、前者		抽象概念	性质与评价
+front	adj.	CORE	s1	136	前面的		空间地点	
+harm	n.	CORE	s1	136	伤害		动作行为	使动与影响
+instance	n.	CORE	s1	136	例子		抽象概念	认知与抽象名词
+judge	vt.	CORE	s1	136	判断		职业工作	
+partner	n.	CORE	s1	136	伙伴		人类与社会	
+release	vt.	CORE	s1	136	释放、解除		动作行为	其他动作
+rely	vi.	CORE	s1	136	依靠		动作行为	其他动作
+clock	n.	CORE	s1,s2	135	时钟、计时		时间日期	
+hunt	v.	CORE	s1	135	打猎		动作行为	身体动作
+imply	vt.	CORE	s1	135	暗示		动作行为	其他动作
+radio	n.	CORE	s1	135	收音机		科学技术	
+remove	vt.	CORE	s1	135	移除		动作行为	身体动作
+tradition	n.	CORE	s1	135	传统		文化宗教	
+vocabulary	n.	CORE	s1	135	词汇		教育学习	
+assume	vt.	CORE	s1	134	假设、揣测		动作行为	身体动作
+campaign	n.	CORE	s1,s2	134	运动、战役		政治法律	
+collect	vt.	CORE	s1	134	收集		动作行为	身体动作
+interesting	adj.	CORE	s1	134	有趣的		情感心理	
+invite	vt.	CORE	s1	134	邀请		动作行为	社交交互
+native	adj.	CORE	s1,s2	134	本地的、天生的		人类与社会	
+shortage	n.	CORE	s1	134	不足		抽象概念	认知与抽象名词
+central	adj.	CORE	s1	133	中心的		空间地点	
+corporate	adj.	CORE	s1,s2	133	公司的、法人的		商业经济	
+dangerous	adj.	CORE	s1	133	危险的		健康医疗	
+efficiency	n.	CORE	s1	133	效率		抽象概念	认知与抽象名词
+gender	n.	CORE	s1	133	性别		人类与社会	
+powerful	adj.	CORE	s1	133	强有力的		抽象概念	性质与评价
+reform	n.	CORE	s1	133	改革		动作行为	变化趋势
+urban	adj.	CORE	s1	133	城市的		空间地点	
+color	n.	CORE	s1	132	颜色	colour	交通旅行	
+connect	vt.	CORE	s1	132	连接		动作行为	身体动作
+connection	n.	CORE	s1	132	联系	connexion	抽象概念	认知与抽象名词
+debt	n.	CORE	s1	132	债务		商业经济	
+diet	n.	CORE	s1	132	饮食		食物营养	
+door	n.	CORE	s1	132	门		日常生活	
+emerge	vi.	CORE	s1	132	出现		动作行为	身体动作
+enhance	vt.	CORE	s1	132	提高		动作行为	身体动作
+forward	adj.	CORE	s1	132	前进的		空间地点	
+handle	vt.	CORE	s1	132	处理		动作行为	身体动作
+round	adj.	CORE	s1	132	圆的		抽象概念	性质与评价
+sort	n./v.	CORE	s1,s2	132	种类、排序		动作行为	身体动作
+afford	vt.	CORE	s1	131	承担得起		动作行为	占有与转移
+apple	n.	CORE	s1	131	苹果		食物营养	
+chemical	adj.	CORE	s1	131	化学的		科学技术	
+eventually	adv.	CORE	s1	131	最终		时间日期	
+hot	adj.	CORE	s1	131	热的		抽象概念	性质与评价
+manufacture	vt.	CORE	s1,s2	131	制造、捏造		商业经济	
+north	n./adj.	CORE	s1,s2	131	北、北方的		空间地点	
+ocean	n.	CORE	s1	131	海洋		自然环境	
+personality	n.	CORE	s1	131	人格		情感心理	
+sugar	n.	CORE	s1	131	糖		食物营养	
+advocate	vt.	CORE	s1	130	主张、倡议		动作行为	身体动作
+contrast	vi.	CORE	s1	130	形成对比		抽象概念	认知与抽象名词
+employment	n.	CORE	s1,s2	130	雇用、工作		职业工作	
+ideal	adj.	CORE	s1,s2	130	理想的、空想的		抽象概念	性质与评价
+inside	adv.	CORE	s1	130	在里面		空间地点	
+mass	n.	CORE	s1	130	大量		抽象概念	数量与程度
+noise	n.	CORE	s1	130	噪音	noize	自然环境	
+vehicle	n.	CORE	s1	130	交通工具		交通旅行	
+west	n./adv.	CORE	s1,s2	130	西、向西		空间地点	
+artist	n.	CORE	s1	129	艺术家		职业工作	
+double	adj./vt.	CORE	s1,s2	129	双的、使加倍		抽象概念	数量与程度
+gift	n.	CORE	s1	129	礼物		商业经济	
+novel	adj./n.	CORE	s1,s2	129	新颖的、长篇小说		文化宗教	
+page	n.	CORE	s1	129	页码		教育学习	
+park	n./v.	CORE	s1,s2	129	停车、公园		自然环境	
+respond	vi.	CORE	s1	129	回答、响应		动作行为	社交交互
+seven	num.	CORE	s1	129	七		抽象概念	数量与程度
+advanced	adj.	CORE	s1	128	高级的		抽象概念	性质与评价
+analysis	n.	CORE	s1	128	分析		抽象概念	认知与抽象名词
+cent	n.	CORE	s1	128	分(货币单位)		商业经济	
+citizen	n.	CORE	s1	128	公民		人类与社会	
+code	n.	CORE	s1,s2	128	代码、法典		科学技术	
+display	vt.	CORE	s1	128	陈列、显示		动作行为	评价与判断
+largely	adv.	CORE	s1	128	大量地		抽象概念	数量与程度
+outline	n.	CORE	s1,s2	128	轮廓、提纲		动作行为	身体动作
+son	n.	CORE	s1,s2	128	儿子、孩子		人类与社会	
+strength	n.	CORE	s1	128	力量		抽象概念	认知与抽象名词
+budget	n./v.	CORE	s1,s2	127	预算、做预算		商业经济	
+smart	adj.	CORE	s1	127	聪明的		情感心理	
+sun	n.	CORE	s1	127	太阳		自然环境	
+agriculture	n.	CORE	s1	126	农业		科学技术	
+brand	n.	CORE	s1	126	品牌		商业经济	
+crop	n.	CORE	s1,s2	126	作物、收成		自然环境	
+estimate	vt.	CORE	s1	126	估计		动作行为	评价与判断
+explore	vt.	CORE	s1	126	探索		动作行为	评价与判断
+launch	vt.	CORE	s1,s2	126	发射、使船下水		动作行为	使动与影响
+manner	n.	CORE	s1,s2	126	礼貌、礼仪、方式		情感心理	
+scan	vt.	CORE	s1	126	扫描		动作行为	身体动作
+count	v.	CORE	s1	125	数数		动作行为	身体动作
+distance	n.	CORE	s1	125	距离		空间地点	
+expose	vt.	CORE	s1	125	暴露		动作行为	使动与影响
+hit	vt.	CORE	s1	125	打		动作行为	身体动作
+nurse	n./vt.	CORE	s1,s2	125	护士、护理		职业工作	
+regulation	n.	CORE	s1	125	规定		抽象概念	认知与抽象名词
+ticket	n.	CORE	s1	125	票		商业经济	
+truth	n.	CORE	s1	125	真相		抽象概念	认知与抽象名词
+ban	vt.	CORE	s1	124	禁止		政治法律	
+bit	n.	CORE	s1	124	一点		抽象概念	数量与程度
+combine	vt.	CORE	s1	124	结合		动作行为	变化趋势
+impossible	adj.	CORE	s1	124	不可能的		抽象概念	性质与评价
+nuclear	adj.	CORE	s1	124	原子的		科学技术	
+basis	n.	CORE	s1	123	基础		抽象概念	认知与抽象名词
+boost	vt.	CORE	s1,s2	123	往上推、增加		动作行为	身体动作
+dog	n.	CORE	s1	123	狗		自然环境	
+rain	n.	CORE	s1	123	雨		自然环境	
+reserve	vt.	CORE	s1	123	预留		动作行为	其他动作
+attractive	adj.	CORE	s1	122	吸引人的、动人的		情感心理	
+communicate	vt./vi.	CORE	s1,s2	122	传达、交流		动作行为	身体动作
+disaster	n.	CORE	s1	122	灾难		自然环境	
+discipline	n.	CORE	s1	122	纪律		教育学习	
+previous	adj.	CORE	s1	122	先前的		时间日期	
+primary	adj.	CORE	s1	122	初级的、最初的		抽象概念	性质与评价
+prize	n.	CORE	s1	122	奖	prise	商业经济	
+productivity	n.	CORE	s1	122	生产力		商业经济	
+revolution	n.	CORE	s1,s2	122	革命、旋转		政治法律	
+seat	n.	CORE	s1	122	座位		日常生活	
+candidate	n.	CORE	s1	121	候选人		职业工作	
+eight	num.	CORE	s1	121	八		时间日期	
+fly	vi.	CORE	s1	121	飞		动作行为	其他动作
+heat	n.	CORE	s1	121	热		科学技术	
+identity	n.	CORE	s1	121	身份		人类与社会	
+quick	adj.	CORE	s1	121	迅速的		抽象概念	性质与评价
+repair	vt.	CORE	s1,s2	121	修理、补救		动作行为	评价与判断
+stock	n.	CORE	s1,s2	121	股票、库存		商业经济	
+tear	n./vt.	CORE	s1,s2	121	眼泪、撕碎		动作行为	身体动作
+conference	n.	CORE	s1	120	会议		政治法律	
+original	adj.	CORE	s1	120	最初的		抽象概念	性质与评价
+press	n.	CORE	s1	120	报刊、新闻界		动作行为	身体动作
+web	n.	CORE	s1	120	网		自然环境	
+clothe	vt.	CORE	s1	119	给穿衣		动作行为	身体动作
+expectation	n.	CORE	s1	119	预期		情感心理	
+facility	n.	CORE	s1	119	灵巧、天资		科学技术	
+generate	vt.	CORE	s1	119	产生、引起		动作行为	其他动作
+recession	n.	CORE	s1,s2	119	经济衰退、退后		商业经济	
+signal	n.	CORE	s1	119	信号		动作行为	社交交互
+spot	vt./n.	CORE	s1,s2	119	发现、污点		空间地点	
+burn	v.	CORE	s1	118	燃烧		动作行为	其他动作
+bus	n.	CORE	s1	118	公车		交通旅行	
+decrease	v.	CORE	s1	118	减少		动作行为	变化趋势
+fat	n.	CORE	s1	118	脂肪		食物营养	
+gold	n.	CORE	s1	118	金子		商业经济	
+refuse	vt.	CORE	s1	118	拒绝		动作行为	评价与判断
+sample	n.	CORE	s1	118	样品		教育学习	
+table	n.	CORE	s1,s2	118	桌子、表格		日常生活	
+ahead	adv.	CORE	s1	117	在…前面		空间地点	
+airport	n.	CORE	s1	117	机场		交通旅行	
+domestic	adj.	CORE	s1	117	家庭的		日常生活	
+guest	n.	CORE	s1	117	客人		人类与社会	
+obesity	n.	CORE	s1	117	肥胖		健康医疗	
+obtain	vt.	CORE	s1	117	获得		动作行为	占有与转移
+criminal	n.	CORE	s1,s2	116	犯罪活动、罪犯		政治法律	
+fair	adj.	CORE	s1	116	公平的		抽象概念	性质与评价
+familiar	adj.	CORE	s1	116	熟悉的		情感心理	
+formal	adj.	CORE	s1,s2	116	正式的、形式的		抽象概念	性质与评价
+historical	adj.	CORE	s1	116	历史的		时间日期	
+marry	v.	CORE	s1	116	结婚		动作行为	其他动作
+threaten	vt.	CORE	s1	116	威胁		动作行为	社交交互
+friendly	adj.	CORE	s1	115	友好的		情感心理	
+perfect	adj.	CORE	s1	115	完美的		抽象概念	性质与评价
+planet	n.	CORE	s1	115	行星		自然环境	
+strange	adj.	CORE	s1	115	奇怪的		抽象概念	性质与评价
+useful	adj.	CORE	s1	115	有用的		抽象概念	性质与评价
+competitive	adj.	CORE	s1	114	竞争的		情感心理	
+deliver	vt.	CORE	s1	114	传递、传输		动作行为	其他动作
+equipment	n.	CORE	s1	114	设备		科学技术	
+genetic	adj.	CORE	s1	114	基因的		科学技术	
+series	n.	CORE	s1	114	系列		抽象概念	认知与抽象名词
+vast	adj.	CORE	s1	114	巨大的、大量的		抽象概念	数量与程度
+visitor	n.	CORE	s1	114	访问者		交通旅行	
+altogether	adv.	CORE	s1,s2	113	总共、完全地		抽象概念	数量与程度
+blood	n.	CORE	s1	113	血		人类与社会	
+calorie	n.	CORE	s1	113	卡路里		食物营养	
+illness	n.	CORE	s1	113	疾病		健康医疗	
+inform	vt.	CORE	s1	113	通知、告诉		动作行为	社交交互
+revenue	n.	CORE	s1	113	财政收入		商业经济	
+sector	n.	CORE	s1,s2	113	部分、扇区		抽象概念	认知与抽象名词
+thank	vt.	CORE	s1	113	感谢		动作行为	社交交互
+twice	adv.	CORE	s1	113	两次		时间日期	
+welfare	n.	CORE	s1	113	福利		商业经济	
+cite	vt.	CORE	s1	112	引用		动作行为	身体动作
+guide	vt.	CORE	s1	112	指引、指导		动作行为	社交交互
+household	n.	CORE	s1	112	户、家庭的		人类与社会	
+intelligent	adj.	CORE	s1	112	聪明的		情感心理	
+pupil	n.	CORE	s1,s2	112	学生、瞳孔		教育学习	
+criticism	n.	CORE	s1	111	批评		情感心理	
+exchange	vt.	CORE	s1	111	交换		商业经济	
+insurance	n.	CORE	s1	111	保险		商业经济	
+ship	n./vt.	CORE	s1,s2	111	船舶、装运		交通旅行	
+admit	vt.	CORE	s1	110	承认		动作行为	其他动作
+commit	vt.	CORE	s1,s2	110	把…交托给、犯（罪）		动作行为	身体动作
+complain	vi.	CORE	s1	110	抱怨		动作行为	身体动作
+context	n.	CORE	s1,s2	110	上下文、环境		抽象概念	认知与抽象名词
+contribution	n.	CORE	s1	110	贡献		文化宗教	
+differ	vi.	CORE	s1	110	与……不同		动作行为	其他动作
+fine	adj.	CORE	s1	110	很好		抽象概念	性质与评价
+label	n./vt.	CORE	s1,s2	110	标签、加标签于		日常生活	
+objective	adj./n.	CORE	s1,s2	110	客观的、目的		抽象概念	认知与抽象名词
+brother	n.	CORE	s1	109	兄弟		人类与社会	
+church	n.	CORE	s1	109	教堂		文化宗教	
+rent	vt.	CORE	s1	109	租		商业经济	
+soil	n.	CORE	s1,s2	109	泥土、国土		自然环境	
+video	n.	CORE	s1	109	录像		科学技术	
+yield	vt./vi./n.	CORE	s1,s2,s3	109	放弃、屈服、收益		动作行为	其他动作
+active	adj.	CORE	s1	108	活跃的、积极的		抽象概念	性质与评价
+capital	n.	CORE	s1,s2	108	首都、大写字母		商业经济	
+circumstance	n.	CORE	s1	108	情况		抽象概念	认知与抽象名词
+illustrate	vt.	CORE	s1,s2	108	说明、加插图		动作行为	身体动作
+pretty	adj.	CORE	s1	108	漂亮的		情感心理	
+schedule	n.	CORE	s1	108	日程		时间日期	
+target	n.	CORE	s1	108	目标		动作行为	其他动作
+window	n.	CORE	s1	108	窗户		日常生活	
+alter	vt.	CORE	s1	107	改变		动作行为	变化趋势
+gather	v.	CORE	s1,s2	107	聚集、搜集		动作行为	变化趋势
+sensitive	adj.	CORE	s1,s2	107	敏感的、易受伤害的		情感心理	
+appearance	n.	CORE	s1,s2	106	出现、外表		抽象概念	认知与抽象名词
+artificial	adj.	CORE	s1	106	人造的		科学技术	
+busy	adj.	CORE	s1	106	忙碌的		抽象概念	性质与评价
+critic	n.	CORE	s1	106	批评者		职业工作	
+eliminate	vt.	CORE	s1	106	排除、淘汰		动作行为	使动与影响
+engineer	n.	CORE	s1	106	工程师		职业工作	
+engineering	n.	CORE	s1	106	工程学		科学技术	
+property	n.	CORE	s1,s2	106	财产、性质、特性		商业经济	
+rank	n./vt.	CORE	s1,s2	106	排列、等级		抽象概念	认知与抽象名词
+requirement	n.	CORE	s1	106	要求		抽象概念	认知与抽象名词
+teenager	n.	CORE	s1	106	青少年		人类与社会	
+touch	vt.	CORE	s1,s2	106	触摸、感动		动作行为	身体动作
+circle	n.	CORE	s1	105	圆		空间地点	
+complaint	n.	CORE	s1,s2	105	抱怨、疾病		动作行为	身体动作
+cure	vt.	CORE	s1	105	治愈		健康医疗	
+secretary	n.	CORE	s1	105	秘书		职业工作	
+switch	n./v.	CORE	s1,s2	105	开关、改变		动作行为	变化趋势
+welcome	vt.	CORE	s1	105	欢迎		动作行为	社交交互
+cope	vi.	CORE	s1	104	处理、应对		动作行为	社交交互
+crowd	vt.	CORE	s1	104	聚集、挤满		人类与社会	
+fresh	adj.	CORE	s1	104	新鲜的		抽象概念	性质与评价
+interpret	vt.	CORE	s1,s2	104	口译、解释		动作行为	社交交互
+lawyer	n.	CORE	s1	104	律师		职业工作	
+military	adj.	CORE	s1	104	军事的、军队		政治法律	
+nowadays	adv.	CORE	s1	104	现今		时间日期	
+priority	n.	CORE	s1	104	优先		抽象概念	认知与抽象名词
+propose	vt.	CORE	s1,s2	104	提议、提名		动作行为	身体动作
+pull	vt.	CORE	s1	104	拉		动作行为	身体动作
+relative	n./adj.	CORE	s1,s2	104	亲戚、比较的		人类与社会	
+sex	n.	CORE	s1	104	性		人类与社会	
+abroad	adv.	CORE	s1,s2	103	到国外、广为流传		交通旅行	
+afternoon	n.	CORE	s1	103	下午		时间日期	
+anxiety	n.	CORE	s1	103	焦虑		情感心理	
+birth	n.	CORE	s1	103	出生		人类与社会	
+feed	vt.	CORE	s1	103	喂食		动作行为	身体动作
+fiction	n.	CORE	s1,s2	103	虚构、小说		文化宗教	
+fish	n.	CORE	s1	103	鱼		自然环境	
+payment	n.	CORE	s1	103	支付		商业经济	
+plane	n.	CORE	s1	103	飞机		交通旅行	
+prospect	n.	CORE	s1,s2	103	景色、前景		抽象概念	认知与抽象名词
+psychology	n.	CORE	s1	103	心理学		情感心理	
+routine	n.	CORE	s1	103	常规、惯例		抽象概念	性质与评价
+shoe	n.	CORE	s1	103	鞋子		交通旅行	
+talent	n.	CORE	s1,s2	103	才华、人才		情感心理	
+technical	adj.	CORE	s1	103	技术的		科学技术	
+consist	vi.	CORE	s1,s2	102	组成、在于		动作行为	其他动作
+explanation	n.	CORE	s1	102	解释		抽象概念	认知与抽象名词
+flow	vi.	CORE	s1	102	流动		动作行为	身体动作
+humanity	n.	CORE	s1,s2	102	人文、人性		人类与社会	
+hurt	vt.	CORE	s1	102	伤害		动作行为	使动与影响
+master	n./vt.	CORE	s1,s2,s3	102	主人、精通、掌握		职业工作	
+preserve	vt.	CORE	s1	102	保护、保存		动作行为	社交交互
+technique	n.	CORE	s1	102	技术		科学技术	
+wake	vi.	CORE	s1	102	醒来		动作行为	身体动作
+block	n./vt.	CORE	s1,s2,s3	101	块、阻止、街区		空间地点	
+blue	adj.	CORE	s1	101	蓝色的		交通旅行	
+broad	adj.	CORE	s1	101	宽的		抽象概念	数量与程度
+convince	vt.	CORE	s1	101	使人信服		动作行为	心理活动
+delay	vt.	CORE	s1	101	推迟		动作行为	起始与终止
+destroy	vt.	CORE	s1	101	摧毁		动作行为	使动与影响
+exhibit	vt.	CORE	s1	101	展览		动作行为	身体动作
+meat	n.	CORE	s1	101	肉类		食物营养	
+mostly	adv.	CORE	s1	101	大部分		抽象概念	数量与程度
+smile	vi.	CORE	s1	101	笑		动作行为	身体动作
+sufficient	adj.	CORE	s1	101	足够的		抽象概念	性质与评价
+vision	n.	CORE	s1,s2	101	视力、想象		情感心理	
+wage	n./vt.	CORE	s1,s2	101	工资、发动		商业经济	
+wealthy	adj.	CORE	s1	101	富裕的		商业经济	
+actual	adj.	CORE	s1	100	实在的		抽象概念	性质与评价
+blame	vt.	CORE	s1	100	责备		动作行为	其他动作
+grammar	n.	CORE	s1	100	语法		教育学习	
+invest	vt.	CORE	s1	100	投资		商业经济	
+peace	n.	CORE	s1	100	和平		政治法律	
+proper	adj.	CORE	s1	100	正确的、适当的		抽象概念	性质与评价
+star	n.	CORE	s1	100	星、恒星		自然环境	
+tough	adj.	CORE	s1	100	艰难的		情感心理	
+club	n.	CORE	s1	99	俱乐部		运动娱乐	
+efficient	adj.	CORE	s1,s2	99	有效的、能胜任的		抽象概念	性质与评价
+emphasis	n.	CORE	s1	99	强调		抽象概念	认知与抽象名词
+escape	vi.	CORE	s1	99	逃跑		动作行为	身体动作
+import	n.	CORE	s1,s2	99	进口、进口商品		商业经济	
+red	adj.	CORE	s1	99	红色的		交通旅行	
+survival	n.	CORE	s1	99	幸存		健康医疗	
+advise	vt.	CORE	s1	98	劝告、建议	advize	动作行为	社交交互
+agent	n.	CORE	s1	98	代理		职业工作	
+copy	vt.	CORE	s1	98	复制		动作行为	其他动作
+discovery	n.	CORE	s1	98	发现		抽象概念	认知与抽象名词
+dominate	vt./vi.	CORE	s1,s2	98	支配、占优势		动作行为	社交交互
+element	n.	CORE	s1,s2	98	元素、要素		科学技术	
+impose	vt.	CORE	s1	98	把……强加于		动作行为	其他动作
+invention	n.	CORE	s1	98	发明		科学技术	
+loan	n./vt.	CORE	s1,s2	98	贷款、借出		商业经济	
+narrow	adj.	CORE	s1	98	狭窄的		抽象概念	性质与评价
+pace	n.	CORE	s1,s2	98	速度、行进		动作行为	其他动作
+participate	vi.	CORE	s1,s2	98	参与、分享		动作行为	占有与转移
+transfer	vt.	CORE	s1	98	转移、传输		动作行为	使动与影响
+vary	v.	CORE	s1	98	改变		动作行为	使动与影响
+vote	n.	CORE	s1,s2	98	投票、选票		动作行为	身体动作
+yes	adv.	CORE	s1	98	是		情感心理	
+addition	n.	CORE	s1	97	加		抽象概念	认知与抽象名词
+alcohol	n.	CORE	s1	97	酒精		食物营养	
+breakfast	n.	CORE	s1	97	早饭		食物营养	
+contract	n./v.	CORE	s1,s2	97	合同、缩小		商业经济	
+demonstrate	vt.	CORE	s1	97	论证、说明		动作行为	社交交互
+description	n.	CORE	s1	97	描述		抽象概念	认知与抽象名词
+district	n.	CORE	s1	97	地区		空间地点	
+dry	adj.	CORE	s1	97	干燥的		抽象概念	性质与评价
+evening	n.	CORE	s1	97	傍晚		时间日期	
+fundamental	adj.	CORE	s1	97	基础的、根本的		抽象概念	性质与评价
+origin	n.	CORE	s1	97	起源		抽象概念	认知与抽象名词
+recommend	vt.	CORE	s1	97	推荐		动作行为	身体动作
+valuable	adj.	CORE	s1,s2	97	有价值的、贵重的		抽象概念	性质与评价
+afraid	adj.	CORE	s1	96	害怕的		情感心理	
+capable	adj.	CORE	s1	96	有能力的		抽象概念	性质与评价
+cash	n.	CORE	s1	96	现金		商业经济	
+gene	n.	CORE	s1	96	基因		科学技术	
+ordinary	adj.	CORE	s1	96	普通的		抽象概念	性质与评价
+persuade	vt.	CORE	s1	96	说服		动作行为	心理活动
+quarter	n.	CORE	s1,s2	96	四分之一、季度		时间日期	
+secret	n.	CORE	s1	96	秘密		情感心理	
+software	n.	CORE	s1	96	软件		科学技术	
+steal	vt.	CORE	s1	96	偷		动作行为	其他动作
+strengthen	vt.	CORE	s1	96	加强		动作行为	变化趋势
+suggestion	n.	CORE	s1	96	建议		情感心理	
+thought	n.	CORE	s1	96	思想、想法		情感心理	
+wave	v.	CORE	s1	96	招手		自然环境	
+apart	adv.	CORE	s1	95	相隔、分开		空间地点	
+athlete	n.	CORE	s1	95	运动员		运动娱乐	
+corporation	n.	CORE	s1,s2	95	公司、法人		商业经济	
+entry	n.	CORE	s1	95	进入		空间地点	
+evolution	n.	CORE	s1	95	进化		科学技术	
+homework	n.	CORE	s1	95	作业		教育学习	
+outcome	n.	CORE	s1	95	结果		抽象概念	认知与抽象名词
+pleasure	n.	CORE	s1,s2	95	愉快、乐事		情感心理	
+sight	n.	CORE	s1,s2	95	视野、景象		抽象概念	认知与抽象名词
+surface	n.	CORE	s1	95	表面		自然环境	
+burden	n.	CORE	s1	94	负担		动作行为	占有与转移
+cycle	vi./n.	CORE	s1,s2	94	骑自行车、周期		时间日期	
+electricity	n.	CORE	s1,s2	94	电、电学		科学技术	
+email	n.	CORE	s1	94	电子邮件		科学技术	
+final	adj.	CORE	s1	94	最终的		抽象概念	性质与评价
+justice	n.	CORE	s1,s2	94	公平、审判		政治法律	
+king	n.	CORE	s1	94	君主		人类与社会	
+mountain	n.	CORE	s1	94	山		自然环境	
+notice	vt./n.	CORE	s1,s2	94	注意、通知		动作行为	心理活动
+privacy	n.	CORE	s1	94	隐私		情感心理	
+rarely	adv.	CORE	s1	94	罕见地、几乎不		抽象概念	数量与程度
+salary	n.	CORE	s1	94	薪水		商业经济	
+satellite	n.	CORE	s1	94	卫星		科学技术	
+annual	adj.	CORE	s1,s2	93	每年的、全年的		时间日期	
+comfort	n.	CORE	s1,s2	93	舒适、安慰		情感心理	
+earthquake	n.	CORE	s1	93	地震		自然环境	
+ease	vt.	CORE	s1	93	减轻		动作行为	使动与影响
+engine	n.	CORE	s1	93	引擎		科学技术	
+foundation	n.	CORE	s1,s2	93	基础、地基		抽象概念	认知与抽象名词
+garden	n.	CORE	s1,s2	93	花园、园艺		自然环境	
+guarantee	vt.	CORE	s1	93	保障		动作行为	其他动作
+lunch	n.	CORE	s1	93	午饭		食物营养	
+religious	adj.	CORE	s1,s2	93	宗教的、虔诚的		文化宗教	
+request	vt.	CORE	s1	93	请求		动作行为	占有与转移
+symbol	n.	CORE	s1	93	符号、象征		文化宗教	
+telephone	n./vt.	CORE	s1,s2	93	电话、打电话		科学技术	
+arise	vi.	CORE	s1,s2	92	形成、上升	arize	动作行为	使动与影响
+childhood	n.	CORE	s1	92	幼年		时间日期	
+climb	v.	CORE	s1	92	攀爬		动作行为	身体动作
+curiosity	n.	CORE	s1	92	好奇心		情感心理	
+existence	n.	CORE	s1	92	存在		抽象概念	认知与抽象名词
+partly	adv.	CORE	s1	92	部分地		抽象概念	数量与程度
+rapid	adj.	CORE	s1	92	快的		抽象概念	性质与评价
+tie	vt.	CORE	s1	92	系		动作行为	身体动作
+willing	adj.	CORE	s1	92	情愿的		情感心理	
+abandon	vt.	CORE	s1	91	抛弃		动作行为	身体动作
+custom	n.	CORE	s1,s2	91	习惯、惠顾		文化宗教	
+fee	n.	CORE	s1	91	费用		商业经济	
+island	n.	CORE	s1	91	岛		自然环境	
+net	n./adj.	CORE	s1,s2	91	网、净的		日常生活	
+none	pron.	CORE	s1	91	没有		抽象概念	数量与程度
+pound	n.	CORE	s1,s2	91	英镑、磅		商业经济	
+stem	n.	CORE	s1,s2	91	茎、词干		自然环境	
+widespread	adj.	CORE	s1	91	遍布的		抽象概念	性质与评价
+careful	adj.	CORE	s1	90	小心的、细致的		情感心理	
+collection	n.	CORE	s1	90	收藏		文化宗教	
+distinguish	vt.	CORE	s1,s2	90	区别、使有特色		动作行为	使动与影响
+favor	vt.	CORE	s1	90	喜欢、赞同	favour	情感心理	
+friendship	n.	CORE	s1	90	友谊		人类与社会	
+independent	adj.	CORE	s1,s2	90	独立的、私营的		抽象概念	性质与评价
+notion	n.	CORE	s1,s2,s3	90	概念、见解、打算		抽象概念	认知与抽象名词
+perspective	n.	CORE	s1,s2	90	观点、判断力		抽象概念	认知与抽象名词
+presence	n.	CORE	s1,s2	90	出席、存在		人类与社会	
+secure	vt.	CORE	s1,s2	90	使安全、争取到		动作行为	占有与转移
+suitable	adj.	CORE	s1	90	合适的		抽象概念	性质与评价
+throw	vt.	CORE	s1	90	扔		动作行为	身体动作
+toy	n.	CORE	s1	90	玩具		运动娱乐	
+transport	vt.	CORE	s1	90	运输		交通旅行	
+ambition	n.	CORE	s1	89	雄心、志向		情感心理	
+behave	vi.	CORE	s1	89	表现		动作行为	身体动作
+dark	adj.	CORE	s1,s2	89	黑暗的、深色的		交通旅行	
+definition	n.	CORE	s1,s2	89	定义、清晰度		抽象概念	认知与抽象名词
+disappear	vi.	CORE	s1	89	消失		动作行为	变化趋势
+giant	n./adj.	CORE	s1,s2	89	巨人、巨大的		人类与社会	
+height	n.	CORE	s1,s2	89	高度、身高		抽象概念	数量与程度
+inspire	vt.	CORE	s1	89	激发		动作行为	使动与影响
+kitchen	n.	CORE	s1	89	厨房		日常生活	
+leadership	n.	CORE	s1	89	领导		职业工作	
+monitor	n.	CORE	s1	89	监视器		动作行为	身体动作
+quit	v.	CORE	s1	89	退出		动作行为	社交交互
+reject	vt.	CORE	s1	89	拒绝		动作行为	身体动作
+suit	vt.	CORE	s1	89	适合		交通旅行	
+typical	adj.	CORE	s1	89	典型的		抽象概念	性质与评价
+violence	n.	CORE	s1,s2	89	暴力、狂热		政治法律	
+youth	n.	CORE	s1,s2	89	青春、年轻人		人类与社会	
+actor	n.	CORE	s1	88	男演员		职业工作	
+complicated	adj.	CORE	s1	88	错综复杂的		抽象概念	性质与评价
+egg	n.	CORE	s1	88	蛋、卵		食物营养	
+extent	n.	CORE	s1,s2	88	程度、范围		抽象概念	数量与程度
+jump	v.	CORE	s1	88	跳		动作行为	身体动作
+phenomenon	n.	CORE	s1	88	现象		抽象概念	认知与抽象名词
+physician	n.	CORE	s1	88	医师		职业工作	
+proportion	n.	CORE	s1,s2	88	部分、比例		抽象概念	认知与抽象名词
+pursue	vt.	CORE	s1	88	追求		动作行为	起始与终止
+assistant	n.	CORE	s1	87	助手		职业工作	
+bracket	n.	CORE	s1	87	括号		日常生活	
+coffee	n.	CORE	s1	87	咖啡		食物营养	
+crash	v.	CORE	s1	87	碰撞		动作行为	身体动作
+duty	n.	CORE	s1	87	责任		政治法律	
+overseas	adj./adv.	CORE	s1,s2	87	外国的、在海外		空间地点	
+recall	vt.	CORE	s1,s2	87	回忆、召回		动作行为	心理活动
+river	n.	CORE	s1	87	河流		自然环境	
+solar	adj.	CORE	s1	87	太阳能的、太阳的		自然环境	
+weekend	n.	CORE	s1	87	周末		时间日期	
+winter	n.	CORE	s1	87	冬季		时间日期	
+administration	n.	CORE	s1,s2	86	管理、政府		政治法律	
+concentrate	v.	CORE	s1	86	集中		动作行为	身体动作
+conservation	n.	CORE	s1	86	保护、保存		自然环境	
+enormous	adj.	CORE	s1	86	巨大的		抽象概念	数量与程度
+excessive	adj.	CORE	s1	86	过多的		抽象概念	性质与评价
+impression	n.	CORE	s1	86	印象		抽象概念	认知与抽象名词
+path	n.	CORE	s1	86	小道		空间地点	
+productive	adj.	CORE	s1	86	盛产的、富有成效的		抽象概念	性质与评价
+urge	vt.	CORE	s1	86	催促、敦促		动作行为	身体动作
+worldwide	adj.	CORE	s1	86	全世界的		抽象概念	性质与评价
+bed	n.	CORE	s1	85	床		日常生活	
+daughter	n.	CORE	s1	85	女儿		人类与社会	
+immediate	adj.	CORE	s1	85	立即的		时间日期	
+liberal	adj.	CORE	s1,s2	85	不严格的、自由的		情感心理	
+retire	vi.	CORE	s1	85	退休		动作行为	起始与终止
+client	n.	CORE	s1,s2	84	顾客、委托人		商业经济	
+clone	n.	CORE	s1	84	克隆		科学技术	
+cognitive	adj.	CORE	s1	84	认知的		科学技术	
+commission	n.	CORE	s1,s2	84	委员会、委托		商业经济	
+editor	n.	CORE	s1	84	编辑		职业工作	
+fun	n.	CORE	s1	84	快乐		运动娱乐	
+insist	vi.	CORE	s1	84	坚持		动作行为	占有与转移
+institute	n./vt.	CORE	s1,s2	84	机构、建立		教育学习	
+nine	num.	CORE	s1	84	九		时间日期	
+quiet	adj.	CORE	s1	84	安静的		情感心理	
+rare	adj.	CORE	s1,s2	84	稀少的、稀薄的		抽象概念	性质与评价
+saving	n.	CORE	s1,s2	84	节省、储蓄金		商业经济	
+scholar	n.	CORE	s1	84	学者		教育学习	
+settle	vt./vi.	CORE	s1,s2	84	解决、定居		动作行为	其他动作
+substance	n.	CORE	s1	84	物质		抽象概念	认知与抽象名词
+unusual	adj.	CORE	s1	84	不平常的		抽象概念	性质与评价
+additional	adj.	CORE	s1	83	附加的		抽象概念	数量与程度
+indifferent	adj.	CORE	s1	83	漠不关心的		情感心理	
+mobile	adj.	CORE	s1	83	移动的		科学技术	
+mood	n.	CORE	s1	83	情绪、心情		情感心理	
+officer	n.	CORE	s1,s2	83	官员、军官		职业工作	
+plastic	n./adj.	CORE	s1,s2	83	塑料、可塑的		科学技术	
+smell	vt.	CORE	s1	83	闻		动作行为	身体动作
+symptom	n.	CORE	s1	83	症状		健康医疗	
+wisdom	n.	CORE	s1	83	智慧		情感心理	
+bright	adj.	CORE	s1	82	明亮的		情感心理	
+fault	n.	CORE	s1	82	错误		抽象概念	认知与抽象名词
+neglect	vt.	CORE	s1	82	忽视、疏忽		动作行为	其他动作
+recovery	n.	CORE	s1	82	恢复、重获		健康医疗	
+reputation	n.	CORE	s1	82	名誉		情感心理	
+transform	vt.	CORE	s1	82	改变		动作行为	身体动作
+assess	vt.	CORE	s1	81	评估		商业经济	
+atmosphere	n.	CORE	s1	81	气氛		自然环境	
+deny	vt.	CORE	s1	81	否定		动作行为	评价与判断
+extreme	n.	CORE	s1	81	极端		抽象概念	性质与评价
+inflation	n.	CORE	s1	81	通货膨胀		商业经济	
+introduction	n.	CORE	s1,s2	81	介绍、传入		教育学习	
+minority	n.	CORE	s1	81	少数		抽象概念	数量与程度
+religion	n.	CORE	s1,s2	81	宗教、信念		文化宗教	
+root	n.	CORE	s1,s2	81	根、根本		自然环境	
+seldom	adv.	CORE	s1	81	很少的		抽象概念	数量与程度
+severe	adj.	CORE	s1	81	严重的		情感心理	
+tip	n.	CORE	s1,s2,s3	81	末端、小费、提示		动作行为	身体动作
+alternative	adj.	CORE	s1	80	备选的		抽象概念	认知与抽象名词
+beautiful	adj.	CORE	s1	80	美好的		情感心理	
+cancel	vt.	CORE	s1	80	取消		动作行为	起始与终止
+chair	n.	CORE	s1,s2	80	主席、椅子		日常生活	
+cool	adj./vt.	CORE	s1,s2	80	酷、使冷静		抽象概念	性质与评价
+depth	n.	CORE	s1	80	深度		抽象概念	数量与程度
+deserve	vt.	CORE	s1	80	值得、应得		动作行为	其他动作
+organic	adj.	CORE	s1,s2	80	器官的、有机物的		科学技术	
+politician	n.	CORE	s1	80	政治家		政治法律	
+pose	v.	CORE	s1,s2,s3	80	摆姿势、造成、提出		动作行为	身体动作
+protein	n.	CORE	s1	80	蛋白质		食物营养	
+relevant	adj.	CORE	s1	80	相关的		抽象概念	性质与评价
+repeat	vt.	CORE	s1	80	重复		动作行为	社交交互
+vital	adj.	CORE	s1	80	重要的		抽象概念	性质与评价
+attribute	n.	CORE	s1	79	属性		动作行为	身体动作
+chain	n.	CORE	s1	79	链		日常生活	
+mere	adj.	CORE	s1	79	仅仅的		抽象概念	性质与评价
+opposite	adj./n.	CORE	s1,s2	79	相反的、对立面		抽象概念	性质与评价
+possess	vt.	CORE	s1	79	拥有、具有		动作行为	占有与转移
+profession	n.	CORE	s1	79	职业		职业工作	
+recognition	n.	CORE	s1,s2	79	认出、承认		抽象概念	认知与抽象名词
+remote	adj.	CORE	s1	79	遥远的		抽象概念	性质与评价
+specialist	n.	CORE	s1	79	专家		职业工作	
+tomorrow	n.	CORE	s1	79	明天、来日		时间日期	
+arrange	vt.	CORE	s1	78	安排		动作行为	使动与影响
+chapter	n.	CORE	s1	78	章节		教育学习	
+continent	n.	CORE	s1	78	洲、大陆		自然环境	
+dramatic	adj.	CORE	s1	78	戏剧性的		运动娱乐	
+everyday	adj.	CORE	s1	78	每日的		日常生活	
+faculty	n.	CORE	s1,s2	78	能力、院系		教育学习	
+percentage	n.	CORE	s1	78	百分比		商业经济	
+praise	vt.	CORE	s1	78	赞美、表扬	praize	动作行为	社交交互
+reduction	n.	CORE	s1	78	减少、降低		抽象概念	认知与抽象名词
+stimulate	vt.	CORE	s1	78	刺激、使兴奋		动作行为	使动与影响
+stone	n.	CORE	s1	78	石头		自然环境	
+version	n.	CORE	s1	78	版本		抽象概念	认知与抽象名词
+volunteer	n.	CORE	s1	78	志愿者		人类与社会	
+absorb	vt.	CORE	s1	77	吸收		动作行为	身体动作
+affair	n.	CORE	s1	77	事情、事务		人类与社会	
+assign	vt.	CORE	s1,s2	77	分配、指定		动作行为	占有与转移
+belong	vi.	CORE	s1	77	属于		动作行为	其他动作
+highway	n.	CORE	s1	77	公路		空间地点	
+joy	n.	CORE	s1	77	欢乐		情感心理	
+meanwhile	adv.	CORE	s1	77	与此同时		时间日期	
+merely	adv.	CORE	s1	77	仅仅		抽象概念	数量与程度
+mission	n.	CORE	s1	77	任务、使命		政治法律	
+perceive	vt.	CORE	s1,s2	77	察觉、理解		动作行为	心理活动
+undergraduate	n./adj.	CORE	s1,s2	77	本科的、本科生		教育学习	
+weak	adj.	CORE	s1	77	弱的		抽象概念	性质与评价
+acknowledge	vt.	CORE	s1	76	承认		动作行为	占有与转移
+adjust	vt.	CORE	s1	76	调整		动作行为	使动与影响
+airline	n.	CORE	s1	76	航线		交通旅行	
+announce	vt.	CORE	s1	76	宣布		动作行为	社交交互
+approve	vt.	CORE	s1	76	赞同		动作行为	社交交互
+assignment	n.	CORE	s1	76	任务		教育学习	
+borrow	vt.	CORE	s1	76	借		动作行为	心理活动
+confident	adj.	CORE	s1	76	自信的		情感心理	
+exposure	n.	CORE	s1	76	暴露、揭发		健康医疗	
+imagination	n.	CORE	s1	76	想象		情感心理	
+incentive	n.	CORE	s1,s2	76	刺激、动机		抽象概念	认知与抽象名词
+locate	vt.	CORE	s1,s2	76	指出、位于		动作行为	身体动作
+necessity	n.	CORE	s1,s2	76	必要、必然性		抽象概念	认知与抽象名词
+poetry	n.	CORE	s1	76	诗歌		文化宗教	
+preference	n.	CORE	s1	76	偏爱		情感心理	
+publication	n.	CORE	s1,s2	76	公布、出版		文化宗教	
+usual	adj.	CORE	s1	76	通常的		抽象概念	性质与评价
+victim	n.	CORE	s1	76	受害者		人类与社会	
+asset	n.	CORE	s1,s2	75	资产、天赋		商业经济	
+beauty	n.	CORE	s1,s2	75	美丽、美人		情感心理	
+considerable	adj.	CORE	s1	75	相当大的		抽象概念	数量与程度
+constant	adj.	CORE	s1,s2	75	坚定的、经常的		抽象概念	性质与评价
+council	n.	CORE	s1	75	理事会		政治法律	
+document	n.	CORE	s1	75	文档		教育学习	
+entire	adj.	CORE	s1	75	完全的		抽象概念	数量与程度
+leisure	n.	CORE	s1	75	空闲、悠闲		时间日期	
+massive	adj.	CORE	s1	75	巨大的、大规模的		抽象概念	数量与程度
+reliable	adj.	CORE	s1	75	可靠的		抽象概念	性质与评价
+reverse	adj.	CORE	s1,s2	75	相反的、倒退的		动作行为	身体动作
+skim	vt.	CORE	s1	75	掠过		动作行为	身体动作
+apartment	n.	CORE	s1,s2	74	房间、公寓		日常生活	
+appreciate	vt.	CORE	s1,s2	74	欣赏、感激		情感心理	
+entertainment	n.	CORE	s1,s2	74	招待、娱乐		运动娱乐	
+optimistic	adj.	CORE	s1	74	乐观的		情感心理	
+recover	vt.	CORE	s1	74	恢复		动作行为	变化趋势
+satisfaction	n.	CORE	s1,s2	74	满意、乐事		情感心理	
+sister	n.	CORE	s1	74	姐妹		人类与社会	
+skilled	adj.	CORE	s1	74	有技能的、熟练的		抽象概念	性质与评价
+somewhat	adv.	CORE	s1	74	稍微		抽象概念	数量与程度
+bottle	n.	CORE	s1	73	瓶子		日常生活	
+ceremony	n.	CORE	s1	73	仪式		文化宗教	
+coach	n.	CORE	s1	73	教练		职业工作	
+convey	vt.	CORE	s1,s2	73	传达、输送		动作行为	身体动作
+dead	adj.	CORE	s1,s2	73	死去的、麻木的		健康医疗	
+discourage	vt.	CORE	s1	73	使泄气	discorage	动作行为	使动与影响
+elsewhere	adv.	CORE	s1	73	在别处		空间地点	
+jam	n.	CORE	s1,s2	73	拥堵、果酱		食物营养	
+justify	vt.	CORE	s1	73	证明…正当		动作行为	评价与判断
+location	n.	CORE	s1	73	位置		空间地点	
+merit	n./vt.	CORE	s1,s2	73	优点、价值、值得		抽象概念	认知与抽象名词
+observation	n.	CORE	s1,s2	73	观察、言论		抽象概念	认知与抽象名词
+occasion	n.	CORE	s1,s2	73	机会、重大活动		时间日期	
+plate	n.	CORE	s1	73	盘子		日常生活	
+procedure	n.	CORE	s1	73	步骤		教育学习	
+stick	n./vt.	CORE	s1,s2,s3	73	棍、刺、粘贴		动作行为	身体动作
+strict	adj.	CORE	s1	73	严格的		情感心理	
+unlikely	adj.	CORE	s1	73	不太可能		抽象概念	性质与评价
+virtual	adj.	CORE	s1,s2	73	虚拟、实际上的		抽象概念	性质与评价
+aside	adv.	CORE	s1	72	在旁边		空间地点	
+bind	vt.	CORE	s1,s2,s3	72	结合、约束、捆绑		动作行为	使动与影响
+capture	vt./n.	CORE	s1,s2,s3,s4	72	捕获、战利品、拍摄、引起注意		动作行为	其他动作
+eager	adj.	CORE	s1	72	渴望的		情感心理	
+excerpt	n.	CORE	s1	72	摘录		教育学习	
+grain	n.	CORE	s1	72	谷物		食物营养	
+implication	n.	CORE	s1,s2	72	后果、言下之意		抽象概念	认知与抽象名词
+independence	n.	CORE	s1	72	独立		抽象概念	性质与评价
+inevitable	adj.	CORE	s1	72	不可避免的		抽象概念	性质与评价
+proposal	n.	CORE	s1,s2	72	提议、求婚		动作行为	身体动作
+recruit	v./n.	CORE	s1,s2	72	招募、新兵		动作行为	身体动作
+retail	n.	CORE	s1	72	零售		商业经济	
+satisfy	vt.	CORE	s1,s2	72	满意、使确信		动作行为	使动与影响
+sick	adj.	CORE	s1	72	生病的		健康医疗	
+skin	n.	CORE	s1	72	皮		人类与社会	
+surprise	n.	CORE	s1	72	惊讶	surprize	情感心理	
+wind	n.	CORE	s1	72	风		自然环境	
+bacteria	n.	CORE	s1	71	细菌		自然环境	
+border	n.	CORE	s1	71	边界		空间地点	
+brief	adj.	CORE	s1	71	简短的		抽象概念	性质与评价
+cultivate	vt.	CORE	s1,s2	71	耕作、培养		动作行为	身体动作
+edge	n.	CORE	s1,s2	71	边、刀口		空间地点	
+exhibition	n.	CORE	s1	71	展览会、陈列		运动娱乐	
+export	vt./n.	CORE	s1,s2	71	输出、出口		商业经济	
+fruit	n.	CORE	s1	71	水果		食物营养	
+hide	vt.	CORE	s1	71	隐藏		动作行为	社交交互
+length	n.	CORE	s1	71	长度		抽象概念	数量与程度
+recycle	vt.	CORE	s1	71	回收		科学技术	
+scene	n.	CORE	s1	71	场景		自然环境	
+treasure	n.	CORE	s1	71	宝藏		商业经济	
+admission	n.	CORE	s1,s2	70	允许进入、承认		教育学习	
+clothing	n.	CORE	s1	70	衣物		交通旅行	
+empty	adj.	CORE	s1	70	空的		抽象概念	性质与评价
+hair	n.	CORE	s1	70	头发		人类与社会	
+helpful	adj.	CORE	s1	70	有帮助的		情感心理	
+instrument	n.	CORE	s1,s2	70	工具、乐器		科学技术	
+nice	adj.	CORE	s1	70	很好的		情感心理	
+selection	n.	CORE	s1,s2	70	选择、精选物		抽象概念	认知与抽象名词
+spring	n./v.	CORE	s1,s2	70	春天、跳跃		时间日期	
+sustain	vt.	CORE	s1,s2	70	支撑、忍受		动作行为	起始与终止
+tired	adj.	CORE	s1	70	疲惫的	tyred	情感心理	
+valley	n.	CORE	s1	70	山谷		自然环境	
+arm	n.	CORE	s1	69	手臂		人类与社会	
+assumption	n.	CORE	s1	69	假定		抽象概念	认知与抽象名词
+beat	vt.	CORE	s1	69	击败		动作行为	身体动作
+confront	vt.	CORE	s1,s2	69	使面临、勇敢地面对		动作行为	使动与影响
+conscious	adj.	CORE	s1,s2	69	神志清醒的、意识到的		情感心理	
+delete	vt.	CORE	s1	69	删除		动作行为	其他动作
+entitle	vt.	CORE	s1,s2	69	给……题名、给……权利		动作行为	其他动作
+equality	n.	CORE	s1	69	同等		抽象概念	认知与抽象名词
+excellent	adj.	CORE	s1	69	优秀的		抽象概念	性质与评价
+glass	n.	CORE	s1,s2	69	玻璃、玻璃杯		日常生活	
+hero	n.	CORE	s1	69	英雄		人类与社会	
+laugh	vi.	CORE	s1	69	笑		动作行为	身体动作
+muscle	n.	CORE	s1,s2	69	肌肉、体力		人类与社会	
+peak	n.	CORE	s1	69	最高点		自然环境	
+prompt	adj./n.	CORE	s1,s2	69	敏捷的、提示		动作行为	身体动作
+pursuit	n.	CORE	s1	69	追求、追赶		动作行为	其他动作
+racial	adj.	CORE	s1	69	种族的		人类与社会	
+shrink	vi./v.	CORE	s1,s2	69	起皱、减少		动作行为	身体动作
+spirit	n.	CORE	s1	69	精神		情感心理	
+suspect	vt.	CORE	s1	69	怀疑		动作行为	心理活动
+transition	n.	CORE	s1	69	过渡、转变		抽象概念	认知与抽象名词
+universe	n.	CORE	s1	69	宇宙		自然环境	
+wild	adj.	CORE	s1	69	野生的		自然环境	
+adolescent	n.	CORE	s1	68	青少年		人类与社会	
+bar	n.	CORE	s1,s2	68	条、酒吧		日常生活	
+branch	n.	CORE	s1,s2	68	枝、分部		自然环境	
+dance	vi.	CORE	s1	68	跳舞		运动娱乐	
+declare	vt.	CORE	s1	68	宣布		动作行为	社交交互
+east	n./adj.	CORE	s1,s2	68	东、东方的		空间地点	
+everywhere	adv.	CORE	s1	68	到处		空间地点	
+hill	n.	CORE	s1	68	小山		自然环境	
+invent	vt.	CORE	s1	68	发明		动作行为	身体动作
+literary	adj.	CORE	s1	68	文学的		文化宗教	
+maybe	adv.	CORE	s1	68	可能、大概		抽象概念	数量与程度
+minister	n.	CORE	s1	68	部长		政治法律	
+puzzle	vt.	CORE	s1	68	使……困惑		动作行为	使动与影响
+reference	n.	CORE	s1,s2	68	提及、参考		教育学习	
+register	v.	CORE	s1	68	注册		动作行为	社交交互
+resume	v./n.	CORE	s1,s2	68	重新开始、恢复、简历		动作行为	变化趋势
+season	n.	CORE	s1	68	季节		时间日期	
+volume	n.	CORE	s1,s2,s3	68	容积、音量（一）卷		科学技术	
+witness	vt.	CORE	s1	68	目击、见证		动作行为	身体动作
+band	n.	CORE	s1,s2	67	乐队、带子		运动娱乐	
+battle	n.	CORE	s1	67	战斗		政治法律	
+category	n.	CORE	s1	67	类别		抽象概念	认知与抽象名词
+committee	n.	CORE	s1	67	委员会		政治法律	
+congress	n.	CORE	s1	67	代表大会		政治法律	
+convenient	adj.	CORE	s1	67	方便的		抽象概念	性质与评价
+dress	v.	CORE	s1	67	穿		交通旅行	
+fifty	num.	CORE	s1	67	五十		时间日期	
+football	n.	CORE	s1	67	足球		运动娱乐	
+infant	n.	CORE	s1	67	婴幼儿		人类与社会	
+urgent	adj.	CORE	s1	67	紧迫的		情感心理	
+vacation	n.	CORE	s1	67	假期		时间日期	
+vulnerable	adj.	CORE	s1	67	易受攻击的、脆弱的		抽象概念	性质与评价
+accurate	adj.	CORE	s1	66	精确的		抽象概念	性质与评价
+brown	adj.	CORE	s1	66	褐色的		交通旅行	
+confirm	vt.	CORE	s1	66	证实、确认		动作行为	使动与影响
+detect	vt.	CORE	s1	66	查明、发现		动作行为	心理活动
+dispute	v.	CORE	s1	66	争论		动作行为	社交交互
+divorce	n.	CORE	s1,s2	66	离婚、断绝关系		政治法律	
+estate	n.	CORE	s1,s2	66	地产、遗产		商业经济	
+examination	n.	CORE	s1	66	考试		教育学习	
+hang	vt.	CORE	s1	66	挂		动作行为	其他动作
+host	n.	CORE	s1	66	主持人		人类与社会	
+initiative	n.	CORE	s1	66	主动性、进取心		抽象概念	认知与抽象名词
+odd	adj.	CORE	s1,s2	66	奇数的、奇怪的		抽象概念	性质与评价
+raw	adj.	CORE	s1,s2	66	生的、未经训练的		抽象概念	性质与评价
+reasonable	adj.	CORE	s1	66	合理的		抽象概念	性质与评价
+significance	n.	CORE	s1	66	重要性		抽象概念	认知与抽象名词
+snow	n.	CORE	s1	66	雪		自然环境	
+unit	n.	CORE	s1,s2	66	单元、单位		科学技术	
+automation	n.	CORE	s1	65	自动		科学技术	
+cat	n.	CORE	s1	65	猫		自然环境	
+craft	n.	CORE	s1	65	工艺		科学技术	
+curriculum	n.	CORE	s1	65	课程		教育学习	
+distinction	n.	CORE	s1,s2	65	区分、卓越		抽象概念	认知与抽象名词
+elite	n.	CORE	s1	65	精英		人类与社会	
+evolve	vt.	CORE	s1	65	使发展		动作行为	使动与影响
+flexible	adj.	CORE	s1	65	灵活的		抽象概念	性质与评价
+mislead	vt.	CORE	s1	65	误导		动作行为	使动与影响
+plenty	n.	CORE	s1	65	丰富、大量		抽象概念	数量与程度
+trial	n.	CORE	s1,s2	65	审判、试用		动作行为	评价与判断
+vegetable	n.	CORE	s1	65	蔬菜		食物营养	
+weigh	vt./vi.	CORE	s1,s2	65	称重量、有影响		动作行为	心理活动
+alarm	n.	CORE	s1	64	警报		情感心理	
+bag	n.	CORE	s1	64	包、袋		日常生活	
+beach	n.	CORE	s1	64	海滩		自然环境	
+comparison	n.	CORE	s1	64	比较		抽象概念	认知与抽象名词
+contrary	adj.	CORE	s1,s2	64	相反的、对方的		抽象概念	性质与评价
+desert	vt./n.	CORE	s1,s2	64	遗弃、沙漠		自然环境	
+highlight	vt.	CORE	s1	64	使显著、强调		动作行为	使动与影响
+interact	vi.	CORE	s1	64	互动		动作行为	使动与影响
+nervous	adj.	CORE	s1	64	紧张的		情感心理	
+regulate	vt.	CORE	s1,s2	64	管理、调节		动作行为	使动与影响
+remark	n.	CORE	s1	64	评价、评论		动作行为	心理活动
+royal	adj.	CORE	s1	64	皇家的		政治法律	
+rush	vi.	CORE	s1	64	冲		动作行为	身体动作
+scheme	n./v.	CORE	s1,s2	64	计划、密谋		动作行为	心理活动
+usage	n.	CORE	s1,s2	64	使用、用法		抽象概念	认知与抽象名词
+bottom	n.	CORE	s1	63	底下		空间地点	
+evil	adj.	CORE	s1	63	邪恶的、坏的		抽象概念	性质与评价
+exceptional	adj.	CORE	s1	63	例外的		抽象概念	性质与评价
+expansion	n.	CORE	s1	63	扩张		抽象概念	认知与抽象名词
+internal	adj.	CORE	s1	63	内部的		空间地点	
+surround	vt.	CORE	s1	63	周围		动作行为	身体动作
+absence	n.	CORE	s1	62	缺席		抽象概念	认知与抽象名词
+anticipate	vt.	CORE	s1,s2	62	预期、先发制人		动作行为	身体动作
+deprive	vt.	CORE	s1	62	剥夺		动作行为	使动与影响
+finance	n.	CORE	s1	62	财政		商业经济	
+guideline	n.	CORE	s1	62	指导方针、指导原则		抽象概念	认知与抽象名词
+journey	n.	CORE	s1	62	旅行		交通旅行	
+license	n.	CORE	s1	62	执照、许可	licence	教育学习	
+musical	adj.	CORE	s1,s2	62	音乐的、音调优美的		运动娱乐	
+protest	v.	CORE	s1	62	抗议		动作行为	社交交互
+route	n.	CORE	s1	62	路线		交通旅行	
+seed	n./vt.	CORE	s1,s2	62	种子、播种		自然环境	
+solid	adj.	CORE	s1	62	固体的		抽象概念	性质与评价
+submit	vi./vt.	CORE	s1,s2	62	顺从、递交		动作行为	身体动作
+tap	vt.	CORE	s1	62	提取、利用		动作行为	身体动作
+whenever	conj.	CORE	s1	62	无论何时		时间日期	
+adequate	adj.	CORE	s1	61	充足的		抽象概念	性质与评价
+boom	n.	CORE	s1	61	繁荣		商业经济	
+bridge	n.	CORE	s1	61	桥		空间地点	
+contest	n.	CORE	s1	61	比赛		运动娱乐	
+emergency	n.	CORE	s1	61	紧急情况		健康医疗	
+fairly	adv.	CORE	s1,s2	61	公正地、相当地		抽象概念	数量与程度
+god	n.	CORE	s1	61	神、上帝		文化宗教	
+grass	n.	CORE	s1	61	草		自然环境	
+illegal	adj.	CORE	s1	61	不合法的		政治法律	
+journalist	n.	CORE	s1	61	记者		职业工作	
+judgment	n.	CORE	s1	61	裁判		抽象概念	认知与抽象名词
+literacy	n.	CORE	s1	61	读写能力		教育学习	
+milk	n.	CORE	s1	61	牛奶		食物营养	
+modify	vt.	CORE	s1,s2	61	修改、缓和		动作行为	评价与判断
+mystery	n.	CORE	s1	61	神秘		情感心理	
+philosophy	n.	CORE	s1	61	哲学		文化宗教	
+reluctant	adj.	CORE	s1	61	不情愿的、勉强的		情感心理	
+rural	adj.	CORE	s1	61	乡村的		空间地点	
+sharp	adj.	CORE	s1,s2	61	尖的、清晰的		抽象概念	性质与评价
+stable	adj.	CORE	s1	61	稳定的		抽象概念	性质与评价
+zone	n.	CORE	s1	61	区域		空间地点	
+accelerate	v.	CORE	s1	60	加速		动作行为	使动与影响
+barrier	n.	CORE	s1	60	障碍		空间地点	
+breath	n.	CORE	s1	60	呼吸		人类与社会	
+breed	vt./vi.	CORE	s1,s2	60	养育、繁殖		动作行为	身体动作
+counterpart	n.	CORE	s1	60	同行		人类与社会	
+era	n.	CORE	s1	60	时代		时间日期	
+false	adj.	CORE	s1	60	错误的		抽象概念	性质与评价
+painting	n.	CORE	s1	60	绘画		运动娱乐	
+pair	n.	CORE	s1	60	一对		人类与社会	
+prison	n.	CORE	s1	60	监狱		政治法律	
+privilege	n.	CORE	s1	60	特权、优先权		情感心理	
+profitable	adj.	CORE	s1	60	有利可图的		商业经济	
+restore	vt.	CORE	s1,s2	60	恢复、归还		动作行为	使动与影响
+slave	n.	CORE	s1	60	奴隶		人类与社会	
+uniform	adj./n.	CORE	s1,s2	60	统一的、制服		交通旅行	
+upset	adj.	CORE	s1	60	沮丧、难过		动作行为	身体动作
+assist	vt.	CORE	s1	59	援助		动作行为	社交交互
+broadcast	vt.	CORE	s1	59	广播		文化宗教	
+crucial	adj.	CORE	s1	59	决定性的		抽象概念	性质与评价
+dam	n.	CORE	s1	59	水坝		自然环境	
+desk	n.	CORE	s1	59	桌子		日常生活	
+devote	vt.	CORE	s1	59	奉献		动作行为	其他动作
+electric	adj.	CORE	s1	59	电的		科学技术	
+entrance	n.	CORE	s1	59	入口		空间地点	
+fan	n.	CORE	s1,s2	59	粉丝、扇子		运动娱乐	
+greenhouse	n.	CORE	s1	59	温室		自然环境	
+infrastructure	n.	CORE	s1	59	基础设施		科学技术	
+landscape	n.	CORE	s1	59	风景		自然环境	
+luxury	n.	CORE	s1,s2	59	奢侈、奢侈品		商业经济	
+permanent	adj.	CORE	s1	59	永恒的		抽象概念	性质与评价
+rock	n./v.	CORE	s1,s2	59	岩石、震动		自然环境	
+segment	n.	CORE	s1	59	段		日常生活	
+snack	n.	CORE	s1,s2	59	点心、易办到的事		食物营养	
+tall	adj.	CORE	s1	59	高		抽象概念	性质与评价
+visual	adj.	CORE	s1	59	看的		抽象概念	性质与评价
+appointment	n.	CORE	s1,s2,s3	58	预约、任命、职位		文化宗教	
+beneath	prep.	CORE	s1	58	在…之下		空间地点	
+channel	n.	CORE	s1,s2	58	频道、隧道		自然环境	
+cheat	v.	CORE	s1,s2	58	作弊、欺骗		动作行为	社交交互
+counter	n.	CORE	s1	58	柜台		日常生活	
+discount	n.	CORE	s1	58	折扣		商业经济	
+evaluate	vt.	CORE	s1	58	评估		动作行为	评价与判断
+ingredient	n.	CORE	s1	58	成分		食物营养	
+injure	vt.	CORE	s1	58	使受伤、损害		动作行为	使动与影响
+injury	n.	CORE	s1	58	损伤		健康医疗	
+maximum	adj.	CORE	s1	58	最大的		抽象概念	数量与程度
+minor	adj.	CORE	s1	58	较小的、较少的		抽象概念	性质与评价
+rat	n.	CORE	s1,s2	58	老鼠、卑鄙的人		自然环境	
+remind	vt.	CORE	s1	58	提醒		动作行为	身体动作
+reply	v.	CORE	s1	58	回复		动作行为	社交交互
+sacrifice	vt.	CORE	s1	58	牺牲		动作行为	身体动作
+spare	adj.	CORE	s1	58	空闲的		动作行为	占有与转移
+steel	n.	CORE	s1	58	钢		科学技术	
+stuff	n./vt.	CORE	s1,s2	58	东西、材料、填满		日常生活	
+sum	n.	CORE	s1	58	总和		商业经济	
+superior	adj.	CORE	s1,s2	58	优良的、较……多的		抽象概念	性质与评价
+tackle	vt.	CORE	s1	58	处理、应付		动作行为	身体动作
+tone	n.	CORE	s1	58	音调、腔调		情感心理	
+tour	n.	CORE	s1	58	旅行		交通旅行	
+trait	n.	CORE	s1	58	特征		情感心理	
+tuition	n.	CORE	s1,s2	58	学费、教学		教育学习	
+virtue	n.	CORE	s1,s2	58	美德、优点		情感心理	
+accomplish	vt.	CORE	s1	57	完成		动作行为	心理活动
+belt	n.	CORE	s1,s2	57	皮带、地带		日常生活	
+camera	n.	CORE	s1	57	照相机		科学技术	
+coast	n./vi.	CORE	s1,s2	57	海岸、沿岸航行		自然环境	
+entertain	vt.	CORE	s1	57	娱乐		动作行为	使动与影响
+finger	n.	CORE	s1	57	手指		人类与社会	
+furniture	n.	CORE	s1	57	家具		日常生活	
+hall	n.	CORE	s1	57	大厅		日常生活	
+interval	n.	CORE	s1,s2	57	间隔、休息		时间日期	
+laboratory	n.	CORE	s1	57	实验室		教育学习	
+march	vi.	CORE	s1	57	行进		动作行为	身体动作
+obstacle	n.	CORE	s1	57	障碍		抽象概念	认知与抽象名词
+regret	vt.	CORE	s1	57	遗憾、后悔		动作行为	身体动作
+ride	v.	CORE	s1	57	骑		动作行为	身体动作
+ruin	vt.	CORE	s1	57	毁灭		动作行为	使动与影响
+tendency	n.	CORE	s1	57	趋势		抽象概念	认知与抽象名词
+terrible	adj.	CORE	s1	57	很糟的、可怕的		情感心理	
+trace	n.	CORE	s1,s2	57	痕迹、微量		动作行为	身体动作
+unfortunately	adv.	CORE	s1	57	不幸地		抽象概念	数量与程度
+abuse	vt.	CORE	s1,s2	56	滥用、虐待		动作行为	其他动作
+aggressive	adj.	CORE	s1	56	好斗的、有侵略性的		情感心理	
+bond	n.	CORE	s1	56	纽带		商业经济	
+breathe	vi.	CORE	s1	56	呼吸		动作行为	身体动作
+camp	n.	CORE	s1	56	营地		运动娱乐	
+commerce	n.	CORE	s1	56	商业、交易		商业经济	
+constitute	vt.	CORE	s1,s2	56	组成、建立		动作行为	身体动作
+destruction	n.	CORE	s1	56	破坏		自然环境	
+elementary	adj.	CORE	s1,s2	56	初等的、简单的		教育学习	
+embrace	vt.	CORE	s1,s2	56	拥抱、接受		动作行为	身体动作
+excuse	n.	CORE	s1	56	借口		动作行为	社交交互
+flood	n./v.	CORE	s1,s2	56	洪水、涌进		自然环境	
+flower	n.	CORE	s1	56	花朵		自然环境	
+influential	adj.	CORE	s1,s2	56	有影响的、权势的		情感心理	
+lucky	adj.	CORE	s1	56	幸运的		情感心理	
+motor	n.	CORE	s1	56	发动机		科学技术	
+northern	adj.	CORE	s1	56	北方的		空间地点	
+prime	adj.	CORE	s1	56	最初的、首要的		抽象概念	性质与评价
+profound	adj.	CORE	s1	56	深刻的		抽象概念	性质与评价
+radical	adj.	CORE	s1,s2	56	根本的、彻底的		抽象概念	性质与评价
+reporter	n.	CORE	s1	56	报告人		职业工作	
+resolve	vt.	CORE	s1,s2	56	解决、决定		动作行为	使动与影响
+salt	n./vt.	CORE	s1,s2	56	盐、腌		食物营养	
+soldier	n.	CORE	s1	56	士兵		职业工作	
+southern	adj.	CORE	s1	56	南方的		空间地点	
+strain	vt.	CORE	s1	56	使紧张、拉紧		动作行为	身体动作
+thrive	vi.	CORE	s1	56	繁荣		动作行为	其他动作
+tiny	adj.	CORE	s1	56	极小的		抽象概念	数量与程度
+valid	adj.	CORE	s1	56	合理的		抽象概念	性质与评价
+village	n.	CORE	s1	56	村		空间地点	
+weapon	n.	CORE	s1	56	武器		政治法律	
+wood	n.	CORE	s1,s2	56	木头、森林		自然环境	
+boat	n.	CORE	s1	55	船		交通旅行	
+chip	n.	CORE	s1,s2	55	薯片、芯片		科学技术	
+civil	adj.	CORE	s1	55	公民的		政治法律	
+conservative	adj.	CORE	s1	55	保守		情感心理	
+costly	adj.	CORE	s1	55	昂贵的		商业经济	
+dioxide	n.	CORE	s1	55	二氧化物		科学技术	
+gamble	v.	CORE	s1,s2	55	赌博、投机		动作行为	身体动作
+honor	n.	CORE	s1	55	荣耀	honour	情感心理	
+insert	vt.	CORE	s1	55	插入		动作行为	身体动作
+mirror	n.	CORE	s1	55	镜子		日常生活	
+panel	n.	CORE	s1	55	面板		日常生活	
+prejudice	n./vt.	CORE	s1,s2	55	偏见、损害		情感心理	
+relief	n.	CORE	s1	55	如释重负		情感心理	
+transaction	n.	CORE	s1,s2	55	交易、业务		商业经济	
+vitamin	n.	CORE	s1	55	维生素		食物营养	
+bias	n.	CORE	s1,s2	54	偏见、偏重		情感心理	
+blind	adj.	CORE	s1	54	失明的		健康医疗	
+chairman	n.	CORE	s1	54	主席		职业工作	
+concert	n.	CORE	s1	54	音乐会		运动娱乐	
+construct	vt.	CORE	s1	54	建造、创立		动作行为	身体动作
+disorder	n.	CORE	s1	54	混乱、骚乱		健康医疗	
+encounter	vt.	CORE	s1	54	偶遇		动作行为	其他动作
+equip	vt.	CORE	s1	54	装备		动作行为	身体动作
+favorite	adj.	CORE	s1	54	最爱的	favourite	情感心理	
+file	n.	CORE	s1	54	文件		教育学习	
+genuine	adj.	CORE	s1	54	真的、真诚的		抽象概念	性质与评价
+initial	adj.	CORE	s1	54	起初的		抽象概念	性质与评价
+instant	n./adv.	CORE	s1,s2	54	时刻、立刻		时间日期	
+investigate	vt.	CORE	s1	54	调查		动作行为	其他动作
+latter	pron.	CORE	s1	54	后者		抽象概念	性质与评价
+minimum	adj.	CORE	s1	54	最低的		抽象概念	数量与程度
+neighbor	n.	CORE	s1	54	邻居	neighbour	人类与社会	
+neighborhood	n.	CORE	s1	54	小区、社区	neighbourhood	空间地点	
+overwhelm	vt.	CORE	s1	54	征服		动作行为	身体动作
+package	n.	CORE	s1	54	包裹		日常生活	
+photograph	n.	CORE	s1	54	照片		运动娱乐	
+principal	adj./n.	CORE	s1,s2	54	最重要的、负责人		教育学习	
+proof	n.	CORE	s1	54	证据		抽象概念	认知与抽象名词
+proud	adj.	CORE	s1	54	骄傲		情感心理	
+quote	vt.	CORE	s1	54	引用		动作行为	其他动作
+relieve	vt.	CORE	s1,s2	54	缓解、救济		动作行为	其他动作
+rival	v.	CORE	s1	54	竞争		人类与社会	
+sponsor	vt.	CORE	s1	54	赞助、资助		动作行为	起始与终止
+tobacco	n.	CORE	s1	54	烟草		食物营养	
+trap	vt.	CORE	s1	54	困住		动作行为	使动与影响
+truck	n.	CORE	s1	54	卡车		交通旅行	
+alert	n.	CORE	s1	53	警报		情感心理	
+amateur	n.	CORE	s1,s2	53	业余爱好者、外行		运动娱乐	
+anywhere	adv.	CORE	s1	53	在任何地方		空间地点	
+army	n.	CORE	s1,s2	53	军队、陆军		政治法律	
+barely	adv.	CORE	s1	53	几乎不		抽象概念	数量与程度
+core	n.	CORE	s1	53	核心		人类与社会	
+delivery	n.	CORE	s1,s2	53	递送、分娩		商业经济	
+ethnic	adj.	CORE	s1	53	民族的		文化宗教	
+exception	n.	CORE	s1	53	例外		抽象概念	认知与抽象名词
+fellow	n.	CORE	s1	53	同事、同辈		人类与社会	
+found	vt.	CORE	s1	53	创立、建立		动作行为	身体动作
+helicopter	n.	CORE	s1	53	直升机		交通旅行	
+incident	n.	CORE	s1	53	事件		时间日期	
+keen	adj.	CORE	s1	53	热忱的		情感心理	
+occupation	n.	CORE	s1,s2	53	占领、职业		职业工作	
+opponent	n.	CORE	s1	53	对手		人类与社会	
+permit	vt.	CORE	s1	53	允许		动作行为	社交交互
+stretch	v.	CORE	s1	53	伸展、延伸		动作行为	身体动作
+theft	n.	CORE	s1	53	偷窃		政治法律	
+unexpected	adj.	CORE	s1	53	想不到的		抽象概念	性质与评价
+admire	vt.	CORE	s1	52	钦佩、羡慕、欣赏		情感心理	
+anxious	adj.	CORE	s1	52	焦虑的		情感心理	
+artistic	adj.	CORE	s1	52	艺术的		文化宗教	
+compensate	v.	CORE	s1	52	补偿		动作行为	占有与转移
+democratic	adj.	CORE	s1	52	民主的		政治法律	
+generous	adj.	CORE	s1	52	慷慨的		情感心理	
+guard	vt.	CORE	s1	52	保卫		动作行为	身体动作
+historian	n.	CORE	s1	52	历史学家		职业工作	
+honest	adj.	CORE	s1	52	诚实的		情感心理	
+inner	adj.	CORE	s1,s2	52	内部的、内心的		空间地点	
+intention	n.	CORE	s1	52	意图、打算		情感心理	
+lean	vi./adj.	CORE	s1,s2	52	倾斜、倚靠、瘦的		动作行为	身体动作
+marine	adj.	CORE	s1,s2	52	海的、船舶的		自然环境	
+resist	vt.	CORE	s1	52	抵挡、抵抗		动作行为	社交交互
+restrict	vt.	CORE	s1	52	限制		动作行为	使动与影响
+sensible	adj.	CORE	s1	52	明智的		情感心理	
+shoulder	n.	CORE	s1	52	肩膀		人类与社会	
+sky	n.	CORE	s1	52	天空		自然环境	
+supreme	adj.	CORE	s1,s2	52	最高的、最优的		抽象概念	性质与评价
+thin	adj.	CORE	s1	52	薄的、稀薄的		抽象概念	性质与评价
+angry	adj.	CORE	s1	51	生气的		情感心理	
+assistance	n.	CORE	s1	51	帮助		情感心理	
+collapse	vi.	CORE	s1	51	倒塌		动作行为	其他动作
+consult	v.	CORE	s1	51	咨询		动作行为	身体动作
+controversy	n.	CORE	s1	51	争论		政治法律	
+dictation	n.	CORE	s1	51	听写		教育学习	
+exciting	adj.	CORE	s1	51	令人兴奋的		情感心理	
+extensive	adj.	CORE	s1	51	广泛的		抽象概念	性质与评价
+flat	adj./n.	CORE	s1,s2	51	水平的、公寓		日常生活	
+freeze	v.	CORE	s1	51	冻结		动作行为	其他动作
+frequent	adj.	CORE	s1	51	常常		时间日期	
+insect	n.	CORE	s1	51	昆虫		自然环境	
+insight	n.	CORE	s1	51	洞察力		情感心理	
+interrupt	vt.	CORE	s1	51	中断、打断		动作行为	身体动作
+lake	n.	CORE	s1	51	湖		自然环境	
+legislation	n.	CORE	s1	51	立法		政治法律	
+lend	vt.	CORE	s1	51	借出		动作行为	占有与转移
+metal	n.	CORE	s1	51	金属		科学技术	
+modest	adj.	CORE	s1	51	谦虚的		情感心理	
+nearby	adj.	CORE	s1	51	附近的		空间地点	
+owe	vt.	CORE	s1,s2	51	欠、归因于		动作行为	社交交互
+personnel	n.	CORE	s1,s2	51	员工、人事部门		职业工作	
+ray	n.	CORE	s1	51	光线、射线		自然环境	
+resort	n./vi.	CORE	s1,s2	51	度假村、被迫采取		动作行为	身体动作
+theatre	n.	CORE	s1,s2	51	电影院、戏剧	theater	运动娱乐	
+venture	v.	CORE	s1,s2	51	冒险、敢于		动作行为	评价与判断
+arouse	vt.	CORE	s1,s2	50	唤醒、激发		动作行为	身体动作
+combination	n.	CORE	s1	50	结合		抽象概念	认知与抽象名词
+defense	n.	CORE	s1	50	防卫	defence	政治法律	
+delight	n.	CORE	s1	50	高兴		情感心理	
+distant	adj.	CORE	s1	50	远的		空间地点	
+diverse	adj.	CORE	s1	50	多种多样的		抽象概念	性质与评价
+facilitate	vt.	CORE	s1	50	促进		动作行为	身体动作
+feedback	n.	CORE	s1	50	反馈		科学技术	
+fortune	n.	CORE	s1,s2	50	命运、财产		商业经济	
+genius	n.	CORE	s1	50	天才		情感心理	
+sad	adj.	CORE	s1	50	悲伤的		情感心理	
+shake	vt.	CORE	s1	50	摇		动作行为	身体动作
+soft	adj.	CORE	s1	50	软的		抽象概念	性质与评价
+sophisticated	adj.	CORE	s1,s2	50	世故的、复杂的		情感心理	
+square	n.	CORE	s1	50	正方形		空间地点	
+theme	n.	CORE	s1	50	主题		文化宗教	
+victory	n.	CORE	s1	50	胜利		政治法律	
+assure	vt.	CORE	s1,s2	49	使确信、担保		动作行为	心理活动
+bury	vt.	CORE	s1	49	埋		动作行为	身体动作
+calm	adj.	CORE	s1	49	冷静、镇定		情感心理	
+cautious	adj.	CORE	s1	49	谨慎的		情感心理	
+classmate	n.	CORE	s1	49	同学		人类与社会	
+contemporary	adj.	CORE	s1,s2	49	同时代的、现代的		时间日期	
+convention	n.	CORE	s1,s2	49	习俗、会议		文化宗教	
+convert	v.	CORE	s1	49	转变		动作行为	变化趋势
+curious	adj.	CORE	s1	49	好奇的		情感心理	
+database	n.	CORE	s1	49	数据库		科学技术	
+dependent	adj.	CORE	s1	49	依靠的、取决于……的		抽象概念	性质与评价
+drought	n.	CORE	s1	49	旱灾		自然环境	
+edition	n.	CORE	s1	49	版本		教育学习	
+enterprise	n.	CORE	s1,s2	49	企业、事业	enterprize	商业经济	
+fatal	adj.	CORE	s1,s2	49	致命的、宿命的		健康医疗	
+grand	adj.	CORE	s1	49	宏伟的		抽象概念	性质与评价
+horse	n.	CORE	s1	49	马		自然环境	
+induce	vt.	CORE	s1,s2	49	引诱、引起		动作行为	使动与影响
+lobby	v./n.	CORE	s1,s2	49	游说、门廊		日常生活	
+monkey	n.	CORE	s1	49	猴子		自然环境	
+pool	n.	CORE	s1	49	池塘		自然环境	
+portion	n.	CORE	s1	49	部分		日常生活	
+prevail	vi.	CORE	s1,s2	49	流行、占优势		动作行为	身体动作
+quantity	n.	CORE	s1	49	数量、数额		抽象概念	数量与程度
+remarkable	adj.	CORE	s1	49	值得注意的		抽象概念	性质与评价
+shed	vt./n.	CORE	s1,s2	49	脱去、棚		动作行为	身体动作
+temporary	adj.	CORE	s1	49	临时的		时间日期	
+trick	n.	CORE	s1,s2	49	诡计、技巧		动作行为	社交交互
+wise	adj.	CORE	s1	49	有智慧的、英明的	wize	情感心理	
+aircraft	n.	CORE	s1	48	航空器		交通旅行	
+ethic	n.	CORE	s1	48	伦理		抽象概念	认知与抽象名词
+external	adj.	CORE	s1	48	外部的		空间地点	
+forum	n.	CORE	s1	48	论坛		文化宗教	
+fossil	n.	CORE	s1	48	化石		自然环境	
+lady	n.	CORE	s1	48	女士		人类与社会	
+luck	n.	CORE	s1	48	运气、好运		情感心理	
+mechanism	n.	CORE	s1,s2	48	机制、方法		科学技术	
+mouth	n.	CORE	s1	48	嘴		人类与社会	
+myth	n.	CORE	s1	48	神话		文化宗教	
+originate	vi./vt.	CORE	s1,s2	48	发源、开创		动作行为	其他动作
+ownership	n.	CORE	s1	48	所有		商业经济	
+pocket	n.	CORE	s1	48	口袋		日常生活	
+poll	n.	CORE	s1	48	投票		政治法律	
+preparation	n.	CORE	s1	48	准备		动作行为	身体动作
+pride	n.	CORE	s1,s2	48	自豪、自满		情感心理	
+qualification	n.	CORE	s1	48	资格		抽象概念	认知与抽象名词
+react	vi.	CORE	s1	48	反应		动作行为	社交交互
+representative	n./adj.	CORE	s1,s2	48	代表、有代表性的		人类与社会	
+retain	vt.	CORE	s1	48	保留		动作行为	起始与终止
+roll	v.	CORE	s1,s2	48	滚动、卷		动作行为	身体动作
+scholarship	n.	CORE	s1,s2	48	奖学金、学问		教育学习	
+slip	vi.	CORE	s1	48	滑		动作行为	身体动作
+soccer	n.	CORE	s1	48	足球		运动娱乐	
+stability	n.	CORE	s1	48	稳定		抽象概念	认知与抽象名词
+substantial	adj.	CORE	s1	48	大量的		抽象概念	性质与评价
+sympathy	n.	CORE	s1	48	同情		情感心理	
+taxi	n.	CORE	s1	48	出租车		交通旅行	
+universal	adj.	CORE	s1,s2	48	普遍的、宇宙的		抽象概念	性质与评价
+academy	n.	CORE	s1	47	学院		教育学习	
+accumulate	v.	CORE	s1	47	积累		动作行为	变化趋势
+ambitious	adj.	CORE	s1,s2	47	有雄心的、艰巨的		情感心理	
+bother	vt.	CORE	s1	47	打扰		动作行为	身体动作
+dean	n.	CORE	s1	47	院长、主任		教育学习	
+defend	vt.	CORE	s1	47	保卫、防守		动作行为	社交交互
+dismiss	vt.	CORE	s1	47	解散		动作行为	心理活动
+gallon	n.	CORE	s1	47	加仑		科学技术	
+lonely	adj.	CORE	s1	47	孤独地		情感心理	
+overcome	vt.	CORE	s1	47	克服		动作行为	其他动作
+overlook	vt.	CORE	s1,s2	47	俯瞰、忽略		动作行为	身体动作
+rail	n.	CORE	s1,s2	47	栏杆、铁轨		空间地点	
+reinforce	vt.	CORE	s1	47	加强		动作行为	变化趋势
+roof	n.	CORE	s1	47	屋顶		日常生活	
+supermarket	n.	CORE	s1	47	超级市场		商业经济	
+thief	n.	CORE	s1	47	小偷		政治法律	
+tutor	n.	CORE	s1	47	导师		职业工作	
+accompany	vt.	CORE	s1,s2	46	陪伴、为……伴奏		动作行为	其他动作
+badly	adv.	CORE	s1,s2	46	糟糕、严重地、非常		抽象概念	性质与评价
+beneficial	adj.	CORE	s1	46	有益的		抽象概念	性质与评价
+casual	adj.	CORE	s1	46	随意的		抽象概念	性质与评价
+chronic	adj.	CORE	s1	46	慢性的、长期的		健康医疗	
+component	n.	CORE	s1	46	组成部分		科学技术	
+cup	n.	CORE	s1	46	杯子		日常生活	
+destination	n.	CORE	s1	46	目的地		交通旅行	
+diminish	vt.	CORE	s1,s2	46	削弱、贬低		动作行为	身体动作
+distribute	vt.	CORE	s1	46	分发、分配		动作行为	变化趋势
+dozen	n.	CORE	s1	46	一打		商业经济	
+exceed	vt.	CORE	s1	46	超过、越过		动作行为	变化趋势
+exclude	vt.	CORE	s1	46	不包括		动作行为	评价与判断
+glance	n.	CORE	s1	46	一瞥		动作行为	身体动作
+imitate	vt.	CORE	s1	46	模仿、仿造		动作行为	其他动作
+implement	vt./n.	CORE	s1,s2	46	实施、工具		动作行为	其他动作
+integrate	vt.	CORE	s1	46	整合		动作行为	使动与影响
+intense	adj.	CORE	s1	46	强烈的、热烈的		抽象概念	性质与评价
+intensive	adj.	CORE	s1	46	密集的		抽象概念	性质与评价
+load	vt.	CORE	s1	46	装货、装载		动作行为	身体动作
+lock	n.	CORE	s1	46	锁		动作行为	其他动作
+occupy	vt.	CORE	s1	46	占据		动作行为	使动与影响
+orient	n./vt.	CORE	s1,s2,s3	46	东方、定位、使适应		动作行为	使动与影响
+pension	n.	CORE	s1	46	养老金		商业经济	
+phase	n.	CORE	s1	46	阶段		抽象概念	认知与抽象名词
+prosperity	n.	CORE	s1	46	繁荣		商业经济	
+railway	n.	CORE	s1	46	铁路		交通旅行	
+revise	vt.	CORE	s1	46	修改	revize	动作行为	评价与判断
+romantic	adj.	CORE	s1,s2	46	浪漫的、不切实际的		情感心理	
+shelf	n.	CORE	s1	46	架子		日常生活	
+sink	vi.	CORE	s1	46	下沉		动作行为	身体动作
+storm	n.	CORE	s1	46	风暴		自然环境	
+straight	adj.	CORE	s1	46	直接的		抽象概念	性质与评价
+arrest	vt.	CORE	s1	45	逮捕		政治法律	
+celebrate	vt.	CORE	s1	45	庆祝		文化宗教	
+clerk	n.	CORE	s1	45	职员		职业工作	
+command	n.	CORE	s1	45	命令		动作行为	身体动作
+commodity	n.	CORE	s1	45	商品		商业经济	
+compromise	n.	CORE	s1	45	妥协	compromize	动作行为	身体动作
+desirable	adj.	CORE	s1	45	称心的、可取的		抽象概念	性质与评价
+dictionary	n.	CORE	s1	45	词典		教育学习	
+endure	vt./vi.	CORE	s1,s2	45	忍受、持久		动作行为	起始与终止
+hate	vt.	CORE	s1	45	讨厌		情感心理	
+hazard	n.	CORE	s1	45	危险		健康医疗	
+humor	n.	CORE	s1	45	幽默、诙谐	humour	情感心理	
+immune	adj.	CORE	s1	45	免疫		健康医疗	
+joint	adj./n.	CORE	s1,s2	45	共同的、关节		人类与社会	
+jury	n.	CORE	s1	45	陪审团		政治法律	
+knit	v.	CORE	s1	45	编织、针织		动作行为	身体动作
+magic	n.	CORE	s1	45	魔法		文化宗教	
+motion	n.	CORE	s1,s2	45	动、提议		动作行为	身体动作
+negotiate	v.	CORE	s1	45	谈判、协商		动作行为	社交交互
+norm	n.	CORE	s1	45	规范		抽象概念	认知与抽象名词
+numerous	adj.	CORE	s1	45	许多的		抽象概念	数量与程度
+pleasant	adj.	CORE	s1	45	愉快的		情感心理	
+reading	n.	CORE	s1,s2	45	读物、读数		教育学习	
+shoot	v.	CORE	s1	45	射击		动作行为	身体动作
+song	n.	CORE	s1	45	歌曲		运动娱乐	
+span	n.	CORE	s1	45	跨度		空间地点	
+storage	n.	CORE	s1,s2	45	储存、库房		日常生活	
+abstract	adj./n.	CORE	s1,s2	44	抽象的、摘要		抽象概念	认知与抽象名词
+assembly	n.	CORE	s1,s2	44	集合、装配		政治法律	
+automobile	n.	CORE	s1	44	汽车		交通旅行	
+biology	n.	CORE	s1	44	生物学		科学技术	
+calculate	vt.	CORE	s1	44	计算		科学技术	
+dish	n.	CORE	s1	44	碟子		日常生活	
+distract	vt.	CORE	s1	44	使转向、使分心		动作行为	身体动作
+enemy	n.	CORE	s1	44	敌人		政治法律	
+faith	n.	CORE	s1,s2	44	信心、信仰		情感心理	
+grasp	vt.	CORE	s1	44	抓住		动作行为	身体动作
+hungry	adj.	CORE	s1	44	饥饿的		情感心理	
+lane	n.	CORE	s1,s2	44	小路、泳道		空间地点	
+lift	vt.	CORE	s1	44	提起		动作行为	身体动作
+map	n.	CORE	s1	44	地图		空间地点	
+motivate	vt.	CORE	s1	44	激发		动作行为	使动与影响
+obscure	adj.	CORE	s1,s2	44	不为人知、晦涩难懂		抽象概念	性质与评价
+parliament	n.	CORE	s1,s2	44	原谅、国会		政治法律	
+passion	n.	CORE	s1	44	热情		情感心理	
+penalty	n.	CORE	s1	44	处罚		政治法律	
+pet	n.	CORE	s1	44	宠物		自然环境	
+philosopher	n.	CORE	s1	44	哲学家		文化宗教	
+possession	n.	CORE	s1	44	所有物、财产		商业经济	
+rescue	vt.	CORE	s1	44	拯救		动作行为	其他动作
+rid	vt.	CORE	s1	44	摆脱		动作行为	身体动作
+settlement	n.	CORE	s1,s2	44	解决、移民地		政治法律	
+shock	vt.	CORE	s1	44	震惊		动作行为	身体动作
+stranger	n.	CORE	s1	44	陌生人		人类与社会	
+strive	vi.	CORE	s1,s2	44	努力、斗争		动作行为	其他动作
+sudden	adj.	CORE	s1	44	突然的		抽象概念	性质与评价
+tooth	n.	CORE	s1	44	牙齿		人类与社会	
+upper	adj.	CORE	s1	44	上面的、较高的		空间地点	
+yesterday	n.	CORE	s1	44	昨天		时间日期	
+alike	adj.	CORE	s1	43	与…相似		抽象概念	性质与评价
+alive	adj.	CORE	s1	43	活着的		自然环境	
+anger	n./vt.	CORE	s1,s2	43	怒气、使发怒		情感心理	
+arrival	n.	CORE	s1	43	到达		时间日期	
+bomb	n.	CORE	s1	43	炸弹		政治法律	
+bore	vt.	CORE	s1,s2	43	使厌烦、钻孔		动作行为	其他动作
+chart	n.	CORE	s1	43	图表		科学技术	
+cloud	n.	CORE	s1	43	云		自然环境	
+compose	vt.	CORE	s1,s2,s3	43	组成、作曲、撰写		动作行为	其他动作
+cream	n.	CORE	s1	43	奶油		食物营养	
+exert	vt.	CORE	s1	43	用、运用		动作行为	身体动作
+interfere	vi.	CORE	s1,s2	43	妨碍、介入		动作行为	身体动作
+interference	n.	CORE	s1	43	干涉		抽象概念	认知与抽象名词
+kingdom	n.	CORE	s1	43	王国		政治法律	
+menu	n.	CORE	s1	43	菜单		食物营养	
+pilot	n.	CORE	s1	43	飞行员		职业工作	
+pioneer	n.	CORE	s1	43	先驱		职业工作	
+plain	adj.	CORE	s1,s2	43	平的、朴素的		自然环境	
+poet	n.	CORE	s1	43	诗人		文化宗教	
+punish	vt.	CORE	s1	43	惩罚		动作行为	其他动作
+readily	adv.	CORE	s1,s2	43	快捷地、乐意地		抽象概念	数量与程度
+soda	n.	CORE	s1	43	苏打		食物营养	
+soul	n.	CORE	s1	43	精神、灵魂		文化宗教	
+tiger	n.	CORE	s1	43	老虎		自然环境	
+ton	n.	CORE	s1,s2	43	吨、大量		科学技术	
+update	vt.	CORE	s1	43	更新		动作行为	使动与影响
+violent	adj.	CORE	s1	43	暴力的		政治法律	
+approval	n.	CORE	s1	42	赞成		情感心理	
+battery	n.	CORE	s1	42	电池		科学技术	
+convenience	n.	CORE	s1	42	便利		抽象概念	认知与抽象名词
+enforce	vt.	CORE	s1	42	强迫		动作行为	使动与影响
+extension	n.	CORE	s1	42	延伸		抽象概念	认知与抽象名词
+fatigue	n.	CORE	s1	42	疲劳		健康医疗	
+hunger	n.	CORE	s1,s2	42	饥饿、渴望		情感心理	
+impress	vt.	CORE	s1	42	留下印象		动作行为	其他动作
+output	n.	CORE	s1,s2	42	产量、输出		商业经济	
+platform	n.	CORE	s1	42	平台		空间地点	
+policeman	n.	CORE	s1	42	警察		职业工作	
+prolong	vt.	CORE	s1	42	延长		动作行为	身体动作
+random	adj.	CORE	s1	42	随机的		抽象概念	性质与评价
+rice	n.	CORE	s1	42	稻、大米		食物营养	
+ring	vi.	CORE	s1	42	响起		动作行为	身体动作
+shut	vt.	CORE	s1	42	关上		动作行为	其他动作
+silicon	n.	CORE	s1	42	硅		科学技术	
+surgery	n.	CORE	s1	42	外科手术		健康医疗	
+tragedy	n.	CORE	s1	42	悲剧		文化宗教	
+wheat	n.	CORE	s1	42	小麦		食物营养	
+absent	adj.	CORE	s1,s2	41	不在场的、漫不经心的		抽象概念	性质与评价
+bargain	n.	CORE	s1,s2	41	廉价货、交易		商业经济	
+boundary	n.	CORE	s1	41	界限		空间地点	
+chicken	n.	CORE	s1	41	小鸡		食物营养	
+comprehensive	adj.	CORE	s1	41	广泛的、全部的		抽象概念	性质与评价
+conform	vi.	CORE	s1	41	符合、遵照		动作行为	使动与影响
+deficit	n.	CORE	s1	41	赤字		商业经济	
+dominant	adj.	CORE	s1	41	支配的		抽象概念	性质与评价
+draft	n./vt.	CORE	s1,s2	41	草稿、起草	draught	动作行为	其他动作
+epidemic	adj./n.	CORE	s1,s2	41	流行性的、流行病		健康医疗	
+exploit	vt.	CORE	s1	41	开发、利用		动作行为	其他动作
+foreigner	n.	CORE	s1	41	外国人		人类与社会	
+formation	n.	CORE	s1	41	形成		抽象概念	认知与抽象名词
+forth	adv.	CORE	s1,s2,s3,s4	41	向前、离开、产生、拿出		空间地点	
+foster	vt.	CORE	s1	41	培养、培育		动作行为	使动与影响
+gesture	n.	CORE	s1	41	手势、姿态		动作行为	身体动作
+impulse	n.	CORE	s1	41	冲动		抽象概念	认知与抽象名词
+limitation	n.	CORE	s1	41	限制		抽象概念	认知与抽象名词
+nutrition	n.	CORE	s1	41	营养		食物营养	
+obligation	n.	CORE	s1	41	义务		情感心理	
+oblige	vt.	CORE	s1	41	强迫		动作行为	使动与影响
+shelter	n.	CORE	s1	41	庇护所		自然环境	
+spouse	n.	CORE	s1	41	配偶		人类与社会	
+subtle	adj.	CORE	s1	41	微妙的、细微的		抽象概念	性质与评价
+suburb	n.	CORE	s1	41	市郊		空间地点	
+sweet	adj.	CORE	s1	41	甜的		食物营养	
+tension	n.	CORE	s1,s2	41	张力、紧张		情感心理	
+verb	n.	CORE	s1	41	动词		教育学习	
+weekly	adj./n.	CORE	s1,s2	41	每周的、周刊		时间日期	
+accuse	vt.	CORE	s1	40	控告		动作行为	社交交互
+automatic	adj.	CORE	s1	40	自动的		科学技术	
+caution	n.	CORE	s1,s2	40	谨慎、警告		情感心理	
+compel	vt.	CORE	s1	40	迫使		动作行为	使动与影响
+corner	n.	CORE	s1	40	角落		空间地点	
+crude	adj.	CORE	s1,s2	40	粗鲁的、简陋的		抽象概念	性质与评价
+division	n.	CORE	s1,s2	40	分开、部门		抽象概念	认知与抽象名词
+evident	adj.	CORE	s1	40	明显的		抽象概念	性质与评价
+explosion	n.	CORE	s1	40	爆炸		自然环境	
+fifteen	num.	CORE	s1	40	十五		时间日期	
+fox	n.	CORE	s1	40	狐狸		自然环境	
+gallery	n.	CORE	s1,s2	40	画廊、长廊		文化宗教	
+globe	n.	CORE	s1,s2	40	球体、地球		自然环境	
+govern	vt.	CORE	s1,s2	40	统治、决定		动作行为	心理活动
+harvest	n.	CORE	s1	40	收获		自然环境	
+layer	n.	CORE	s1	40	层		科学技术	
+liquid	n.	CORE	s1	40	液体		科学技术	
+lower	adj.	CORE	s1,s2	40	较低的、下级的		动作行为	其他动作
+maintenance	n.	CORE	s1	40	维护		动作行为	起始与终止
+mechanical	adj.	CORE	s1	40	机械的		科学技术	
+melt	v.	CORE	s1	40	融化、溶解		动作行为	使动与影响
+mode	n.	CORE	s1,s2	40	模式、状态		抽象概念	认知与抽象名词
+mouse	n.	CORE	s1	40	鼠		自然环境	
+neutral	adj.	CORE	s1,s2	40	中立的、中性的		政治法律	
+pop	adj./vi.	CORE	s1,s2	40	流行的、突然出现		运动娱乐	
+primitive	adj.	CORE	s1,s2	40	原始的、简单的		抽象概念	性质与评价
+proceed	vi.	CORE	s1	40	继续进行		动作行为	起始与终止
+render	vt.	CORE	s1	40	使得、给予		动作行为	身体动作
+renew	vt.	CORE	s1,s2	40	更新、补充		动作行为	使动与影响
+somewhere	adv.	CORE	s1	40	在某处		空间地点	
+steady	adj.	CORE	s1	40	稳定的		抽象概念	性质与评价
+territory	n.	CORE	s1,s2	40	领土、领域		空间地点	
+transmit	vt.	CORE	s1	40	传送、发射		动作行为	变化趋势
+ancestor	n.	CORE	s1	39	祖先		人类与社会	
+classic	adj.	CORE	s1	39	传统的、古典的		文化宗教	
+coal	n.	CORE	s1	39	煤		自然环境	
+deadline	n.	CORE	s1	39	最后期限		时间日期	
+dislike	vt.	CORE	s1	39	不喜欢		情感心理	
+ear	n.	CORE	s1	39	耳朵		人类与社会	
+equivalent	adj.	CORE	s1	39	相同的		抽象概念	性质与评价
+excess	n.	CORE	s1	39	过剩、过量		商业经济	
+folk	n.	CORE	s1,s2	39	民间音乐、人们		人类与社会	
+fond	adj.	CORE	s1	39	喜欢		情感心理	
+guilty	adj.	CORE	s1	39	内疚		情感心理	
+hinder	vt.	CORE	s1	39	阻碍		动作行为	社交交互
+musician	n.	CORE	s1	39	音乐家		职业工作	
+narrative	n.	CORE	s1	39	叙述		文化宗教	
+permission	n.	CORE	s1	39	允许、许可		情感心理	
+pour	vt.	CORE	s1	39	倾倒	por	动作行为	身体动作
+semester	n.	CORE	s1	39	学期		教育学习	
+session	n.	CORE	s1,s2	39	会议、阶段		教育学习	
+setback	n.	CORE	s1	39	挫折		抽象概念	认知与抽象名词
+spelling	n.	CORE	s1	39	拼写		教育学习	
+stream	n./vi.	CORE	s1,s2	39	溪流、流淌		自然环境	
+triumph	n.	CORE	s1	39	胜利		动作行为	其他动作
+ultimate	adj.	CORE	s1	39	终极		抽象概念	性质与评价
+vice	n.	CORE	s1	39	恶习、邪恶、缺点	vise	政治法律	
+addict	vt.	CORE	s1	38	上瘾		健康医疗	
+architecture	n.	CORE	s1	38	结构		文化宗教	
+biography	n.	CORE	s1	38	传记		文化宗教	
+birthday	n.	CORE	s1	38	生日		时间日期	
+celebrity	n.	CORE	s1	38	名人		文化宗教	
+census	n.	CORE	s1	38	人口普查		政治法律	
+column	n.	CORE	s1	38	列		教育学习	
+confusion	n.	CORE	s1	38	混乱		抽象概念	认知与抽象名词
+controversial	adj.	CORE	s1	38	有争议的		抽象概念	性质与评价
+curb	vt.	CORE	s1	38	抑制	kerb	动作行为	社交交互
+dirty	adj.	CORE	s1	38	脏的		自然环境	
+disturb	vt.	CORE	s1	38	打扰		动作行为	使动与影响
+enthusiasm	n.	CORE	s1	38	热情		情感心理	
+entrepreneur	n.	CORE	s1	38	企业家		职业工作	
+fade	vi.	CORE	s1	38	消退、消逝		动作行为	变化趋势
+fake	vt./adj.	CORE	s1,s2	38	伪造、假的		抽象概念	性质与评价
+forecast	vt.	CORE	s1	38	预测		科学技术	
+forever	adv.	CORE	s1	38	永远		时间日期	
+frequency	n.	CORE	s1	38	频率		时间日期	
+inferior	n./adj.	CORE	s1,s2	38	下级、较差的		抽象概念	性质与评价
+ladder	n.	CORE	s1	38	梯子		日常生活	
+machinery	n.	CORE	s1	38	机械		科学技术	
+moon	n.	CORE	s1	38	月球、月亮		自然环境	
+oppose	vt.	CORE	s1	38	反对		动作行为	社交交互
+outstanding	adj.	CORE	s1	38	杰出的		抽象概念	性质与评价
+pile	n.	CORE	s1	38	堆		日常生活	
+prior	adj.	CORE	s1,s2	38	优先的、在前的		抽象概念	性质与评价
+province	n.	CORE	s1	38	省		空间地点	
+realistic	adj.	CORE	s1	38	现实的		情感心理	
+subsidy	n.	CORE	s1	38	津贴		商业经济	
+therapy	n.	CORE	s1	38	治疗		健康医疗	
+tolerant	adj.	CORE	s1	38	宽容的		情感心理	
+tower	n.	CORE	s1	38	塔		空间地点	
+wedding	n.	CORE	s1	38	婚礼		文化宗教	
+advertise	v.	CORE	s1	37	打广告	advertize	商业经济	
+alliance	n.	CORE	s1	37	联盟		政治法律	
+assemble	vt.	CORE	s1,s2	37	装配、召集		动作行为	身体动作
+clever	adj.	CORE	s1	37	聪明的		情感心理	
+colony	n.	CORE	s1	37	殖民地		政治法律	
+compound	n.	CORE	s1	37	化合物		科学技术	
+confine	vt.	CORE	s1	37	限制		动作行为	使动与影响
+copyright	n.	CORE	s1	37	版权		商业经济	
+crack	n.	CORE	s1	37	裂缝		动作行为	身体动作
+decorate	vt.	CORE	s1	37	装饰		动作行为	身体动作
+expertise	n.	CORE	s1	37	专业知识	expertize	科学技术	
+fancy	n.	CORE	s1	37	幻想、想象		情感心理	
+fashionable	adj.	CORE	s1	37	时髦的		交通旅行	
+hurry	adj.	CORE	s1	37	匆忙的		动作行为	其他动作
+leg	n.	CORE	s1	37	腿		人类与社会	
+literally	adv.	CORE	s1,s2	37	逐字地、简直		抽象概念	数量与程度
+loyalty	n.	CORE	s1	37	忠诚		情感心理	
+organism	n.	CORE	s1	37	有机体		自然环境	
+painful	adj.	CORE	s1	37	痛苦的		健康医疗	
+panic	adj.	CORE	s1	37	惊慌的		情感心理	
+prohibit	vt.	CORE	s1	37	禁止		动作行为	社交交互
+rough	adj.	CORE	s1	37	粗糙的		抽象概念	性质与评价
+scope	n.	CORE	s1	37	范围		抽象概念	认知与抽象名词
+spite	n.	CORE	s1	37	恶意、怨恨		情感心理	
+supplement	vt.	CORE	s1	37	补充		动作行为	其他动作
+sympathetic	adj.	CORE	s1	37	同情的		情感心理	
+till	prep.	CORE	s1	37	直到……为止		时间日期	
+upgrade	vt.	CORE	s1	37	升级		动作行为	身体动作
+wheel	n.	CORE	s1	37	轮子		交通旅行	
+worthy	adj.	CORE	s1	37	有价值的、值得的		抽象概念	性质与评价
+accommodation	n.	CORE	s1,s2	36	住处、和解		日常生活	
+acquisition	n.	CORE	s1,s2	36	收购、习得		抽象概念	认知与抽象名词
+amid	prep.	CORE	s1	36	在其间		空间地点	
+beer	n.	CORE	s1	36	啤酒		食物营养	
+bread	n.	CORE	s1	36	面包		食物营养	
+charm	n.	CORE	s1	36	魅力		情感心理	
+combat	n.	CORE	s1	36	战斗		动作行为	其他动作
+consistent	adj.	CORE	s1	36	一致的		抽象概念	性质与评价
+democracy	n.	CORE	s1	36	民主		政治法律	
+distinct	adj.	CORE	s1	36	不同的		抽象概念	性质与评价
+edit	vt.	CORE	s1	36	编辑		动作行为	身体动作
+exhaust	vt.	CORE	s1	36	耗尽		动作行为	身体动作
+fame	n.	CORE	s1	36	名声		情感心理	
+fulfil	vt.	CORE	s1	36	履行	fulfill	动作行为	使动与影响
+golden	adj.	CORE	s1	36	金色的		商业经济	
+harsh	adj.	CORE	s1,s2	36	严厉的、恶劣的		情感心理	
+holder	n.	CORE	s1	36	持有者		人类与社会	
+housework	n.	CORE	s1	36	家务		日常生活	
+identical	adj.	CORE	s1	36	相同的		抽象概念	性质与评价
+instruct	vt.	CORE	s1	36	指导		动作行为	社交交互
+jacket	n.	CORE	s1	36	夹克		交通旅行	
+lifetime	n.	CORE	s1	36	一生		时间日期	
+linguistic	adj.	CORE	s1	36	语言的		文化宗教	
+logical	adj.	CORE	s1	36	合理的、符合逻辑的		抽象概念	性质与评价
+mankind	n.	CORE	s1	36	人类		人类与社会	
+monetary	adj.	CORE	s1	36	货币的		商业经济	
+motive	n.	CORE	s1	36	动机		情感心理	
+nap	n.	CORE	s1	36	小睡		动作行为	身体动作
+nose	n.	CORE	s1	36	鼻子		人类与社会	
+pole	n.	CORE	s1	36	杆		空间地点	
+precious	adj.	CORE	s1	36	宝贵的		情感心理	
+provision	n.	CORE	s1	36	提供、供给		商业经济	
+reflection	n.	CORE	s1	36	反射		抽象概念	认知与抽象名词
+refugee	n.	CORE	s1	36	难民		人类与社会	
+sake	n.	CORE	s1,s2	36	缘故、目的		抽象概念	认知与抽象名词
+servant	n.	CORE	s1	36	仆人		职业工作	
+shirt	n.	CORE	s1	36	衬衫		交通旅行	
+suicide	n.	CORE	s1	36	自杀		政治法律	
+temper	n.	CORE	s1	36	脾气		情感心理	
+variation	n.	CORE	s1	36	变化		抽象概念	认知与抽象名词
+virus	n.	CORE	s1	36	病毒		健康医疗	
+wound	adj.	CORE	s1	36	受伤的		健康医疗	
+abundant	adj.	CORE	s1	35	丰富的		自然环境	
+apparent	adj.	CORE	s1	35	明显的		抽象概念	性质与评价
+appetite	n.	CORE	s1	35	食欲		食物营养	
+appliance	n.	CORE	s1,s2	35	装置、应用		日常生活	
+bicycle	n.	CORE	s1	35	自行车		交通旅行	
+blow	v.	CORE	s1	35	吹		动作行为	身体动作
+bone	n.	CORE	s1	35	骨		人类与社会	
+classical	adj.	CORE	s1	35	古典的		文化宗教	
+creature	n.	CORE	s1	35	生物		自然环境	
+cue	n.	CORE	s1	35	提示、暗示		抽象概念	认知与抽象名词
+currency	n.	CORE	s1	35	货币		商业经济	
+disable	vt.	CORE	s1	35	失去能力	dizable	动作行为	使动与影响
+eastern	adj.	CORE	s1	35	东部的		空间地点	
+fierce	adj.	CORE	s1,s2	35	凶猛的、激烈的		情感心理	
+gate	n.	CORE	s1	35	门		空间地点	
+guidance	n.	CORE	s1	35	指导		情感心理	
+horizon	n.	CORE	s1	35	地平线		自然环境	
+hostile	adj.	CORE	s1	35	敌对的		情感心理	
+integrity	n.	CORE	s1,s2	35	诚实正直、完整		情感心理	
+laundry	n.	CORE	s1	35	洗衣		日常生活	
+lion	n.	CORE	s1	35	狮子		自然环境	
+mix	vt.	CORE	s1	35	混合		动作行为	使动与影响
+passive	adj.	CORE	s1	35	被动的		情感心理	
+precise	adj.	CORE	s1	35	精确的	precize	抽象概念	性质与评价
+relax	v.	CORE	s1	35	放松		动作行为	使动与影响
+sequence	n.	CORE	s1	35	顺序		抽象概念	认知与抽象名词
+skirt	n.	CORE	s1	35	裙子		交通旅行	
+smooth	adj.	CORE	s1,s2	35	光滑的、顺利的		抽象概念	性质与评价
+suppress	vt.	CORE	s1	35	压制、镇压		动作行为	身体动作
+systematic	adj.	CORE	s1	35	系统的、成体系的		抽象概念	性质与评价
+toilet	n.	CORE	s1	35	厕所		日常生活	
+trigger	vt.	CORE	s1	35	触发		动作行为	身体动作
+bureau	n.	CORE	s1	34	办事处		商业经济	
+coat	n.	CORE	s1	34	外套		交通旅行	
+coin	n.	CORE	s1	34	硬币		商业经济	
+collective	adj.	CORE	s1	34	集体的、共同的		抽象概念	性质与评价
+companion	n.	CORE	s1	34	陪伴		人类与社会	
+concrete	adj.	CORE	s1,s2	34	具体的、确实的		抽象概念	性质与评价
+continuous	adj.	CORE	s1	34	连续的		时间日期	
+countryside	n.	CORE	s1	34	农村		自然环境	
+deposit	n.	CORE	s1	34	存款		商业经济	
+dynamic	n./adj.	CORE	s1,s2	34	动力、动态的		抽象概念	性质与评价
+elaborate	adj.	CORE	s1,s2	34	复杂的、详尽的		动作行为	社交交互
+electrical	adj.	CORE	s1	34	电的		科学技术	
+flash	v.	CORE	s1	34	闪		动作行为	其他动作
+format	n.	CORE	s1	34	版式、设计		科学技术	
+governor	n.	CORE	s1	34	统治者		政治法律	
+guess	v.	CORE	s1	34	猜测		动作行为	身体动作
+guilt	n.	CORE	s1	34	内疚		情感心理	
+habitat	n.	CORE	s1	34	栖息地		自然环境	
+heritage	n.	CORE	s1	34	遗产		文化宗教	
+incline	v./n.	CORE	s1,s2	34	倾斜、斜坡		动作行为	身体动作
+indispensable	adj.	CORE	s1	34	不可缺少的		抽象概念	性质与评价
+install	vt.	CORE	s1	34	安装		动作行为	身体动作
+instinct	n.	CORE	s1	34	本能		情感心理	
+mask	n.	CORE	s1	34	面具		交通旅行	
+mount	n.	CORE	s1	34	山		动作行为	身体动作
+parallel	adj.	CORE	s1,s2	34	平行的、类似的		抽象概念	性质与评价
+premium	n./adj.	CORE	s1,s2	34	保险费、优质的		商业经济	
+quarrel	vi.	CORE	s1	34	争吵		动作行为	社交交互
+resistant	adj.	CORE	s1	34	抵抗的		抽象概念	性质与评价
+secondary	adj.	CORE	s1	34	次要的		教育学习	
+shuttle	n.	CORE	s1	34	航天飞机		交通旅行	
+sorry	adj.	CORE	s1	34	抱歉		情感心理	
+spoil	vt.	CORE	s1	34	破坏		动作行为	其他动作
+straightforward	adj.	CORE	s1	34	坦率的		情感心理	
+sweep	vt.	CORE	s1	34	扫地		动作行为	身体动作
+tolerance	n.	CORE	s1	34	宽容、容忍		情感心理	
+tremendous	adj.	CORE	s1	34	巨大的		抽象概念	数量与程度
+variable	n./adj.	CORE	s1,s2	34	变量、多变的		抽象概念	性质与评价
+visible	adj.	CORE	s1	34	可见的		抽象概念	性质与评价
+withdraw	vi.	CORE	s1	34	退出、撤退		动作行为	身体动作
+accuracy	n.	CORE	s1	33	精确度		抽象概念	认知与抽象名词
+ambiguous	adj.	CORE	s1	33	模棱两可的		抽象概念	性质与评价
+courage	n.	CORE	s1	33	勇气	corage	情感心理	
+deliberate	adj.	CORE	s1,s2	33	深思熟虑的、故意的		动作行为	其他动作
+enrich	vt.	CORE	s1	33	丰富		动作行为	使动与影响
+fare	n.	CORE	s1	33	车费		商业经济	
+guy	n.	CORE	s1	33	家伙		人类与社会	
+noble	adj.	CORE	s1	33	贵族的		情感心理	
+operator	n.	CORE	s1	33	操作人员		职业工作	
+patience	n.	CORE	s1	33	耐心		情感心理	
+polite	adj.	CORE	s1	33	礼貌的		情感心理	
+pollute	vt.	CORE	s1	33	污染		自然环境	
+prominent	adj.	CORE	s1	33	突出的		抽象概念	性质与评价
+shame	n.	CORE	s1	33	羞愧		情感心理	
+silver	n.	CORE	s1	33	银		商业经济	
+substitute	v.	CORE	s1	33	代替		动作行为	身体动作
+suspend	vt.	CORE	s1	33	暂停		动作行为	身体动作
+suspicious	adj.	CORE	s1	33	可疑的		情感心理	
+thick	adj.	CORE	s1	33	厚的		抽象概念	性质与评价
+undermine	vt.	CORE	s1	33	逐渐削弱		动作行为	使动与影响
+voluntary	adj.	CORE	s1	33	自愿的		情感心理	
+acceptance	n.	CORE	s1	32	接受		抽象概念	认知与抽象名词
+asleep	adj.	CORE	s1	32	睡着		健康医疗	
+behalf	n.	CORE	s1	32	代表		人类与社会	
+cast	vt.	CORE	s1,s2	32	投射、铸造		动作行为	身体动作
+chat	vi.	CORE	s1	32	聊天		动作行为	社交交互
+cheer	v.	CORE	s1	32	欢呼		情感心理	
+comparable	adj.	CORE	s1	32	可比较的		抽象概念	性质与评价
+consensus	n.	CORE	s1	32	共识		抽象概念	认知与抽象名词
+cotton	n.	CORE	s1	32	棉花		交通旅行	
+esteem	vt.	CORE	s1	32	尊敬		情感心理	
+fate	n.	CORE	s1	32	命运		抽象概念	认知与抽象名词
+forbid	vt.	CORE	s1	32	禁止		动作行为	其他动作
+forty	num.	CORE	s1	32	四十		时间日期	
+heel	n.	CORE	s1	32	脚后跟		人类与社会	
+hemisphere	n.	CORE	s1	32	半球		自然环境	
+impressive	adj.	CORE	s1	32	印象深刻的		情感心理	
+intensity	n.	CORE	s1	32	强度		抽象概念	认知与抽象名词
+liberate	vt.	CORE	s1	32	解放		动作行为	其他动作
+mutual	adj.	CORE	s1	32	相互的		抽象概念	性质与评价
+nerve	n.	CORE	s1	32	神经		人类与社会	
+nurture	vt.	CORE	s1	32	培育		动作行为	使动与影响
+organisation	n.	CORE	s1	32	组织	organization	文化宗教	
+outlook	n.	CORE	s1	32	前景		情感心理	
+peculiar	adj.	CORE	s1	32	独特的、特殊的		情感心理	
+persist	vi.	CORE	s1	32	坚持		动作行为	起始与终止
+pure	adj.	CORE	s1	32	纯粹的、纯的		抽象概念	性质与评价
+rational	adj.	CORE	s1	32	理性的		抽象概念	性质与评价
+rear	n./vt.	CORE	s1,s2	32	后方、培育		人类与社会	
+row	n.	CORE	s1	32	行、排		动作行为	其他动作
+spur	vt.	CORE	s1	32	刺激、促进		动作行为	使动与影响
+tennis	n.	CORE	s1	32	网球		运动娱乐	
+tolerate	vt.	CORE	s1	32	容忍		动作行为	其他动作
+undergo	vt.	CORE	s1	32	经历		动作行为	其他动作
+verbal	adj.	CORE	s1	32	语言的		抽象概念	性质与评价
+wallet	n.	CORE	s1	32	钱包		日常生活	
+wash	vt.	CORE	s1	32	洗		动作行为	身体动作
+adventure	n.	CORE	s1	31	冒险		交通旅行	
+affection	n.	CORE	s1	31	喜爱、感情		情感心理	
+appoint	vt.	CORE	s1,s2,s3	31	任命、安排、约定		动作行为	社交交互
+architect	n.	CORE	s1	31	建筑师		职业工作	
+attain	vt.	CORE	s1	31	达到、获得		动作行为	起始与终止
+ball	n.	CORE	s1	31	球		运动娱乐	
+boast	vi.	CORE	s1	31	自夸		动作行为	其他动作
+cathedral	n.	CORE	s1	31	大教堂		文化宗教	
+clue	n.	CORE	s1	31	线索		抽象概念	认知与抽象名词
+consultant	n.	CORE	s1	31	顾问		职业工作	
+decent	adj.	CORE	s1	31	体面的		抽象概念	性质与评价
+defeat	vt.	CORE	s1	31	击败		动作行为	身体动作
+desperate	adj.	CORE	s1,s2	31	绝望的、不顾一切的		情感心理	
+drama	n.	CORE	s1	31	戏剧		运动娱乐	
+elevate	vt.	CORE	s1,s2	31	举起、提拔		动作行为	身体动作
+exclusive	adj.	CORE	s1	31	独有的		抽象概念	性质与评价
+frighten	vt.	CORE	s1	31	害怕、惊吓		动作行为	使动与影响
+greet	vt.	CORE	s1	31	打招呼		动作行为	其他动作
+headache	n.	CORE	s1	31	头痛		健康医疗	
+hesitate	vi.	CORE	s1	31	犹豫		动作行为	心理活动
+index	n.	CORE	s1	31	索引		教育学习	
+knock	v.	CORE	s1	31	敲		动作行为	身体动作
+membership	n.	CORE	s1	31	会员		抽象概念	认知与抽象名词
+mortgage	n.	CORE	s1	31	抵押		商业经济	
+opera	n.	CORE	s1	31	歌剧		运动娱乐	
+oxygen	n.	CORE	s1	31	氧		科学技术	
+plunge	vi.	CORE	s1,s2	31	陷入、暴跌		动作行为	身体动作
+reception	n.	CORE	s1,s2	31	接待、招待会		文化宗教	
+rubbish	n.	CORE	s1	31	垃圾		日常生活	
+satisfactory	adj.	CORE	s1	31	令人满意的		情感心理	
+seminar	n.	CORE	s1	31	研讨会		教育学习	
+stereotype	n.	CORE	s1	31	刻板		抽象概念	认知与抽象名词
+sue	vt.	CORE	s1	31	起诉		动作行为	身体动作
+tape	n.	CORE	s1	31	胶带		日常生活	
+thesis	n.	CORE	s1	31	论文		教育学习	
+twelve	num.	CORE	s1	31	十二		时间日期	
+twin	n.	CORE	s1	31	双胞胎		人类与社会	
+underground	adj.	CORE	s1	31	地下		空间地点	
+upward	adv.	CORE	s1	31	向上		空间地点	
+zero	num.	CORE	s1	31	零		时间日期	
+annoy	adj.	CORE	s1	30	令人厌烦的		情感心理	
+brick	n.	CORE	s1	30	砖		日常生活	
+bush	n.	CORE	s1	30	灌木		自然环境	
+chef	n.	CORE	s1	30	厨师		职业工作	
+constitution	n.	CORE	s1	30	宪法		政治法律	
+definite	adj.	CORE	s1	30	明确的		抽象概念	性质与评价
+dictate	vt.	CORE	s1,s2	30	规定、口述		动作行为	身体动作
+drift	vi.	CORE	s1	30	漂移、漂流		动作行为	身体动作
+endeavor	n.	CORE	s1	30	努力	endeavour	动作行为	其他动作
+enlarge	vt.	CORE	s1	30	扩大		动作行为	变化趋势
+enthusiastic	adj.	CORE	s1	30	热情的		情感心理	
+flourish	vi.	CORE	s1	30	繁荣	florish	动作行为	其他动作
+frame	n.	CORE	s1	30	框架		动作行为	使动与影响
+gaze	vi.	CORE	s1	30	凝视		动作行为	其他动作
+inch	n.	CORE	s1	30	英寸		科学技术	
+incredible	adj.	CORE	s1	30	难以置信的		抽象概念	性质与评价
+junior	adj.	CORE	s1	30	年资较浅的		教育学习	
+junk	n.	CORE	s1	30	垃圾		日常生活	
+lung	n.	CORE	s1	30	肺		人类与社会	
+mature	adj.	CORE	s1	30	成熟的		动作行为	使动与影响
+mechanic	n.	CORE	s1	30	技工		职业工作	
+mineral	n.	CORE	s1	30	矿物质		自然环境	
+organ	n.	CORE	s1	30	器官		人类与社会	
+pack	vt.	CORE	s1	30	打包		动作行为	身体动作
+piano	n.	CORE	s1	30	钢琴		运动娱乐	
+poem	n.	CORE	s1	30	诗		文化宗教	
+profile	n.	CORE	s1,s2	30	轮廓、简介		人类与社会	
+pump	n.	CORE	s1	30	泵		科学技术	
+pyramid	n.	CORE	s1	30	金字塔		自然环境	
+remedy	n.	CORE	s1	30	补救、治疗		动作行为	身体动作
+scatter	vt.	CORE	s1	30	分散、散布		动作行为	变化趋势
+subway	n.	CORE	s1	30	地铁		交通旅行	
+tropical	adj.	CORE	s1	30	热带的		自然环境	
+twist	vt.	CORE	s1,s2	30	扭曲、捻		动作行为	身体动作
+wherever	conj.	CORE	s1	30	无论在哪里		空间地点	
+wipe	vt.	CORE	s1	30	擦除		动作行为	身体动作
+youngster	n.	CORE	s1	30	少年		人类与社会	
+accommodate	vt.	CORE	s1,s2	29	适应、容纳		动作行为	身体动作
+activate	vt.	CORE	s1	29	激活		动作行为	使动与影响
+bid	v.	CORE	s1	29	出价、投标		动作行为	身体动作
+chase	vt.	CORE	s1	29	追逐		动作行为	其他动作
+chemistry	n.	CORE	s1	29	化学		科学技术	
+click	v.	CORE	s1	29	点击		动作行为	身体动作
+clinic	n.	CORE	s1	29	诊所		健康医疗	
+criterion	n.	CORE	s1	29	标准		抽象概念	认知与抽象名词
+deed	n.	CORE	s1	29	行为、事迹		动作行为	其他动作
+destructive	adj.	CORE	s1	29	破坏性的		抽象概念	性质与评价
+dull	adj.	CORE	s1	29	枯燥的		情感心理	
+gentleman	n.	CORE	s1	29	绅士		人类与社会	
+gradual	adj.	CORE	s1	29	逐渐的		时间日期	
+ignorant	adj.	CORE	s1	29	无知的		情感心理	
+interior	n.	CORE	s1	29	内部		空间地点	
+invisible	adj.	CORE	s1	29	看不见的		抽象概念	性质与评价
+lawsuit	n.	CORE	s1	29	诉讼		政治法律	
+liability	n.	CORE	s1	29	责任		商业经济	
+lightning	n.	CORE	s1	29	闪电		自然环境	
+manipulate	vt.	CORE	s1	29	操纵		动作行为	使动与影响
+migrate	vi.	CORE	s1	29	迁移		动作行为	其他动作
+objection	n.	CORE	s1	29	反对		情感心理	
+outlet	n.	CORE	s1	29	出口		空间地点	
+prisoner	n.	CORE	s1	29	囚犯		人类与社会	
+recreation	n.	CORE	s1	29	娱乐		运动娱乐	
+refine	vt.	CORE	s1	29	改进		动作行为	身体动作
+retreat	vi.	CORE	s1	29	撤退		动作行为	其他动作
+rude	adj.	CORE	s1	29	粗鲁的		情感心理	
+salesman	n.	CORE	s1	29	推销员		职业工作	
+squeeze	vt.	CORE	s1	29	挤压		动作行为	身体动作
+stamp	n.	CORE	s1	29	邮票		动作行为	身体动作
+steep	adj.	CORE	s1	29	陡峭的		抽象概念	性质与评价
+summary	n.	CORE	s1	29	摘要		教育学习	
+surname	n.	CORE	s1	29	姓		人类与社会	
+tight	adj.	CORE	s1	29	紧的		抽象概念	性质与评价
+tunnel	n.	CORE	s1	29	隧道		交通旅行	
+wonderful	adj.	CORE	s1	29	精彩的		情感心理	
+absolute	adj.	CORE	s1	28	绝对的		抽象概念	数量与程度
+bet	v.	CORE	s1	28	打赌		动作行为	身体动作
+brilliant	adj.	CORE	s1,s2,s3	28	闪亮的、聪明的、出色的		情感心理	
+brush	n.	CORE	s1	28	刷子		日常生活	
+cinema	n.	CORE	s1	28	电影院		运动娱乐	
+classify	vt.	CORE	s1	28	分类		动作行为	评价与判断
+conceive	vi./vt.	CORE	s1,s2	28	怀孕、设想		动作行为	心理活动
+density	n.	CORE	s1	28	密度		科学技术	
+discard	vt.	CORE	s1	28	抛弃、丢弃		动作行为	身体动作
+dose	n.	CORE	s1	28	剂量		健康医疗	
+essence	n.	CORE	s1	28	本质		抽象概念	认知与抽象名词
+extraordinary	adj.	CORE	s1	28	非凡的		抽象概念	性质与评价
+festival	n.	CORE	s1	28	节日		文化宗教	
+frank	adj.	CORE	s1	28	坦白的、直率的		情感心理	
+gadget	n.	CORE	s1	28	小玩意儿		科学技术	
+gross	adj.	CORE	s1	28	总的		抽象概念	性质与评价
+gun	n.	CORE	s1	28	枪		政治法律	
+inhabitant	n.	CORE	s1	28	居民		人类与社会	
+laughter	n.	CORE	s1	28	笑声		情感心理	
+leap	v.	CORE	s1	28	跳跃		动作行为	身体动作
+misfortune	n.	CORE	s1	28	不幸		情感心理	
+momentum	n.	CORE	s1	28	势头		科学技术	
+monopoly	n.	CORE	s1	28	垄断		商业经济	
+orbit	n.	CORE	s1	28	轨道		科学技术	
+playground	n.	CORE	s1	28	操场		运动娱乐	
+polish	vt.	CORE	s1	28	擦亮		动作行为	身体动作
+prescription	n.	CORE	s1	28	处方		健康医疗	
+quest	v.	CORE	s1	28	探索、寻求		动作行为	其他动作
+reproduce	vt.	CORE	s1	28	复制		动作行为	其他动作
+reservation	n.	CORE	s1	28	预定		抽象概念	认知与抽象名词
+resistance	n.	CORE	s1	28	抵抗		科学技术	
+revolutionary	adj.	CORE	s1	28	革命的		政治法律	
+rob	vt.	CORE	s1	28	抢劫		动作行为	占有与转移
+shy	adj.	CORE	s1	28	害羞地		情感心理	
+sir	n.	CORE	s1	28	先生		人类与社会	
+slight	adj.	CORE	s1	28	轻微的		抽象概念	性质与评价
+stare	vi.	CORE	s1	28	盯着		动作行为	身体动作
+surgeon	n.	CORE	s1	28	外科医生		职业工作	
+tenant	n.	CORE	s1	28	房客、租户		人类与社会	
+trail	n.	CORE	s1,s2	28	小径、踪迹		动作行为	身体动作
+transmission	n.	CORE	s1	28	传输		科学技术	
+underestimate	vt.	CORE	s1	28	低估		动作行为	身体动作
+wander	vi.	CORE	s1	28	游荡		动作行为	起始与终止
+agenda	n.	CORE	s1	27	议程、日程		教育学习	
+apology	n.	CORE	s1	27	道歉		文化宗教	
+assert	vt.	CORE	s1	27	断言		动作行为	社交交互
+basketball	n.	CORE	s1	27	篮球		运动娱乐	
+burst	vi.	CORE	s1	27	迸发、爆发		动作行为	其他动作
+corn	n.	CORE	s1	27	玉米		食物营养	
+dine	vi.	CORE	s1	27	进餐		食物营养	
+excitement	n.	CORE	s1	27	兴奋		情感心理	
+extract	vt.	CORE	s1	27	提取		动作行为	身体动作
+geography	n.	CORE	s1	27	地理		科学技术	
+headline	n.	CORE	s1	27	头条新闻		文化宗教	
+hobby	n.	CORE	s1	27	兴趣		运动娱乐	
+inherent	adj.	CORE	s1	27	固有的		抽象概念	性质与评价
+joke	n.	CORE	s1	27	笑话		运动娱乐	
+laptop	n.	CORE	s1	27	笔记本电脑		科学技术	
+loud	adj.	CORE	s1	27	大声的		抽象概念	性质与评价
+margin	n.	CORE	s1,s2	27	利润、边缘		抽象概念	数量与程度
+murder	n./vt.	CORE	s1,s2	27	谋杀		动作行为	其他动作
+mysterious	adj.	CORE	s1	27	神秘的		情感心理	
+oneself	pron.	CORE	s1	27	自己		人类与社会	
+pessimistic	adj.	CORE	s1	27	悲观的		情感心理	
+portray	vt.	CORE	s1	27	描绘		动作行为	身体动作
+potato	n.	CORE	s1	27	马铃薯		食物营养	
+pretend	vt.	CORE	s1	27	假装		动作行为	身体动作
+prevalent	adj.	CORE	s1	27	普遍的		抽象概念	性质与评价
+pronunciation	n.	CORE	s1	27	发音		教育学习	
+rigorous	adj.	CORE	s1	27	严格的		抽象概念	性质与评价
+shadow	n.	CORE	s1	27	阴影		自然环境	
+silence	n.	CORE	s1	27	沉默		情感心理	
+sixty	num.	CORE	s1	27	六十		抽象概念	数量与程度
+slice	n.	CORE	s1,s2	27	部分、薄片		日常生活	
+specify	vt.	CORE	s1	27	指定		动作行为	社交交互
+tag	n.	CORE	s1	27	标签		日常生活	
+theoretical	adj.	CORE	s1	27	理论上的		抽象概念	性质与评价
+tongue	n.	CORE	s1	27	舌头		人类与社会	
+tune	n.	CORE	s1	27	曲调		动作行为	其他动作
+waiter	n.	CORE	s1	27	服务员		职业工作	
+worthwhile	adj.	CORE	s1	27	值得的		抽象概念	性质与评价
+abolish	vt.	CORE	s1	26	废除		政治法律	
+cater	vi.	CORE	s1	26	迎合		动作行为	身体动作
+collar	n.	CORE	s1	26	衣领		交通旅行	
+deficiency	n.	CORE	s1	26	不足、缺乏		抽象概念	认知与抽象名词
+dissolve	v.	CORE	s1	26	溶解		动作行为	使动与影响
+donate	vt.	CORE	s1	26	捐赠		动作行为	占有与转移
+drastic	adj.	CORE	s1	26	激烈的		抽象概念	性质与评价
+enrol	v.	CORE	s1	26	登记	enroll	动作行为	其他动作
+expedition	n.	CORE	s1	26	探险队		交通旅行	
+foresee	vt.	CORE	s1	26	预见		动作行为	其他动作
+fortunate	adj.	CORE	s1	26	幸运的		抽象概念	性质与评价
+grave	n.	CORE	s1	26	坟墓		政治法律	
+halt	v.	CORE	s1	26	停止		动作行为	使动与影响
+hardship	n.	CORE	s1	26	艰难		抽象概念	认知与抽象名词
+historic	adj.	CORE	s1	26	有历史意义的		时间日期	
+hormone	n.	CORE	s1	26	激素		健康医疗	
+hypothesis	n.	CORE	s1	26	假设		抽象概念	认知与抽象名词
+incorporate	vt.	CORE	s1	26	合并		动作行为	变化趋势
+lag	vi.	CORE	s1	26	落后		动作行为	身体动作
+liable	adj.	CORE	s1	26	有义务的		抽象概念	性质与评价
+mild	adj.	CORE	s1	26	温和的		情感心理	
+nursery	n.	CORE	s1	26	托儿所		教育学习	
+outdoor	adj.	CORE	s1	26	户外的		日常生活	
+peaceful	adj.	CORE	s1	26	和平的		政治法律	
+physicist	n.	CORE	s1	26	物理学家		科学技术	
+plot	n.	CORE	s1	26	情节		动作行为	心理活动
+precede	vt.	CORE	s1	26	先于		动作行为	其他动作
+prey	n./vi.	CORE	s1,s2	26	猎物、捕食		动作行为	身体动作
+quota	n.	CORE	s1	26	配额		商业经济	
+rainbow	n.	CORE	s1	26	彩虹		自然环境	
+realise	vt.	CORE	s1	26	认识到、体会到	realize	动作行为	其他动作
+recipient	n.	CORE	s1	26	接受者		人类与社会	
+resemble	vt.	CORE	s1	26	像		动作行为	其他动作
+revive	v./vt.	CORE	s1,s2	26	复苏、唤醒		动作行为	使动与影响
+senator	n.	CORE	s1	26	参议员		政治法律	
+sheer	adj.	CORE	s1,s2	26	纯然的、陡峭的		抽象概念	性质与评价
+sing	v.	CORE	s1	26	唱歌		运动娱乐	
+soar	vi.	CORE	s1	26	翱翔、高飞		动作行为	其他动作
+speculate	v.	CORE	s1	26	推测		动作行为	身体动作
+spiritual	adj.	CORE	s1	26	精神的		文化宗教	
+studio	n.	CORE	s1	26	工作室		运动娱乐	
+stupid	adj.	CORE	s1	26	愚蠢		情感心理	
+supervise	vt.	CORE	s1	26	监督	supervize	动作行为	社交交互
+surplus	n.	CORE	s1	26	盈余、过剩		商业经济	
+suspicion	n.	CORE	s1	26	怀疑		情感心理	
+temptation	n.	CORE	s1	26	诱惑		情感心理	
+toxic	adj.	CORE	s1	26	有毒的		健康医疗	
+underlie	vt.	CORE	s1,s2	26	构成...的基础、在...之下		动作行为	其他动作
+undertake	vt.	CORE	s1	26	承担		动作行为	身体动作
+wine	n.	CORE	s1	26	酒		食物营养	
+allowance	n.	CORE	s1	25	津贴		商业经济	
+awkward	adj.	CORE	s1,s2	25	笨拙的、令人尴尬的		情感心理	
+bell	n.	CORE	s1	25	钟、铃		日常生活	
+cable	n.	CORE	s1	25	缆、电缆		科学技术	
+cherish	vt.	CORE	s1	25	珍爱		动作行为	身体动作
+circuit	n.	CORE	s1	25	电路		科学技术	
+competent	adj.	CORE	s1	25	有能力的		抽象概念	性质与评价
+contend	vi.	CORE	s1,s2	25	竞争、争辩		动作行为	心理活动
+cooperate	vi.	CORE	s1	25	合作		动作行为	社交交互
+deem	vt.	CORE	s1	25	认为		动作行为	心理活动
+delicate	adj.	CORE	s1,s2	25	易碎的、精致的		抽象概念	性质与评价
+descend	vi.	CORE	s1	25	下降		动作行为	变化趋势
+emit	vt.	CORE	s1	25	放射		动作行为	身体动作
+entity	n.	CORE	s1	25	实体		抽象概念	认知与抽象名词
+fourteen	num.	CORE	s1	25	十四		时间日期	
+fry	vt.	CORE	s1	25	油炸		食物营养	
+hat	n.	CORE	s1	25	帽子		交通旅行	
+indoor	adj.	CORE	s1	25	室内的		日常生活	
+manual	n.	CORE	s1	25	手册		科学技术	
+mathematical	adj.	CORE	s1	25	数学的		科学技术	
+nowhere	adv.	CORE	s1	25	无处		空间地点	
+occasional	adj.	CORE	s1	25	偶然的		时间日期	
+offend	vt.	CORE	s1	25	冒犯		动作行为	使动与影响
+outer	adj.	CORE	s1	25	外面的		空间地点	
+prescribe	vt.	CORE	s1	25	开处方		动作行为	社交交互
+prestige	n.	CORE	s1	25	声望		抽象概念	性质与评价
+publicity	n.	CORE	s1	25	宣传		文化宗教	
+refrain	vi.	CORE	s1	25	避免、克制		动作行为	社交交互
+shell	n.	CORE	s1	25	壳		自然环境	
+silly	adj.	CORE	s1	25	愚蠢的		情感心理	
+simplify	vt.	CORE	s1	25	简化		动作行为	使动与影响
+skip	vt.	CORE	s1	25	跳过		动作行为	身体动作
+split	v.	CORE	s1	25	分开、划分		动作行为	变化趋势
+syndrome	n.	CORE	s1	25	综合症		健康医疗	
+tailor	n.	CORE	s1	25	裁缝		职业工作	
+tale	n.	CORE	s1	25	故事		文化宗教	
+vague	adj.	CORE	s1	25	模糊地		抽象概念	性质与评价
+volcano	n.	CORE	s1	25	火山		自然环境	
+whale	n.	CORE	s1	25	鲸		自然环境	
+alien	n.	CORE	s1	24	外星人		人类与社会	
+array	n.	CORE	s1	24	系列、序列		抽象概念	数量与程度
+beam	n./v.	CORE	s1,s2	24	光线、发射		科学技术	
+blog	n.	CORE	s1	24	博客		科学技术	
+cease	v.	CORE	s1	24	停止		动作行为	起始与终止
+charter	n.	CORE	s1	24	宪章		政治法律	
+correlate	v.	CORE	s1	24	关联		动作行为	其他动作
+deadly	adj.	CORE	s1	24	致命的		健康医疗	
+departure	n.	CORE	s1	24	离开		时间日期	
+devise	vt.	CORE	s1	24	设计	devize	动作行为	心理活动
+diagnose	vt.	CORE	s1	24	判断		健康医疗	
+dilemma	n.	CORE	s1	24	困境		抽象概念	认知与抽象名词
+dip	vt.	CORE	s1	24	蘸		动作行为	其他动作
+distress	n.	CORE	s1	24	忧虑、悲伤		情感心理	
+drill	n.	CORE	s1	24	练习		动作行为	其他动作
+dump	n./vt.	CORE	s1,s2	24	垃圾场、倾倒		动作行为	身体动作
+engagement	n.	CORE	s1	24	订婚		文化宗教	
+exaggerate	vt.	CORE	s1	24	夸大		动作行为	其他动作
+favorable	adj.	CORE	s1	24	有利的	favourable	抽象概念	性质与评价
+fertile	adj.	CORE	s1	24	肥沃的		自然环境	
+float	vi.	CORE	s1	24	漂浮		动作行为	身体动作
+fold	vt.	CORE	s1	24	折叠		动作行为	身体动作
+fool	n.	CORE	s1	24	傻瓜		情感心理	
+herd	n.	CORE	s1	24	群		自然环境	
+inherit	vt.	CORE	s1	24	继承		动作行为	占有与转移
+intimate	adj.	CORE	s1	24	亲密的		情感心理	
+opt	vi.	CORE	s1	24	选择		动作行为	评价与判断
+ours	pron.	CORE	s1	24	我们的		人类与社会	
+pencil	n.	CORE	s1	24	铅笔		教育学习	
+resign	vi.	CORE	s1	24	辞职		动作行为	身体动作
+rocket	n.	CORE	s1	24	火箭		科学技术	
+scratch	vt.	CORE	s1	24	抓		动作行为	身体动作
+sculpture	n.	CORE	s1	24	雕塑		文化宗教	
+spell	v./n.	CORE	s1,s2	24	拼写、咒语		动作行为	身体动作
+spy	n./vt.	CORE	s1,s2	24	监视、间谍		职业工作	
+steam	n.	CORE	s1	24	蒸汽		自然环境	
+strip	vt.	CORE	s1,s2	24	脱衣、剥夺		动作行为	其他动作
+thrill	n.	CORE	s1	24	激动		情感心理	
+tribe	n.	CORE	s1	24	部落		人类与社会	
+troop	n.	CORE	s1	24	军队		政治法律	
+vigorous	adj.	CORE	s1	24	充满力量的		情感心理	
+warmth	n.	CORE	s1	24	温暖		情感心理	
+wet	adj.	CORE	s1	24	湿的		自然环境	
+alongside	adv.	CORE	s1	23	在旁边		空间地点	
+authentic	adj.	CORE	s1	23	真实的、真正的		抽象概念	性质与评价
+beef	n.	CORE	s1	23	牛肉		食物营养	
+bitter	adj.	CORE	s1	23	苦的		食物营养	
+bulk	n.	CORE	s1,s2	23	大部分、体积		抽象概念	数量与程度
+butter	n.	CORE	s1	23	黄油		食物营养	
+carpet	n.	CORE	s1	23	地毯		日常生活	
+civilian	n.	CORE	s1	23	平民		人类与社会	
+conquer	vt.	CORE	s1	23	征服		动作行为	占有与转移
+contradict	vt.	CORE	s1	23	反驳		动作行为	身体动作
+coordinate	vt./n.	CORE	s1,s2	23	协调、坐标		动作行为	身体动作
+dig	v.	CORE	s1	23	挖		动作行为	其他动作
+digest	vt.	CORE	s1	23	消化		动作行为	心理活动
+elect	vt.	CORE	s1	23	选举		动作行为	身体动作
+excel	vi.	CORE	s1	23	优于		动作行为	其他动作
+exotic	adj.	CORE	s1,s2	23	奇异的、外来的		自然环境	
+feasible	adj.	CORE	s1	23	可行的		抽象概念	性质与评价
+funny	adj.	CORE	s1	23	有趣的、滑稽的		情感心理	
+gloomy	adj.	CORE	s1	23	阴暗的		情感心理	
+hint	n.	CORE	s1	23	暗示		动作行为	身体动作
+hip	n.	CORE	s1	23	髋		人类与社会	
+illiterate	n.	CORE	s1	23	文盲		教育学习	
+innocent	adj.	CORE	s1	23	无辜的		情感心理	
+input	n.	CORE	s1	23	输入		科学技术	
+iron	vt.	CORE	s1	23	熨		日常生活	
+lazy	adj.	CORE	s1	23	懒惰的		情感心理	
+leaf	n.	CORE	s1	23	叶子		自然环境	
+leak	v.	CORE	s1	23	泄露		动作行为	其他动作
+lip	n.	CORE	s1	23	嘴唇		人类与社会	
+manifest	vt./adj.	CORE	s1,s2	23	显示、显然的		动作行为	心理活动
+nonsense	n.	CORE	s1	23	胡说		情感心理	
+obey	vt.	CORE	s1	23	遵守、服从		动作行为	身体动作
+painter	n.	CORE	s1	23	画家		职业工作	
+pen	n.	CORE	s1	23	钢笔		教育学习	
+pie	n.	CORE	s1	23	馅饼		食物营养	
+pin	n./vt.	CORE	s1,s2	23	别针、固定		日常生活	
+queue	vi.	CORE	s1	23	排队		动作行为	起始与终止
+retrieve	vt.	CORE	s1,s2	23	取回、恢复		动作行为	起始与终止
+romance	n.	CORE	s1,s2	23	浪漫、冒险故事		文化宗教	
+seize	vt.	CORE	s1	23	抓住	seise	动作行为	身体动作
+stir	vt.	CORE	s1	23	搅拌		动作行为	身体动作
+vivid	adj.	CORE	s1	23	生动的		情感心理	
+workshop	n.	CORE	s1	23	车间		日常生活	
+yellow	n.	CORE	s1	23	黄色		交通旅行	
+acquaintance	n.	CORE	s1	22	相识的人		人类与社会	
+alleviate	vt.	CORE	s1	22	减轻		动作行为	其他动作
+amuse	vt.	CORE	s1	22	娱乐		动作行为	身体动作
+bay	n.	CORE	s1	22	海湾		自然环境	
+bite	vt.	CORE	s1	22	咬		动作行为	身体动作
+cake	n.	CORE	s1	22	蛋糕		食物营养	
+cap	n.	CORE	s1	22	帽子		交通旅行	
+cart	n.	CORE	s1	22	手推车		交通旅行	
+comply	vi.	CORE	s1	22	顺从		动作行为	其他动作
+contempt	n.	CORE	s1	22	轻蔑		情感心理	
+cow	n.	CORE	s1	22	母牛		自然环境	
+demographic	adj.	CORE	s1	22	人口的		抽象概念	性质与评价
+depict	vt.	CORE	s1	22	描述、描绘		动作行为	身体动作
+dimension	n.	CORE	s1	22	维度		科学技术	
+downtown	n.	CORE	s1	22	市中心		空间地点	
+furnish	vt.	CORE	s1	22	提供		动作行为	身体动作
+grateful	adj.	CORE	s1	22	感激的		情感心理	
+hurricane	n.	CORE	s1	22	飓风		自然环境	
+imitation	n.	CORE	s1	22	模仿		动作行为	身体动作
+incidence	n.	CORE	s1	22	发生率		抽象概念	认知与抽象名词
+invitation	n.	CORE	s1	22	邀请		情感心理	
+jet	v./n.	CORE	s1,s2	22	喷射、喷气式飞机		交通旅行	
+linger	vi.	CORE	s1	22	徘徊、逗留		动作行为	身体动作
+mill	vt.	CORE	s1	22	磨		商业经济	
+palace	n.	CORE	s1	22	宫殿		空间地点	
+patch	n./vt.	CORE	s1,s2	22	补丁、修补		日常生活	
+precision	n.	CORE	s1	22	精确		抽象概念	认知与抽象名词
+provoke	vt.	CORE	s1	22	激怒		动作行为	使动与影响
+queen	n.	CORE	s1	22	女王		人类与社会	
+setting	n.	CORE	s1	22	环境、背景		空间地点	
+shore	n.	CORE	s1	22	岸上		自然环境	
+stroke	n.	CORE	s1	22	中风		动作行为	身体动作
+super	adj.	CORE	s1	22	极好的		抽象概念	性质与评价
+superficial	adj.	CORE	s1	22	肤浅的		情感心理	
+surge	n.	CORE	s1	22	激增		动作行为	变化趋势
+tea	n.	CORE	s1	22	茶		食物营养	
+testify	vi.	CORE	s1	22	作证		动作行为	社交交互
+unity	n.	CORE	s1	22	统一		抽象概念	认知与抽象名词
+awake	adj./vi.	CORE	s1,s2	21	醒着的、醒来		健康医疗	
+beside	prep.	CORE	s1	21	在…旁边		空间地点	
+commute	vi.	CORE	s1	21	通勤		动作行为	其他动作
+compute	vt.	CORE	s1	21	估计		动作行为	其他动作
+crazy	adj.	CORE	s1	21	疯狂的		情感心理	
+dare	v.	CORE	s1	21	敢		动作行为	社交交互
+decisive	adj.	CORE	s1	21	决定性的		抽象概念	性质与评价
+dwell	vi.	CORE	s1	21	居住		动作行为	其他动作
+elegant	adj.	CORE	s1	21	优雅的		情感心理	
+energetic	adj.	CORE	s1,s2	21	精力旺盛的、能量的		抽象概念	性质与评价
+episode	n.	CORE	s1	21	情节		运动娱乐	
+faulty	adj.	CORE	s1	21	有缺陷的		抽象概念	性质与评价
+flag	n.	CORE	s1	21	旗		日常生活	
+flaw	n.	CORE	s1	21	缺陷		抽象概念	认知与抽象名词
+formulate	vt.	CORE	s1	21	规划、制订		动作行为	评价与判断
+fraud	n.	CORE	s1	21	欺骗		政治法律	
+frontier	n.	CORE	s1	21	边境、边界		空间地点	
+housewife	n.	CORE	s1	21	家庭主妇		人类与社会	
+illusion	n.	CORE	s1	21	错觉		情感心理	
+indication	n.	CORE	s1,s2	21	迹象、指示		抽象概念	认知与抽象名词
+inspiration	n.	CORE	s1	21	灵感		情感心理	
+intervene	vi.	CORE	s1	21	干预		动作行为	身体动作
+invade	vt.	CORE	s1	21	侵略		动作行为	使动与影响
+lord	n.	CORE	s1	21	主		政治法律	
+luggage	n.	CORE	s1	21	行李		交通旅行	
+merge	v.	CORE	s1	21	合并		动作行为	使动与影响
+misery	n.	CORE	s1	21	痛苦		情感心理	
+moderate	adj.	CORE	s1	21	温和的、适度的		抽象概念	性质与评价
+occurrence	n.	CORE	s1	21	发生		抽象概念	认知与抽象名词

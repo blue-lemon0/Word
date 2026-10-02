@@ -1,0 +1,406 @@
+word	senseId	text	clue	span_start	span_len	translation	note
+airline	s1	This airline flies twice daily between the two cities.	flies twice	13	11	这条航线每天在两座城市之间飞两班。	airline 此处指「航线」，即空中航线，不是航空公司。	MANUAL
+airline	s1	The airline was closed by heavy fog all morning.	closed by heavy fog	16	19	这条航线整个上午因大雾而关闭。	airline 意为「航线」。	MANUAL
+airline	s1	That airline over the pole is rarely used in winter.	over the pole	13	13	那条飞越极地的航线冬天很少使用。	airline 此处是「航线」，与公司无关。	MANUAL
+airline	s1	The airline between the islands operates only on Fridays.	between the islands	12	19	岛间航线只在每周五运营。	airline 意为「航线」。	MANUAL
+airline	s1	Weather forced the airline to change its usual path.	usual path	41	10	天气迫使该航线改变其通常的航路。	airline 此处指「航线」。	MANUAL
+anticipate	s2	The young boxer moved first and anticipated his rival's punch.	moved first	16	11	年轻拳手先动，预判了对手的出拳。	此处 anticipate 是「先发制人、抢先行动」，不是「预料」。	MANUAL
+anticipate	s2	Our team will anticipate the storm by leaving early today.	leaving early	38	13	我们队打算先发制人，趁今天早点撤离以应对风暴。	anticipate 此处指抢先行动以占先机。	MANUAL
+anticipate	s2	He anticipated the attack and blocked it in time.	blocked	30	7	他预判出攻击并及时挡住。	anticipate 意为先一步察觉并应对，抢先化解。	MANUAL
+anticipate	s2	The company anticipated its rivals by opening a new shop first.	opening a new shop	38	18	公司先发制人，抢先开了新店。	anticipate 是抢先做，占据先机。	MANUAL
+anticipate	s2	Quick to anticipate, she changed the plan before anyone noticed.	changed the plan	25	16	她反应快、先发制人，在没人察觉前就改了计划。	anticipate 此处指抢先一步采取行动。	MANUAL
+apartment	s1	Her apartment has two rooms and a tiny balcony.	two rooms	18	9	她的公寓有两个房间和一个小阳台。	apartment 指供人居住的房间单元。	MANUAL
+apartment	s1	The apartment upstairs is rented to a young couple.	rented	26	6	楼上那套公寓租给了一对年轻夫妇。	apartment 是一套独立的居住单元。	MANUAL
+apartment	s1	We painted the apartment before moving in last spring.	moving in	32	9	去年春天搬家前我们把公寓粉刷了一遍。	apartment 意为「公寓、一套房」。	MANUAL
+apartment	s1	His apartment looks over the busy market square.	over	20	4	他的公寓俯瞰热闹的市场广场。	apartment 是一套带独立门户的住宅。	MANUAL
+apartment	s1	Apartment prices in this district rose again last year.	prices	10	6	这个区的公寓价格去年又涨了。	apartment 意为「公寓住宅单元」。	MANUAL
+arise	s2	Smoke began to arise from the burning roof above us.	from	21	4	浓烟开始从我们上方燃烧的屋顶冒上来。	arise 此处是「上升、升起」，强调由下往上。	MANUAL
+arise	s2	A loud noise arose from the basement at midnight.	basement	28	8	午夜时地下室传来一声巨响。	arise 此处意为「升起、出现（声音等）」。	MANUAL
+arise	s2	Water vapour arises from the wet ground all morning.	wet ground	29	10	水汽整个上午从湿地上升腾而起。	arise 意为「上升、升起」。	MANUAL
+arise	s2	Heat arises quickly from the hot coals in the stove.	hot coals	29	9	热量从炉子里的热煤中迅速升起。	arise 此处是「上升、散发出来」。	MANUAL
+arise	s2	A bad smell arose from the old drain outside.	old drain	27	9	一股臭味从外面的旧下水沟冒上来。	arise 意为「升起、出现」。	MANUAL
+available	s1	Only one route is available through the mountain pass.	route	9	5	只有一条路线可经由山口通行。	available 此处是「可行的、可用的」。	MANUAL
+available	s1	Is Friday afternoon available for a short meeting?	Friday	3	6	周五下午有空开个短会吗？	available 意为「可行的、可以安排」。	MANUAL
+available	s1	The doctor is available for consultations on Tuesday mornings.	consultations	28	13	医生周二上午可以看诊。	available 意为「可应约的、可安排的」。	MANUAL
+available	s1	No parking is available near the old bridge.	parking	3	7	旧桥附近没有可用的停车位。	available 此处意为「可提供的、可用的」。	MANUAL
+available	s1	The earlier train is available if you book online.	online	43	6	如果在线预订，可以乘更早的那班车。	available 意为「可获得的、可行的」。	MANUAL
+beautiful	s1	The lake looked beautiful in the early morning mist.	lake	4	4	清晨薄雾中的湖看起来很美。	beautiful 形容景色美好。	MANUAL
+beautiful	s1	She wore a beautiful dress to the evening party.	dress	21	5	她穿着一条漂亮的裙子去参加晚会。	beautiful 形容外表美丽动人。	MANUAL
+beautiful	s1	The garden is beautiful, though few people visit it.	garden	4	6	这个花园很美，尽管很少有人来。	beautiful 描述令人赏心悦目的景象。	MANUAL
+beautiful	s1	The old town has beautiful stone bridges over the river.	bridges	33	7	这座古镇有美丽的石桥横跨河上。	beautiful 形容景色优雅动人。	MANUAL
+beautiful	s1	It was a beautiful morning for a long walk outside.	morning	19	7	那是个适合户外长距离散步的美好清晨。	beautiful 形容天气或时刻宜人美好。	MANUAL
+blank	s2	His face went blank when he heard the bad news.	went blank	9	10	听到坏消息时他脸色突然僵住了。	blank 此处是「失色的、面无表情的」。	MANUAL
+blank	s2	She looked at me with a blank expression and said nothing.	expression	30	10	她面无表情地看着我，一句话也没说。	blank 形容表情空白、没有神色。	MANUAL
+blank	s2	The audience sat in blank silence after the announcement.	silence	26	7	公告之后，观众席陷入一片死寂。	blank 此处修饰 silence，表示空白的、呆滞的。	MANUAL
+blank	s2	He turned blank when the question came to him.	turned blank	3	12	问题问到 him 时他脸上什么表情也没有。	blank 是「脸上没有表情的」。	MANUAL
+blank	s2	Her blank stare showed she had not heard a word.	stare	10	5	她茫然的目光表明她一个字也没听见。	blank stare 指呆滞无神的凝视。	MANUAL
+bright	s1	The room is bright in the morning because of the large window.	window	55	6	因为大窗户，房间早上很明亮。	bright 形容光线充足、明亮。	MANUAL
+bright	s1	The stars look especially bright on cold winter nights.	stars	4	5	在寒冷的冬夜，星星显得格外明亮。	bright 此处形容发光强度。	MANUAL
+bright	s1	She has bright eyes that catch the light quickly.	eyes	15	4	她有一双被光一照就亮的眼睛。	bright 形容眼睛明亮有神。	MANUAL
+bright	s1	A bright orange light flashed briefly over the hills.	light	16	5	一道明亮的橙光在山丘上闪过。	bright 形容光线亮。	MANUAL
+bright	s1	The kitchen needs cleaning; the stove is far too bright.	stove	32	5	厨房该擦了，炉灶火太亮了。	bright 此处指过于强烈的亮光。	MANUAL
+capital	s1	The capital of France is a city full of museums.	France	15	6	法国的首都是一座充满博物馆的城市。	capital 此处指「首都」。	MANUAL
+capital	s1	Parliament meets in the capital every January.	Parliament	0	10	议会每年一月在首都开会。	capital 是国家行政中心、首都。	MANUAL
+capital	s1	Many young people move to the capital to find work.	find work	41	9	许多年轻人搬到首都去找工作。	capital 强调其政治中心地位。	MANUAL
+capital	s1	The old capital lost its importance after the war.	old	4	3	战后这座旧首都失去了它的重要地位。	capital 指曾作为首都的城市。	MANUAL
+capital	s1	Their flight to the capital was delayed three hours today.	flight	6	6	他们飞往首都的航班今天延误了三小时。	capital 是一国的政治中心。	MANUAL
+capital	s2	Write your name in capital letters at the top of the form.	letters	27	7	把你的名字用大写字母写在表格顶端。	capital 此处指「大写字母」。	MANUAL
+capital	s2	The sign was written in block capital letters for everyone to read.	block	24	5	招牌用大写字母书写，让每个人都能看清。	capital 此处意为「大写字母」。	MANUAL
+capital	s2	He wrote PARIS in big capital letters on the poster.	big	18	3	他在海报上用大写字母写下 PARIS。	capital 此处指「大写的」。	MANUAL
+capital	s2	Please print your surname in capitals on the entrance card.	print	7	5	请把你的姓用大写字母印在入场卡上。	capital 此处意为「大写字母」。	MANUAL
+capital	s2	The letter 'R' looks the same in capital and small form here.	small form	45	10	这里的字母 R 在大写和小写形式下看起来一样。	capital 此处指「大写」。	MANUAL
+care	s1	She cares a lot about her students and their families.	students	26	8	她非常关心她的学生和他们的家庭。	care 此处是「关心、在意」。	MANUAL
+care	s1	He did not care whether they approved of the plan.	approved	29	8	他并不在意他们是否赞成这个计划。	care 此处意为「在乎、计较」。	MANUAL
+care	s1	Drivers must care for the safety of everyone on board.	safety	26	6	驾驶员必须关心车上每个人的安全。	care 意为「关心、重视」。	MANUAL
+care	s1	I do not care if the meeting starts ten minutes late.	late	48	4	会议晚十分钟开始我并不在意。	care 此处是「在乎、介意」。	MANUAL
+care	s1	She cares deeply about protecting the small forest nearby.	protecting	23	10	她深深在意保护附近那片小森林。	care 意为「关心、爱护」。	MANUAL
+cater	s1	The magazine caters to young readers who like design.	readers	29	7	这本杂志迎合喜欢设计的年轻读者。	cater 意为「迎合、投其所好」。	MANUAL
+cater	s1	The hotel caters mainly to business travelers each autumn.	business travelers	27	18	这家酒店主要迎合秋季出差的商务旅客。	cater 意为「满足某种人或某事的需要」。	MANUAL
+cater	s1	This shop caters to people who love old books.	old books	36	9	这家店迎合喜爱旧书的人。	cater 意为「迎合、服务于某群体」。	MANUAL
+cater	s1	The program caters to both children and parents on weekends.	children	27	8	这个节目周末同时迎合孩子和家长。	cater 意为「迎合不同受众」。	MANUAL
+cater	s1	She caters to her guests with homemade bread and soup.	guests	18	6	她用自制面包和汤来招待客人。	cater 意为「迎合、提供服务」。	MANUAL
+complete	s1	He cleaned the entire kitchen completely before dinner.	entire kitchen	15	14	他在晚饭前把整个厨房彻底清洗干净。	complete 此处是副词「完全地、彻底地」。	MANUAL
+complete	s1	She completely forgot the meeting after the phone call.	forgot	15	6	那个电话之后她完全忘了开会的事。	complete 意为「完全地」，修饰动词。	MANUAL
+complete	s1	The road was completely blocked by fallen rocks overnight.	blocked	24	7	这条路整个晚上被落石完全堵住。	complete 此处是副词「完全、彻底」。	MANUAL
+complete	s1	We completely rebuilt the wall after the earthquake.	rebuilt	14	7	地震之后我们完全重建了墙。	complete 此处意为「完全地」。	MANUAL
+complete	s1	The letter was completely destroyed by the leaking pipe.	destroyed	26	9	这封信被漏水的水管彻底毁掉了。	complete 此处是副词「完全地」。	MANUAL
+concern	s1	Her health is my main concern after the long surgery.	health	4	6	长时间手术后，她的健康是我最担心的事。	concern 此处作名词，意为「关心、忧虑」。	MANUAL
+concern	s1	There is growing public concern about the rising prices.	public	17	6	公众对物价上涨日益关注。	concern 意为「关注、忧虑」。	MANUAL
+concern	s1	His comment caused concern among the local parents.	parents	43	7	他的评论引起了当地家长的关注。	concern 意为「关切」。	MANUAL
+concern	s1	We share a common concern for the future of the town.	future	34	6	我们对镇子的未来有共同的忧虑。	concern 此处是名词「忧虑、关切」。	MANUAL
+concern	s1	Safety of the workers is the company's main concern.	safety	0	6	员工安全是公司最关心的事。	concern 意为「关心的事项」。	MANUAL
+criminal	s2	The war brought crime, violence, and fear to every street.	crime	16	5	战争把犯罪、暴力和恐惧带到了每一条街。	criminal 此处作名词，意为「犯罪活动」这一现象。	MANUAL
+criminal	s2	Too much criminal activity keeps tourists away from the port.	tourists	33	8	太多犯罪活动使游客远离这个港口。	criminal 修饰 activity，意为「犯罪的」。	MANUAL
+criminal	s2	They moved away because of the criminal element in town.	element	40	7	他们搬走了，因为镇上有犯罪分子。	criminal 此处指「犯罪活动/犯罪分子」。	MANUAL
+criminal	s2	The film shows how criminal life destroys small towns.	small towns	42	11	这部电影展现犯罪活动如何摧毁小镇。	criminal 此处作名词，意为「犯罪（现象）」。	MANUAL
+criminal	s2	Local leaders fought to reduce criminal activity near schools.	near schools	49	12	当地领导人努力减少学校附近的犯罪活动。	criminal 意为「犯罪的」，此处指犯罪活动整体。	MANUAL
+current	s3	The current of public opinion turned against the plan.	opinion	22	7	舆论的潮流转而反对这项计划。	current 此处是名词「趋势、倾向」。	MANUAL
+current	s3	There is a strong current of thought against this theory.	thought	29	7	有强大的思潮反对这个理论。	current 意为「思潮、趋势」。	MANUAL
+current	s3	A current of doubt ran through the whole class.	doubt	13	5	一股怀疑的情绪流遍了全班。	current 此处是名词「倾向、暗流」。	MANUAL
+current	s3	The current of protest spread quickly through the country.	protest	15	7	抗议的浪潮迅速传遍全国。	current 意为「浪潮、趋势」。	MANUAL
+current	s3	His opinion followed the current of the times.	times	40	5	他的观点追随着时代的潮流。	current 此处是名词「潮流、趋势」。	MANUAL
+daily	s1	The farmer works from daily dawn to dark in the field.	dawn	28	4	农民从每日的破晓一直劳作到天黑。	daily 此处是名词，指「破晓、清晨」。	MANUAL
+daily	s1	Cock crowing at daily woke the whole village early.	woke	22	4	破晓时的鸡叫早早唤醒了全村。	daily 作为名词意为「黎明、破晓时分」。	MANUAL
+daily	s1	Few buses run on the road at daily.	buses	4	5	破晓时分，这条路上很少有公交车在跑。	daily 作名词指一天中最早的时候。	MANUAL
+daily	s1	They left before daily to catch the first ferry.	ferry	42	5	他们赶在破晓前出发去赶第一班渡轮。	daily 此处是名词「破晓」。	MANUAL
+daily	s1	The night watch ended just as daily began to break.	began	36	5	守夜结束的时候破晓正好开始。	daily 意为「黎明、破晓」。	MANUAL
+daily	s2	The shop opens at the daily of the working year.	opens	9	5	这家店在工作年的年初开始营业。	daily 此处是名词「开始、开端」。	MANUAL
+daily	s2	From the daily of his career he never gave up.	career	22	6	从他职业生涯的开始起，他就从未放弃。	daily 意为「开端、起始」。	MANUAL
+daily	s2	It is a good daily to begin such a long task.	begin	22	5	开始这样一项长期任务，开个好头很重要。	daily 此处是名词「开始、开端」。	MANUAL
+daily	s2	The daily of the festival was marked by loud drums.	drums	45	5	节日的开始以喧闹的鼓声为标志。	daily 意为「开端、开始」。	MANUAL
+daily	s2	Wrong choices at the daily shaped his whole life.	whole life	38	10	在开头做出的错误选择决定了他的一生。	daily 此处是名词「开始、起始」。	MANUAL
+differ	s1	Our views differ sharply on how to solve the problem.	views	4	5	我们在如何解决这个问题上看法差别很大。	differ 此处意为「相异、不同」，是 vi.。	MANUAL
+differ	s1	The results differ from what the researchers had expected.	results	4	7	结果与研究人员预期的不同。	differ 意为「与……不同」。	MANUAL
+differ	s1	Prices in the two cities differ by nearly ten dollars.	Prices	0	6	两个城市的价格相差近十美元。	differ 意为「有差异」，是 vi.。	MANUAL
+differ	s1	Temperatures here differ greatly from those in the north.	Temperatures	0	12	这里的气温与北方相差很大。	differ 是不及物动词，意为「相异」。	MANUAL
+differ	s1	Their opinions differ, yet they remain close friends.	opinions	6	8	他们观点不同，却仍是好朋友。	differ 此处为 vi.，意为「不同」。	MANUAL
+dynamic	s1	The manager is a dynamic leader who inspires the team.	leader	25	6	这位经理是一位鼓舞团队的活力型领导者。	dynamic 此处作名词，指「动力、活力」。	MANUAL
+dynamic	s1	She brought new dynamic to the failing department.	department	39	10	她为这个陷入困境的部门带来了新的动力。	dynamic 作名词意为「活力、动力」。	MANUAL
+dynamic	s1	The new player added real dynamic to the second half.	player	8	6	那位新球员为下半场增添了真正的活力。	dynamic 是名词，指推动力。	MANUAL
+dynamic	s1	Lack of dynamic in the economy worries economists.	economy	23	7	经济缺乏活力让经济学家担忧。	dynamic 作名词，意为「动力、能动性」。	MANUAL
+dynamic	s1	His speech lacked the dynamic needed to move voters.	voters	45	6	他的演讲缺乏打动选民的活力。	dynamic 此处是名词「动力、气势」。	MANUAL
+dynamic	s2	The language model is highly dynamic and learns quickly.	learns	41	6	这个语言模型非常动态，学习很快。	dynamic 此处是形容词「动态的、变化的」。	MANUAL
+dynamic	s2	Prices are dynamic and change with every supply shock.	change	23	6	价格是动态的，会随每一次供应冲击而变化。	dynamic 形容「不断变化的、动态的」。	MANUAL
+dynamic	s2	The system is dynamic, adjusting as the situation changes.	adjusting	23	9	这个系统是动态的，会随情况变化而调整。	dynamic 此处意为「动态的、可变的」。	MANUAL
+dynamic	s2	Her dynamic acting kept the audience fully awake.	acting	12	6	她充满活力的表演让观众全程保持清醒。	dynamic 作形容词意为「有活力的、动态的」。	MANUAL
+dynamic	s2	A dynamic economy needs flexible rules and quick change.	economy	10	7	充满活力的经济需要灵活的规则和快速的变化。	dynamic 此处形容经济是有活力的、动态发展的。	MANUAL
+eat	s1	He eats three meals a day at the family table.	meals	14	5	他每天在家庭餐桌上吃三顿饭。	eat 此处是及物动词，后接食物。	MANUAL
+eat	s1	The child refuses to eat vegetables of any kind.	vegetables	25	10	这孩子拒绝吃任何蔬菜。	eat 意为「吃（某种食物）」。	MANUAL
+eat	s1	We eat fish twice a week in this household.	twice	12	5	我们家一周吃两次鱼。	eat 此处是 vt.「吃、食用」。	MANUAL
+eat	s1	Nobody in our family eats red meat these days.	red meat	26	8	我们家这几天没人吃红肉。	eat 此处是及物动词「食用」。	MANUAL
+eat	s1	He ate the whole plate of noodles by himself.	whole plate	11	11	他自己把一整盘面条吃光了。	eat 意为「吃（完）」。	MANUAL
+elementary	s2	The book explains the theory in very elementary terms.	explains	9	8	这本书用非常简单的术语解释了这个理论。	elementary 此处意为「简单的、基础的」。	MANUAL
+elementary	s2	Even elementary math should be taught with real examples.	real	43	4	即便是简单的数学也应该用真实的例子来教。	elementary 此处形容「简单的」。	MANUAL
+elementary	s2	He has only an elementary knowledge of computer repair.	knowledge	26	9	他对电脑维修只有一点基础了解。	elementary 此处意为「初步的、简单的」。	MANUAL
+elementary	s2	The course assumes no more than elementary physics background.	background	51	10	这门课假定学生只有基础物理知识。	elementary 此处意为「基础的、初步的」。	MANUAL
+elementary	s2	She gave me some elementary advice about safe driving.	advice	28	6	她给了我一些关于安全驾驶的简单建议。	elementary 此处是形容词「简单的」。	MANUAL
+enforce	s1	The coach enforced daily training by arriving at dawn.	arriving at dawn	37	16	教练以每天清晨到场的方式强制训练。	enforce 此处是「强迫（某人做某事）」。	MANUAL
+enforce	s1	His parents enforced an early bedtime every single night.	bedtime	30	7	他父母每晚都强迫他早睡。	enforce 意为「强逼、强迫」。	MANUAL
+enforce	s1	The teacher enforced silence by standing near the door.	standing	32	8	老师站在门边以强迫大家安静。	enforce 此处是 vt.「强迫」。	MANUAL
+enforce	s1	The manager enforced honesty by signing every report himself.	signing	32	7	经理亲自签署每份报告，以强求诚实。	enforce 意为「强使、坚持要求」。	MANUAL
+enforce	s1	The law enforced strict limits on working hours.	strict limits	17	13	法律强制作业时间受到严格限制。	enforce 此处意为「强制实施」。	MANUAL
+everyday	s1	The shop sells everyday tools at very low prices.	tools	24	5	这家店以很低的价格出售日常工具。	everyday 此处意为「日常使用的、日常的」。	MANUAL
+everyday	s1	These shoes are cheap but good for everyday use.	use	44	3	这双鞋便宜，但日常穿着很合适。	everyday 意为「日常的、平常的」。	MANUAL
+everyday	s1	We keep a small notebook for everyday notes.	notes	38	5	我们有一个小本子记日常笔记。	everyday 此处是形容词「日常的」。	MANUAL
+everyday	s1	Her everyday dress was always simple and clean.	dress	13	5	她平日的衣着总是简单干净的。	everyday 意为「平日的、日常的」。	MANUAL
+everyday	s1	The market sells fruit that is perfect for everyday cooking.	cooking	52	7	市场卖的水果非常适合日常烹饪。	everyday 此处意为「日常的」。	MANUAL
+exclude	s1	The price does not include tax or service charges.	tax	27	3	这个价格不含税，也不含服务费。	exclude 意为「不包括、把……排除在外」。	MANUAL
+exclude	s1	We must exclude weekends from the working schedule.	weekends	16	8	我们必须把周末从工作安排中排除。	exclude 意为「排除」。	MANUAL
+exclude	s1	The rules exclude anyone under eighteen from entry.	under eighteen	25	14	规定把十八岁以下者排除在入场之外。	exclude 意为「不让进入、排除」。	MANUAL
+exclude	s1	Careful wide research excludes many false assumptions.	false assumptions	36	17	谨慎的研究排除了许多错误的假设。	exclude 意为「排除、剔除」。	MANUAL
+exclude	s1	The report excludes students who missed the test.	missed	33	6	这份报告把缺考的学生排除在外。	exclude 意为「把……排除在外」。	MANUAL
+export	s1	The country exports coffee to buyers across Europe.	buyers	30	6	该国向欧洲各地的买家出口咖啡。	export 此处是动词「输出、出口」。	MANUAL
+export	s1	This software lets you export photos to a computer.	photos	30	6	这个软件让你能把照片导出到电脑。	export 此处意为「输出、导出（数据）」。	MANUAL
+export	s1	Small factories export their goods only to nearby countries.	goods	29	5	小工厂只把货物出口到邻近国家。	export 意为「输出、出口到国外」。	MANUAL
+export	s1	You can export the list as a text file easily.	list	19	4	你可以轻松把列表导出为文本文件。	export 此处是动词「导出（数据）」。	MANUAL
+export	s1	The city exports clean energy technology to other regions.	technology	30	10	该市向其他地区输出清洁能源技术。	export 意为「输出、出口」。	MANUAL
+fatal	s2	It was fatal for the whole plan that he resigned early.	plan	27	4	他早早辞职，这对整个计划是致命的。	fatal 此处意为「决定命运的、命定的」。	MANUAL
+fatal	s2	The same mistake proved fatal to his career forever.	career	37	6	同样的错误给他的职业生涯带来致命影响。	fatal 此处意为「致命的、带来毁灭的」。	MANUAL
+fatal	s2	Their fatal delay in signing cost them the contract.	delay	12	5	签约的致命延误让他们丢掉了合同。	fatal 意为「决定性的、极其严重的」。	MANUAL
+fatal	s2	A fatal wound to the engine stopped the plane.	engine	21	6	发动机上致命的损伤让飞机停了下来。	fatal 此处意为「致命的」。	MANUAL
+fatal	s2	Ignoring that warning was fatal for the whole crew.	crew	46	4	无视那个警告对全体机组人员是致命的。	fatal 此处意为「致命后果的」。	MANUAL
+foot	s2	It is ten miles to the lighthouse, so we foot it.	ten miles	6	9	到灯塔有十英里，所以我们步行去。	foot 此处是动词「步行、走路」。	MANUAL
+foot	s2	We footed to the station instead of taking a taxi.	taxi	45	4	我们步行去车站，没有打车。	foot 意为「走、步行」。	MANUAL
+foot	s2	The old horse refused to foot the long mountain path.	refused	14	7	那匹老马不肯走这条漫长的山路。	foot 此处是 v.「行走」。	MANUAL
+foot	s2	He footed home alone through the heavy snow.	home	10	4	他独自冒雪走回了家。	foot 意为「步行、走」。	MANUAL
+foot	s2	They footed all the way to save the taxi fare.	save	27	4	他们一路步行，以省下打车费。	foot 此处是动词「走路」。	MANUAL
+fund	s1	The charity raised funds for children in poor villages.	children	29	8	这个慈善机构为贫困村庄的孩子们筹集了资金。	fund 此处作名词，意为「资金、款项」。	MANUAL
+fund	s1	The project was delayed because of a shortage of funds.	shortage	37	8	该项目因资金短缺而延期。	fund 此处是名词「资金」。	MANUAL
+fund	s1	She set up a fund to support young musicians.	musicians	35	9	她设立了一个支持年轻音乐家的基金。	fund 作名词意为「基金、专款」。	MANUAL
+fund	s1	The university relies on government funds for basic research.	research	52	8	这所大学依靠政府资金进行基础研究。	fund 此处指提供支持的款项。	MANUAL
+fund	s1	His plan needs more funds than we currently have.	plan	4	4	他的计划需要比我们现有更多的资金。	fund 此处作名词「资金」。	MANUAL
+garden	s2	She spends every weekend doing garden work outside.	work	38	4	她每个周末都在户外做园艺活。	garden 此处是名词「园艺、园艺业」，指劳作。	MANUAL
+garden	s2	Garden work keeps him busy every Saturday morning.	busy	22	4	园艺劳作让他每周六上午都很忙。	garden 作名词指「园艺劳动」。	MANUAL
+garden	s2	He learned garden skills from his grandmother in the village.	skills	18	6	他在村里从祖母那里学到了园艺技能。	garden 此处是名词，意为「园艺」。	MANUAL
+garden	s2	The course covers garden design and planting methods.	design	25	6	这门课涵盖园艺设计和种植方法。	garden 此处作名词「园艺、园艺业」。	MANUAL
+garden	s2	Modern garden work now uses electric tools instead of hand tools.	tools	37	5	现代园艺劳作现在使用电动工具而非手工工具。	garden 此处指「园艺（工作）」。	MANUAL
+hardly	s2	There was hardly any food left in the empty pantry.	any	17	3	空荡荡的厨房里几乎没剩下什么食物。	hardly 此处意为「几乎不、几乎」，是 s2 义。	MANUAL
+hardly	s2	She can hardly walk after the ankle surgery yesterday.	walk	15	4	昨天脚踝手术后她几乎走不了路。	hardly 此处意为「几乎不能」。	MANUAL
+hardly	s2	Hardly a day passed without him calling the office.	a day	7	5	几乎没有一天他不给办公室打电话。	hardly 此处意为「几乎」。	MANUAL
+hardly	s2	The old bridge could hardly hold the weight of trucks.	hold	28	4	这座旧桥几乎承受不住卡车的重量。	hardly 此处是副词「几乎不」。	MANUAL
+hardly	s2	He hardly noticed the change in her tone that day.	noticed	10	7	那天他几乎没有注意到她语气的变化。	hardly 此处意为「几乎没有」。	MANUAL
+hurry	s1	He did everything in a hurry and forgot his keys.	forgot	33	6	他做什么事都急急忙忙，还忘了钥匙。	hurry 此处是形容词「匆忙的、草率的」，形容状态。	MANUAL
+hurry	s1	The morning was a hurry to catch the early bus.	early bus	37	9	那个早晨是匆忙赶早班车的。	hurry 此处意为「匆忙的状态」。	MANUAL
+hurry	s1	Her reply showed a hurry that was not quite polite.	reply	4	5	她的回复显出一种不太礼貌的匆忙。	hurry 此处是形容词「匆忙的」。	MANUAL
+hurry	s1	A hurried meal is often a cold sandwich standing up.	meal	10	4	匆忙的一餐常常是站着吃的冷三明治。	hurry 此处指「匆忙的」状态。	MANUAL
+hurry	s1	The whole morning was a blur of hurry and worry.	blur	24	4	整个上午都是一片匆忙和担忧的模糊。	hurry 此处意为「匆忙」。	MANUAL
+inflation	s1	Inflation has made the cost of living rise quickly.	cost	23	4	通货膨胀使生活成本迅速上升。	inflation 此处是名词，意为「通货膨胀」。	MANUAL
+inflation	s1	The government raised interest rates to control inflation.	interest rates	22	14	政府提高利率以控制通货膨胀。	inflation 此处是「通货膨胀、物价上涨」。	MANUAL
+inflation	s1	High inflation makes saving money harder for families.	saving	21	6	高通货膨胀让家庭储蓄变得更难。	inflation 此处指「通胀、物价上涨」。	MANUAL
+inflation	s1	Wages could not keep up with the sharp inflation last year.	Wages	0	5	去年工资跟不上急剧的通货膨胀。	inflation 此处是名词「通货膨胀」。	MANUAL
+inflation	s1	Slow inflation is less harmful to small businesses than high.	harmful	23	7	温和的通货膨胀对小企业的伤害小于高通胀。	inflation 此处意为「通货膨胀」。	MANUAL
+instant	s2	The medicine brought instant relief to her headache.	relief	29	6	这药立刻缓解了她的头痛。	instant 此处是副词「立刻、瞬间」。	MANUAL
+instant	s2	He felt instant shame when he saw the result.	shame	16	5	看到结果时他立刻感到羞愧。	instant 此处是副词，意为「立即」。	MANUAL
+instant	s2	The wound caused instant pain after the fall.	pain	25	4	摔倒后伤口立刻疼痛起来。	instant 此处是副词「立刻」。	MANUAL
+instant	s2	There was instant silence after the principal spoke.	silence	18	7	校长说完后立刻一片安静。	instant 此处是副词「马上、当场」。	MANUAL
+instant	s2	The treatment showed instant results within an hour.	results	29	7	这个治疗一小时内就显示出立即的效果。	instant 此处是副词「立刻」。	MANUAL
+institution	s1	Marriage is an important social institution in most cultures.	social	25	6	婚姻在大多数文化中是重要的社会制度。	institution 此处指「制度、机构（社会意义）」。	MANUAL
+institution	s1	Universities are ancient institutions that survive many reforms.	reforms	56	7	大学是历经多次改革仍延续的古老制度。	institution 此处是「制度」。	MANUAL
+institution	s1	The rule about copyright is a legal institution, not a custom.	copyright	15	9	关于版权的规定是一种法律制度，而非习俗。	institution 此处指「制度、机构」。	MANUAL
+institution	s1	Trust is a basic institution in every working relationship.	basic	11	5	信任是每一种工作关系中的基本制度。	institution 此处意为「制度」。	MANUAL
+institution	s1	He studied how that institution protects the rights of children.	protects	32	8	他研究那个机构如何保护儿童权利。	institution 此处指「机构、组织」。	MANUAL
+last	s2	The storm lasted for three long days and nights.	storm	4	5	暴风雨持续了整整三天三夜。	last 此处是动词「持续」。	MANUAL
+last	s2	The meeting lasted longer than anyone had expected.	longer	19	6	会议持续的时间比任何人预想的都长。	last 意为「持续」。	MANUAL
+last	s2	Their friendship has lasted for more than forty years.	friendship	6	10	他们的友谊持续了四十多年。	last 意为「持续、延续」。	MANUAL
+last	s2	The fire lasted until the firemen finally arrived.	firemen	26	7	大火一直烧到消防员赶到才结束。	last 此处是 vi.，意为「持续」。	MANUAL
+last	s2	His illness lasted through the whole cold winter.	illness	4	7	他的病持续了整个寒冷的冬天。	last 此处意为「持续」。	MANUAL
+lay	s2	She likes to lay on the grass and read novels.	read novels	34	11	她喜欢躺在草地上读小说。	lay 此处是「躺、卧」，注意与 lie（躺）形式区分。	MANUAL
+lay	s2	The cat lays beside the warm fire every afternoon.	warm fire	24	9	那只猫每天下午都躺在暖炉旁。	lay 此处意为「躺、卧」。	MANUAL
+lay	s2	He laid in the shade and drank cold water all day.	shade	15	5	他整天躺在阴凉处喝凉水。	lay 此处是「躺、躺卧」。	MANUAL
+lay	s2	The injured deer lay still under the tall pines.	still	21	5	受伤的鹿一动不动地躺在高高的松树下。	lay 此处意为「躺」。	MANUAL
+lay	s2	Birds lay in the reeds until the storm passed.	reeds	17	5	鸟儿在芦苇丛中躺卧，直到风暴过去。	lay 此处作动词「躺、栖卧」。	MANUAL
+lay	s3	The old village lies quietly between two green hills.	between two green hills	29	23	这座古老的村庄静静地卧在两座青山之间。	lay 此处是动词「位于、处在（某处）」。	MANUAL
+lay	s3	The temple lies far from the busy city center.	far	16	3	这座寺庙远离繁忙的市中心。	lay 意为「位于」。	MANUAL
+lay	s3	Our school lies just beside the small park.	beside	21	6	我们学校就在小公园旁边。	lay 此处是 vi.，意为「位于」。	MANUAL
+lay	s3	The old bridge now lies in ruins after the war.	ruins	27	5	战争之后，这座旧桥如今已成废墟。	lay 此处意为「处于（某种状态）、位于」。	MANUAL
+lay	s3	The fishing port lies on the eastern edge of the lake.	edge	37	4	这个渔港位于湖的东岸边缘。	lay 意为「位于、坐落在」。	MANUAL
+lay	s4	He never admitted he lay about his salary last year.	salary	35	6	他从不承认去年谎报了工资。	lay 此处是动词「说谎」，是 lie 的过去式。	MANUAL
+lay	s4	The witness lay in court about what he had seen.	witness	4	7	证人在法庭上就他看到的事撒谎。	lay 此处意为「说谎」。	MANUAL
+lay	s4	She lay to the teacher about being late again.	teacher	15	7	她向老师撒谎说自己又迟到了。	lay 此处是「说谎」之意。	MANUAL
+lay	s4	Suspecting the boy, the coach lay about his practice time.	practice	44	8	教练怀疑那个男孩，谎报了他的训练时间。	lay 意为「说谎、说假话」。	MANUAL
+lay	s4	He lay in the interview about his work experience.	interview	14	9	他在面试中对自己的工作经验撒谎。	lay 此处意为「说谎」。	MANUAL
+liberal	s2	His parents are liberal and let him choose freely.	choose freely	36	13	他的父母很开明，让他自由选择。	liberal 此处意为「开明的、不拘束的」。	MANUAL
+liberal	s2	The judge gave a liberal interpretation of the old rule.	interpretation	25	14	法官对那条旧规则作了宽松的解释。	liberal 意为「开明的、宽大的」。	MANUAL
+liberal	s2	They grew liberal in their views after years abroad.	views	27	5	在国外多年后，他们的观点变得开明。	liberal 此处意为「开明的、宽容的」。	MANUAL
+liberal	s2	The professor was liberal with students who disagreed.	disagreed	44	9	那位教授对持不同意见的学生很宽容。	liberal 意为「宽大的、不苛刻的」。	MANUAL
+liberal	s2	The magazine stays liberal in its support of free speech.	free speech	45	11	这本杂志在支持言论自由方面一向开明。	liberal 此处意为「开明的、自由的」。	MANUAL
+literally	s2	The train is literally full from morning to night.	full	23	4	这趟火车从早到晚几乎挤满了人。	literally 此处意为「几乎、简直」，是口语义。	MANUAL
+literally	s2	He literally ran out of time before the exam.	ran out	13	7	考试之前他几乎耗尽了时间。	literally 意为「几乎、差不多」。	MANUAL
+literally	s2	The hall was literally empty by nine o'clock.	empty	23	5	到九点时，大厅几乎已经空了。	literally 此处意为「简直、几乎」。	MANUAL
+literally	s2	Our team literally could not hear a single word.	a single word	34	13	我们队几乎一个字也听不清。	literally 意为「几乎、简直」。	MANUAL
+literally	s2	She literally has no idea what he meant yesterday.	no idea	18	7	她几乎完全不明白他昨天是什么意思。	literally 此处意为「几乎、完全」。	MANUAL
+make	s2	The rain made the road too slippery to drive safely.	slippery	27	8	大雨使路面太滑，无法安全驾驶。	make 此处是使役动词「使得、致使」。	MANUAL
+make	s2	Her sudden exit made everyone fall silent at once.	silent	35	6	她的突然离开使所有人一下子都沉默了。	make 意为「使得、让」。	MANUAL
+make	s2	The teacher made us rewrite the essay three times.	rewrite	20	7	老师让我们把那篇文章重写了三遍。	make 此处是使役用法「让某人做某事」。	MANUAL
+make	s2	The heavy snow made the train two hours late.	late	40	4	大雪使火车晚点了两个小时。	make 意为「致使、导致」。	MANUAL
+make	s2	The new rules made it illegal to park on that street.	illegal	22	7	新规使在那条街上停车变得非法。	make 此处是「使得、致使」。	MANUAL
+manner	s1	He greeted us in a warm and courteous manner.	courteous	28	9	他以热情而有礼貌的方式向我们问候。	manner 此处是名词，意为「礼貌、举止」。	MANUAL
+manner	s1	She spoke in a calm manner even under pressure.	calm	15	4	即使在压力下她说话的方式也很冷静。	manner 此处指「举止、方式」。	MANUAL
+manner	s1	He had the good manners to thank his host warmly.	good	11	4	他有良好的礼貌，热情地感谢了主人。	manner 此处意为「礼仪、礼貌」。	MANUAL
+manner	s1	Her nervous manner gave away her lack of confidence.	nervous	4	7	她紧张的举止暴露了她的不自信。	manner 意为「举止、方式」。	MANUAL
+manner	s1	I admired the respectful manner in which she spoke.	respectful	14	10	我钦佩她说话时那种恭敬的举止。	manner 此处是名词「举止、礼貌」。	MANUAL
+meanwhile	s1	Meanwhile, the price of grain continued to climb sharply.	price	15	5	与此同时，粮价继续大幅攀升。	meanwhile 是副词「与此同时」，表时间并列。	MANUAL
+meanwhile	s1	Meanwhile, she finished her report before the deadline passed.	report	28	6	与此同时，她在截止日期前完成了报告。	meanwhile 意为「同时、与此同时」。	MANUAL
+meanwhile	s1	Meanwhile the storm rolled in from the open sea.	storm	14	5	与此同时，暴风雨从开阔的海面袭来。	meanwhile 意为「与此同时」。	MANUAL
+meanwhile	s1	Meanwhile, the students discussed the exam in the hallway.	exam	38	4	与此同时，学生们在走廊里讨论考试。	meanwhile 此处是副词表同时发生。	MANUAL
+meanwhile	s1	Meanwhile his health slowly improved week by week.	health	14	6	与此同时，他的健康逐周慢慢好转。	meanwhile 意为「同时、与此同时」。	MANUAL
+moon	s1	The moon rose slowly above the quiet pine trees.	rose	9	4	月亮慢慢升到安静的松树之上。	moon 此处是名词，指月亮本身。	MANUAL
+moon	s1	The full moon lit the whole garden with silver light.	full	4	4	满月用银色光芒照亮了整个花园。	moon 是名词，指月亮。	MANUAL
+moon	s1	Astronomers mapped the surface of the moon in detail.	surface	23	7	天文学家详细绘制了月球的表面。	moon 此处指地球的天然卫星「月球」。	MANUAL
+moon	s1	She stared at the moon through her bedroom window.	stared	4	6	她透过卧室的窗户凝视着月亮。	moon 是名词，指月亮。	MANUAL
+moon	s1	Many poems describe a lover looking up at the moon.	poems	5	5	许多诗篇描写恋人仰望月亮。	moon 此处指月亮（诗情意象）。	MANUAL
+near	s1	The library stands quite near the main train station.	train station	39	13	图书馆离主火车站相当近。	near 此处是形容词「近的、距离小的」。	MANUAL
+near	s1	We chose a restaurant near the hotel for dinner.	hotel	31	5	我们选了 hotels 附近的一家餐厅吃晚饭。	near 意为「近的、在附近的」。	MANUAL
+near	s1	Her flat is near enough to walk to work daily.	walk	27	4	她的公寓离得很近，可以每天步行上班。	near 此处表示「距离小的」。	MANUAL
+near	s1	The exam hall sits near the college main gate.	exam hall	4	9	考场坐落在学院大门附近。	near 意为「附近的、邻近的」。	MANUAL
+near	s1	He parked his car near the front entrance of the store.	entrance	33	8	他把车停在商店正门附近。	near 此处是形容词「近的」。	MANUAL
+near	s2	We grew up near each other in the same small town.	grew up	3	7	我们在同一个小镇一起长大，关系很亲近。	near 此处是形容词「亲近的、关系密切的」。	MANUAL
+near	s2	The two sisters are near to each other after all these years.	sisters	8	7	过了这么多年，两姐妹依然亲近。	near 意为「亲近的、亲密的」。	MANUAL
+near	s2	The manager keeps everyone near and works closely with the team.	works closely	36	13	经理和大家很亲近，和团队紧密合作。	near 此处表示「亲近的」。	MANUAL
+near	s2	Though they argue often, they remain very near.	remain very near	30	16	虽然他们经常争吵，但依然非常亲近。	near 意为「关系亲近的」。	MANUAL
+near	s2	He is near to his children and calls them daily.	children	18	8	他和子女关系亲近，每天都给他们打电话。	near 此处表示「亲近的」。	MANUAL
+no	s1	No, I do not think that answer is correct at all.	think	13	5	不，我不认为那个答案是正确的。	no 此处是否定副词，意为「不」。	MANUAL
+no	s1	There is no doubt that the plan needs more work.	doubt	12	5	毫无疑问这个计划还需要更多工作。	no 此处意为「没有、不」。	MANUAL
+no	s1	He gave no answer to my question about the delay.	answer	11	6	关于延误的问题，他没有给出任何回答。	no 此处作否定词「没有」。	MANUAL
+no	s1	No one knows exactly how the accident happened that day.	knows	7	5	没有人确切知道那天事故是怎么发生的。	no 此处是否定词「没有」。	MANUAL
+no	s1	There is nothing to worry about, no reason at all.	reason	36	6	没什么好担心的，完全没有理由。	no 此处意为「不、没有」。	MANUAL
+obscure	s2	The manual's language is so obscure that few readers follow it.	few readers	41	11	这本手册的语言晦涩难懂，很少有读者能读懂。	obscure 此处是形容词「晦涩难懂的」。	MANUAL
+obscure	s2	His explanation was filled with obscure terms I could not grasp.	terms	40	5	他的解释充满了我无法理解的晦涩术语。	obscure 意为「晦涩难解的」。	MANUAL
+obscure	s2	The essay writes in an obscure style that hides its meaning.	style	31	5	这篇文章行文晦涩，隐藏了真正含义。	obscure 此处形容文风晦涩。	MANUAL
+obscure	s2	Technical jargon made the topic obscure to ordinary readers.	jargon	10	6	技术术语使这个话题对普通读者变得晦涩难懂。	obscure 意为「难懂的、晦涩的」。	MANUAL
+obscure	s2	The professor's lecture was obscure, confusing the whole class.	class	57	5	教授的讲座晦涩难懂，让全班都困惑。	obscure 此处是形容词「令人费解的」。	MANUAL
+opposite	s2	They are exact opposites on almost every political issue.	political	41	9	他们在几乎每个政治议题上都是完全对立的。	opposite 此处是名词，指「对立面、对立的人或事」。	MANUAL
+opposite	s2	The opposite wall of the room was covered with maps.	wall	13	4	房间的对面的墙上挂满了地图。	opposite 此处是名词，意为「对面、对立面」。	MANUAL
+opposite	s2	Patience is the opposite of anger in her philosophy.	anger	28	5	在她的理念里，耐心是愤怒的对立面。	opposite 此处是名词「对立面」。	MANUAL
+opposite	s2	He is the opposite of his cheerful older brother.	brother	41	7	他与开朗的哥哥正好相反。	opposite 作名词指「相反的人或事」。	MANUAL
+opposite	s2	The two buildings stand on opposite sides of the street.	sides	36	5	两座建筑位于街道的两侧相对。	opposite 此处是名词，意为「对立的另一方/面」。	MANUAL
+organic	s1	The scan showed some organic damage in her left kidney.	kidney	48	6	扫描显示她左肾存在器质性损伤。	organic 此处意为「器官的」，医学名词用法。	MANUAL
+organic	s1	The doctor suspected organic causes rather than stress.	causes	29	6	医生怀疑是器质性原因而非精神压力。	organic 意为「与器官有关的」。	MANUAL
+organic	s1	His illness was organic, not psychological, as tests showed.	tests	47	5	检查显示他的病是器质性的，而非心理性的。	organic 此处意为「器官性的」。	MANUAL
+organic	s1	The report describes organic changes in the affected tissue.	tissue	53	6	报告描述了受影响组织中的器质性改变。	organic 意为「器官的、器质的」。	MANUAL
+organic	s1	Doctors found organic damage behind her failing hearing.	hearing	48	7	医生发现她听力衰退背后存在器质性损伤。	organic 此处指与器官结构有关的。	MANUAL
+pace	s2	The pace of reform in that country has slowed sharply.	of reform	9	9	那个国家的改革进展已明显放缓。	pace 此处是名词「进展、进程」。	MANUAL
+pace	s2	The pace of recovery surprised even the doctors.	recovery	12	8	康复的进展速度连医生都感到惊讶。	pace 意为「进展、进程」。	MANUAL
+pace	s2	We must speed up the pace of our research work.	research	33	8	我们必须加快研究工作的进展速度。	pace 此处指「进展速度」。	MANUAL
+pace	s2	His illness slowed the pace of his studies greatly.	studies	35	7	他的病大大拖慢了他学业的进展。	pace 意为「进展、前进的步伐」。	MANUAL
+pace	s2	Progress came slowly at first but the pace improved.	improved	43	8	起初进展缓慢，但后来速度提高了。	pace 此处指「进展、进程」。	MANUAL
+panic	s1	The crowd grew panic when the lights suddenly failed.	grew panic	10	10	灯突然灭掉时，人群变得恐慌起来。	panic 此处是形容词「惊慌的、恐慌的」。	MANUAL
+panic	s1	She looked panic and ran toward the exit door.	looked panic	4	12	她神情惊慌，朝出口门跑去。	panic 意为「惊慌的」。	MANUAL
+panic	s1	He was panic about losing the only copy of his thesis.	losing	19	6	他担心丢掉论文唯一的副本，惊慌不已。	panic 此处作形容词「惊慌的」。	MANUAL
+panic	s1	The panic buyers emptied every shelf within an hour.	buyers	10	6	那些恐慌的购物者一小时之内扫空了每个货架。	panic 修饰 buyers，意为「恐慌的」。	MANUAL
+panic	s1	Her panic voice told us something was seriously wrong.	voice	10	5	她惊慌的声音告诉我们出了严重问题。	panic 此处是形容词「惊慌的」。	MANUAL
+participate	s2	Children learn early how to share with classmates.	share	28	5	孩子们很早就学会如何与同学分享。	participate 此处是「分享」，即参与分摊。	MANUAL
+participate	s2	The brothers share the cost of their mother's care.	cost	23	4	兄弟俩分摊照顾母亲的费用。	participate 意为「分担、分享」。	MANUAL
+participate	s2	All team members share in the profits each winter.	profits	30	7	所有队员每年冬天都分享利润。	participate 此处意为「分享（利益）」。	MANUAL
+participate	s2	He shared in the work without asking for any pay.	asking for any pay	30	18	他参与分担这项工作，却没有要求任何报酬。	participate 意为「分担、参与」。	MANUAL
+participate	s2	She shares her lunch with the new student daily.	lunch	15	5	她每天和新来的学生分享午餐。	participate 此处意为「分享」。	MANUAL
+perhaps	s1	Perhaps we should wait until tomorrow to decide anything.	decide	41	6	也许我们应该等到明天再做任何决定。	perhaps 此处是副词「也许、可能」。	MANUAL
+perhaps	s1	Perhaps the train is late because of the heavy fog.	fog	47	3	也许火车晚点是因为大雾。	perhaps 意为「也许、可能」。	MANUAL
+perhaps	s1	He is perhaps the best player on this whole team.	best	18	4	他或许是这支全队最好的球员。	perhaps 此处意为「大概、也许」。	MANUAL
+perhaps	s1	Perhaps you could ask your teacher about this rule.	teacher	27	7	也许你可以就这条规则问问你的老师。	perhaps 意为「也许」。	MANUAL
+perhaps	s1	It is perhaps wise to take an umbrella with you today.	umbrella	30	8	今天带把伞或许是明智的。	perhaps 此处是副词「或许、也许」。	MANUAL
+previous	s1	The previous owner repainted the walls a soft green.	owner	13	5	前一位房主把墙刷成了柔和的绿色。	previous 此处是形容词「先前的、以前的」。	MANUAL
+previous	s1	Her previous job was in a small design studio.	job	13	3	她之前的工作是在一家小型设计工作室。	previous 意为「先前的、从前的」。	MANUAL
+previous	s1	We met again in the previous semester's final exam.	semester	29	8	我们在上学期期末考试中又遇见了。	previous 此处表示「先前的、上一个的」。	MANUAL
+previous	s1	No previous experience is needed for this part-time job.	experience	12	10	这份兼职工作不需要以往的经验。	previous 意为「以前的、先前的」。	MANUAL
+previous	s1	The previous chapter explained the theory in detail.	chapter	13	7	前一章详细解释了这个理论。	previous 意为「先前的」。	MANUAL
+radical	s2	The city needs a radical reform of its transport system.	of its transport	32	16	这座城市需要对交通系统做彻底的改革。	radical 此处意为「彻底的、根本的」。	MANUAL
+radical	s2	His radical change of the plan shocked the whole team.	of the plan	19	11	他对计划的彻底改变让整个团队震惊。	radical 意为「彻底的、全面的」。	MANUAL
+radical	s2	The company made radical changes to its old plans.	to its old plans	33	16	公司对其旧计划做了彻底的修改。	radical 此处意为「根本的、彻底的」。	MANUAL
+radical	s2	Only radical measures can stop the river pollution.	stop	26	4	只有彻底的措施才能阻止这条河的污染。	radical 意为「彻底的」。	MANUAL
+radical	s2	The new director made a radical clean-up of the office.	clean-up	32	8	新主任对办公室做了一次彻底的大扫除。	radical 此处意为「彻底的、全面的」。	MANUAL
+really	s1	I really enjoyed the concert last night, it was wonderful.	enjoyed	9	7	我昨晚真的很享受那场音乐会，非常棒。	really 此处是副词「真的、确实」，强调真实感受。	MANUAL
+really	s1	She really needs more sleep before the long exam week.	needs	11	5	在漫长的考试周之前她真的需要更多睡眠。	really 意为「真的、确实」。	MANUAL
+really	s1	He really meant what he said at the meeting yesterday.	meant	10	5	他昨天在会上说的确实是真心话。	really 此处意为「确实、真的」。	MANUAL
+really	s1	We really had no idea the answer would be so hard.	no idea	14	7	我们真没想到答案会这么难。	really 意为「真的、确实」。	MANUAL
+really	s1	The food here is really worth trying at least once.	worth	24	5	这里的食物真的至少值得一试。	really 此处是副词「真的」。	MANUAL
+reporter	s1	A reporter stood outside asking about the late decision.	outside	17	7	一名记者站在外面询问这项迟来的决定。	reporter 此处是名词，指「记者、报道者」。	MANUAL
+reporter	s1	The reporter asked sharp questions about the factory fire.	questions	25	9	记者就工厂火灾提出了尖锐的问题。	reporter 是「记者」。	MANUAL
+reporter	s1	She works as a reporter covering the city's local news.	local news	44	10	她是一名报道该市本地新闻的记者。	reporter 此处指「记者、通讯员」。	MANUAL
+reporter	s1	The reporter refused to reveal her private sources.	sources	43	7	记者拒绝透露她的私人消息来源。	reporter 意为「记者」。	MANUAL
+reporter	s1	A young reporter followed the mayor through the crowd.	mayor	30	5	一名年轻记者跟着市长穿过人群。	reporter 此处是「记者、新闻记者」。	MANUAL
+resemble	s1	Her face resembles her mother's in every small detail.	face	4	4	她的脸在每个细节上都像她的母亲。	resemble 此处是动词「像、类似」。	MANUAL
+resemble	s1	The two brothers resemble each other almost too closely.	brothers	8	8	这两兄弟彼此长得几乎太像了。	resemble 意为「与……相像」。	MANUAL
+resemble	s1	This new design resembles an ancient temple in style.	design	9	6	这个新设计在风格上像一座古庙。	resemble 意为「像、与……相似」。	MANUAL
+resemble	s1	He resembles his uncle more than his own father.	uncle	17	5	他比起自己的父亲更像他的叔叔。	resemble 是动词「与……相似」。	MANUAL
+resemble	s1	The quiet lake resembles a mirror lying in the hills.	mirror	27	6	这面安静的湖像山间的一面镜子。	resemble 此处意为「像、如同」。	MANUAL
+sake	s2	He walked in the rain for the sake of his sick mother.	sick mother	42	11	为了生病的母亲，他在雨中走着。	sake 此处意为「缘故、理由」。	MANUAL
+sake	s2	She sold her bicycle for the sake of a far trip.	far trip	39	8	为了远行，她卖掉了自己的自行车。	sake 意为「目的、缘由」。	MANUAL
+sake	s2	They stopped arguing for the sake of their children.	children	43	8	为了孩子，他们停止了争吵。	sake 此处意为「缘故」。	MANUAL
+sake	s2	He stayed late for the sake of a better grade.	better grade	33	12	为了更好的成绩，他待到很晚。	sake 意为「目的、动机」。	MANUAL
+sake	s2	The meal was simple, made for the sake of speed.	speed	42	5	这顿饭很简单，是为了快。	sake 此处意为「目的、考虑」。	MANUAL
+second	s2	This office is only second rate and poorly maintained.	poorly maintained	36	17	这间办公室只是二流水平，维护很差。	second 此处意为「次等的、低一等的」。	MANUAL
+second	s2	He plays a second violin in the school orchestra.	second violin	11	13	他在学校乐团里担任第二小提琴手。	second 意为「次要的、居第二的」。	MANUAL
+second	s2	The team finished second in the national championship game.	national	32	8	该队在全国锦标赛中获得第二名。	second 此处是「第二的」，指名次而非质量。	MANUAL
+second	s2	We need a second opinion before signing the contract.	opinion	17	7	签合同前我们需要第二意见。	second 此处意为「第二的、另一个的」。	MANUAL
+second	s2	The hotel is second class, but the price is low.	hotel	4	5	这家旅店是二流的，但价格便宜。	second 此处意为「次等的」。	MANUAL
+self	s1	She learned a lot about herself during those lonely years.	herself	24	7	在那些孤独的岁月里她对自己了解了很多。	self 此处是名词「自我、自己」。	MANUAL
+self	s1	Meditation helped him find his inner self again.	inner	31	5	冥想帮他重新找到了内在的自我。	self 此处是名词「自我、本我」。	MANUAL
+self	s1	Children must learn to care for themselves very early.	themselves	32	10	孩子必须很早就学会照顾自己。	self 此处是名词「自己、本人」。	MANUAL
+self	s1	The talk about mental health helped her accept her true self.	true	51	4	关于心理健康的谈话帮助她接纳真实的自我。	self 意为「自我、本质」。	MANUAL
+self	s1	Music is the way he expresses his deepest self.	expresses	20	9	音乐是他表达内心自我的方式。	self 此处是名词「自我」。	MANUAL
+snack	s2	The first exam was a real snack for her.	real snack	21	10	第一次考试对她来说是件易事。	snack 此处作名词，指「轻便容易做的事」。	MANUAL
+snack	s2	Answering that question was a snack after lunch.	after lunch	36	11	午饭后回答那个问题是件容易的事。	snack 意为「容易做的事」。	MANUAL
+snack	s2	Such a small repair is a snack for our team.	small repair	7	12	这样的小修理对我们团队来说是件易事。	snack 此处为名词，指容易办到的事。	MANUAL
+snack	s2	It was a snack to fix the broken chair ourselves.	broken chair	26	12	自己修好那把破椅子是件容易的事。	snack 意为「易事、轻便的事」。	MANUAL
+snack	s2	For an experienced cook, this recipe is a snack.	recipe	30	6	对有经验的厨师来说，这个食谱算是易事。	snack 此处作名词「容易做的事」。	MANUAL
+social	s2	Her social life filled up after the new job began.	life	11	4	新工作开始后她的社交生活充实起来了。	social 此处是形容词「社交的、交际的」。	MANUAL
+social	s2	The club offers social events every weekend for members.	events	23	6	俱乐部为会员每周举办社交活动。	social 此处意为「社交的」。	MANUAL
+social	s2	He was known for his pleasant social manner at parties.	manner	37	6	他因在聚会中令人愉快的社交举止而闻名。	social 此处形容「社交的、交际的」。	MANUAL
+social	s2	A social weekend helps her meet new people in town.	meet	27	4	一个社交周末帮她结识了镇上的新朋友。	social 此处是形容词「社交的」。	MANUAL
+social	s2	The event was a chance to improve social ties with clients.	ties	41	4	这次活动是改善与客户社交关系的机会。	social 此处意为「社交的、交涉的」。	MANUAL
+son	s2	Every mother wants her son to grow up healthy.	grow up	30	7	每位母亲都希望孩子健康成长。	son 此处是名词，指「孩子、子女」，不限性别。	MANUAL
+son	s2	Their son studies medicine in another large city.	medicine	18	8	他们的孩子在另一座大城市学医。	son 此处意为「子女、孩子」。	MANUAL
+son	s2	A farmer's son works the land from early dawn.	farmer	2	6	农民的孩子从黎明起就在田间劳作。	son 此处泛指「儿子/孩子」。	MANUAL
+son	s2	The villagers treat every son of the family kindly.	villagers	4	9	村民们善意地对待这家人的每一个孩子。	son 此处意为「孩子、后代」。	MANUAL
+son	s2	No son of the family speaks foreign languages well.	foreign languages	28	17	这家没有哪个孩子精通外语。	son 此处指「子女」，可指男孩或女孩。	MANUAL
+spring	s1	In spring the cherry trees along the river turn pink.	cherry trees	14	12	春天河边的樱花变成粉色。	spring 此处是名词「春天、春季」。	MANUAL
+spring	s1	Farmers wait for spring to plant the rice seedlings.	rice	37	4	农民等待春天来插秧。	spring 意为「春天」。	MANUAL
+spring	s1	The park looks different in spring after the long winter.	winter	50	6	漫长冬季过后，公园在春天看起来不一样。	spring 此处是名词，指春季。	MANUAL
+spring	s1	Many birds return to this lake every spring.	birds	5	5	许多鸟儿每年春天回到这个湖边。	spring 意为「春天」。	MANUAL
+spring	s1	Spring weather here is warm and full of sunshine.	weather	7	7	这里的春天天气温暖，阳光充足。	spring 此处作名词，指春季。	MANUAL
+storage	s2	The old warehouse serves as storage for winter equipment.	warehouse	8	9	这座旧仓库用作冬季设备的库房。	storage 此处是名词「库房、储存处」。	MANUAL
+storage	s2	They built a small storage behind the farm house.	built	5	5	他们在农舍后面建了一间小库房。	storage 此处指「储藏室、库房」。	MANUAL
+storage	s2	Grain is kept in the storage until market prices rise.	grain	0	5	粮食储存在库房里，直到市场价格上涨。	storage 此处是名词「储存处、仓房」。	MANUAL
+storage	s2	The fishing gear is kept in a dry storage near the dock.	gear	12	4	渔具存放在码头附近一间干燥的库房里。	storage 此处指「库房」。	MANUAL
+storage	s2	Cold storage helps keep the fruit fresh for months.	fresh	34	5	冷藏库有助于让水果保鲜数月。	storage 此处是名词「储藏、库房」。	MANUAL
+strive	s2	She strove for years to keep her family together.	family together	33	15	她奋斗多年以维系家庭完整。	strive 此处意为「斗争、奋斗」，近 struggle。	MANUAL
+strive	s2	The young soldiers strove against the bitter cold.	bitter cold	38	11	年轻的士兵们与刺骨的寒冷搏斗。	strive 意为「挣扎、奋斗」。	MANUAL
+strive	s2	He strove against the current for half an hour.	current	22	7	他与水流搏斗了半个小时。	strive 此处意为「与……搏斗」。	MANUAL
+strive	s2	Our team strove hard for the championship title.	championship	29	12	我们队为冠军头衔奋力拼搏。	strive 意为「奋斗、拼搏」。	MANUAL
+strive	s2	The plant strove to survive in the dry soil.	survive	20	7	这株植物在干燥的土壤中挣扎着生存。	strive 此处意为「挣扎、奋斗」。	MANUAL
+taste	s1	This soup has a strong taste of garlic and ginger.	garlic	32	6	这汤有很浓的大蒜和姜的味道。	taste 此处是名词「味道、口味」。	MANUAL
+taste	s1	The new restaurant has a taste I cannot quite describe.	describe	46	8	这家新餐厅有一种我说不清的味道。	taste 此处是名词，意为「味道」。	MANUAL
+taste	s1	Add a little salt to improve the taste of the soup.	salt	13	4	加一点盐来改善汤的味道。	taste 此处作名词「味道、味觉」。	MANUAL
+taste	s1	The ice cream has a light taste of lemon and mint.	lemon	35	5	这份冰淇淋有淡淡的柠檬和薄荷味。	taste 此处是名词「味道、口味」。	MANUAL
+taste	s1	His illness has left him with almost no sense of taste.	sense	40	5	他的病让他几乎失去了味觉。	taste 此处是名词「味道、味觉」。	MANUAL
+transaction	s2	The bank closed the business early on holidays.	closed the business early	9	25	银行假日很早就停止营业。	transaction 此处指「业务、营业」，与单笔交易不同。	MANUAL
+transaction	s2	Daily business at the shop slows down in January.	slows down	27	10	这家店的日常营业在一月份会变慢。	transaction 意为「业务、经营活动」。	MANUAL
+transaction	s2	New business will open in the building next spring.	next spring	39	11	明年春天新业务将在这栋楼里开办。	transaction 此处指「业务、营业」。	MANUAL
+transaction	s2	He runs a small business repairing old typewriters.	runs	3	4	他经营着一家修理旧打字机的小生意。	transaction 意为「业务、经营」。	MANUAL
+transaction	s2	Business was booming before the war finally ended.	booming	13	7	战争最终结束前， business 一直很兴旺。	transaction 此处指「业务、生意」。	MANUAL
+tree	s2	A brave boy climbed the tall tree in their garden.	climbed	12	7	一个勇敢的男孩爬上了他们花园里那棵高树。	tree 此处是动词「爬上（树）」。	MANUAL
+tree	s2	Monkeys often tree themselves to escape the hunters below.	escape	33	6	猴子常爬到树上躲避下方的猎人。	tree 作为动词意为「爬树」。	MANUAL
+tree	s2	The cat treed the squirrel and waited patiently below.	squirrel	18	8	这只猫把松鼠逼上树，然后在下面耐心等待。	tree 此处是动词「把……逼上树」。	MANUAL
+tree	s2	The leopard treed the antelope and pulled it down slowly.	antelope	22	8	豹把羚羊逼上树后慢慢拉了下来。	tree 此处为动词「使……上树、逼上树」。	MANUAL
+tree	s2	Birds tree themselves high in the oak every evening.	oak	34	3	鸟儿每天傍晚都爬到高高的橡树上。	tree 此处作动词「爬到树上」。	MANUAL
+underlie	s1	Careful planning underlies every successful project of ours.	planning	8	8	细致的计划是我们每个成功项目的基础。	underlie 此处是动词「构成……的基础、支撑」。	MANUAL
+underlie	s1	A strong trust underlies their long business partnership.	trust	9	5	深厚的信任支撑着他们长期的商业伙伴关系。	underlie 意为「构成……的基础」。	MANUAL
+underlie	s1	Hidden fear underlies many of his seemingly calm decisions.	fear	7	4	隐藏的恐惧是他许多看似冷静决策的基础。	underlie 此处指「构成……的基础」。	MANUAL
+underlie	s1	Basic assumptions underlie the whole theory of the book.	assumptions	6	11	基本假设构成了这本书整个理论的基础。	underlie 此处是「支撑、构成基础」。	MANUAL
+underlie	s1	A shared value underlies all the rules in this school.	shared value	2	12	一个共同的价值观构成了这所学校所有规则的基础。	underlie 此处意为「构成……的基础」。	MANUAL
+use	s1	We use a bicycle to save money on transport daily.	bicycle	9	7	我们用自行车，每天都能省下交通费。	use 此处是及物动词「使用、利用」。	MANUAL
+use	s1	The kitchen uses a large wooden table for meals.	wooden table	25	12	厨房用一张大木桌吃饭。	use 意为「使用（工具、物品）」。	MANUAL
+use	s1	He used his old car to drive to work daily.	old car	12	7	他每天开自己的旧车上班。	use 此处是 vt.「用、使用」。	MANUAL
+use	s1	Please use the stairs while the lift is being fixed.	stairs	15	6	电梯维修期间请走楼梯。	use 意为「使用、利用」。	MANUAL
+use	s1	Farmers here use a simple wooden plough instead.	plough	33	6	这里的农民用一种简单的木犁代替。	use 此处是及物动词「使用」。	MANUAL
+very	s1	The soup is very hot, so please eat it slowly.	hot	17	3	汤非常烫，请慢慢喝。	very 此处是副词「非常」，修饰形容词。	MANUAL
+very	s1	She has very little time left before the exam starts.	little	13	6	考试开始前她剩下的时间非常少。	very 意为「非常、极」。	MANUAL
+very	s1	The library has very many books on modern economics.	many	21	4	图书馆有非常多的现代经济学书籍。	very 此处是副词「非常」。	MANUAL
+very	s1	It was very late when they finally finished the work.	late	12	4	他们终于完成工作时天色已非常晚。	very 意为「非常」。	MANUAL
+very	s1	The road was very difficult to walk along the cliff.	difficult	18	9	沿着悬崖的那条路非常难走。	very 此处是副词，修饰形容词。	MANUAL
+violence	s2	Religious frenzy and violence spread through the old town.	frenzy	10	6	宗教狂热与狂躁蔓延到这座老镇。	violence 此处是名词「狂热、激烈情绪」。	MANUAL
+violence	s2	The crowd burst into violence after the cruel verdict.	verdict	46	7	那个残酷判决后，人群爆发出一阵狂热。	violence 意为「狂热、激愤」。	MANUAL
+violence	s2	Her voice was full of violence and barely controlled.	barely controlled	35	17	她的声音充满狂热，几乎无法控制。	violence 此处指「激烈的情感」。	MANUAL
+violence	s2	He answered my question with obvious violence and anger.	anger	50	5	他带着明显的激愤和怒气回答我的问题。	violence 意为「狂热、激烈的情绪」。	MANUAL
+violence	s2	The fans showed such violence for their new champion.	new champion	40	12	球迷们对新冠军表现出如此狂热。	violence 此处是名词「狂热」。	MANUAL
+week	s1	The office is closed all weekend without exception.	closed	14	6	办公室周末一律休息，无例外。	week 此处与 end 构成 weekend，意为「周末」。	MANUAL
+week	s1	We spent the weekend quietly reading at home together.	reading	29	7	我们一起在家安静地度过了周末。	week 此处指周末（weekend 的一部分）。	MANUAL
+week	s1	She works every weekend at the busy weekend market.	market	44	6	她每个周末都在繁忙的周末市场工作。	week 此处意为「周末」。	MANUAL
+week	s1	The library stays open throughout the whole weekend.	open	18	4	图书馆整个周末都保持开放。	week 此处指「周末」。	MANUAL
+week	s1	He plays tennis with his brother each weekend afternoon.	tennis	9	6	他每个周末下午都和弟弟打网球。	week 此处是「周末」。	MANUAL
+well	s1	She sings well enough to win the school prize.	sing	4	4	她唱得足够好，足以赢得学校奖项。	well 此处是副词「好地」，修饰动词。	MANUAL
+well	s1	He did well on the final exam this past term.	exam	25	4	他上学期期末考试考得很好。	well 此处是副词「好、不错」。	MANUAL
+well	s1	The two brothers cook well and never burn the food.	cook	17	4	这两兄弟做饭很好，从不烧焦食物。	well 此处是副词「好地」。	MANUAL
+well	s1	Speak clearly and well so everyone can hear you.	clearly	6	7	说得清楚又好，让每个人都能听见你。	well 此处是副词「好地」。	MANUAL
+well	s1	If you sleep well, you will work well tomorrow too.	sleep	7	5	如果你睡得好，明天也会工作得好。	well 此处是副词，修饰动词。	MANUAL
+where	s1	Where did you first hear about this interesting book?	book	48	4	你第一次听说这本有趣的书是在哪里？	where 此处是疑问副词「在哪里」。	MANUAL
+where	s1	Where are we supposed to meet for the morning class?	meet	25	4	我们该在哪里碰面上上午的课？	where 意为「在哪里」。	MANUAL
+where	s1	Where did you spend your childhood in the mountain town?	childhood	25	9	你的童年是在哪个山间小镇度过的？	where 此处意为「在哪里」。	MANUAL
+where	s1	Where can I find a quiet place to study tonight?	study	34	5	今晚我在哪里可以找到一个安静的学习地方？	where 此处是「在哪里」。	MANUAL
+where	s1	Where were you when the lights suddenly went out?	out	45	3	突然停电的时候你在哪里？	where 意为「在哪里」。	MANUAL
+wound	s1	His leg was wounded in the mountain climbing accident.	leg	4	3	他的腿在登山事故中受伤了。	wound 此处是形容词「受伤的」。	MANUAL
+wound	s1	The wounded soldiers were taken to the field hospital.	soldiers	12	8	伤兵们被送往野战医院。	wound 此处是形容词「受伤的」。	MANUAL
+wound	s1	She felt wounded by his cruel remarks at the party.	remarks	30	7	他在聚会上的残忍话语让她感到受伤。	wound 此处意为「受伤的（感情上）」。	MANUAL
+wound	s1	He had a wounded look in his eyes all that week.	look	17	4	那一周他眼神一直带着受伤的神色。	wound 此处是形容词「受伤的」。	MANUAL
+wound	s1	The wounded deer struggled slowly up the forest path.	deer	12	4	受伤的鹿艰难地慢慢走上林间小路。	wound 此处修饰名词，指「受伤的」。	MANUAL

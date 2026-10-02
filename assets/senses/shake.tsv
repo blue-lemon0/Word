@@ -1,0 +1,5 @@
+senseId	pos	glossZh	glossEn	trap	note
+s1	n.	摇动		0	tier=T1
+s2	n.	震动		0	tier=T1
+s3	vi.	动摇		0	tier=T1
+s4	vt.	使震动		0	tier=T1

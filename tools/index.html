@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>单词判别 · 原型</title>
+<style>
+  :root {
+    --bg: #f4f6fb;
+    --card: #ffffff;
+    --ink: #1a1f36;
+    --ink-soft: #5b6472;
+    --ink-faint: #9aa3b2;
+    --line: #e6e9f2;
+    --primary: #4f46e5;
+    --primary-soft: #eef2ff;
+    --good: #10b981;
+    --good-soft: #ecfdf5;
+    --bad: #ef4444;
+    --bad-soft: #fef2f2;
+    --focus: #f59e0b;
+    --radius-lg: 20px;
+    --radius: 14px;
+    --radius-sm: 10px;
+    --shadow: 0 8px 30px rgba(31, 35, 51, .08);
+    --shadow-sm: 0 2px 10px rgba(31, 35, 51, .06);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, "SF Pro Text", "PingFang SC", "Segoe UI", "Microsoft YaHei", sans-serif;
+    background: var(--bg); color: var(--ink);
+    display: flex; justify-content: center;
+    padding: 18px 12px 40px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .app {
+    width: 100%; max-width: 430px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+
+  /* 顶栏 */
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 2px;
+  }
+  .progress {
+    font-size: 13px; color: var(--ink-faint); display: flex; align-items: center; gap: 8px;
+  }
+  .progress .bar {
+    width: 110px; height: 5px; border-radius: 999px; background: var(--line); overflow: hidden;
+  }
+  .progress .bar i { display: block; height: 100%; background: var(--primary); border-radius: 999px; transition: width .3s; }
+  .stats { font-size: 12px; color: var(--ink-faint); }
+  .stats b { color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+
+  /* 题干卡 */
+  .question {
+    background: var(--card);
+    border-radius: var(--radius-lg);
+    padding: 26px 22px 22px;
+    box-shadow: var(--shadow);
+  }
+  .word-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .word-badge {
+    font-weight: 700; font-size: 22px; letter-spacing: .02em;
+    color: var(--primary); display: inline-flex; align-items: center; gap: 6px;
+  }
+  .word-badge small {
+    font-size: 12px; font-weight: 500; color: var(--ink-faint);
+    background: var(--line); padding: 3px 8px; border-radius: 999px;
+  }
+  .tag-line { font-size: 12px; color: var(--ink-faint); }
+  .tag-line .trap {
+    color: var(--focus); background: #fff7e8; padding: 3px 8px; border-radius: 999px;
+    font-weight: 600;
+  }
+  .tag-line .tier {
+    color: var(--ink-faint); background: var(--line);
+    padding: 3px 8px; border-radius: 999px;
+  }
+
+  /* D16：该义项暂无例句 */
+  .nosent { text-align: center; padding: 28px 12px; }
+  .nosent-title {
+    font-size: 26px; font-weight: 700; color: var(--ink);
+    font-family: var(--serif); letter-spacing: .2px;
+  }
+  .nosent-pos { font-size: 14px; font-weight: 400; color: var(--ink-faint); }
+  .nosent-gloss {
+    margin-top: 14px; font-size: 20px; color: var(--primary); font-weight: 600;
+  }
+  .nosent-note { margin-top: 22px; font-size: 15px; color: var(--ink-dim); }
+  .nosent-sub { margin-top: 6px; font-size: 13px; color: var(--ink-faint); }
+  .sentence {
+    font-size: 20px; line-height: 1.7; color: var(--ink);
+    caret-color: transparent;
+  }
+  .sentence mark {
+    background: var(--primary);
+    color: #fff; border-radius: 6px;
+    padding: 1px 5px; font-weight: 700;
+  }
+  .sentence legend { display: block; font-size: 12px; color: var(--ink-faint); margin-bottom: 6px; }
+
+  /* 判别区：先空白，点击揭示 */
+  .reveal-area { margin-top: 22px; }
+  .hint {
+    font-size: 13px; color: var(--ink-faint); text-align: center; margin-bottom: 10px;
+  }
+  .blank-box {
+    border: 2px dashed #cdd3e2; border-radius: var(--radius);
+    min-height: 74px; display: flex; align-items: center; justify-content: center;
+    color: var(--ink-faint); cursor: pointer; font-size: 15px; font-weight: 500;
+    transition: border-color .15s, background .15s, transform .05s;
+    background: #fbfcff;
+    user-select: none;
+  }
+  .blank-box:hover { border-color: var(--primary); background: var(--primary-soft); color: var(--primary); }
+  .blank-box:active { transform: scale(.99); }
+
+  .giveup {
+    margin-top: 14px; text-align: center;
+  }
+  .giveup a {
+    color: var(--ink-faint); font-size: 13px; font-weight: 500;
+    text-decoration: none; cursor: pointer;
+    border-bottom: 1px dashed transparent; transition: color .15s;
+    user-select: none; display: inline-block; padding: 6px 12px;
+  }
+  .giveup a:hover { color: var(--ink-soft); border-bottom-color: var(--ink-faint); }
+
+  .options {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    margin-top: 4px;
+    animation: rise .22s ease;
+  }
+  @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  .opt {
+    display: flex; align-items: center; gap: 10px;
+    padding: 13px 12px;
+    background: var(--card); border: 1.5px solid var(--line);
+    border-radius: var(--radius); cursor: pointer;
+    font-size: 15px; color: var(--ink);
+    box-shadow: var(--shadow-sm);
+    transition: border-color .12s, transform .06s, background .12s, opacity .2s;
+    user-select: none;
+  }
+  .opt:hover { border-color: #c2c9dd; }
+  .opt:active { transform: scale(.985); }
+  .opt .key {
+    width: 26px; height: 26px; flex: none;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--line); color: var(--ink-soft);
+    border-radius: 8px; font-size: 13px; font-weight: 700;
+  }
+  .opt .en { color: var(--ink-faint); font-size: 13px; margin-top: 1px; }
+  .opt .body { flex: 1; display: flex; flex-direction: column; line-height: 1.35; }
+  .opt.full { grid-column: 1 / -1; }
+  .opt.correct {
+    border-color: var(--good); background: var(--good-soft); color: #065f46;
+  }
+  .opt.correct .key { background: var(--good); color: #fff; }
+  .opt.wrong {
+    border-color: var(--bad); background: var(--bad-soft); color: #991b1b;
+  }
+  .opt.wrong .key { background: var(--bad); color: #fff; }
+  .opt.dim { opacity: .42; border-color: var(--line); background: #fff; }
+  .opt.disabled { pointer-events: none; }
+
+  /* 讲解 */
+  .explain {
+    background: var(--card);
+    border-radius: var(--radius-lg);
+    padding: 20px 22px 16px;
+    box-shadow: var(--shadow);
+    display: none;
+    animation: rise .22s ease;
+  }
+  .explain .result-row {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 14px;
+  }
+  .explain .chip {
+    display: inline-flex; align-items: center;
+    padding: 5px 10px; border-radius: 999px;
+    font-size: 13px; font-weight: 700; flex: none;
+  }
+  .explain .result-row.good .chip { background: var(--good-soft); color: #047857; }
+  .explain .result-row.bad .chip { background: var(--bad-soft); color: #b91c1c; }
+  .explain .result-row.pending .chip { background: #fff7e8; color: #b45309; }
+  .explain .correct-ans {
+    font-size: 18px; font-weight: 700; color: var(--ink);
+  }
+  .explain .correct-ans b { color: var(--primary); }
+  .explain .trans { font-size: 15px; color: var(--ink-soft); line-height: 1.7; }
+  .explain .trans b { color: var(--ink); }
+  .explain .note {
+    font-size: 14px; color: var(--ink-soft); line-height: 1.7;
+    border-top: 1px solid var(--line); margin-top: 12px; padding-top: 12px;
+  }
+
+  /* 动作 */
+  .actions { display: flex; gap: 10px; margin-top: 4px; }
+  .btn {
+    flex: 1; padding: 14px; border: none; border-radius: var(--radius);
+    font-size: 16px; font-weight: 700; cursor: pointer;
+    transition: transform .06s, opacity .15s;
+  }
+  .btn:active { transform: scale(.98); }
+  .btn.primary { background: var(--primary); color: #fff; }
+  .btn.ghost { background: transparent; color: var(--ink-soft); font-weight: 600; }
+  .btn.secondary { background: var(--line); color: var(--ink-soft); }
+
+  /* 会话结束 */
+  .session-end {
+    background: var(--card); border-radius: var(--radius-lg); padding: 40px 22px;
+    text-align: center; box-shadow: var(--shadow);
+  }
+  .session-end .big { font-size: 44px; margin-bottom: 12px; }
+  .session-end h2 { font-size: 20px; margin-bottom: 6px; }
+  .session-end p { color: var(--ink-soft); font-size: 15px; line-height: 1.8; }
+
+  .fade-enter { animation: rise .25s ease; }
+
+  /* 底部 tab */
+  .tabbar {
+    display: flex; gap: 6px; padding: 6px;
+    background: var(--card); border-radius: 16px;
+    box-shadow: var(--shadow-sm);
+  }
+  .tab {
+    flex: 1; text-align: center; padding: 12px;
+    font-size: 14px; font-weight: 700; color: var(--ink-faint);
+    border-radius: 12px; cursor: pointer; user-select: none;
+    transition: background .15s, color .15s;
+  }
+  .tab.active { background: var(--primary-soft); color: var(--primary); }
+
+  /* 单挑横幅 */
+  .solo-banner {
+    background: var(--primary-soft); color: var(--primary);
+    border-radius: var(--radius); padding: 10px 14px;
+    font-size: 13px; font-weight: 600; text-align: center;
+  }
+
+  /* 错题板 */
+  .board {
+    background: var(--card); border-radius: var(--radius-lg);
+    padding: 20px; box-shadow: var(--shadow);
+  }
+  .board-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .board-head h3 { font-size: 18px; }
+  .board-count { font-size: 13px; color: var(--ink-faint); }
+  .board-list { display: flex; flex-direction: column; gap: 10px; }
+  .worst-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px; border: 1.5px solid var(--line); border-radius: var(--radius);
+    cursor: pointer; transition: border-color .12s, background .12s;
+  }
+  .worst-item:hover { border-color: var(--primary); background: var(--primary-soft); }
+  .worst-item .badge {
+    flex: none; padding: 3px 8px; border-radius: 999px;
+    font-size: 12px; font-weight: 700;
+  }
+  .worst-item .badge.hot { background: var(--bad-soft); color: #b91c1c; }
+  .worst-item .badge.cold { background: #fff7e8; color: #b45309; }
+  .worst-item .word { font-weight: 700; font-size: 16px; }
+  .worst-item .sub { font-size: 13px; color: var(--ink-faint); margin-top: 2px; }
+  .worst-item .go { margin-left: auto; color: var(--ink-faint); font-size: 15px; }
+  .board-empty {
+    padding: 40px 0; text-align: center; color: var(--ink-faint); font-size: 14px;
+  }
+
+  /* 小结页 */
+  .summary {
+    background: var(--card); border-radius: var(--radius-lg); padding: 26px 22px;
+    box-shadow: var(--shadow);
+  }
+  .summary h2 { font-size: 20px; margin-bottom: 16px; }
+  .summary .block { margin-bottom: 16px; }
+  .summary .block .label { font-size: 13px; color: var(--ink-faint); margin-bottom: 8px; }
+  .summary .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .summary .stat {
+    background: var(--bg); border-radius: var(--radius-sm);
+    padding: 12px 8px; text-align: center;
+  }
+  .summary .stat b { display: block; font-size: 20px; }
+  .summary .stat span { font-size: 12px; color: var(--ink-faint); }
+  .summary .stat.good b { color: var(--good); }
+  .summary .stat.bad b { color: var(--bad); }
+  .summary .stat.pending b { color: var(--focus); }
+  .summary .miss-list { display: flex; flex-wrap: wrap; gap: 8px; }
+  .summary .miss-item {
+    padding: 7px 12px; background: var(--bad-soft); color: #b91c1c;
+    border-radius: 999px; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  .summary .miss-item:hover { background: #ffe4e4; }
+  .summary .done-line { font-size: 14px; color: var(--ink-soft); }
+  .summary .actions { margin-top: 20px; }
+
+  /* 我已学会 / 单挑完成行 */
+  .master-line { text-align: right; font-size: 13px; }
+  .master-line a {
+    color: var(--primary); font-weight: 600; cursor: pointer;
+    border-bottom: 1px dashed var(--primary);
+  }
+  .master-line a:hover { opacity: .8; }
+  .mastered-line { text-align: right; color: var(--good); font-weight: 600; font-size: 13px; }
+  .solo-done { color: var(--good); font-weight: 700; }
+</style>
+</head>
+<body>
+<div id="loading" style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--ink-soft);z-index:99">正在加载词库…</div>
+  <div class="app" id="appBody">
+  <div class="topbar">
+    <div class="progress">
+      <span id="progressText">0 / 0</span>
+      <div class="bar"><i id="progressFill" style="width:0%"></i></div>
+      <span class="stats" id="statsLine"></span>
+    </div>
+  </div>
+
+  <div id="viewTrain">
+    <div class="question">
+      <div class="word-row">
+        <span class="word-badge" id="wordBadge"></span>
+        <span class="tag-line" id="tagLine"></span>
+      </div>
+      <p class="sentence" id="sentence"></p>
+      <div class="reveal-area">
+        <div class="hint" id="hint">想清楚这个词在这里的意思</div>
+        <div class="blank-box" id="blankBox" onclick="revealOptions()">— 点击空白处显示选项 —</div>
+        <div class="giveup" id="giveupStage1"><a onclick="giveUpNow()">我不会</a></div>
+        <div class="options" id="options" style="display:none"></div>
+        <div class="actions" id="actions" style="display:none"></div>
+      </div>
+    </div>
+    <div class="explain" id="explain"></div>
+    <div class="solo-banner" id="soloBanner" style="display:none">
+      单挑：训练这一对子，连续 2 次答对即从错题板移除
+    </div>
+  </div>
+
+  <div id="viewBoard" style="display:none">
+    <div class="board">
+      <div class="board-head">
+        <h3>错题板</h3>
+        <span class="board-count" id="boardCount"></span>
+      </div>
+      <div class="board-list" id="boardList"></div>
+    </div>
+  </div>
+
+  <div id="viewSummary" style="display:none"></div>
+
+  <div class="tabbar">
+    <div class="tab" id="tabTrain" onclick="switchTab('train')">训练</div>
+    <div class="tab" id="tabBoard" onclick="switchTab('board')">错题板</div>
+  </div>
+</div>
+
+<script>
+
+/* =========================================================================
+   数据：一次性加载 bundle（义项级卡片），不再逐词 fetch
+   ========================================================================= */
+const BUNDLE_URL = "/assets/bundle/cards.json";
+const STORE_KEY = "wordjudge.v2";
+
+let BUNDLE = null;
+let CARDS = [];
+let GLOSS = [];          // 跨词干扰项池
+let card = null;         // 当前义项卡
+let row = null;          // 当前句
+let options = [];
+let renderedOptions = null;
+
+let revealed = false, answered = false;
+let solo = null;         // {id, chain}
+
+/* 会话状态（全部持久化） */
+let state = null;
+
+function freshState(){
+  return {
+    v: 2,
+    queue: [],            // 本轮待练义项 id
+    pos: 0,               // 当前在 queue 中的位置
+    stats: {correct:0, wrong:0, pending:0},
+    wrong: {},            // id -> {id, w, s, zh, wrongCount, lastKind}
+    mastered: {},         // id -> true
+    rowIdx: {},           // id -> 下一句索引（轮换）
+    updatedAt: 0,
+  };
+}
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if (!raw) return freshState();
+    const s = JSON.parse(raw);
+    if (s.v !== 2) return freshState();
+    return Object.assign(freshState(), s);
+  }catch(e){
+    return freshState();
+  }
+}
+function saveState(){
+  state.updatedAt = Date.now();
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+  catch(e){ /* 隐私模式下忽略 */ }
+}
+
+/* =========================================================================
+   练习队列
+   ========================================================================= */
+function pickQueue(size){
+  // D16：没有例句的义项不出题（它没法出题），只在空状态里提示
+  const pool = CARDS.filter(c => !state.mastered[c.id] && hasRows(c));
+  // TRAP 义项优先，其次错题
+  const wrongIds = new Set(Object.keys(state.wrong));
+  const rank = c => (wrongIds.has(c.id) ? 0 : 1) * 10 + (c.trap ? 0 : 1);
+  pool.sort((a,b) => rank(a) - rank(b) || a.id.localeCompare(b.id));
+  return pool.slice(0, size).map(c => c.id);
+}
+function hasRows(c){
+  return Array.isArray(c.rows) && c.rows.length > 0;
+}
+function shuffle(a){
+  const r = a.slice();
+  for (let i=r.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [r[i],r[j]]=[r[j],r[i]]; }
+  return r;
+}
+
+function buildOptions(c){
+  // 干扰项：同词他义（TRAP 优先） -> 跨词同义池
+  const same = CARDS
+    .filter(x => x.w === c.w && x.s !== c.s)
+    .sort((a,b) => b.trap - a.trap);
+  const opts = [{zh: c.zh, kind: "correct", id: c.id}];
+  for (const s of same){
+    if (opts.length >= 4) break;
+    if (!opts.some(o => o.zh === s.zh)) opts.push({zh: s.zh, kind: "same"});
+  }
+  // 跨词补足
+  const need = 4 - opts.length;
+  if (need > 0){
+    const cand = shuffle(GLOSS.filter(g => g && !opts.some(o => o.zh === g)));
+    for (const g of cand){ if (opts.length >= 4) break; opts.push({zh: g, kind: "cross"}); }
+  }
+  return shuffle(opts);
+}
+
+function nextRow(c){
+  if (!hasRows(c)) return null;   // D16：无句义项
+  const i = (state.rowIdx[c.id] || 0) % c.rows.length;
+  state.rowIdx[c.id] = (i + 1) % c.rows.length;
+  return c.rows[i];
+}
+
+function loadCard(id){
+  const c = CARDS.find(x => x.id === id);
+  if (!c) { nextCard(); return; }
+  card = c;
+  row = nextRow(c);
+  revealed = false; answered = false; renderedOptions = null;
+  if (!row){ renderNoSentence(); return; }   // D16：无句状态
+  options = buildOptions(c);
+  renderQuestion();
+}
+
+/* D16：该义项还没有例句。
+   这是词库先行、句子后补的正常状态，不是错误——
+   所以给它一个诚实的说明，而不是空白页或崩溃。 */
+function renderNoSentence(){
+  const g = c => document.getElementById(c);
+  g("sentence").innerHTML =
+    `<div class="nosent">
+       <div class="nosent-title">${esc(card.w)} <span class="nosent-pos">${esc(card.pos)}</span></div>
+       <div class="nosent-gloss">${esc(card.zh)}</div>
+       <div class="nosent-note">这个义项还没有例句。</div>
+       <div class="nosent-sub">例句由句子生成流水线产出，需要启用 LLM 通道后批量生成。</div>
+     </div>`;
+  g("wordBadge").textContent = card.w;
+  g("tagLine").innerHTML = `<span>${esc(card.pos)}</span>` +
+    (card.tier ? ` <span class="tier">${esc(card.tier)}</span>` : "") +
+    (card.trap ? ' <span class="trap">TRAP · 熟词僻义</span>' : "");
+  g("blankBox").style.display = "none";
+  g("giveupStage1").style.display = "none";
+  g("options").style.display = "none";
+  g("options").innerHTML = "";
+  g("explain").style.display = "none";
+  g("explain").innerHTML = "";
+  g("actions").style.display = "flex";
+  g("actions").innerHTML = `<button class="btn primary" onclick="nextCard()">下一题</button>`;
+  g("hint").textContent = "";
+  g("soloBanner").style.display = solo ? "block" : "none";
+  updateProgress();
+}
+
+/* =========================================================================
+   判分
+   ========================================================================= */
+function recordWrong(kind){
+  const id = card.id;
+  if (!state.wrong[id]) state.wrong[id] = {id, w: card.w, s: card.s, zh: card.zh, wrongCount: 0, lastKind: null};
+  state.wrong[id].wrongCount++;
+  state.wrong[id].lastKind = kind;
+}
+
+function choose(o, node, key){
+  if (answered) return;
+  answered = true;
+  document.querySelectorAll(".opt").forEach(n => n.classList.add("disabled"));
+  document.getElementById("hint").textContent = "";
+  let status;
+  if (o.kind === "pending"){
+    state.stats.pending++; status = "pending";
+    recordWrong("pending");
+    if (solo) solo.chain = 0;
+  } else if (o.kind === "correct"){
+    state.stats.correct++; status = "good";
+    node.classList.add("correct");
+    if (solo) solo.chain = (solo.chain || 0) + 1;
+  } else {
+    state.stats.wrong++; status = "bad";
+    node.classList.add("wrong");
+    if (renderedOptions){
+      renderedOptions.nodes.forEach((n,i) => {
+        const k = renderedOptions.shuffle[i];
+        if (k === "correct") n.classList.add("correct");
+        else if (n !== node) n.classList.add("dim");
+      });
+    }
+    recordWrong("wrong");
+    if (solo) solo.chain = 0;
+  }
+  saveState();
+  updateProgress();
+  showExplain(status, node, key);
+}
+
+function markMastered(id){
+  state.mastered[id] = true;
+  delete state.wrong[id];
+  saveState();
+  const exp = document.getElementById("explain");
+  const line = exp.querySelector(".master-line") || exp.querySelector(".mastered-line");
+  if (line) line.outerHTML = `<div class="note mastered-line">✓ 已标记「我已学会」</div>`;
+  renderBoard();
+  updateProgress();
+}
+
+function nextCard(){
+  if (solo){ exitSolo(); return; }
+  state.pos++;
+  saveState();
+  if (state.pos >= state.queue.length){ renderSummary(); return; }
+  loadCard(state.queue[state.pos]);
+}
+
+function exitSolo(){
+  solo = null;
+  document.getElementById("soloBanner").style.display = "none";
+  switchTab("board");
+}
+
+function startSolo(id){
+  solo = {id, chain: 0};
+  switchTab("train");
+  loadCard(id);
+}
+
+function newRound(){
+  state.queue = pickQueue(20);
+  state.pos = 0;
+  state.stats = {correct:0, wrong:0, pending:0};
+  state.rowIdx = {};
+  solo = null;
+  saveState();
+  switchTab("train");
+  if (!state.queue.length){ renderSummary(); return; }
+  loadCard(state.queue[0]);
+}
+
+/* =========================================================================
+   渲染
+   ========================================================================= */
+function esc(s){
+  return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+}
+
+function renderQuestion(){
+  // 高亮：优先用数据里的 span，缺失时回退到词匹配
+  const t = row.t;
+  let html;
+  if (typeof row.ss === "number" && row.ss >= 0 && row.ss + row.sl <= t.length){
+    html = esc(t.slice(0, row.ss)) + "<mark>" + esc(t.slice(row.ss, row.ss + row.sl)) + "</mark>" + esc(t.slice(row.ss + row.sl));
+  } else {
+    const e = card.w.replace(/[-\\^$*+?.()|[\]{}]/g, "\\$&");
+    html = esc(t).replace(new RegExp(`\\b(${e}[a-z]*)\\b`, "ig"), m => `<mark>${m}</mark>`);
+  }
+  document.getElementById("sentence").innerHTML = html;
+  document.getElementById("wordBadge").textContent = card.w;
+  document.getElementById("tagLine").innerHTML =
+    `<span>${esc(card.pos)}</span>${card.trap ? ' <span class="trap">TRAP · 熟词僻义</span>' : ""}`;
+
+  document.getElementById("blankBox").style.display = "flex";
+  document.getElementById("giveupStage1").style.display = "block";
+  document.getElementById("options").style.display = "none";
+  document.getElementById("options").innerHTML = "";
+  document.getElementById("explain").innerHTML = "";
+  document.getElementById("explain").style.display = "none";
+  document.getElementById("actions").style.display = "none";
+  document.getElementById("hint").textContent = "想清楚这个词在这句里的意思…";
+  document.getElementById("soloBanner").style.display = solo ? "block" : "none";
+  updateProgress();
+}
+
+function updateProgress(){
+  if (!state) return;
+  const total = state.queue.length || 0;
+  const inSolo = !!solo;
+  const label = inSolo ? "单挑" : `第 ${Math.min(state.pos+1, total)} / ${total} 题`;
+  document.getElementById("progressText").textContent = total ? label : "未开始";
+  const pct = total ? Math.min(100, (state.pos / total) * 100) : 0;
+  document.getElementById("progressFill").style.width = `${pct}%`;
+  const s = state.stats;
+  const masteredCount = Object.keys(state.mastered).length;
+  document.getElementById("statsLine").innerHTML =
+    `对 <b>${s.correct}</b> · 错 <b>${s.wrong}</b> · 不会 <b>${s.pending}</b> · 已掌握 <b>${masteredCount}</b> / ${CARDS.length}`;
+}
+
+function revealOptions(){
+  if (revealed || answered) return;
+  revealed = true;
+  document.getElementById("hint").textContent = "选择一个义项";
+  document.getElementById("blankBox").style.display = "none";
+  document.getElementById("giveupStage1").style.display = "none";
+  const list = document.getElementById("options");
+  list.style.display = "grid";
+  list.innerHTML = "";
+  const shuffled = options.slice();
+  const nodes = [], kinds = [];
+  shuffled.forEach((o,i) => {
+    const d = document.createElement("div");
+    d.className = "opt";
+    const key = "ABCD"[i];
+    d.innerHTML = `<span class="key">${key}</span><span class="body">${esc(o.zh)}</span>`;
+    d.onclick = () => choose(o, d, key);
+    list.appendChild(d);
+    nodes.push(d); kinds.push(o.kind);
+  });
+  const d = document.createElement("div");
+  d.className = "opt full";
+  d.innerHTML = `<span class="key">E</span><span class="body">我不会</span>`;
+  d.onclick = () => choose({kind:"pending"}, d, "E");
+  list.appendChild(d);
+  renderedOptions = {nodes, shuffle: kinds};
+}
+
+function giveUpNow(){
+  choose({kind:"pending"}, document.getElementById("giveupStage1"), "");
+}
+
+function showExplain(status, node, key){
+  const exp = document.getElementById("explain");
+  exp.className = "explain";
+  exp.style.display = "block";
+  const correct = options.find(o => o.kind === "correct");
+  const meta = {
+    good:     {icon:"✓", label:"正确",   cls:"good"},
+    bad:      {icon:"✕", label:"答错",   cls:"bad"},
+    pending:  {icon:"·", label:"我不会", cls:"pending"},
+  }[status];
+  const isMastered = !!state.mastered[card.id];
+  const masterBtn = isMastered
+    ? `<div class="note mastered-line">✓ 已标记「我已学会」</div>`
+    : `<div class="note master-line"><a onclick="markMastered('${card.id}')">我已学会</a></div>`;
+
+  exp.innerHTML =
+    `<div class="result-row ${meta.cls}"><span class="chip">${meta.icon} ${meta.label}</span>` +
+    `<span class="correct-ans">正确答案 <b>${esc(correct.zh)}</b></span></div>` +
+    `<div class="trans"><b>译文：</b>${esc(row.tr)}</div>` +
+    `<div class="note">${esc(row.n)}</div>` + masterBtn;
+
+  const act = document.getElementById("actions");
+  act.style.display = "flex";
+  act.innerHTML = "";
+  const mk = (cls, txt, fn) => { const b=document.createElement("button"); b.className=`btn ${cls}`; b.textContent=txt; b.onclick=fn; act.appendChild(b); return b; };
+
+  if (solo){
+    if (solo.chain >= 2){
+      delete state.wrong[solo.id];
+      saveState();
+      const doneId = solo.id, doneWord = card.w, doneZh = correct.zh;
+      solo = null;
+      document.getElementById("soloBanner").style.display = "none";
+      renderBoard();
+      const note = document.createElement("div");
+      note.className = "note solo-done";
+      note.textContent = `恭喜：${doneWord}「${doneZh}」已从错题板移出`;
+      exp.appendChild(note);
+      mk("primary", "返回错题板", () => switchTab("board"));
+    } else {
+      mk("primary", "再来一题", () => loadCard(solo.id));
+      mk("ghost", "返回错题板", () => { exitSolo(); });
+    }
+  } else {
+    const last = state.pos + 1 >= state.queue.length;
+    mk("primary", last ? "看小结" : "下一题", nextCard);
+    mk("ghost", "标记「我已学会」", () => markMastered(card.id));
+  }
+}
+
+function switchTab(name){
+  const vTrain = document.getElementById("viewTrain");
+  const vBoard = document.getElementById("viewBoard");
+  const vSum = document.getElementById("viewSummary");
+  const tabTrain = document.getElementById("tabTrain");
+  const tabBoard = document.getElementById("tabBoard");
+  if (name === "board"){
+    vTrain.style.display = "none"; vSum.style.display = "none";
+    vBoard.style.display = "block";
+    tabTrain.classList.remove("active"); tabBoard.classList.add("active");
+    renderBoard();
+  } else {
+    vBoard.style.display = "none"; vSum.style.display = "none";
+    vTrain.style.display = "block";
+    tabTrain.classList.add("active"); tabBoard.classList.remove("active");
+  }
+}
+
+function renderBoard(){
+  if (!state) return;                 // 数据未就绪时避免崩溃
+  const items = Object.values(state.wrong)
+    .sort((a,b) => b.wrongCount - a.wrongCount || a.w.localeCompare(b.w));
+  document.getElementById("boardCount").textContent = `${items.length} 个对子`;
+  const list = document.getElementById("boardList");
+  list.innerHTML = "";
+  if (!items.length){
+    list.innerHTML = `<div class="board-empty">还没有错题。持续答题，点「我不会」的对子会出现在这里。</div>`;
+    return;
+  }
+  items.forEach(it => {
+    const d = document.createElement("div");
+    d.className = "worst-item";
+    const hot = it.wrongCount >= 3;
+    d.innerHTML =
+      `<span class="badge ${hot ? "hot" : "cold"}">${it.wrongCount}次</span>` +
+      `<div><div class="word">${esc(it.w)}</div><div class="sub">${esc(it.zh)}</div></div>` +
+      `<span class="go">›</span>`;
+    d.onclick = () => startSolo(it.id);
+    list.appendChild(d);
+  });
+}
+
+function renderSummary(){
+  if (!state) return;
+  const vTrain = document.getElementById("viewTrain");
+  const vBoard = document.getElementById("viewBoard");
+  const vSum = document.getElementById("viewSummary");
+  vTrain.style.display = "none"; vBoard.style.display = "none";
+  vSum.style.display = "block";
+  document.getElementById("tabTrain").classList.remove("active");
+  document.getElementById("tabBoard").classList.add("active");
+
+  const items = Object.values(state.wrong);
+  const miss = items.map(it =>
+    `<span class="miss-item" onclick="startSolo('${it.id}')">${esc(it.w)}「${esc(it.zh)}」</span>`);
+  const s = state.stats;
+  const answered = s.correct + s.wrong + s.pending;
+  const acc = answered ? Math.round(s.correct / answered * 100) : 0;
+
+  // D16：所有义项都没有例句时，小结页要说清"为什么没题"，而不是"你答了 0 题"
+  const playable = CARDS.filter(hasRows).length;
+  if (!playable){
+    vSum.innerHTML = `
+      <div class="summary fade-enter">
+        <h2>暂时没有可练的题目</h2>
+        <div class="block">
+          <div class="label">现状</div>
+          <div class="stat-grid">
+            <div class="stat"><b>${CARDS.length}</b><span>义项已入库</span></div>
+            <div class="stat"><b>${playable}</b><span>有例句</span></div>
+            <div class="stat pending"><b>${CARDS.length - playable}</b><span>待生成</span></div>
+            <!-- 生成进行中时，额外显示进度条，让"正在逐词填充"可见 -->
+          </div>
+        </div>
+        <div class="block">
+          <div class="label">说明</div>
+          <div class="done-line">
+            词库已按 D15 重建（${CARDS.length} 个义项，来自 ECDICT）。
+            例句正在按 T1 高频词逐词生成，目前完成 ${playable} 个义项。
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn secondary" onclick="switchTab('board')">看错题板</button>
+        </div>
+      </div>`;
+    return;
+  }
+
+  vSum.innerHTML = `
+    <div class="summary fade-enter">
+      <h2>本场完成</h2>
+      <div class="block">
+        <div class="label">统计</div>
+        <div class="stat-grid">
+          <div class="stat good"><b>${s.correct}</b><span>对</span></div>
+          <div class="stat bad"><b>${s.wrong}</b><span>错</span></div>
+          <div class="stat pending"><b>${s.pending}</b><span>不会</span></div>
+          <div class="stat"><b>${acc}%</b><span>正确率</span></div>
+        </div>
+      </div>
+      <div class="block">
+        <div class="label">错过（点击单挑）</div>
+        ${miss.length ? `<div class="miss-list">${miss.join("")}</div>` : `<div class="done-line">本场没有错过</div>`}
+      </div>
+      <div class="block">
+        <div class="label">累计</div>
+        <div class="done-line">已掌握 ${Object.keys(state.mastered).length} / ${CARDS.length} 个对子；错题板 ${items.length} 个</div>
+      </div>
+      <div class="actions">
+        <button class="btn secondary" onclick="switchTab('board')">看错题板</button>
+        <button class="btn primary" onclick="newRound()">再来一轮</button>
+      </div>
+    </div>`;
+}
+
+/* =========================================================================
+   启动
+   ========================================================================= */
+function boot(){
+  const load = document.getElementById("loading");
+  fetch(BUNDLE_URL)
+    .then(r => r.json())
+    .then(b => {
+      BUNDLE = b;
+      CARDS = b.cards;
+      GLOSS = b.glossPool;
+      if (load) load.remove();
+      state = loadState();
+      // 恢复未完成的一轮
+      if (state.queue.length && state.pos < state.queue.length){
+        switchTab("train");
+        loadCard(state.queue[state.pos]);
+      } else if (state.queue.length && state.pos >= state.queue.length){
+        // 上一轮已做完 -> 回到小结，而不是静默开新一轮
+        renderSummary();
+      } else {
+        state.queue = pickQueue(20);
+        state.pos = 0;
+        saveState();
+        if (state.queue.length){ switchTab("train"); loadCard(state.queue[0]); }
+        else renderSummary();
+      }
+      renderBoard();
+    })
+    .catch(e => {
+      if (load) load.textContent = "数据加载失败：" + e.message;
+    });
+}
+boot();
+
+</script>
+</body>
+</html>

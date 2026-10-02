@@ -1,0 +1,5 @@
+senseId	pos	glossZh	glossEn	trap	note
+s1	n.	日常饮食		0	tier=T1
+s2	n.	议会		0	tier=T1
+s3	vt.	照规定饮食		0	tier=T1
+s4	vi.	忌食		0	tier=T1

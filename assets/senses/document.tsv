@@ -1,0 +1,5 @@
+senseId	pos	glossZh	glossEn	trap	note
+s1	n.	文件		0	tier=T1
+s2	n.	公文		0	tier=T1
+s3	n.	文档		0	tier=T1
+s4	vt.	证明		0	tier=T1

@@ -1,0 +1,5 @@
+senseId	pos	glossZh	glossEn	trap	note
+s1	n.	医生		0	tier=T1
+s2	n.	体格检查		0	tier=T1
+s3	a.	医学的		0	tier=T1
+s4	a.	内科的		0	tier=T1

@@ -1,0 +1,5 @@
+senseId	pos	glossZh	glossEn	trap	note
+s1	n.	水准		0	tier=T1
+s2	n.	平地		0	tier=T1
+s3	a.	同高的		0	tier=T1
+s4	a.	平坦的		0	tier=T1

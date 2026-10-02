@@ -1,0 +1,133 @@
+# -*- coding: utf-8 -*-
+"""构建原型/Stage4 用的紧凑聚合包。
+
+产物 assets/bundle/cards.json：
+{
+  "version": "...",
+  "stats": {"words":2998,"senses":7884,"withSentences":0,"cards":7884,"glossPool":N},
+  "glossPool": ["释义1","释义2",...],          # 跨词干扰项池
+  "cards": [
+    {"id":"lay#s1","w":"lay","s":"s1","pos":"vt.","zh":"放置","en":"","trap":0,
+     "tier":"T1",
+     "rows":[{"t":"...","c":"clue","ss":4,"sl":3,"tr":"...","n":"...","src":"GENERATED"}]}
+  ]
+}
+
+D16 之后的要点：
+  1. 义项表是唯一真相源，**没有句子的义项也要成卡**（rows 为空）。
+     旧版会把无 PASS 句的义项丢掉，导致词库里"消失"一部分义项——
+     那是内容缺失，不该由打包逻辑掩盖。
+  2. 句子目录不存在时（LLM 通道禁用期）自动降级为纯义项包。
+  3. 干扰项池从全部义项的 glossZh 构建，不依赖句子。
+"""
+import csv, json, os, sys, time, collections
+
+PROJ = r"D:\projectX\android\Word"
+sys.stdout.reconfigure(encoding="utf-8")
+S = os.path.join(PROJ, "assets", "sentences")
+SE = os.path.join(PROJ, "assets", "senses")
+J = os.path.join(PROJ, "assets", "judge_results")
+OUT = os.path.join(PROJ, "assets", "bundle", "cards.json")
+
+has_sent = os.path.isdir(S)
+has_judge = os.path.isdir(J)
+
+# 1) PASS 句集合（judge 目录不存在时为空集 = 收全部句）
+pass_set = collections.defaultdict(set)
+if has_judge:
+    for f in os.listdir(J):
+        if not f.endswith(".tsv"):
+            continue
+        lemma = f[:-4]
+        with open(os.path.join(J, f), encoding="utf-8") as fh:
+            for r in csv.DictReader(fh, delimiter="\t"):
+                if r.get("passed") == "PASS":
+                    pass_set[lemma].add((r["senseId"], r["text"]))
+
+cards = []
+gloss_pool = []
+gloss_seen = set()
+n_sent = 0
+n_no_sent = 0
+n_words = 0
+
+for f in sorted(os.listdir(SE)):
+    if not f.endswith(".tsv"):
+        continue
+    lemma = f[:-4]
+    with open(os.path.join(SE, f), encoding="utf-8") as fh:
+        senses = list(csv.DictReader(fh, delimiter="\t"))
+    n_words += 1
+
+    rows_by = collections.defaultdict(list)
+    spath = os.path.join(S, f"{lemma}.tsv")
+    if os.path.exists(spath):
+        with open(spath, encoding="utf-8") as fh:
+            for r in csv.DictReader(fh, delimiter="\t"):
+                if not has_judge or (r["senseId"], r["text"]) in pass_set.get(lemma, ()):
+                    rows_by[r["senseId"]].append(r)
+
+    for s in senses:
+        sid = s["senseId"]
+        rs = rows_by.get(sid, [])
+        zh = s.get("glossZh", "")
+        if zh and zh not in gloss_seen:
+            gloss_seen.add(zh)
+            gloss_pool.append(zh)
+        if not rs:
+            n_no_sent += 1
+        n_sent += len(rs)
+        cards.append({
+            "id": f"{lemma}#{sid}",
+            "w": lemma, "s": sid,
+            "pos": s.get("pos", ""),
+            "zh": zh,
+            "en": s.get("glossEn", ""),
+            "trap": 1 if s.get("trap") == "1" else 0,
+            "tier": s.get("tier", ""),
+            "rows": [{
+                "t": r["text"], "c": r.get("clue", ""),
+                "ss": int(r.get("span_start") or 0), "sl": int(r.get("span_len") or 0),
+                "tr": r.get("translation", ""), "n": r.get("note", ""),
+                "src": r.get("source", ""),
+            } for r in rs],
+        })
+
+bundle = {
+    "version": time.strftime("%Y%m%d"),
+    "stats": {
+        "words": n_words,
+        "senses": len(cards),
+        "cards": len(cards),
+        "withSentences": len(cards) - n_no_sent,
+        "sentences": n_sent,
+        "glossPool": len(gloss_pool),
+        "traps": sum(1 for c in cards if c["trap"]),
+        "noSentence": n_no_sent,
+        "mode": "FULL" if n_no_sent == 0 else "SENSES_ONLY" if n_sent == 0 else "PARTIAL",
+    },
+    "glossPool": gloss_pool,
+    "cards": cards,
+}
+
+os.makedirs(os.path.dirname(OUT), exist_ok=True)
+with open(OUT, "w", encoding="utf-8") as fh:
+    json.dump(bundle, fh, ensure_ascii=False, separators=(",", ":"))
+
+size = os.path.getsize(OUT)
+st = bundle["stats"]
+print("构建完成  mode=%s" % st["mode"])
+print("  words           :", st["words"])
+print("  cards(义项级)   :", st["cards"])
+print("  sentences       :", st["sentences"])
+print("  有句义项        :", st["withSentences"])
+print("  无句义项        :", st["noSentence"])
+print("  trap            :", st["traps"])
+print("  glossPool       :", st["glossPool"])
+print("  文件大小        : {:.3f} MB".format(size / 1024 / 1024))
+print("  ->", OUT)
+if st["noSentence"]:
+    print("\n  [注意] %d 个义项没有例句，原型需能显示「暂无例句」状态" % st["noSentence"])
+
+d = collections.Counter(len(c["rows"]) for c in cards)
+print("  每卡句数分布:", dict(sorted(d.items())))

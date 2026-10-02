@@ -1,0 +1,178 @@
+lemma	pos	tier	senseIds	freq	gloss	alt	category	subcategory
+the		FULL		86015	这个、这些		抽象概念	基础功能词
+be		FULL		54093	是、存在		动作行为	起始与终止
+a		FULL		50252	一、每一		抽象概念	基础功能词
+to		FULL		44609	目的、终点		空间地点	
+of		FULL		40452	的		抽象概念	基础功能词
+and		FULL		28550	和		抽象概念	逻辑与关系
+in		FULL		28481	在…内		空间地点	
+have		FULL		15599	有		动作行为	身体动作
+that		FULL		14916	那		抽象概念	基础功能词
+it		FULL		13810	它		抽象概念	基础功能词
+for		FULL		13733	为了…、因为…		抽象概念	逻辑与关系
+on		FULL		12004	在…上、持续		空间地点	
+they		FULL		11942	他们		人类与社会	
+you		FULL		10015	你		人类与社会	
+with		FULL		9006	伴随		空间地点	
+as		FULL		8258	作为、既然、随着、就像		抽象概念	逻辑与关系
+their		FULL		7050	他们的		人类与社会	
+by		FULL		6895	方式、到…为止		空间地点	
+not		FULL		6608	不、没有		抽象概念	逻辑与关系
+he		FULL		6542	他		人类与社会	
+from		FULL		6455	从…、起点		空间地点	
+at		FULL		6378	在…位置		空间地点	
+do		FULL		5932	做		动作行为	变化趋势
+we		FULL		5808	我们		人类与社会	
+this		FULL		5481	这		抽象概念	基础功能词
+or		FULL		5362	或者、否则		抽象概念	逻辑与关系
+I		FULL		5332	我		人类与社会	
+one		FULL		5193	一个		抽象概念	数量与程度
+but		FULL		4929	但是		抽象概念	逻辑与关系
+what		FULL		4554	什么		抽象概念	基础功能词
+about		FULL		4062	关于		空间地点	
+than		FULL		3795	比		抽象概念	逻辑与关系
+his		FULL		3761	他的		人类与社会	
+which		FULL		3351	哪个、什么样的		抽象概念	基础功能词
+should		FULL		3190	应该		动作行为	其他动作
+your		FULL		3121	你的		人类与社会	
+all		FULL		3043	一切		抽象概念	数量与程度
+she		FULL		2960	她		人类与社会	
+who		FULL		2954	谁		人类与社会	
+each		FULL		2924	每个		抽象概念	数量与程度
+some		FULL		2923	一些		抽象概念	数量与程度
+other		FULL		2891	其他		抽象概念	性质与评价
+if		FULL		2794	如果、是否		抽象概念	逻辑与关系
+its		FULL		2572	它的		抽象概念	基础功能词
+may		FULL		2528	可能、祝		抽象概念	基础功能词
+many		FULL		2493	很多		抽象概念	数量与程度
+most		FULL		2477	最多的、大多数的		抽象概念	数量与程度
+up		FULL		2454	在...上、完成		空间地点	
+her		FULL		2437	她的		人类与社会	
+would		FULL		2396	愿意		动作行为	其他动作
+so		FULL		2281	因此		抽象概念	逻辑与关系
+our		FULL		2178	我们的		人类与社会	
+out		FULL		2168	出去、外面		空间地点	
+just		FULL		2152	只、仅仅		抽象概念	逻辑与关系
+how		FULL		2125	如何		抽象概念	逻辑与关系
+into		FULL		2016	进入内部		空间地点	
+because		FULL		1932	因为		抽象概念	逻辑与关系
+through		FULL		1912	通过、穿过		空间地点	
+much		FULL		1727	许多的、非常		抽象概念	数量与程度
+over		FULL		1554	在…上方、结束		空间地点	
+after		FULL		1528	在…之后		时间日期	
+these		FULL		1504	这些、这些人		抽象概念	基础功能词
+could		FULL		1479	能够		动作行为	评价与判断
+even		FULL		1465	甚至		抽象概念	逻辑与关系
+also		FULL		1446	也		抽象概念	逻辑与关系
+such		FULL		1424	这样的		抽象概念	性质与评价
+those		FULL		1332	那些		抽象概念	基础功能词
+must		FULL		1218	必须		动作行为	其他动作
+any		FULL		1199	任何		抽象概念	数量与程度
+my		FULL		1197	我的		人类与社会	
+both		FULL		1172	两者		抽象概念	数量与程度
+between		FULL		1116	在…之间		空间地点	
+before		FULL		1103	在…之前		时间日期	
+own		FULL		1078	拥有		动作行为	占有与转移
+few		FULL		1011	很少		抽象概念	数量与程度
+why		FULL		880	为什么		抽象概念	逻辑与关系
+might		FULL		847	可能		动作行为	其他动作
+another		FULL		782	另一个		抽象概念	数量与程度
+during		FULL		780	在…期间		时间日期	
+down		FULL		748	在…下面、情绪低落		空间地点	
+without		FULL		731	没有		空间地点	
+off		FULL		700	关闭、不在原处		空间地点	
+something		FULL		662	某事		抽象概念	数量与程度
+however		FULL		621	但是、然而		抽象概念	逻辑与关系
+around		FULL		617	周围、环绕		空间地点	
+whether		FULL		615	是否		抽象概念	逻辑与关系
+among		FULL		594	在……之中		空间地点	
+themselves		FULL		556	他们自己、他们亲自		人类与社会	
+against		FULL		528	相对、相反		空间地点	
+under		FULL		487	在…之下		空间地点	
+though		FULL		435	尽管		抽象概念	逻辑与关系
+instead		FULL		390	反而		抽象概念	逻辑与关系
+although		FULL		384	尽管		抽象概念	逻辑与关系
+within		FULL		379	内部		空间地点	
+several		FULL		348	几个		抽象概念	数量与程度
+below		FULL		314	在…下面		空间地点	
+nothing		FULL		287	没有		抽象概念	数量与程度
+together		FULL		283	一共		抽象概念	逻辑与关系
+along		FULL		281	沿着		空间地点	
+across		FULL		275	穿过		空间地点	
+someone		FULL		272	某人		人类与社会	
+everyone		FULL		270	每人		人类与社会	
+either		FULL		269	两者之一		抽象概念	数量与程度
+anything		FULL		264	任何事		抽象概念	数量与程度
+everything		FULL		258	每件事		抽象概念	数量与程度
+per		FULL		255	每、经		抽象概念	逻辑与关系
+itself		FULL		245	它自己		抽象概念	基础功能词
+except		FULL		239	除了……之外		抽象概念	逻辑与关系
+himself		FULL		233	他自己、他本人		人类与社会	
+therefore		FULL		233	因此		抽象概念	逻辑与关系
+above		FULL		228	在…上面		空间地点	
+whose		FULL		219	谁的		人类与社会	
+upon		FULL		213	在…上面		空间地点	
+thus		FULL		212	因此		抽象概念	逻辑与关系
+toward		FULL		212	向、朝向		空间地点	
+else		FULL		211	其他		抽象概念	逻辑与关系
+despite		FULL		181	尽管		抽象概念	逻辑与关系
+yourself		FULL		177	你自己、你亲自		人类与社会	
+nor		FULL		153	也不		抽象概念	逻辑与关系
+unless		FULL		150	除非		抽象概念	逻辑与关系
+whom		FULL		127	谁、哪个人		人类与社会	
+whatever		FULL		126	无论什么		抽象概念	逻辑与关系
+being		FULL		125	生物、生存		人类与社会	
+directly		FULL		118	直接地		抽象概念	逻辑与关系
+ourselves		FULL		118	我们自己、我们亲自		人类与社会	
+herself		FULL		113	她自己、她亲自		人类与社会	
+neither		FULL		106	两个都不		抽象概念	逻辑与关系
+unlike		FULL		101	不同的、不像		抽象概念	逻辑与关系
+otherwise		FULL		99	否则	otherwize	抽象概念	逻辑与关系
+moreover		FULL		96	而且、此外		抽象概念	逻辑与关系
+nobody		FULL		74	谁也不、小人物		人类与社会	
+everybody		FULL		70	每人		人类与社会	
+regardless		FULL		70	不顾、不管怎样		抽象概念	逻辑与关系
+nevertheless		FULL		67	然而		抽象概念	逻辑与关系
+myself		FULL		62	我自己、我亲自		人类与社会	
+whereas		FULL		62	然而		抽象概念	逻辑与关系
+besides		FULL		61	除了之外、而且		抽象概念	逻辑与关系
+plus		FULL		55	加上、正的		抽象概念	逻辑与关系
+onto		FULL		54	在上面、到上面		空间地点	
+shall		FULL		50	将要		动作行为	其他动作
+via		FULL		48	经过		空间地点	
+anyway		FULL		38	无论如何		抽象概念	逻辑与关系
+hence		FULL		38	因此		抽象概念	逻辑与关系
+somehow		FULL		38	以某种方式		抽象概念	逻辑与关系
+consequently		FULL		36	因此		抽象概念	逻辑与关系
+mine		FULL		36	我的、矿		人类与社会	
+somebody		FULL		29	某人		人类与社会	
+lest		FULL		26	以免		抽象概念	逻辑与关系
+nonetheless		FULL		23	然而		抽象概念	逻辑与关系
+anybody		FULL		22	任何人		人类与社会	
+likewise		FULL		22	同样地	likewize	抽象概念	逻辑与关系
+thereby		FULL		20	从而		抽象概念	逻辑与关系
+versus		FULL		20	对抗		抽象概念	逻辑与关系
+accordingly		FULL		16	相应地、因此		抽象概念	逻辑与关系
+whichever		FULL		15	无论哪一个		抽象概念	逻辑与关系
+incidentally		FULL		13	偶然地、附带地		抽象概念	逻辑与关系
+whereby		FULL		12	凭借		抽象概念	逻辑与关系
+whoever		FULL		11	任何人、不管谁		人类与社会	
+conversely		FULL		10	相反地		抽象概念	逻辑与关系
+namely		FULL		10	即		抽象概念	逻辑与关系
+irrespective		FULL		5	不考虑的		抽象概念	逻辑与关系
+whatsoever		FULL		5	无论什么		抽象概念	逻辑与关系
+anyhow		FULL		3	无论如何		抽象概念	逻辑与关系
+me		FULL		3	我		人类与社会	
+notwithstanding		FULL		3	尽管		抽象概念	逻辑与关系
+May		FULL		0	五月		时间日期	
+according to		FULL		0	据所说、根据		抽象概念	逻辑与关系
+albeit		FULL		0	虽然		抽象概念	逻辑与关系
+him		FULL		0	他		人类与社会	
+ought to		FULL		0	应该		抽象概念	逻辑与关系
+owing to		FULL		0	由于		抽象概念	逻辑与关系
+provided		FULL		0	提供的		抽象概念	逻辑与关系
+regarding		FULL		0	关于		抽象概念	逻辑与关系
+them		FULL		0	他们		人类与社会	
+us		FULL		0	我们		人类与社会	
+yours		FULL		0	你的		人类与社会	
+yourselves		FULL		0	你们自己		抽象概念	基础功能词

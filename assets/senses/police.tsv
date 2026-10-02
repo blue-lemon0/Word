@@ -1,0 +1,5 @@
+senseId	pos	glossZh	glossEn	trap	note
+s1	n.	警察当局		0	tier=T1
+s2	n.	治安		0	tier=T1
+s3	vt.	维持治安		0	tier=T1
+s4	vt.	管辖		0	tier=T1
