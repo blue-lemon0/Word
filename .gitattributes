@@ -1,0 +1,9 @@
+# 源码与文档：统一 LF，避免 Windows 上 CRLF 污染 diff
+* text=auto eol=lf
+
+# 数据文件：按字节原样存储（-text 关闭行尾转换，-diff 关闭逐行 diff）
+# 理由：句子的 span_start/span_len 是字符偏移，任何字节变化都会让高亮错位；
+#       这些文件由脚本生成，不需要人肉 diff。
+*.tsv  -text -diff
+*.json -text -diff
+*.csv  -text -diff

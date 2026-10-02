@@ -1,3 +1,22 @@
+# Python
 __pycache__/
 *.pyc
+
+# Node（e2e 测试用 jsdom）
 node_modules/
+
+# ── 派生产物：由脚本一条命令重建，不入库 ──────────────
+# bundle 是打包结果，真相源是 assets/senses + assets/sentences
+assets/bundle/
+
+# ECDICT 切分中间产物（可由 raw 重跑得到）
+# 注意：ecdict_senses_raw.json **不入库忽略**——它是 ECDICT CSV 的唯一快照，
+# CSV 在仓库外，删掉就再也拿不回来。
+assets/wordlists/ecdict_senses_final.json
+assets/wordlists/ecdict_senses_b.json
+
+# 本地运行时数据库（学习进度，由 sqlite 重建/迁移，不入库）
+data/
+*.db
+*.db-wal
+*.db-shm
