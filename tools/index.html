@@ -314,6 +314,21 @@
   .master-line a:hover { opacity: .8; }
   .mastered-line { text-align: right; color: var(--good); font-weight: 600; font-size: 13px; }
   .solo-done { color: var(--good); font-weight: 700; }
+
+  /* D17：标记「这句有问题」 */
+  .flag-line { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+  .flag-line a {
+    color: var(--ink-faint); font-size: 13px; cursor: pointer; white-space: nowrap;
+    border-bottom: 1px dashed var(--ink-faint);
+  }
+  .flag-input {
+    flex: 1; min-width: 0; font: inherit; font-size: 13px;
+    border: 1px solid var(--line); border-radius: var(--radius-sm);
+    padding: 6px 10px; background: #fbfcff; color: var(--ink);
+  }
+  .flag-input:focus { outline: none; border-color: var(--primary); }
+  .flagged-ok { color: var(--good); font-size: 13px; font-weight: 600; }
+  .flag-bad { color: var(--bad); font-size: 13px; }
 </style>
 </head>
 <body>
@@ -443,6 +458,7 @@ const API = {
 };
 
 let _pushTimer = null;
+let SERVER_LIVE = {};        // D17：服务端给的「每张卡还能用的句子下标」
 function pushState(){
   if (!state || _pushTimer) return;
   // 连续点击「下一题」时合并成一次推送，别每题都写一遍
@@ -460,6 +476,22 @@ function commitMastered(id){
   const c = CARDS.find(x => x.id === id);
   if (!c) return Promise.resolve(null);
   return API.post("/api/mastered", {word: c.w, senseId: c.s, on: true});
+}
+
+/** 这句有问题：标一下（备注可空），标完就不再出这句。
+ *  事后跑 scripts/triage_flags.py 拿清单统一改。 */
+function flagSentence(){
+  if (!card || !row) return;
+  const input = document.getElementById("flagNote");
+  const note = input ? input.value.trim() : "";
+  API.post("/api/flag", {word: card.w, senseId: card.s, sentence: row.t, note})
+    .then(r => {
+      const line = document.querySelector(".flag-line");
+      if (!line) return;
+      line.innerHTML = (r && r.ok)
+        ? `<span class="flagged-ok">✓ 已标记，不再出这句${note ? `（${esc(note)}）` : ""}</span>`
+        : `<span class="flag-bad">标记失败：${esc((r && r.error) || "未知原因")}</span>`;
+    });
 }
 
 /** 本地没有存档时，从 SQLite 恢复。返回是否有可恢复的内容。 */
@@ -486,6 +518,19 @@ function pickQueue(size){
   const rank = c => (wrongIds.has(c.id) ? 0 : 1) * 10 + (c.trap ? 0 : 1);
   pool.sort((a,b) => rank(a) - rank(b) || a.id.localeCompare(b.id));
   return pool.slice(0, size).map(c => c.id);
+}
+
+/** D17：向服务端要本轮队列。
+ *  服务端按 SRS 到期 + 权重排（03 §5.2），并剔除已被标记的问题句；
+ *  前端自己的 pickQueue 只作兜底（离线 / 纯静态打开时用）。
+ *  恢复上一轮时也要调 —— 只取 live（可用句子下标），不用它的 ids。
+ *  返回服务端给的完整结果，失败返回 null。 */
+function fetchQueue(size){
+  return API.post("/api/queue", {n: size}).then(q => {
+    if (!q || !Array.isArray(q.ids)) return null;
+    SERVER_LIVE = q.live || {};
+    return q;
+  }).catch(() => null);
 }
 function hasRows(c){
   return Array.isArray(c.rows) && c.rows.length > 0;
@@ -517,8 +562,11 @@ function buildOptions(c){
 
 function nextRow(c){
   if (!hasRows(c)) return null;   // D16：无句义项
-  const i = (state.rowIdx[c.id] || 0) % c.rows.length;
-  state.rowIdx[c.id] = (i + 1) % c.rows.length;
+  // 服务端给的可���下标里挑（已剔除被标记的问题句）；没有就退回全量
+  const live = SERVER_LIVE[c.id];
+  const pool = (live && live.length) ? live : c.rows.map((_, i) => i);
+  const i = pool[(state.rowIdx[c.id] || 0) % pool.length];
+  state.rowIdx[c.id] = ((state.rowIdx[c.id] || 0) + 1) % pool.length;
   return c.rows[i];
 }
 
@@ -640,15 +688,20 @@ function startSolo(id){
 }
 
 function newRound(){
-  state.queue = pickQueue(20);
-  state.pos = 0;
-  state.stats = {correct:0, wrong:0, pending:0};
-  state.rowIdx = {};
-  solo = null;
-  saveState();
-  switchTab("train");
-  if (!state.queue.length){ renderSummary(); return; }
-  loadCard(state.queue[0]);
+  SERVER_LIVE = {};
+  // 先向服务端要到期队列（SRS 排期 + 剔除已标记的问题句）；
+  // 拿不到就退回前端自己的排法（离线 / 纯静态打开）。
+  fetchQueue(20).then(q => {
+    state.queue = (q && q.ids && q.ids.length) ? q.ids : pickQueue(20);
+    state.pos = 0;
+    state.stats = {correct:0, wrong:0, pending:0};
+    state.rowIdx = {};
+    solo = null;
+    saveState();
+    switchTab("train");
+    if (!state.queue.length){ renderSummary(); return; }
+    loadCard(state.queue[0]);
+  });
 }
 
 /* =========================================================================
@@ -756,7 +809,9 @@ function showExplain(status, node, key){
     `<div class="result-row ${meta.cls}"><span class="chip">${meta.icon} ${meta.label}</span>` +
     `<span class="correct-ans">正确答案 <b>${esc(correct.zh)}</b></span></div>` +
     `<div class="trans"><b>译文：</b>${esc(row.tr)}</div>` +
-    `<div class="note">${esc(row.n)}</div>` + masterBtn;
+    `<div class="note">${esc(row.n)}</div>` + masterBtn +
+    `<div class="note flag-line"><a onclick="flagSentence()">这句有问题</a>` +
+    `<input class="flag-input" id="flagNote" placeholder="备注（可空）" maxlength="60"></div>`;
 
   const act = document.getElementById("actions");
   act.style.display = "flex";
@@ -918,21 +973,29 @@ function boot(){
       // D17：本地没有存档时，从 SQLite 恢复这一轮（换机器/清缓存后接着练）
       return restoreFromServer().then(restored => {
         if (restored && load) load.textContent = "";
-        // 恢复未完成的一轮
-        if (state.queue.length && state.pos < state.queue.length){
-          switchTab("train");
-          loadCard(state.queue[state.pos]);
-        } else if (state.queue.length && state.pos >= state.queue.length){
-          // 上一轮已做完 -> 回到小结，而不是静默开新一轮
-          renderSummary();
-        } else {
-          state.queue = pickQueue(20);
+        // 恢复未完成的一轮。也要先取 live：否则恢复出来的这一轮
+        // 会把已标记的问题句再考一遍（SERVER_LIVE 空 -> nextRow 用全量下标）。
+        return fetchQueue(20).then(q => {
+          if (state.queue.length && state.pos < state.queue.length){
+            switchTab("train");
+            loadCard(state.queue[state.pos]);
+            renderBoard();
+            return;
+          }
+          if (state.queue.length && state.pos >= state.queue.length){
+            // 上一轮已做完 -> 回到小结，而不是静默开新一轮
+            renderSummary();
+            renderBoard();
+            return;
+          }
+          // 全新一轮：用服务端按 SRS 排好的队列
+          state.queue = (q && q.ids && q.ids.length) ? q.ids : pickQueue(20);
           state.pos = 0;
           saveState();
           if (state.queue.length){ switchTab("train"); loadCard(state.queue[0]); }
           else renderSummary();
-        }
-        renderBoard();
+          renderBoard();
+        });
       });
     })
     .catch(e => {

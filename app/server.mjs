@@ -96,7 +96,32 @@ const routes = {
     }
   },
 
-  /** 只清 UI 存档，不动 SRS —— 想「重开一轮但保留记忆曲线」时用 */
+  /**
+   * 本轮队列。到期卡按 SRS 权重排序（03 §5.2），
+   * 并剔除已被标记的问题句 —— 前端拿不到该出的题。
+   * 前端 pickQueue() 拿不到它时退回自己的排法（离线 / 纯静态打开）。
+   */
+  async '/api/queue'(req, res) {
+    const { n } = await readBody(req);
+    json(res, 200, store.queue(db, bundle, params, Math.min(Number(n) || 20, 200)));
+  },
+
+  /** 这句有问题。标完立刻退出出题池，备注可空。 */
+  async '/api/flag'(req, res) {
+    const { word, senseId, sentence, note } = await readBody(req);
+    try {
+      json(res, 200, store.flagSentence(db, bundle, { word, senseId, sentence, note }));
+    } catch (e) {
+      json(res, 400, { error: String((e && e.message) || e) });
+    }
+  },
+
+  /** 已标记的问题清单，scripts/triage_flags.py 也读这张表。 */
+  async '/api/flags'(req, res) {
+    json(res, 200, { total: store.flaggedCount(db), flags: store.listFlags(db) });
+  },
+
+  /** 只清 UI 存档，不动 SRS 与标记 —— 想「重开一轮但保留记忆曲线」时用 */
   async '/api/reset-ui'(req, res) {
     store.clearUiState(db);
     json(res, 200, { ok: true });

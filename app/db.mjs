@@ -325,6 +325,71 @@ const P_MASTER_S = 90;
 const P_MASTER_D = 5.0;
 const P_MASTER_REPS = 6;
 
+/* ─────────────────────────────────────────────────────────
+   句子标记：有问题就标一下，可以写句备注。标了就不再出这句。
+   事后跑 scripts/triage_flags.py 拿清单统一改。
+   ───────────────────────────────────────────────────────── */
+
+/** 标一句有问题。幂等：同一句只记一条，重复标只是更新备注。 */
+export function flagSentence(db, bundle, f) {
+  const card = bundle.cards.find((c) => c.w === f.word && c.s === f.senseId);
+  if (!card) throw new Error(`bundle 里没有这张卡: ${f.word}#${f.senseId}`);
+  if (!card.rows.some((r) => r.t === f.sentence)) {
+    throw new Error('这句不在该义项的句子里');
+  }
+  db.prepare(
+    `INSERT INTO sentence_flag (word, sense_id, sentence, note, ts) VALUES (?,?,?,?,?)
+     ON CONFLICT(word, sense_id, sentence) DO UPDATE SET
+       note = excluded.note, ts = excluded.ts`)
+    .run(f.word, f.senseId, f.sentence, f.note || null, now());
+  return { ok: true, total: flaggedCount(db) };
+}
+
+export function flaggedCount(db) {
+  return db.prepare('SELECT COUNT(*) n FROM sentence_flag').get().n;
+}
+
+export function listFlags(db, limit = 500) {
+  return db.prepare(
+    'SELECT word, sense_id, sentence, note, ts FROM sentence_flag ' +
+    'ORDER BY ts DESC LIMIT ?').all(limit);
+}
+
+/** 键用空格分隔三段，避免拼接歧义。 */
+export function flaggedSet(db) {
+  const s = new Set();
+  for (const r of db.prepare('SELECT word, sense_id, sentence FROM sentence_flag').all()) {
+    s.add(r.word + ' ' + r.sense_id + ' ' + r.sentence);
+  }
+  return s;
+}
+
+/**
+ * 本轮队列：到期卡按 SRS 权重排序（03 §5.2），跳过已无干净句子的卡。
+ *   ids  = 有序卡 id
+ *   live = 每个卡还能用的句子下标（被标记的已剔除）
+ */
+export function queue(db, bundle, params, limit = 20) {
+  const flagged = flaggedSet(db);
+  const rows = db.prepare('SELECT word, sense_id, is_trap, wrong_n FROM v_due').all();
+  const out = [];
+  for (const r of rows) {
+    const card = bundle.cards.find((c) => c.w === r.word && c.s === r.sense_id);
+    if (!card) continue;
+    const idx = [];
+    card.rows.forEach((row, i) => {
+      if (!flagged.has(r.word + ' ' + r.sense_id + ' ' + row.t)) idx.push(i);
+    });
+    if (!idx.length) continue;
+    out.push({ id: r.word + '#' + r.sense_id, w: weight(params, r), idx });
+  }
+  out.sort((a, b) => b.w - a.w || a.id.localeCompare(b.id));
+  const picked = out.slice(0, limit);
+  const live = {};
+  for (const x of picked) live[x.id] = x.idx;
+  return { ids: picked.map((x) => x.id), live, dueTotal: out.length };
+}
+
 export function overview(db, params, nowSec = now()) {
   const pool = db.prepare('SELECT COUNT(*) n FROM v_pool').get().n;
   const due = db.prepare('SELECT COUNT(*) n FROM v_due').get().n;

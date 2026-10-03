@@ -18,6 +18,21 @@ CREATE TABLE IF NOT EXISTS meta (
   value TEXT NOT NULL
 );
 
+-- ── 句子问题标记（背单词时随手标，事后统一改）───────────
+-- 生成不过度审：句子批量出，遇到问题随手标一句 + 备注，事后按这张表改。
+-- 标了就不再出这句（02 文档的 status='bad'），不拿已知有问题的句子考用户。
+-- sentence 存原文而不是外键 —— 内容在 bundle 里，DB 不持有句子表。
+CREATE TABLE IF NOT EXISTS sentence_flag (
+  id        INTEGER PRIMARY KEY,
+  word      TEXT    NOT NULL,
+  sense_id  TEXT    NOT NULL,
+  sentence  TEXT    NOT NULL,     -- 句子原文，天然指纹
+  note      TEXT,                 -- 备注，可空
+  ts        INTEGER NOT NULL,
+  UNIQUE(word, sense_id, sentence)
+);
+CREATE INDEX IF NOT EXISTS ix_flag_ts ON sentence_flag(ts DESC);
+
 -- ── 前端 UI 状态 ───────────────────────────────────
 -- tools/index.html 原来把整套 state（queue/pos/stats/wrong/mastered/rowIdx）
 -- 塞进 localStorage。localStorage 换浏览器、清缓存、重装就没了，
