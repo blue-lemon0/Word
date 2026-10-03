@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	vi.	答应		0	tier=T2
-s2	vi.	从事		0	tier=T2
-s3	vi.	交战		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	vi.	答应		0	T2	
+s2	vi.	从事		0	T2	
+s3	vi.	交战		0	T2	

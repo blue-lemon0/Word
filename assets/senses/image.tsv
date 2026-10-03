@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	影像		0	tier=T2
-s2	n.	肖像		0	tier=T2
-s3	n.	想象		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	影像		0	T2	
+s2	n.	肖像		0	T2	
+s3	n.	想象		0	T2	

@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	vt.	以...回答		0	tier=T1
-s2	vi.	回答		0	tier=T1
-s3	vi.	响应		0	tier=T1
-s4	vi.	回报		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	vt.	以...回答		0	T1	
+s2	vi.	回答		0	T1	
+s3	vi.	响应		0	T1	
+s4	vi.	回报		0	T1	

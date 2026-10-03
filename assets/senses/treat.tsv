@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	宴请		0	tier=T1
-s2	n.	款待		0	tier=T1
-s3	vt.	视为		0	tier=T1
-s4	vt.	对待		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	宴请		0	T1	
+s2	n.	款待		0	T1	
+s3	vt.	视为		0	T1	
+s4	vt.	对待		0	T1	

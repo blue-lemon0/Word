@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	vi.	过来		0	tier=T2
-s2	vi.	来		0	tier=T2
-s3	vi.	到达		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	vi.	过来		0	T2	
+s2	vi.	来		0	T2	
+s3	vi.	到达		0	T2	

@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	结果		0	tier=T1
-s2	n.	成绩		0	tier=T1
-s3	n.	答案		0	tier=T1
-s4	vi.	产生		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	结果		0	T1	
+s2	n.	成绩		0	T1	
+s3	n.	答案		0	T1	
+s4	vi.	产生		0	T1	

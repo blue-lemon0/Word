@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	委任状		0	tier=T2
-s2	n.	任官令		0	tier=T2
-s3	n.	所委职责		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	委任状		0	T2	
+s2	n.	任官令		0	T2	
+s3	n.	所委职责		0	T2	

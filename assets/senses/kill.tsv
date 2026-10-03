@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	杀		0	tier=T1
-s2	n.	杀戮		0	tier=T1
-s3	n.	小河		0	tier=T1
-s4	vt.	破坏		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	杀		0	T1	
+s2	n.	杀戮		0	T1	
+s3	n.	小河		0	T1	
+s4	vt.	破坏		0	T1	

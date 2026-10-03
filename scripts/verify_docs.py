@@ -1,14 +1,21 @@
 # -*- coding: utf-8 -*-
 """校验 docs/ 里的关键数字与实际数据是否一致。"""
-import io, json, os, re, sys, collections
+import csv, io, json, os, re, sys, collections
 sys.stdout.reconfigure(encoding="utf-8")
 PROJ = r"D:\projectX\android\Word"
 DOCS = os.path.join(PROJ, "docs")
 
-sel = json.load(io.open(os.path.join(PROJ, "assets", "wordlists",
-                                    "ecdict_senses_b.json"), encoding="utf-8"))
-fin = json.load(io.open(os.path.join(PROJ, "assets", "wordlists",
-                                    "ecdict_senses_final.json"), encoding="utf-8"))
+sel_path = os.path.join(PROJ, "assets", "wordlists", "ecdict_senses_b.json")
+fin_path = os.path.join(PROJ, "assets", "wordlists", "ecdict_senses_final.json")
+if not (os.path.exists(sel_path) and os.path.exists(fin_path)):
+    # 这两个是切分中间产物，已被 .gitignore 排除（D17）。新克隆的仓库要重跑一遍。
+    sys.stderr.write(
+        "缺少 ECDICT 切分中间产物（不在版本库里，属派生产物）。请先跑：\n"
+        "  python scripts/build_senses.py     # raw -> final\n"
+        "  python scripts/select_tier_b.py    # final -> b\n")
+    sys.exit(2)
+sel = json.load(io.open(sel_path, encoding="utf-8"))
+fin = json.load(io.open(fin_path, encoding="utf-8"))
 ns = sum(len(v["senses"]) for v in sel.values())
 nfull = sum(len(v["senses"]) for v in fin.values())
 nw = len(sel)
@@ -88,6 +95,25 @@ PIPE = ["parse_ecdict.py", "fix_pos.py", "diag_senses.py", "build_senses.py",
         "select_tier_b.py", "emit_senses_b.py", "build_bundle.py"]
 for f in PIPE:
     d16.append(("流水线有 %s" % f, os.path.exists(os.path.join(PROJ, "scripts", f))))
+
+# D17：最小循环的必备件
+APP = ["schema.sql", "srs.mjs", "db.mjs", "server.mjs", "index.html", "app.js"]
+for f in APP:
+    d16.append(("app/ 有 %s" % f, os.path.exists(os.path.join(PROJ, "app", f))))
+d16 += [
+    ("SRS 参数文件存在", os.path.exists(os.path.join(
+        PROJ, "assets", "profile", "srs_params.tsv"))),
+    ("有 e2e_loop", os.path.exists(os.path.join(PROJ, "scripts", "e2e_loop.mjs"))),
+    ("有 smoke_http", os.path.exists(os.path.join(PROJ, "scripts", "smoke_http.py"))),
+    # schema.sql 里的关键不变量不能被改掉
+    ("schema 有 due_at 列", "due_at" in io.open(
+        os.path.join(PROJ, "app", "schema.sql"), encoding="utf-8").read()),
+    ("schema 有 attempt_id 幂等键", "attempt_id" in io.open(
+        os.path.join(PROJ, "app", "schema.sql"), encoding="utf-8").read()),
+]
+# SRS 参数必须是代码之外的唯一真相源：verify_srs.py 不得再硬编码 S0/D0
+_vsp = io.open(os.path.join(PROJ, "scripts", "verify_srs.py"), encoding="utf-8").read()
+d16.append(("verify_srs.py 读参数文件不硬编码", "load_params" in _vsp))
 # 已废弃的脚本不得留在 scripts/
 DEAD = ["map_senses.py", "stage1_senses.py", "stage2_sentences.py",
         "stage3_judge.py", "judge_audit.py", "llm_client.py"]
@@ -106,6 +132,17 @@ if os.path.exists(bp):
     st = b["stats"]
     no_pos = [c for c in b["cards"] if not c.get("pos")]
     pl_pref = [c for c in b["cards"] if c.get("zh", "").lower().startswith("pl. ")]
+    # 正式词库里每词的义项数，用于校验 tier 的 keep 上限
+    tsv_n = collections.Counter()
+    tsv_tier = {}
+    for f in os.listdir(senses_dir):
+        if not f.endswith(".tsv"):
+            continue
+        rows = list(csv.DictReader(io.open(os.path.join(senses_dir, f),
+                                           encoding="utf-8"), delimiter="\t"))
+        tsv_n[f[:-4]] = len(rows)
+        if rows:
+            tsv_tier[f[:-4]] = rows[0].get("tier", "")
     d16 += [
         ("bundle cards = 7884", st["cards"] == 7884),
         # 句子按词递增生成，不钉死句数；只校验 stats 自洽
@@ -118,6 +155,14 @@ if os.path.exists(bp):
         ("全部卡有 rows 数组", all(isinstance(c.get("rows"), list) for c in b["cards"])),
         ("全部义项有词性", len(no_pos) == 0),
         ("无 pl. 前缀残留", len(pl_pref) == 0),
+        # tier 必须真的落到 bundle 里：曾经写成 note=tier=T1 而 build_bundle 读 tier 列，
+        # 导致 7884 张卡 tier 全空、UI 档位标签永不显示，且没有任何校验拦得住。
+        ("正式词库 tier 列非空", all(tsv_tier.values()) and len(tsv_tier) == 2998),
+        ("bundle tier 无空值", all(c.get("tier") for c in b["cards"])),
+        ("bundle tier 与词库一致",
+         all(c["tier"] == tsv_tier[c["w"]] for c in b["cards"])),
+        ("每词义项数 <= keep[tier]",
+         all(tsv_n[w] <= keep[tsv_tier[w]] for w in tsv_n)),
         # span 约定：精确指向 clue（UI 用 <mark> 高亮作提示）
         ("bundle span 全部指向 clue",
          all(r["t"][r["ss"]:r["ss"] + r["sl"]] == r["c"]

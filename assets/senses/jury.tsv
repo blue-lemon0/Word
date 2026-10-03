@@ -1,3 +1,3 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	陪审团		0	tier=T3
-s2	n.	评判委员会		0	tier=T3
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	陪审团		0	T3	
+s2	n.	评判委员会		0	T3	

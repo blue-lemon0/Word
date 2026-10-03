@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	adv.	请		0	tier=T2
-s2	vt.	使高兴		0	tier=T2
-s3	vt.	合...的心意		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	adv.	请		0	T2	
+s2	vt.	使高兴		0	T2	
+s3	vt.	合...的心意		0	T2	

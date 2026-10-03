@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	感应		0	tier=T1
-s2	n.	感觉		0	tier=T1
-s3	n.	感官		0	tier=T1
-s4	n.	意识		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	感应		0	T1	
+s2	n.	感觉		0	T1	
+s3	n.	感官		0	T1	
+s4	n.	意识		0	T1	

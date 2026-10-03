@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	基金		0	tier=T1
-s2	n.	资金		0	tier=T1
-s3	n.	存款		0	tier=T1
-s4	n.	财源		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	基金		0	T1	
+s2	n.	资金		0	T1	
+s3	n.	存款		0	T1	
+s4	n.	财源		0	T1	

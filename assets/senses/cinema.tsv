@@ -1,2 +1,2 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	电影院		0	tier=T3
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	电影院		0	T3	

@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	conj.	当...的时候		0	tier=T2
-s2	adv.	何时		0	tier=T2
-s3	adv.	什么时候		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	conj.	当...的时候		0	T2	
+s2	adv.	何时		0	T2	
+s3	adv.	什么时候		0	T2	

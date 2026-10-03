@@ -1,3 +1,3 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	无精打采之人		0	tier=T3
-s2	a.	蔬菜的		0	tier=T3
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	无精打采之人		0	T3	
+s2	a.	蔬菜的		0	T3	

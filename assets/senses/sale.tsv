@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	出售		0	tier=T1
-s2	n.	卖		0	tier=T1
-s3	n.	拍卖		0	tier=T1
-s4	n.	销售额		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	出售		0	T1	
+s2	n.	卖		0	T1	
+s3	n.	拍卖		0	T1	
+s4	n.	销售额		0	T1	

@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	a.	社会的		0	tier=T1
-s2	a.	群居的		0	tier=T1
-s3	a.	社交的		0	tier=T1
-s4	n.	联欢会		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	a.	社会的		0	T1	
+s2	a.	群居的		0	T1	
+s3	a.	社交的		0	T1	
+s4	n.	联欢会		0	T1	

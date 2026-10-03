@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	vi.	解散		0	tier=T1
-s2	vt.	开除		0	tier=T1
-s3	vt.	解职		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	vi.	解散		0	T1	
+s2	vt.	开除		0	T1	
+s3	vt.	解职		0	T1	

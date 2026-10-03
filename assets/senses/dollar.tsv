@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	美元		0	tier=T1
-s2	n.	元(加		0	tier=T1
-s3	n.	澳等国货币单位)		0	tier=T1
-s4	n.	元		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	美元		0	T1	
+s2	n.	元(加		0	T1	
+s3	n.	澳等国货币单位)		0	T1	
+s4	n.	元		0	T1	

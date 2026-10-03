@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	选票		0	tier=T1
-s2	n.	表决		0	tier=T1
-s3	n.	选举权		0	tier=T1
-s4	n.	得票数		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	选票		0	T1	
+s2	n.	表决		0	T1	
+s3	n.	选举权		0	T1	
+s4	n.	得票数		0	T1	

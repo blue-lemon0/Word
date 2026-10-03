@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	热		0	tier=T1
-s2	n.	热度		0	tier=T1
-s3	n.	体温		0	tier=T1
-s4	n.	高潮		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	热		0	T1	
+s2	n.	热度		0	T1	
+s3	n.	体温		0	T1	
+s4	n.	高潮		0	T1	

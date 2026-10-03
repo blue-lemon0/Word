@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	adv.	还		0	tier=T2
-s2	adv.	尚		0	tier=T2
-s3	adv.	仍然		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	adv.	还		0	T2	
+s2	adv.	尚		0	T2	
+s3	adv.	仍然		0	T2	

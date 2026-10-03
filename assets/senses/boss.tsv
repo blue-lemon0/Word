@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	老板		0	tier=T1
-s2	n.	上司		0	tier=T1
-s3	n.	岩瘤		0	tier=T1
-s4	n.	浮雕		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	老板		0	T1	
+s2	n.	上司		0	T1	
+s3	n.	岩瘤		0	T1	
+s4	n.	浮雕		0	T1	

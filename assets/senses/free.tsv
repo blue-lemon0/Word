@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	a.	自由的		0	tier=T2
-s2	a.	享受政治权力的		0	tier=T2
-s3	a.	允许的		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	a.	自由的		0	T2	
+s2	a.	享受政治权力的		0	T2	
+s3	a.	允许的		0	T2	

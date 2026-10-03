@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	白痴		0	tier=T1
-s2	a.	自然的		0	tier=T1
-s3	a.	自然界的		0	tier=T1
-s4	a.	本能的		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	白痴		0	T1	
+s2	a.	自然的		0	T1	
+s3	a.	自然界的		0	T1	
+s4	a.	本能的		0	T1	

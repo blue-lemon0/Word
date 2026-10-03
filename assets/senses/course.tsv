@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	课程		0	tier=T1
-s2	n.	路线		0	tier=T1
-s3	n.	过程		0	tier=T1
-s4	n.	一道菜		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	课程		0	T1	
+s2	n.	路线		0	T1	
+s3	n.	过程		0	T1	
+s4	n.	一道菜		0	T1	

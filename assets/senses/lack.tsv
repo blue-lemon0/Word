@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	缺乏		0	tier=T1
-s2	n.	无		0	tier=T1
-s3	n.	不足		0	tier=T1
-s4	vt.	短少		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	缺乏		0	T1	
+s2	n.	无		0	T1	
+s3	n.	不足		0	T1	
+s4	vt.	短少		0	T1	

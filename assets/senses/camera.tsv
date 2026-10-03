@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	照相机		0	tier=T1
-s2	n.	摄影机		0	tier=T1
-s3	n.	密谈室		0	tier=T1
-s4	n.	暗箱		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	照相机		0	T1	
+s2	n.	摄影机		0	T1	
+s3	n.	密谈室		0	T1	
+s4	n.	暗箱		0	T1	

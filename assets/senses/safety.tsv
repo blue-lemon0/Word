@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	安全		0	tier=T1
-s2	n.	保险		0	tier=T1
-s3	n.	平安		0	tier=T1
-s4	n.	保安设备		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	安全		0	T1	
+s2	n.	保险		0	T1	
+s3	n.	平安		0	T1	
+s4	n.	保安设备		0	T1	

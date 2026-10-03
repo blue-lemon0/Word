@@ -1,2 +1,2 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	电子信函		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	电子信函		0	T1	

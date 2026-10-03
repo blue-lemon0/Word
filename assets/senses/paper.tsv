@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	纸		0	tier=T2
-s2	n.	文件		0	tier=T2
-s3	n.	文章		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	纸		0	T2	
+s2	n.	文件		0	T2	
+s3	n.	文章		0	T2	

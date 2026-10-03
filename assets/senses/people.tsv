@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	人		0	tier=T2
-s2	n.	人民		0	tier=T2
-s3	n.	民族		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	人		0	T2	
+s2	n.	人民		0	T2	
+s3	n.	民族		0	T2	

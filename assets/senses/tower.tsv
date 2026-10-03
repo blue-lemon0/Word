@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	塔		0	tier=T2
-s2	n.	高楼		0	tier=T2
-s3	n.	堡垒		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	塔		0	T2	
+s2	n.	高楼		0	T2	
+s3	n.	堡垒		0	T2	

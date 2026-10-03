@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	习惯		0	tier=T2
-s2	n.	使用价值		0	tier=T2
-s3	n.	用法		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	习惯		0	T2	
+s2	n.	使用价值		0	T2	
+s3	n.	用法		0	T2	

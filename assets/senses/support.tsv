@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	支持		0	tier=T1
-s2	n.	援助		0	tier=T1
-s3	n.	供养		0	tier=T1
-s4	n.	支撑物		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	支持		0	T1	
+s2	n.	援助		0	T1	
+s3	n.	供养		0	T1	
+s4	n.	支撑物		0	T1	

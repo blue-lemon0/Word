@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	饲料		0	tier=T1
-s2	n.	一餐		0	tier=T1
-s3	n.	饲养		0	tier=T1
-s4	vt.	喂		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	饲料		0	T1	
+s2	n.	一餐		0	T1	
+s3	n.	饲养		0	T1	
+s4	vt.	喂		0	T1	

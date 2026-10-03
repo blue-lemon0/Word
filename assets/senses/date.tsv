@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	日期		0	tier=T2
-s2	n.	约会		0	tier=T2
-s3	n.	枣椰树		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	日期		0	T2	
+s2	n.	约会		0	T2	
+s3	n.	枣椰树		0	T2	

@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	摘要		0	tier=T1
-s2	n.	简报		0	tier=T1
-s3	a.	简短的		0	tier=T1
-s4	a.	短暂的		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	摘要		0	T1	
+s2	n.	简报		0	T1	
+s3	a.	简短的		0	T1	
+s4	a.	短暂的		0	T1	

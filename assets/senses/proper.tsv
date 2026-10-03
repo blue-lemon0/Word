@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	a.	适当的		0	tier=T1
-s2	a.	固有的		0	tier=T1
-s3	a.	高尚的		0	tier=T1
-s4	a.	专属的		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	a.	适当的		0	T1	
+s2	a.	固有的		0	T1	
+s3	a.	高尚的		0	T1	
+s4	a.	专属的		0	T1	

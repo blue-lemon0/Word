@@ -1,3 +1,3 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	页边的空白		0	tier=T3
-s2	n.	边缘		0	tier=T3
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	页边的空白		0	T3	
+s2	n.	边缘		0	T3	

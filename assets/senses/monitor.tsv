@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	监督器		0	tier=T2
-s2	n.	级长		0	tier=T2
-s3	n.	监听员		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	监督器		0	T2	
+s2	n.	级长		0	T2	
+s3	n.	监听员		0	T2	

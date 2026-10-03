@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	vt.	看见		0	tier=T2
-s2	vt.	查看		0	tier=T2
-s3	vt.	参观		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	vt.	看见		0	T2	
+s2	vt.	查看		0	T2	
+s3	vt.	参观		0	T2	

@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	vt.	调整		0	tier=T2
-s2	vt.	使适应于		0	tier=T2
-s3	vt.	校准		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	vt.	调整		0	T2	
+s2	vt.	使适应于		0	T2	
+s3	vt.	校准		0	T2	

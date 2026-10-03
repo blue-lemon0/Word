@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	令人讨厌的人		0	tier=T2
-s2	n.	激浪		0	tier=T2
-s3	n.	枪膛		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	令人讨厌的人		0	T2	
+s2	n.	激浪		0	T2	
+s3	n.	枪膛		0	T2	

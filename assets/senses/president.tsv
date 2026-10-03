@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	总统		0	tier=T1
-s2	n.	总裁		0	tier=T1
-s3	n.	董事长		0	tier=T1
-s4	n.	(学院)院长		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	总统		0	T1	
+s2	n.	总裁		0	T1	
+s3	n.	董事长		0	T1	
+s4	n.	(学院)院长		0	T1	

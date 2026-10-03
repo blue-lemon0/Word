@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	自然		0	tier=T1
-s2	n.	大自然		0	tier=T1
-s3	n.	本性		0	tier=T1
-s4	n.	性格		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	自然		0	T1	
+s2	n.	大自然		0	T1	
+s3	n.	本性		0	T1	
+s4	n.	性格		0	T1	

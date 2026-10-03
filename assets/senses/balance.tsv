@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	平衡		0	tier=T1
-s2	n.	差额		0	tier=T1
-s3	vi.	相等		0	tier=T1
-s4	vt.	称		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	平衡		0	T1	
+s2	n.	差额		0	T1	
+s3	vi.	相等		0	T1	
+s4	vt.	称		0	T1	

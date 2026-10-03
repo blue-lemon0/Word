@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	a.	单身的		0	tier=T2
-s2	a.	单程的		0	tier=T2
-s3	a.	单一的		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	a.	单身的		0	T2	
+s2	a.	单程的		0	T2	
+s3	a.	单一的		0	T2	

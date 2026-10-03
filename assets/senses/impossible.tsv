@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	a.	不可能的		0	tier=T1
-s2	a.	难以置信的		0	tier=T1
-s3	a.	令人无法忍受的		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	a.	不可能的		0	T1	
+s2	a.	难以置信的		0	T1	
+s3	a.	令人无法忍受的		0	T1	

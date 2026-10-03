@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	技艺		0	tier=T2
-s2	n.	手艺		0	tier=T2
-s3	n.	诡计		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	技艺		0	T2	
+s2	n.	手艺		0	T2	
+s3	n.	诡计		0	T2	

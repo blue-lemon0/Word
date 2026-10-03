@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	信任		0	tier=T1
-s2	n.	信赖		0	tier=T1
-s3	n.	相信		0	tier=T1
-s4	n.	受托		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	信任		0	T1	
+s2	n.	信赖		0	T1	
+s3	n.	相信		0	T1	
+s4	n.	受托		0	T1	

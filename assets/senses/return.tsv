@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	回来		0	tier=T2
-s2	n.	来回票		0	tier=T2
-s3	n.	归还		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	回来		0	T2	
+s2	n.	来回票		0	T2	
+s3	n.	归还		0	T2	

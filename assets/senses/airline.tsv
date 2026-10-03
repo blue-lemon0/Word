@@ -1,3 +1,3 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	航线的设备		0	tier=T2
-s2	n.	航空公司		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	航线的设备		0	T2	
+s2	n.	航空公司		0	T2	

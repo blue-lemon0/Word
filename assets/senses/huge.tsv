@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	a.	极大的		0	tier=T1
-s2	a.	巨大的		0	tier=T1
-s3	a.	无限的		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	a.	极大的		0	T1	
+s2	a.	巨大的		0	T1	
+s3	a.	无限的		0	T1	

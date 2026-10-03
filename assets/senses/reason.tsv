@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	理由		0	tier=T2
-s2	n.	原因		0	tier=T2
-s3	n.	理智		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	理由		0	T2	
+s2	n.	原因		0	T2	
+s3	n.	理智		0	T2	

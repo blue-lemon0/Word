@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	a.	完全的		0	tier=T1
-s2	a.	十足的		0	tier=T1
-s3	a.	完成的		0	tier=T1
-s4	vt.	完工		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	a.	完全的		0	T1	
+s2	a.	十足的		0	T1	
+s3	a.	完成的		0	T1	
+s4	vt.	完工		0	T1	

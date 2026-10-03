@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	vi.	追赶		0	tier=T2
-s2	vt.	追踪		0	tier=T2
-s3	vt.	追随		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	vi.	追赶		0	T2	
+s2	vt.	追踪		0	T2	
+s3	vt.	追随		0	T2	

@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	事件		0	tier=T1
-s2	n.	事务		0	tier=T1
-s3	n.	恋爱事件		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	事件		0	T1	
+s2	n.	事务		0	T1	
+s3	n.	恋爱事件		0	T1	

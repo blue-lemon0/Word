@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	大陆		0	tier=T2
-s2	n.	洲		0	tier=T2
-s3	a.	自制的		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	大陆		0	T2	
+s2	n.	洲		0	T2	
+s3	a.	自制的		0	T2	

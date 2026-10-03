@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	油炸食物		0	tier=T2
-s2	n.	鱼苗		0	tier=T2
-s3	v.	煎		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	油炸食物		0	T2	
+s2	n.	鱼苗		0	T2	
+s3	v.	煎		0	T2	

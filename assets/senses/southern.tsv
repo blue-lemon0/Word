@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	南方人		0	tier=T1
-s2	n.	男风		0	tier=T1
-s3	a.	向南方的		0	tier=T1
-s4	a.	来自南方的		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	南方人		0	T1	
+s2	n.	男风		0	T1	
+s3	a.	向南方的		0	T1	
+s4	a.	来自南方的		0	T1	

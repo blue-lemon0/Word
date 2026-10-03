@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	提到		0	tier=T2
-s2	n.	言及		0	tier=T2
-s3	n.	陈述		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	提到		0	T2	
+s2	n.	言及		0	T2	
+s3	n.	陈述		0	T2	

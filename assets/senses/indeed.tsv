@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	adv.	的确		0	tier=T1
-s2	adv.	实在		0	tier=T1
-s3	adv.	真正地		0	tier=T1
-s4	adv.	甚至		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	adv.	的确		0	T1	
+s2	adv.	实在		0	T1	
+s3	adv.	真正地		0	T1	
+s4	adv.	甚至		0	T1	

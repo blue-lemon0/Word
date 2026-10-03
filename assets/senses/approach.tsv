@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	接近		0	tier=T1
-s2	n.	入门		0	tier=T1
-s3	vt.	近似		0	tier=T1
-s4	vt.	找...商量		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	接近		0	T1	
+s2	n.	入门		0	T1	
+s3	vt.	近似		0	T1	
+s4	vt.	找...商量		0	T1	

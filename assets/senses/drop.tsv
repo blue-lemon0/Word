@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	滴		0	tier=T1
-s2	n.	微量		0	tier=T1
-s3	n.	落下		0	tier=T1
-s4	n.	空投		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	滴		0	T1	
+s2	n.	微量		0	T1	
+s3	n.	落下		0	T1	
+s4	n.	空投		0	T1	

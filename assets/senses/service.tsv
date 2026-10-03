@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	贡献		0	tier=T2
-s2	n.	雇佣		0	tier=T2
-s3	n.	公职		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	贡献		0	T2	
+s2	n.	雇佣		0	T2	
+s3	n.	公职		0	T2	

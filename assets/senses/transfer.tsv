@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	迁移		0	tier=T2
-s2	n.	移动		0	tier=T2
-s3	n.	传递		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	迁移		0	T2	
+s2	n.	移动		0	T2	
+s3	n.	传递		0	T2	

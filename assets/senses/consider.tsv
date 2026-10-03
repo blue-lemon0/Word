@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	v.	考虑		0	tier=T1
-s2	v.	思考		0	tier=T1
-s3	v.	认为		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	v.	考虑		0	T1	
+s2	v.	思考		0	T1	
+s3	v.	认为		0	T1	

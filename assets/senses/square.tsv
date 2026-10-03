@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	街区		0	tier=T1
-s2	n.	广场		0	tier=T1
-s3	n.	直角尺		0	tier=T1
-s4	a.	正方形的		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	街区		0	T1	
+s2	n.	广场		0	T1	
+s3	n.	直角尺		0	T1	
+s4	a.	正方形的		0	T1	

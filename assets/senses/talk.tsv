@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	谈话		0	tier=T2
-s2	n.	交谈		0	tier=T2
-s3	n.	会谈		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	谈话		0	T2	
+s2	n.	交谈		0	T2	
+s3	n.	会谈		0	T2	

@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	vt.	包含		0	tier=T1
-s2	vt.	容纳		0	tier=T1
-s3	vt.	控制		0	tier=T1
-s4	vi.	自制		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	vt.	包含		0	T1	
+s2	vt.	容纳		0	T1	
+s3	vt.	控制		0	T1	
+s4	vi.	自制		0	T1	

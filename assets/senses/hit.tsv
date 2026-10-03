@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	打击		0	tier=T1
-s2	n.	打		0	tier=T1
-s3	n.	冲撞		0	tier=T1
-s4	n.	讽刺		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	打击		0	T1	
+s2	n.	打		0	T1	
+s3	n.	冲撞		0	T1	
+s4	n.	讽刺		0	T1	

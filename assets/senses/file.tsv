@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	档案		0	tier=T1
-s2	n.	公文箱		0	tier=T1
-s3	n.	文件夹		0	tier=T1
-s4	n.	卷宗		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	档案		0	T1	
+s2	n.	公文箱		0	T1	
+s3	n.	文件夹		0	T1	
+s4	n.	卷宗		0	T1	

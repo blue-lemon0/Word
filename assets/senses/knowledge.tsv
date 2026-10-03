@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	知识		0	tier=T1
-s2	n.	学问		0	tier=T1
-s3	n.	认识		0	tier=T1
-s4	n.	知道		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	知识		0	T1	
+s2	n.	学问		0	T1	
+s3	n.	认识		0	T1	
+s4	n.	知道		0	T1	

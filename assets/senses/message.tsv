@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	消息		0	tier=T1
-s2	n.	通讯		0	tier=T1
-s3	n.	讯息		0	tier=T1
-s4	n.	教训		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	消息		0	T1	
+s2	n.	通讯		0	T1	
+s3	n.	讯息		0	T1	
+s4	n.	教训		0	T1	

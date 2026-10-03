@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	恐吓		0	tier=T2
-s2	n.	恶兆		0	tier=T2
-s3	n.	威胁		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	恐吓		0	T2	
+s2	n.	恶兆		0	T2	
+s3	n.	威胁		0	T2	

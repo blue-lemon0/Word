@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	位置		0	tier=T1
-s2	n.	空间		0	tier=T1
-s3	n.	距离		0	tier=T1
-s4	n.	太空		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	位置		0	T1	
+s2	n.	空间		0	T1	
+s3	n.	距离		0	T1	
+s4	n.	太空		0	T1	

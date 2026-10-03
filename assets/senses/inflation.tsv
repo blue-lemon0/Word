@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	胀大		0	tier=T2
-s2	n.	夸张		0	tier=T2
-s3	n.	通货膨胀		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	胀大		0	T2	
+s2	n.	夸张		0	T2	
+s3	n.	通货膨胀		0	T2	

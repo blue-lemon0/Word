@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	比较		0	tier=T2
-s2	n.	对照		0	tier=T2
-s3	n.	比喻		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	比较		0	T2	
+s2	n.	对照		0	T2	
+s3	n.	比喻		0	T2	

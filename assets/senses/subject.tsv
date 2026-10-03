@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	科目		0	tier=T2
-s2	n.	主题		0	tier=T2
-s3	n.	臣民		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	科目		0	T2	
+s2	n.	主题		0	T2	
+s3	n.	臣民		0	T2	

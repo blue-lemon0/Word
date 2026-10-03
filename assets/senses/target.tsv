@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	目标		0	tier=T1
-s2	n.	靶子		0	tier=T1
-s3	n.	指标		0	tier=T1
-s4	vt.	对准		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	目标		0	T1	
+s2	n.	靶子		0	T1	
+s3	n.	指标		0	T1	
+s4	vt.	对准		0	T1	

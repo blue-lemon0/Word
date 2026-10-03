@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	正义		0	tier=T1
-s2	n.	公平		0	tier=T1
-s3	n.	公正		0	tier=T1
-s4	n.	正确		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	正义		0	T1	
+s2	n.	公平		0	T1	
+s3	n.	公正		0	T1	
+s4	n.	正确		0	T1	

@@ -1,3 +1,3 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	vt.	登记		0	tier=T3
-s2	vt.	使加入		0	tier=T3
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	vt.	登记		0	T3	
+s2	vt.	使加入		0	T3	

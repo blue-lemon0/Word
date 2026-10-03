@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	工作室		0	tier=T1
-s2	n.	画室		0	tier=T1
-s3	n.	演播室		0	tier=T1
-s4	n.	电影制片厂		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	工作室		0	T1	
+s2	n.	画室		0	T1	
+s3	n.	演播室		0	T1	
+s4	n.	电影制片厂		0	T1	

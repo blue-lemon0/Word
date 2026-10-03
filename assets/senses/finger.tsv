@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	手指		0	tier=T1
-s2	n.	指状物		0	tier=T1
-s3	n.	(手套的)手指部分		0	tier=T1
-s4	n.	指针		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	手指		0	T1	
+s2	n.	指状物		0	T1	
+s3	n.	(手套的)手指部分		0	T1	
+s4	n.	指针		0	T1	

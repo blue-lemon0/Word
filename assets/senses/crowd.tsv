@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	群众		0	tier=T1
-s2	n.	一伙人		0	tier=T1
-s3	vt.	拥挤		0	tier=T1
-s4	vt.	挤满		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	群众		0	T1	
+s2	n.	一伙人		0	T1	
+s3	vt.	拥挤		0	T1	
+s4	vt.	挤满		0	T1	

@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	厨子		0	tier=T2
-s2	n.	厨师		0	tier=T2
-s3	vt.	烹调		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	厨子		0	T2	
+s2	n.	厨师		0	T2	
+s3	vt.	烹调		0	T2	

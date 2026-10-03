@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	秘密		0	tier=T2
-s2	n.	神秘		0	tier=T2
-s3	n.	奥秘		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	秘密		0	T2	
+s2	n.	神秘		0	T2	
+s3	n.	奥秘		0	T2	

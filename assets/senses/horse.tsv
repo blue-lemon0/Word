@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	马		0	tier=T2
-s2	n.	骑兵		0	tier=T2
-s3	n.	脚架		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	马		0	T2	
+s2	n.	骑兵		0	T2	
+s3	n.	脚架		0	T2	

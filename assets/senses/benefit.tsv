@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	利益		0	tier=T1
-s2	vt.	有益于		0	tier=T1
-s3	vi.	受益		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	利益		0	T1	
+s2	vt.	有益于		0	T1	
+s3	vi.	受益		0	T1	

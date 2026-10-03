@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	vt.	遗失		0	tier=T1
-s2	vt.	损失		0	tier=T1
-s3	vt.	丢失		0	tier=T1
-s4	vt.	使失去		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	vt.	遗失		0	T1	
+s2	vt.	损失		0	T1	
+s3	vt.	丢失		0	T1	
+s4	vt.	使失去		0	T1	

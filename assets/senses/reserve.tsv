@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	储备品		0	tier=T1
-s2	n.	贮量		0	tier=T1
-s3	n.	后备军		0	tier=T1
-s4	n.	自然保护区		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	储备品		0	T1	
+s2	n.	贮量		0	T1	
+s3	n.	后备军		0	T1	
+s4	n.	自然保护区		0	T1	

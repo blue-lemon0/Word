@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	vi.	发展		0	tier=T2
-s2	vt.	使发达		0	tier=T2
-s3	vt.	进步		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	vi.	发展		0	T2	
+s2	vt.	使发达		0	T2	
+s3	vt.	进步		0	T2	

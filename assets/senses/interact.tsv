@@ -1,3 +1,3 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	vi.	互相影响		0	tier=T3
-s2	vi.	交互作用		0	tier=T3
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	vi.	互相影响		0	T3	
+s2	vi.	交互作用		0	T3	

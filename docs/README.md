@@ -10,13 +10,24 @@
 
 | # | 文档 | 作用 | 状态 |
 | --- | --- | --- | --- |
+| 17 | [decisions/D17-存储分层.md](decisions/D17-存储分层.md) | 内容走 bundle、进度走 SQLite；4 表落地 + 4 处修正 | **已决策并实现** |
 | 16 | [decisions/D16-断舍离.md](decisions/D16-断舍离.md) | 不迁移旧数据：归档不可再生、删除可再生、从零重造 | **已决策** |
 | 15 | [decisions/D15-词库源-ECDICT.md](decisions/D15-词库源-ECDICT.md) | 词库源定为 ECDICT，收敛到 7884 义项 | **已决策** |
 | 01 | [design/01-句子生成与复用.md](design/01-句子生成与复用.md) | 三层句子供给、状态机、G1-G7 质检、轮换与复用 | 待施工 |
 | 02 | [design/02-淘汰与替换.md](design/02-淘汰与替换.md) | 耗尽 vs 变坏、退役/替换事务边界、排布权重 | 待施工 |
-| 03 | [design/03-记忆曲线与复习.md](design/03-记忆曲线与复习.md) | 替换规格 §6 的 SRS：S/D 分离、TRAP 短间隔、90 天掌握门槛 | 待施工 |
-| 04 | [design/04-使用体验.md](design/04-使用体验.md) | 首页、三步答题流、错题板、明确不做的事 | 待施工 |
-| 05 | [design/05-数据模型-SQLite.md](design/05-数据模型-SQLite.md) | 7 表 4 视图、bundle 合并、幂等落库 | 待施工 |
+| 03 | [design/03-记忆曲线与复习.md](design/03-记忆曲线与复习.md) | 替换规格 §6 的 SRS：S/D 分离、TRAP 短间隔、90 天掌握门槛 | **已实现** |
+| 04 | [design/04-使用体验.md](design/04-使用体验.md) | 首页、三步答题流、错题板、明确不做的事 | **最小循环已实现** |
+| 05 | [design/05-数据模型-SQLite.md](design/05-数据模型-SQLite.md) | 目标 7 表 4 视图；D17 落地为 4 表，SQL 在 `app/schema.sql` | **已实现** |
+
+## 跑起来
+
+```bash
+python scripts/build_bundle.py    # 打包（首次或词库变动后）
+node app/server.mjs               # → http://127.0.0.1:8777
+```
+
+最小学习循环已通：首页 → 三步答题 → 判对错 → 进度落 `data/user.db`。
+关掉浏览器、重启服务，进度都在。
 
 ## 被本目录推翻的旧决策
 
@@ -30,25 +41,29 @@
 | 规格 §5.1 | 句长难度档 D1/D2/D3 | 保留 | 04 |
 | 规格 §3 | localStorage | SQLite | 05 |
 | 规格 §5.3 | REJECT 率应 > 5% | 健康区间 8-20% | 01 |
+| 规格 §6 | `D + 0.35×(grade-4)` | `D + 0.35×(4-grade)`（原文符号与注解相反） | D17 §5.2 |
+| 05 §3 | `v_due` 现算 `last_review + S×86400` | `card_state.due_at` 单列存（差一个 `1+ef` 倍） | D17 §5.1 |
+| 05 §3 | 错题板只查倒数第 2 条 | 最近两条都要是 CORRECT | D17 §5.3 |
+| 05 §2 | 7 表（含 `sense`/`sentence`） | 4 表：内容在 bundle，只存投影 + 进度 | D17 §4.2 |
 
 ## 当前状态
 
 ```
-词库       ✅ 7884 义项已启用（assets/senses/，ECDICT B 方案）
-句子       ❌ 0 条（旧 18610 句已删，不迁移）
+词库       ✅ 7884 义项已启用（assets/senses/，ECDICT B 方案），tier 已落到 bundle
+句子       🟡 20 条（lay 试点 4 义项 × 5 句），需求 39420
 TRAP       ❌ 0 个（642 个旧标记已归档，不迁移）
-词性        ✅ 400 个缺失 pos 已补齐（scripts/fix_pos.py）
+词性       ✅ 400 个缺失 pos 已补齐（scripts/fix_pos.py）
 glossEn    ❌ 全部为空
-bundle     ✅ SENSES_ONLY，7884 卡全部 rows:[]
+bundle     ✅ SENSES_ONLY→PARTIAL，7884 卡，其中 4 张有句
 原型       ✅ 24 项测试通过（scripts/e2e_d16.js），正确显示「暂无例句」
-LLM 通道   🔒 禁用中 → 句子无法生成
-SQLite     ✅ 探针验证通过，schema 已设计
-设计文档   ✅ 5 篇 + D15/D16 决策记录，关键数字全部脚本校验
-安卓       ❌ 未开始
+最小循环   ✅ node app/server.mjs —— 首页/三步答题/小结，进度落 data/user.db
+SRS        ✅ app/srs.mjs + assets/profile/srs_params.tsv，78 项 e2e 全绿
+SQLite     ✅ app/schema.sql 4 表 3 视图，Node 与 Android 共用
+设计文档   ✅ 5 篇 + D15/D16/D17 决策记录，关键数字全部脚本校验
+安卓       ❌ 未开始（按要求先放放）
 ```
 
-> 这是**词库先行、句子后补**的中间态，不是半成品。
-> D16 决定了不为旧数据付迁移成本，所以句子从零开始生成。
+> 句子仍是唯一瓶颈：**20 / 39420**。循环已经跑通，扩句子是纯内容工作。
 
 ## 验证脚本
 
@@ -56,15 +71,28 @@ SQLite     ✅ 探针验证通过，schema 已设计
 
 | 脚本 | 作用 |
 | --- | --- |
-| `scripts/verify_docs.py` | 校验 docs/ 里关键数字与实际数据一致 + 算术抽查 |
-| `scripts/verify_srs.py` | 实跑 `ease_factor` 斜坡、间隔演化、90 天门槛、间隔下界 |
-| `scripts/verify_ecdict.py` | 词库验收：噪声残留、义项分布 |
-| `scripts/fix_pos.py` | 补齐 ECDICT 缺失的词性（继承前驱 + 剥 `pl.` 前缀） |
-| `scripts/e2e_d16.js` | 零句基线验收：空句池不崩溃、给出诚实说明 |
-| `scripts/diag_senses.py` | 5 类噪声的量化诊断 |
-| `scripts/build_bundle.py` | 打包；无句义项也成卡 |
+| `node scripts/e2e_loop.mjs` | 最小循环：持久化 / 到期 / 幂等 / 事务 / SRS 数值（78 项） |
+| `python scripts/smoke_http.py` | 真起服务走完一整场，验进度落盘与重放折叠（19 项） |
+| `python scripts/verify_docs.py` | 校验 docs/ 里关键数字与实际数据一致 + 算术抽查（37 项） |
+| `python scripts/verify_srs.py` | 实跑 `ease_factor` 斜坡、间隔演化、90 天门槛、间隔下界 |
+| `node scripts/e2e_d16.js` | 零句基线回归：空句池不崩溃、给出诚实说明（39 项） |
+| `python scripts/verify_ecdict.py` | 词库验收：噪声残留、义项分布 |
+| `python scripts/sentence_audit.py` | 句子机械质检 G1-G7 + SPAN/SID/NOTE |
+| `python scripts/fix_pos.py` | 补齐 ECDICT 缺失的词性（继承前驱 + 剥 `pl.` 前缀） |
+| `python scripts/build_bundle.py` | 打包；无句义项也成卡 |
 
 > `scripts/map_senses.py` 保留为历史工具。**不要用它做迁移**——D16 已否决。
+
+## 目录
+
+```
+app/         最小循环：schema.sql / srs.mjs / db.mjs / server.mjs / index.html / app.js
+assets/      内容真相源：senses/ sentences/ prompts/ profile/ bundle/(派生) wordlists/
+scripts/     流水线 + 校验脚本
+tools/       零句最坏路径的回归基线（e2e_d16.js 依赖，功能上已被 app/ 取代）
+archive/     不可再生产物（405 人工句 / 642 TRAP / 旧规格）
+data/        user.db，运行时进度，不入库
+```
 
 ## 词库重建流水线
 
@@ -85,8 +113,10 @@ python scripts/build_bundle.py     # -> assets/bundle/cards.json
 
 ## 阻塞项
 
-1. **LLM 通道**：`assets/prompts/` 的生成与质检都无法跑。
-   解封后第一件事：T1 档 663 词 × 4 义项 = 2652 义项各配 5 句（13260 句）。
+1. **句子**：20 / 39420。`assets/sentences/<word>.tsv` 一词一文件，
+   写完立刻 `python scripts/sentence_audit.py` 校验。
+   T1 档 663 词 × 4 义项 × 5 句 = 13260 句是首批。
+   G5（义项唯一性）机械规则查不出来，必须逐句自审 —— 这是产能瓶颈所在。
 2. **TRAP 重建**：需要人工或 LLM 判定新库哪些义项是"熟词僻义"。
    这是 `03-记忆曲线` 全部参数的前提（TRAP 用最短 S0=0.8）。
    旧 642 个标记在 `archive/2026-09-30-pre-ECDICT/old-senses/`，**只作判断依据参考，不迁移**。

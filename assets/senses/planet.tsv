@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	行星		0	tier=T2
-s2	n.	命运星辰		0	tier=T2
-s3	n.	杰出的人		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	行星		0	T2	
+s2	n.	命运星辰		0	T2	
+s3	n.	杰出的人		0	T2	

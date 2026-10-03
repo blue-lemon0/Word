@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	类型		0	tier=T1
-s2	n.	样式		0	tier=T1
-s3	n.	典型		0	tier=T1
-s4	n.	榜样		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	类型		0	T1	
+s2	n.	样式		0	T1	
+s3	n.	典型		0	T1	
+s4	n.	榜样		0	T1	

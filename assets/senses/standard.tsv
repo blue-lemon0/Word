@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	规格		0	tier=T1
-s2	n.	旗		0	tier=T1
-s3	n.	军旗		0	tier=T1
-s4	n.	本位		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	规格		0	T1	
+s2	n.	旗		0	T1	
+s3	n.	军旗		0	T1	
+s4	n.	本位		0	T1	

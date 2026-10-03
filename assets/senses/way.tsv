@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	路		0	tier=T2
-s2	n.	路线		0	tier=T2
-s3	n.	路途		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	路		0	T2	
+s2	n.	路线		0	T2	
+s3	n.	路途		0	T2	

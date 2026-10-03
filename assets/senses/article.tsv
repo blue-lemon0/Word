@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	文章		0	tier=T1
-s2	n.	冠词		0	tier=T1
-s3	n.	物品		0	tier=T1
-s4	n.	物件		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	文章		0	T1	
+s2	n.	冠词		0	T1	
+s3	n.	物品		0	T1	
+s4	n.	物件		0	T1	

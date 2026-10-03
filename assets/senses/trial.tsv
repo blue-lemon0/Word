@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	审判		0	tier=T1
-s2	n.	艰苦		0	tier=T1
-s3	n.	麻烦事		0	tier=T1
-s4	n.	考验		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	审判		0	T1	
+s2	n.	艰苦		0	T1	
+s3	n.	麻烦事		0	T1	
+s4	n.	考验		0	T1	

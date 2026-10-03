@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	风格		0	tier=T1
-s2	n.	时尚		0	tier=T1
-s3	n.	文体		0	tier=T1
-s4	n.	风度		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	风格		0	T1	
+s2	n.	时尚		0	T1	
+s3	n.	文体		0	T1	
+s4	n.	风度		0	T1	

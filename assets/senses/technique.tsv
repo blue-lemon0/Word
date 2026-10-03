@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	技巧		0	tier=T1
-s2	n.	技术		0	tier=T1
-s3	n.	方法		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	技巧		0	T1	
+s2	n.	技术		0	T1	
+s3	n.	方法		0	T1	

@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	生意		0	tier=T1
-s2	n.	事情		0	tier=T1
-s3	n.	业务		0	tier=T1
-s4	n.	商业		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	生意		0	T1	
+s2	n.	事情		0	T1	
+s3	n.	业务		0	T1	
+s4	n.	商业		0	T1	

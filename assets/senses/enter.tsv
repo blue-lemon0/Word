@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	vt.	进入		0	tier=T1
-s2	vi.	参加		0	tier=T1
-s3	vt.	开始		0	tier=T1
-s4	vt.	输入		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	vt.	进入		0	T1	
+s2	vi.	参加		0	T1	
+s3	vt.	开始		0	T1	
+s4	vt.	输入		0	T1	

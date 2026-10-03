@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	一项(或条		0	tier=T1
-s2	n.	点)		0	tier=T1
-s3	n.	个别项目		0	tier=T1
-s4	n.	详细说明		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	一项(或条		0	T1	
+s2	n.	点)		0	T1	
+s3	n.	个别项目		0	T1	
+s4	n.	详细说明		0	T1	

@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	弹性		0	tier=T2
-s2	n.	适应性		0	tier=T2
-s3	vt.	给		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	弹性		0	T2	
+s2	n.	适应性		0	T2	
+s3	vt.	给		0	T2	

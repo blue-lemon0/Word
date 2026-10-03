@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	总数		0	tier=T1
-s2	n.	总额		0	tier=T1
-s3	vi.	总计		0	tier=T1
-s4	vi.	等同		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	总数		0	T1	
+s2	n.	总额		0	T1	
+s3	vi.	总计		0	T1	
+s4	vi.	等同		0	T1	

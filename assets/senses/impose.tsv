@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	vt.	征(税)		0	tier=T2
-s2	vt.	把...强加于		0	tier=T2
-s3	vt.	以...欺骗		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	vt.	征(税)		0	T2	
+s2	vt.	把...强加于		0	T2	
+s3	vt.	以...欺骗		0	T2	

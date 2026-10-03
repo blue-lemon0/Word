@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	力		0	tier=T1
-s2	n.	体力		0	tier=T1
-s3	n.	力量		0	tier=T1
-s4	n.	势力		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	力		0	T1	
+s2	n.	体力		0	T1	
+s3	n.	力量		0	T1	
+s4	n.	势力		0	T1	

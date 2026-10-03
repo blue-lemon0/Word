@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	vt.	赞同		0	tier=T1
-s2	vt.	核准		0	tier=T1
-s3	vt.	为...提供证据		0	tier=T1
-s4	vi.	赞许		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	vt.	赞同		0	T1	
+s2	vt.	核准		0	T1	
+s3	vt.	为...提供证据		0	T1	
+s4	vi.	赞许		0	T1	

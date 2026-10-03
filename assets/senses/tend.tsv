@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	vi.	走向		0	tier=T1
-s2	vi.	有某种的倾向		0	tier=T1
-s3	vi.	易于		0	tier=T1
-s4	vi.	照顾		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	vi.	走向		0	T1	
+s2	vi.	有某种的倾向		0	T1	
+s3	vi.	易于		0	T1	
+s4	vi.	照顾		0	T1	

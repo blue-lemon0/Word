@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	罪犯		0	tier=T1
-s2	n.	犯人		0	tier=T1
-s3	a.	犯了罪的		0	tier=T1
-s4	a.	刑事的		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	罪犯		0	T1	
+s2	n.	犯人		0	T1	
+s3	a.	犯了罪的		0	T1	
+s4	a.	刑事的		0	T1	

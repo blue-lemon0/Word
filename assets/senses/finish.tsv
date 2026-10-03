@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	完成		0	tier=T2
-s2	n.	结束		0	tier=T2
-s3	n.	末道漆		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	完成		0	T2	
+s2	n.	结束		0	T2	
+s3	n.	末道漆		0	T2	

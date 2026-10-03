@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	vi.	承认		0	tier=T1
-s2	vt.	接受		0	tier=T1
-s3	vt.	允许进入		0	tier=T1
-s4	vi.	容许		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	vi.	承认		0	T1	
+s2	vt.	接受		0	T1	
+s3	vt.	允许进入		0	T1	
+s4	vi.	容许		0	T1	

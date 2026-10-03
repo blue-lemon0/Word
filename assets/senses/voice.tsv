@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	声音		0	tier=T1
-s2	n.	嗓音		0	tier=T1
-s3	n.	嗓子		0	tier=T1
-s4	n.	愿望		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	声音		0	T1	
+s2	n.	嗓音		0	T1	
+s3	n.	嗓子		0	T1	
+s4	n.	愿望		0	T1	

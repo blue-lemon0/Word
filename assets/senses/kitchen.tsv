@@ -1,3 +1,3 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	厨房		0	tier=T2
-s2	n.	全套炊具		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	厨房		0	T2	
+s2	n.	全套炊具		0	T2	

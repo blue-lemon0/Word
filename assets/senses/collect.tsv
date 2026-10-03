@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	v.	收集		0	tier=T1
-s2	v.	聚集		0	tier=T1
-s3	v.	集中		0	tier=T1
-s4	v.	搜集		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	v.	收集		0	T1	
+s2	v.	聚集		0	T1	
+s3	v.	集中		0	T1	
+s4	v.	搜集		0	T1	

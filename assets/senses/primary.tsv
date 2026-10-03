@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	最主要者		0	tier=T2
-s2	n.	原色		0	tier=T2
-s3	a.	主要的		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	最主要者		0	T2	
+s2	n.	原色		0	T2	
+s3	a.	主要的		0	T2	

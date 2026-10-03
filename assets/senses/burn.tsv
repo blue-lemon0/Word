@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	vt.	烧		0	tier=T1
-s2	vi.	烧毁		0	tier=T1
-s3	n.	烧伤		0	tier=T1
-s4	vi.	燃烧		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	vt.	烧		0	T1	
+s2	vi.	烧毁		0	T1	
+s3	n.	烧伤		0	T1	
+s4	vi.	燃烧		0	T1	

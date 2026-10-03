@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	自动手枪		0	tier=T2
-s2	n.	自动机械		0	tier=T2
-s3	a.	自动的		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	自动手枪		0	T2	
+s2	n.	自动机械		0	T2	
+s3	a.	自动的		0	T2	

@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	岛		0	tier=T1
-s2	n.	岛屿		0	tier=T1
-s3	n.	孤立地区		0	tier=T1
-s4	n.	安全岛		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	岛		0	T1	
+s2	n.	岛屿		0	T1	
+s3	n.	孤立地区		0	T1	
+s4	n.	安全岛		0	T1	

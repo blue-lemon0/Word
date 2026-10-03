@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	典范		0	tier=T2
-s2	n.	思想		0	tier=T2
-s3	n.	最后目标		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	典范		0	T2	
+s2	n.	思想		0	T2	
+s3	n.	最后目标		0	T2	

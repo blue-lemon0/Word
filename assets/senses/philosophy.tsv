@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	人生观		0	tier=T2
-s2	n.	哲学思想		0	tier=T2
-s3	n.	哲理		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	人生观		0	T2	
+s2	n.	哲学思想		0	T2	
+s3	n.	哲理		0	T2	

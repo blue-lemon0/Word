@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	场合		0	tier=T2
-s2	n.	时机		0	tier=T2
-s3	n.	机会		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	场合		0	T2	
+s2	n.	时机		0	T2	
+s3	n.	机会		0	T2	

@@ -1,0 +1,62 @@
+# SRS 参数（唯一真相源）
+#
+# 03-记忆曲线与复习.md §9 声明参数落在这里，之前文件不存在，
+# 参数实际散在 verify_srs.py 的硬编码里 —— 那是第二份真相源。
+# 现在：Python（verify_srs.py）与 JS（app/srs.mjs）都读这个文件。
+#
+# 列：key <TAB> value <TAB> 说明
+# 改动这里即可调参，不用改代码。改完重跑 scripts/verify_srs.py 看推演。
+
+# ── 初始参数（按义项类型分 5 档）──────────────────────
+S0_TRAP	0.8	熟词僻义：TRAP 义项，间隔必须最短
+D0_TRAP	7.0
+S0_MULTI_S1	2.0	多义词首义（主义）：最熟悉
+D0_MULTI_S1	5.0
+S0_SINGLE	1.2	单义词：见过但没熟
+D0_SINGLE	6.0
+S0_NEW	0.6	其他义项（s2+、T2）：按生词起步
+D0_NEW	8.0
+S0_RARE	0.5	低频档 T3/T4：几乎没印象
+D0_RARE	8.5
+
+# ── 稳定度 / 难度边界 ───────────────────────────────
+S_MAX	365	天
+S_MIN	0.1	天
+
+# ── 间隔因子 ease_factor(D) = clamp(EF_A - EF_B*(D-1), EF_MIN, EF_A)
+EF_A	1.50	D=1 的上限
+EF_B	0.12	难度惩罚斜率
+EF_MIN	0.35	下限，防止最难词间隔塌成 0
+
+# ── 评分档 ────────────────────────────────────────
+GRADE_FAST	5	答对且快于基准时间
+GRADE_SLOW	4	答对但慢
+GRADE_PEND	2	点「我不会」或超时
+GRADE_WRONG	0	答错
+
+# ── 快答基准：FAST_MS = FAST_BASE + FAST_SLOPE*D ────────
+# ★ D17 新增：03 只写了「快于该难度档基准时间」，没给基准。
+#   取 D=5 → 6.5s、D=8 → 8.9s（读一句 + 在 4 个释义里选一个的手感）
+FAST_BASE	2500	ms
+FAST_SLOPE	800	ms/难度档
+
+# ── 变化系数 ───────────────────────────────────────
+SLOW_FACTOR	0.70	慢速答对的增长折扣
+S_PEND	0.80	PENDING 时 S *= 该值
+S_WRONG	0.40	WRONG 时 S *= 该值
+D_WRONG_BUMP	0.80	WRONG 时 D 额外 += 该值
+D_DRIFT	0.35	D += D_DRIFT * (grade - 4)
+INTERVAL_FLOOR	0.25	天；任何情况的间隔下界（6 小时）
+
+# ── 遗忘衰减 ───────────────────────────────────────
+DECAY_IDLE_FACTOR	3.00	距上次复习 > DECAY_IDLE_FACTOR*S 天
+DECAY_IDLE	0.70	超出后 S *= 该值，并标 rusty
+
+# ── 同日重复 ───────────────────────────────────────
+SAME_DAY_HOURS	6	距上次复习不足该小时数
+SAME_DAY_FACTOR	0.50	同日重复时 S 的增长折扣
+
+# ── 掌握判定 ───────────────────────────────────────
+MASTER_S	90	天，硬门槛
+MASTER_REPS	6	最少复习次数
+MASTER_STREAK	3	近 N 次有效作答须全对

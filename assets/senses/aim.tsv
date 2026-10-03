@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	目标		0	tier=T1
-s2	n.	瞄准		0	tier=T1
-s3	n.	击中目标的能力		0	tier=T1
-s4	vi.	对准目标		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	目标		0	T1	
+s2	n.	瞄准		0	T1	
+s3	n.	击中目标的能力		0	T1	
+s4	vi.	对准目标		0	T1	

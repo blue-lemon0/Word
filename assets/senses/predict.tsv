@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	v.	预知		0	tier=T2
-s2	v.	预言		0	tier=T2
-s3	v.	预报		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	v.	预知		0	T2	
+s2	v.	预言		0	T2	
+s3	v.	预报		0	T2	

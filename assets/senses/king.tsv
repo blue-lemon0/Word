@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	国王		0	tier=T1
-s2	n.	君主		0	tier=T1
-s3	vt.	使...成为君主		0	tier=T1
-s4	vi.	君临		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	国王		0	T1	
+s2	n.	君主		0	T1	
+s3	vt.	使...成为君主		0	T1	
+s4	vi.	君临		0	T1	

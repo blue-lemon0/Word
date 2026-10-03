@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	恶棍		0	tier=T1
-s2	a.	强硬的		0	tier=T1
-s3	a.	艰苦的		0	tier=T1
-s4	a.	坚固的		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	恶棍		0	T1	
+s2	a.	强硬的		0	T1	
+s3	a.	艰苦的		0	T1	
+s4	a.	坚固的		0	T1	

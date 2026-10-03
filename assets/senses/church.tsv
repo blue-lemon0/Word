@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	礼拜		0	tier=T1
-s2	n.	教会		0	tier=T1
-s3	vt.	使人接受宗教仪式		0	tier=T1
-s4	a.	教堂的		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	礼拜		0	T1	
+s2	n.	教会		0	T1	
+s3	vt.	使人接受宗教仪式		0	T1	
+s4	a.	教堂的		0	T1	

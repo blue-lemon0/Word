@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	古典作品		0	tier=T1
-s2	n.	杰作		0	tier=T1
-s3	n.	大艺术家		0	tier=T1
-s4	a.	第一流的		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	古典作品		0	T1	
+s2	n.	杰作		0	T1	
+s3	n.	大艺术家		0	T1	
+s4	a.	第一流的		0	T1	

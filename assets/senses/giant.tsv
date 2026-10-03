@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	巨人		0	tier=T2
-s2	n.	大力士		0	tier=T2
-s3	n.	巨大怪物		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	巨人		0	T2	
+s2	n.	大力士		0	T2	
+s3	n.	巨大怪物		0	T2	

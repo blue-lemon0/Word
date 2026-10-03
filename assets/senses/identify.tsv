@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	vt.	识别		0	tier=T2
-s2	vt.	认为...等同于		0	tier=T2
-s3	vt.	确定		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	vt.	识别		0	T2	
+s2	vt.	认为...等同于		0	T2	
+s3	vt.	确定		0	T2	

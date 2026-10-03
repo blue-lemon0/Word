@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	连接处		0	tier=T2
-s2	n.	接合		0	tier=T2
-s3	n.	关节		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	连接处		0	T2	
+s2	n.	接合		0	T2	
+s3	n.	关节		0	T2	

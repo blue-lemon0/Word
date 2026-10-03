@@ -1,6 +1,10 @@
 # SQLite 数据模型
 
 > 关联：`02-淘汰与替换.md` §8、`03-记忆曲线与复习.md` §4
+> **D17 起本文是"目标形态"**：实际落地的是 4 表子集，SQL 真相源在
+> [`app/schema.sql`](../../app/schema.sql)，取舍理由与 4 处修正见
+> [`decisions/D17-存储分层.md`](../decisions/D17-存储分层.md)。
+> 下面保留完整设计作为 `02` 句子轮换开工时的路线图。
 > 依据：真实数据探针（旧库 3641 义项 / 16612 句 → DB 4.37MB，建库 1.20s，
 > 五条热查询均 < 2.2ms，外键孤儿 0）。新库句子生成后需重测。
 
@@ -22,6 +26,26 @@
 ---
 
 ## 2. 表结构
+
+> **D17 落地版（`app/schema.sql`，4 表 + 3 视图）**
+
+> ```sql
+> meta(key, value)                        -- schema 版本 / bundle 版本
+> card(word, sense_id, tier, is_trap, n_sent)   -- bundle 投影，可整表重建
+> card_state(word, sense_id, stability, difficulty, last_review, due_at,
+>            reps, wrong_n, pending_n, mastered, rusty)   -- 用户进度，唯一真相源
+> review_log(session_id, idx, attempt_id, word, sense_id,
+>            result, grade, elapsed_ms, is_due, stability_after, ts)
+> ```
+>
+> 相比下面的完整设计去掉了 `sense` / `sentence`（内容在 `assets/bundle/cards.json`，
+> 一次性读进内存）、`new_word` / `user_flag` / `setting`（对应功能未开工）。
+> 三处与本文原文不同：
+> `srs.due_at` 单列（D17 §5.1）、`review_log.attempt_id` 幂等（D17 §5.4）、
+> `v_wrong` 同时查最近两条（D17 §5.3）。
+
+<details>
+<summary>完整设计（7 表 4 视图，02 句子轮换开工时启用）</summary>
 
 ```sql
 PRAGMA foreign_keys = ON;
@@ -123,6 +147,8 @@ CREATE TABLE setting (
   value TEXT NOT NULL
 );
 ```
+
+</details>
 
 ---
 

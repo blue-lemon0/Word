@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	vt.	增加		0	tier=T1
-s2	vt.	添加		0	tier=T1
-s3	vt.	附带说明		0	tier=T1
-s4	vt.	计算...总和		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	vt.	增加		0	T1	
+s2	vt.	添加		0	T1	
+s3	vt.	附带说明		0	T1	
+s4	vt.	计算...总和		0	T1	

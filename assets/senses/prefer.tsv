@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	vt.	宁可		0	tier=T1
-s2	vt.	较喜欢		0	tier=T1
-s3	vt.	提出		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	vt.	宁可		0	T1	
+s2	vt.	较喜欢		0	T1	
+s3	vt.	提出		0	T1	

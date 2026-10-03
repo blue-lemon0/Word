@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	民众		0	tier=T1
-s2	a.	公众的		0	tier=T1
-s3	a.	公共的		0	tier=T1
-s4	a.	公立的		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	民众		0	T1	
+s2	a.	公众的		0	T1	
+s3	a.	公共的		0	T1	
+s4	a.	公立的		0	T1	

@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	根据		0	tier=T1
-s2	n.	证据		0	tier=T1
-s3	n.	迹象		0	tier=T1
-s4	n.	凭证		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	根据		0	T1	
+s2	n.	证据		0	T1	
+s3	n.	迹象		0	T1	
+s4	n.	凭证		0	T1	

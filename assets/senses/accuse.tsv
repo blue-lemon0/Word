@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	vi.	指责		0	tier=T1
-s2	vi.	控告		0	tier=T1
-s3	vt.	归咎于		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	vi.	指责		0	T1	
+s2	vi.	控告		0	T1	
+s3	vt.	归咎于		0	T1	

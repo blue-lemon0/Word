@@ -1,3 +1,3 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	v.	溶解		0	tier=T3
-s2	v.	解散		0	tier=T3
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	v.	溶解		0	T3	
+s2	v.	解散		0	T3	

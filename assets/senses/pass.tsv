@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	经过		0	tier=T2
-s2	n.	要隘		0	tier=T2
-s3	n.	途径		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	经过		0	T2	
+s2	n.	要隘		0	T2	
+s3	n.	途径		0	T2	

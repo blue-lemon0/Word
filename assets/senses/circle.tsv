@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	圆周		0	tier=T1
-s2	n.	社交圈		0	tier=T1
-s3	n.	循环		0	tier=T1
-s4	n.	范围		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	圆周		0	T1	
+s2	n.	社交圈		0	T1	
+s3	n.	循环		0	T1	
+s4	n.	范围		0	T1	

@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	a.	敏感的		0	tier=T2
-s2	a.	易感的		0	tier=T2
-s3	a.	灵敏的		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	a.	敏感的		0	T2	
+s2	a.	易感的		0	T2	
+s3	a.	灵敏的		0	T2	

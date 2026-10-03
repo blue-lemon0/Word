@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	额外的事物		0	tier=T1
-s2	n.	另外的收费		0	tier=T1
-s3	a.	特别的		0	tier=T1
-s4	adv.	额外地		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	额外的事物		0	T1	
+s2	n.	另外的收费		0	T1	
+s3	a.	特别的		0	T1	
+s4	adv.	额外地		0	T1	

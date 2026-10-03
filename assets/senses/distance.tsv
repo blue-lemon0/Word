@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	距离		0	tier=T1
-s2	n.	远方		0	tier=T1
-s3	n.	遥远		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	距离		0	T1	
+s2	n.	远方		0	T1	
+s3	n.	遥远		0	T1	

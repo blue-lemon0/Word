@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	盒子		0	tier=T2
-s2	n.	箱		0	tier=T2
-s3	n.	方框		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	盒子		0	T2	
+s2	n.	箱		0	T2	
+s3	n.	方框		0	T2	

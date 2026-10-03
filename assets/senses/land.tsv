@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	陆地		0	tier=T2
-s2	n.	地面		0	tier=T2
-s3	n.	地界		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	陆地		0	T2	
+s2	n.	地面		0	T2	
+s3	n.	地界		0	T2	

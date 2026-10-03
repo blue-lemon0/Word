@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	a.	奇怪的		0	tier=T2
-s2	a.	陌生的		0	tier=T2
-s3	a.	生疏的		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	a.	奇怪的		0	T2	
+s2	a.	陌生的		0	T2	
+s3	a.	生疏的		0	T2	

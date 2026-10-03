@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	帐单		0	tier=T1
-s2	n.	清单		0	tier=T1
-s3	n.	钞票		0	tier=T1
-s4	n.	鸟嘴		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	帐单		0	T1	
+s2	n.	清单		0	T1	
+s3	n.	钞票		0	T1	
+s4	n.	鸟嘴		0	T1	

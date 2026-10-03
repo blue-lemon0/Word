@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	v.	操作		0	tier=T1
-s2	v.	运转		0	tier=T1
-s3	v.	动手术		0	tier=T1
-s4	v.	活动		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	v.	操作		0	T1	
+s2	v.	运转		0	T1	
+s3	v.	动手术		0	T1	
+s4	v.	活动		0	T1	

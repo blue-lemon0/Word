@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	景观		0	tier=T1
-s2	n.	视力		0	tier=T1
-s3	n.	眼界		0	tier=T1
-s4	n.	阅读		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	景观		0	T1	
+s2	n.	视力		0	T1	
+s3	n.	眼界		0	T1	
+s4	n.	阅读		0	T1	

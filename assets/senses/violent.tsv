@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	a.	暴力的		0	tier=T2
-s2	a.	猛烈的		0	tier=T2
-s3	a.	激烈的		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	a.	暴力的		0	T2	
+s2	a.	猛烈的		0	T2	
+s3	a.	激烈的		0	T2	

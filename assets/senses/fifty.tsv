@@ -1,2 +1,2 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	num.	五十个		0	tier=T3
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	num.	五十个		0	T3	

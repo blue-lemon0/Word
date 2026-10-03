@@ -1,5 +1,5 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	规则		0	tier=T1
-s2	n.	统治		0	tier=T1
-s3	n.	控制		0	tier=T1
-s4	n.	支配		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	规则		0	T1	
+s2	n.	统治		0	T1	
+s3	n.	控制		0	T1	
+s4	n.	支配		0	T1	

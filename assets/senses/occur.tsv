@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	vi.	发生		0	tier=T1
-s2	vi.	被想到		0	tier=T1
-s3	vi.	存在		0	tier=T1
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	vi.	发生		0	T1	
+s2	vi.	被想到		0	T1	
+s3	vi.	存在		0	T1	

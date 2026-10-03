@@ -7,8 +7,13 @@ D16 已决定**不迁移**，因此现在的职责只剩一个：**写出正式�
 与旧库的对比保留为信息性输出（读归档快照，不参与任何迁移）。
 
 输出 assets/senses/<word>.tsv：
-    senseId \t pos \t glossZh \t glossEn \t trap \t note
-    s1        n.      飞机场      (空)      0     tier=T1
+    senseId \t pos \t glossZh \t glossEn \t trap \t tier \t note
+    s1        n.      飞机场      (空)      0     T1    (空)
+
+`tier` 是**独立列**，不塞进 note。
+早先写成 `note=tier=T1`，而 build_bundle.py 读的是 `tier` 列
+→ bundle 里 7884 张卡 tier 全空、UI 的档位标签永不显示。
+这种"写一处读另一处"的断链只有让 verify_docs 校验 bundle 的 tier 才拦得住。
 """
 import csv, io, json, os, re, sys, collections
 
@@ -41,13 +46,13 @@ def main():
     npos_blank = 0
     for w, v in sel.items():
         with io.open(os.path.join(SDIR, w + ".tsv"), "w", encoding="utf-8", newline="") as fh:
-            fh.write("senseId\tpos\tglossZh\tglossEn\ttrap\tnote\n")
+            fh.write("senseId\tpos\tglossZh\tglossEn\ttrap\ttier\tnote\n")
             for i, s in enumerate(v["senses"], 1):
                 pos = POS_CN.get(s["pos"], s["pos"] or "")
                 if not pos:
                     npos_blank += 1
-                fh.write("s%d\t%s\t%s\t\t0\t%s\n"
-                         % (i, pos, s["zh"], "tier=%s" % v["tier"]))
+                fh.write("s%d\t%s\t%s\t\t0\t%s\t\n"
+                         % (i, pos, s["zh"], v["tier"]))
 
     n_sense = sum(len(v["senses"]) for v in sel.values())
     print("写出 assets/senses/: %d 词 / %d 义项" % (len(sel), n_sense))

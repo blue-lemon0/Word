@@ -1,2 +1,2 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	安定		0	tier=T4
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	安定		0	T4	

@@ -1,3 +1,3 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	n.	议程		0	tier=T3
-s2	n.	日常工作事项		0	tier=T3
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	议程		0	T3	
+s2	n.	日常工作事项		0	T3	

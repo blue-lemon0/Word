@@ -1,4 +1,4 @@
-senseId	pos	glossZh	glossEn	trap	note
-s1	vi.	反对		0	tier=T2
-s2	vt.	以...对抗		0	tier=T2
-s3	vt.	抗争		0	tier=T2
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	vi.	反对		0	T2	
+s2	vt.	以...对抗		0	T2	
+s3	vt.	抗争		0	T2	
