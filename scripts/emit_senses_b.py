@@ -18,7 +18,7 @@ D16 已决定**不迁移**，因此现在的职责只剩一个：**写出正式�
 import csv, io, json, os, re, sys, collections
 
 sys.stdout.reconfigure(encoding="utf-8")
-PROJ = r"D:\projectX\android\Word"
+PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 B = os.path.join(PROJ, "assets", "wordlists", "ecdict_senses_b.json")
 SDIR = os.path.join(PROJ, "assets", "senses")
 ARCHIVE = os.path.join(PROJ, "archive", "2026-09-30-pre-ECDICT",

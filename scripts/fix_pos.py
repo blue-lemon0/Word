@@ -43,7 +43,7 @@ ECDICT 的 `translation` 是**按词性分块**排列的：同一词性连续出
 import collections, io, json, os, re, sys
 
 sys.stdout.reconfigure(encoding="utf-8")
-PROJ = r"D:\projectX\android\Word"
+PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RAW = os.path.join(PROJ, "assets", "wordlists", "ecdict_senses_raw.json")
 
 # ECDICT definition 的行首词性标记 -> 内部简称

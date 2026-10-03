@@ -2,7 +2,7 @@
 """诊断 ECDICT 切分结果的收敛问题：缺失词 / 超长释义 / 跨词性重复 / 近义细分。"""
 import csv, io, json, os, re, sys, collections
 sys.stdout.reconfigure(encoding="utf-8")
-PROJ = r"D:\projectX\android\Word"
+PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 raw = json.load(io.open(os.path.join(PROJ, "assets", "wordlists", "ecdict_senses_raw.json"),
                         encoding="utf-8"))
 core = list(csv.reader(

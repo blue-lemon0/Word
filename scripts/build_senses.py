@@ -11,7 +11,7 @@
 """
 import csv, io, json, os, re, sys, collections
 sys.stdout.reconfigure(encoding="utf-8")
-PROJ = r"D:\projectX\android\Word"
+PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RAW = os.path.join(PROJ, "assets", "wordlists", "ecdict_senses_raw.json")
 
 # 1. 变位形式

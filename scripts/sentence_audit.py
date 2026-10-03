@@ -14,7 +14,7 @@ opencode（我）生成的句子写到 assets/sentences/<word>.tsv，
 import csv, io, json, os, re, sys, collections, hashlib
 
 sys.stdout.reconfigure(encoding="utf-8")
-PROJ = r"D:\projectX\android\Word"
+PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SDIR = os.path.join(PROJ, "assets", "sentences")
 SE = os.path.join(PROJ, "assets", "senses")
 WL = os.path.join(PROJ, "assets", "wordlists")

@@ -2,7 +2,7 @@
 """校验 docs/ 里的关键数字与实际数据是否一致。"""
 import csv, io, json, os, re, sys, collections
 sys.stdout.reconfigure(encoding="utf-8")
-PROJ = r"D:\projectX\android\Word"
+PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DOCS = os.path.join(PROJ, "docs")
 
 sel_path = os.path.join(PROJ, "assets", "wordlists", "ecdict_senses_b.json")
@@ -105,6 +105,11 @@ d16 += [
         PROJ, "assets", "profile", "srs_params.tsv"))),
     ("有 e2e_loop", os.path.exists(os.path.join(PROJ, "scripts", "e2e_loop.mjs"))),
     ("有 smoke_http", os.path.exists(os.path.join(PROJ, "scripts", "smoke_http.py"))),
+    # 选词范围表被正式流水线读取（parse_ecdict / build_senses / select_tier_b /
+    # diag_senses / emit_senses），不是 archive 专属的参考件。
+    # 曾在"清理冗余"时把它当成 archive 的重复件删掉，流水线直接 FileNotFoundError。
+    ("选词范围表在位", os.path.exists(os.path.join(
+        PROJ, "assets", "wordlists", "kaoyan_dagang_core.tsv"))),
     # schema.sql 里的关键不变量不能被改掉
     ("schema 有 due_at 列", "due_at" in io.open(
         os.path.join(PROJ, "app", "schema.sql"), encoding="utf-8").read()),
@@ -114,6 +119,18 @@ d16 += [
 # SRS 参数必须是代码之外的唯一真相源：verify_srs.py 不得再硬编码 S0/D0
 _vsp = io.open(os.path.join(PROJ, "scripts", "verify_srs.py"), encoding="utf-8").read()
 d16.append(("verify_srs.py 读参数文件不硬编码", "load_params" in _vsp))
+
+# 脚本不得硬编码项目绝对路径：在克隆里跑流水线会把产物写回原目录
+hardcoded = []
+for f in sorted(os.listdir(os.path.join(PROJ, "scripts"))):
+    if not (f.endswith(".py") or f.endswith(".mjs")):
+        continue
+    body = io.open(os.path.join(PROJ, "scripts", f), encoding="utf-8").read()
+    if re.search(r'["\'][A-Za-z]:\\\\projectX', body) or re.search(r'["\'][A-Za-z]:\\projectX', body):
+        hardcoded.append(f)
+d16.append(("脚本无硬编码项目路径", not hardcoded))
+if hardcoded:
+    print("       硬编码项目路径的脚本: %s" % ", ".join(hardcoded))
 # 已废弃的脚本不得留在 scripts/
 DEAD = ["map_senses.py", "stage1_senses.py", "stage2_sentences.py",
         "stage3_judge.py", "judge_audit.py", "llm_client.py"]

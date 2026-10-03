@@ -15,8 +15,11 @@ definition 字段（英文）则是逐义项的，可以拿它做切分锚点。
 import csv, io, os, re, sys, json, collections
 csv.field_size_limit(20 * 1024 * 1024)
 sys.stdout.reconfigure(encoding="utf-8")
-EC = r"C:\Users\huaiqi\AppData\Local\Temp\opencode\node_modules\ecdict\assets\ecdict.csv"
-PROJ = r"D:\projectX\android\Word"
+# ECDICT CSV 在仓库外（1.9MB，不入库）。可用环境变量 ECDICT_CSV 覆盖。
+EC = os.environ.get(
+    "ECDICT_CSV",
+    r"C:\Users\huaiqi\AppData\Local\Temp\opencode\node_modules\ecdict\assets\ecdict.csv")
+PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # 考研不考的义项标记
 SKIP_TAGS = re.compile(

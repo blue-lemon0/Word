@@ -12,7 +12,7 @@ ecdict_senses_final.json 里每个词的 senses 数组已按优先级降序排�
 """
 import csv, io, json, os, re, sys, collections
 sys.stdout.reconfigure(encoding="utf-8")
-PROJ = r"D:\projectX\android\Word"
+PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FINAL = os.path.join(PROJ, "assets", "wordlists", "ecdict_senses_final.json")
 
 # 词级分档 -> 保留义项数

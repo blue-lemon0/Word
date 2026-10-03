@@ -22,7 +22,7 @@ D16 之后的要点：
 """
 import csv, json, os, sys, time, collections
 
-PROJ = r"D:\projectX\android\Word"
+PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.stdout.reconfigure(encoding="utf-8")
 S = os.path.join(PROJ, "assets", "sentences")
 SE = os.path.join(PROJ, "assets", "senses")
