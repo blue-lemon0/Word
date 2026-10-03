@@ -1,0 +1,21 @@
+senseId	text	clue	span_start	span_len	translation	note	source
+s1	He sent a heavy pack to his friend in the north.	pack	16	4	他给北方的朋友寄了一个很重的包裹。	sent + a pack 是邮寄语境，与 s2 的一伙、s3 一副牌、s4 背包都不同。	GENERATED
+s1	The pack was so heavy that he carried it in parts.	pack	4	4	包裹太重了，他得分几次搬。	so heavy + carry it：可搬动的大件实物。	GENERATED
+s1	She opened the small pack and found two new books inside it.	pack	21	4	她打开小包裹，发现里面有两本新书。	opened + found ... inside：有内部空间的容器。	GENERATED
+s1	The post office lost the small pack that I sent away.	pack	31	4	邮局把我寄出去的那个小包裹弄丢了。	post office + sent away，邮寄链路的专有场景。	GENERATED
+s1	He tied the heavy pack with a strong rope twice over.	pack	18	4	他用结实的绳子把大包裹扎了两道。	tied ... with a rope 是打包动作，rope/结是包裹的标志物。	GENERATED
+s2	The police caught a whole pack of thieves that night.	pack	26	4	那天晚上警察抓住了一伙窃贼。	a pack of + 人（贬义），固定结构；与 s1 的可数包裹不同。	GENERATED
+s2	A pack of wild wolves ran across the open snow field.	pack	2	4	一群野狼跑过开阔的雪原。	a pack of + 动物（狼群），固定结构。	GENERATED
+s2	The wolf pack hunts together and rests together in winter.	pack	9	4	狼群冬天一起狩猎，也一起休息。	wolf pack 是固定搭配，且与群居动物的行为连用。	GENERATED
+s2	He never goes out at night because of that pack.	pack	43	4	因为那伙人，他晚上从不出门。	goes out at night + 因为：说的是一伙人的威胁，不是物品。	GENERATED
+s2	That pack of young men runs the whole market street.	pack	5	4	那伙年轻人控制着整条市场街。	a pack of + 人 + 行为（runs）：一群人作案，非物品。	GENERATED
+s3	He dealt a new pack of cards onto the small table.	pack	15	4	他把新买的一副牌发到小桌子上。	a pack of cards 是固定搭配 dealt（发牌）只能配牌。	GENERATED
+s3	She took a pack of cards and played alone for hours.	pack	11	4	她拿了一副牌，独自玩了好几个钟头。	pack of cards + played：整副牌作为一个集合。	GENERATED
+s3	Put the pack back in its box and clean the table.	pack	8	4	把牌放回盒里，然后把桌子擦干净。	pack back in its box：牌盒是牌的容器，对比 s1 的包裹有绳无盒。	GENERATED
+s3	The whole pack of cards was lost under the long cloth.	pack	10	4	整副牌丢在一块长布下面了。	the whole pack（整副）+ cards，集合义。	GENERATED
+s3	He bought a new pack of cards at the corner shop.	pack	16	4	他在街角商店买了一副新牌。	bought a new pack of cards：整副购买，不是单个包裹。	GENERATED
+s4	He put the food in his pack and left the house early.	pack	23	4	他把食物装进包里，很早就出门了。	his pack + put ... in + 出门远行：随身背负的包。	GENERATED
+s4	My pack is heavy because it holds two books and a coat.	pack	3	4	我的包很重，因为里面有两本书和一件外套。	holds books and a coat：装随身物的背包。	GENERATED
+s4	She carried her pack on her back up the long path.	pack	16	4	她背着包走上那条长路。	on her back 是最强的判别词：背负式。	GENERATED
+s4	Take some water in your pack before you walk far.	pack	24	4	走远路之前，往包里带些水。	Take some water in your pack：行军/远足补给。	GENERATED
+s4	The blue pack on the table is full of old tools.	pack	9	4	桌上那个蓝包装满了旧工具。	full of tools：装工具的背包，对比 s1 的邮包。	GENERATED

@@ -384,6 +384,7 @@ let renderedOptions = null;
 
 let revealed = false, answered = false;
 let solo = null;         // {id, chain}
+let cardShownAt = 0;     // D17：本次出题时刻，算作答耗时
 
 /* 会话状态（全部持久化） */
 let state = null;
@@ -416,6 +417,62 @@ function saveState(){
   state.updatedAt = Date.now();
   try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
   catch(e){ /* 隐私模式下忽略 */ }
+  pushState();
+}
+
+/* =========================================================================
+   D17 · 服务端存档
+   ---------------------------------------------------------------------------
+   上面那两行是原型原样保留的：localStorage 仍是前端的真相源（离线可用、秒开）。
+   这里额外接一层 SQLite（app/server.mjs + data/user.db），只解决 localStorage
+   解决不了的两件事：
+
+     1. 清缓存 / 换浏览器 / 换机器 -> 从 SQLite 恢复这一轮的 queue 与进度
+     2. 每次作答在服务端独立留痕 -> SRS（S/D/due_at）不依赖前端是否打开
+
+   失败一律静默：存档是附加能力，不能让它把练习搞挂。
+   ========================================================================= */
+const API = {
+  get(p){ return fetch(p, {cache:"no-store"}).then(r => r.ok ? r.json() : null).catch(() => null); },
+  post(p, body){
+    return fetch(p, {
+      method:"POST", headers:{"content-type":"application/json"},
+      body: JSON.stringify(body),
+    }).then(r => r.ok ? r.json() : null).catch(() => null);
+  },
+};
+
+let _pushTimer = null;
+function pushState(){
+  if (!state || _pushTimer) return;
+  // 连续点击「下一题」时合并成一次推送，别每题都写一遍
+  _pushTimer = setTimeout(() => { _pushTimer = null; API.post("/api/ui-state", {state}); }, 400);
+}
+
+/** 记一次作答。result: CORRECT / WRONG / PENDING。返回里带 SRS 数值。 */
+function commitAnswer(result, elapsedMs){
+  if (!card) return Promise.resolve(null);
+  return API.post("/api/answer", {
+    word: card.w, senseId: card.s, result, elapsedMs: elapsedMs ?? null,
+  });
+}
+function commitMastered(id){
+  const c = CARDS.find(x => x.id === id);
+  if (!c) return Promise.resolve(null);
+  return API.post("/api/mastered", {word: c.w, senseId: c.s, on: true});
+}
+
+/** 本地没有存档时，从 SQLite 恢复。返回是否有可恢复的内容。 */
+function restoreFromServer(){
+  return API.get("/api/ui-state").then(r => {
+    if (!r || !r.state || !r.state.v) return false;
+    // 本地已有进度就不覆盖：localStorage 是真相源，服务端只是备份
+    const mine = localStorage.getItem(STORE_KEY);
+    if (mine) return false;
+    state = Object.assign(freshState(), r.state);
+    saveState();
+    return true;
+  });
 }
 
 /* =========================================================================
@@ -471,6 +528,7 @@ function loadCard(id){
   card = c;
   row = nextRow(c);
   revealed = false; answered = false; renderedOptions = null;
+  cardShownAt = Date.now();     // D17：用来算作答耗时，供 SRS 判快/慢
   if (!row){ renderNoSentence(); return; }   // D16：无句状态
   options = buildOptions(c);
   renderQuestion();
@@ -520,17 +578,18 @@ function choose(o, node, key){
   answered = true;
   document.querySelectorAll(".opt").forEach(n => n.classList.add("disabled"));
   document.getElementById("hint").textContent = "";
-  let status;
+  const shownAt = cardShownAt || Date.now();
+  let status, result;
   if (o.kind === "pending"){
-    state.stats.pending++; status = "pending";
+    state.stats.pending++; status = "pending"; result = "PENDING";
     recordWrong("pending");
     if (solo) solo.chain = 0;
   } else if (o.kind === "correct"){
-    state.stats.correct++; status = "good";
+    state.stats.correct++; status = "good"; result = "CORRECT";
     node.classList.add("correct");
     if (solo) solo.chain = (solo.chain || 0) + 1;
   } else {
-    state.stats.wrong++; status = "bad";
+    state.stats.wrong++; status = "bad"; result = "WRONG";
     node.classList.add("wrong");
     if (renderedOptions){
       renderedOptions.nodes.forEach((n,i) => {
@@ -542,6 +601,7 @@ function choose(o, node, key){
     recordWrong("wrong");
     if (solo) solo.chain = 0;
   }
+  commitAnswer(result, Date.now() - shownAt);   // D17：SRS 在服务端算
   saveState();
   updateProgress();
   showExplain(status, node, key);
@@ -550,6 +610,7 @@ function choose(o, node, key){
 function markMastered(id){
   state.mastered[id] = true;
   delete state.wrong[id];
+  commitMastered(id);      // D17：服务端同步置 mastered，重排到期
   saveState();
   const exp = document.getElementById("explain");
   const line = exp.querySelector(".master-line") || exp.querySelector(".mastered-line");
@@ -848,21 +909,25 @@ function boot(){
       GLOSS = b.glossPool;
       if (load) load.remove();
       state = loadState();
-      // 恢复未完成的一轮
-      if (state.queue.length && state.pos < state.queue.length){
-        switchTab("train");
-        loadCard(state.queue[state.pos]);
-      } else if (state.queue.length && state.pos >= state.queue.length){
-        // 上一轮已做完 -> 回到小结，而不是静默开新一轮
-        renderSummary();
-      } else {
-        state.queue = pickQueue(20);
-        state.pos = 0;
-        saveState();
-        if (state.queue.length){ switchTab("train"); loadCard(state.queue[0]); }
-        else renderSummary();
-      }
-      renderBoard();
+      // D17：本地没有存档时，从 SQLite 恢复这一轮（换机器/清缓存后接着练）
+      return restoreFromServer().then(restored => {
+        if (restored && load) load.textContent = "";
+        // 恢复未完成的一轮
+        if (state.queue.length && state.pos < state.queue.length){
+          switchTab("train");
+          loadCard(state.queue[state.pos]);
+        } else if (state.queue.length && state.pos >= state.queue.length){
+          // 上一轮已做完 -> 回到小结，而不是静默开新一轮
+          renderSummary();
+        } else {
+          state.queue = pickQueue(20);
+          state.pos = 0;
+          saveState();
+          if (state.queue.length){ switchTab("train"); loadCard(state.queue[0]); }
+          else renderSummary();
+        }
+        renderBoard();
+      });
     })
     .catch(e => {
       if (load) load.textContent = "数据加载失败：" + e.message;

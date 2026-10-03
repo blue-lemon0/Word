@@ -1,9 +1,13 @@
 // 最小学习循环的本地服务：零依赖（node:http + node:sqlite）。
 //   node app/server.mjs           默认 http://127.0.0.1:8777
-//   PORT=9000 node app/server.mjs
+//   PORT=8000 node app/server.mjs
 //
-// 职责边界：HTTP + 会话队列。SRS 算在 app/srs.mjs，落在 data/user.db。
-// 队列本身不入库 —— 关掉浏览器再打开，队列从 v_due 重新算，进度一条不少。
+// 页面是仓库里原有的 tools/index.html —— 那份原型一个字都没改，
+// 本文件只提供 bundle 静态文件 + 存档接口（见 D17）。
+//
+// 职责边界：HTTP + SQLite。SRS 算在 app/srs.mjs，落在 data/user.db。
+// 练习队列不在服务端：tools/index.html 自己管（原来在 localStorage，
+// 现在镜像一份到 SQLite 的 ui_state 表）。
 
 import http from 'node:http';
 import fs from 'node:fs';
@@ -13,72 +17,35 @@ import * as store from './db.mjs';
 import { loadParams } from './srs.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
+export const PROJ = path.resolve(HERE, '..');
 const PORT = Number(process.env.PORT || 8777);
-const SESSION_SIZE = Number(process.env.SESSION_SIZE || 20);
 
 const params = loadParams();
 const bundle = store.loadBundle();
 const db = store.openDb();
 const n = store.syncBundle(db, bundle);
 
-const sessions = new Map();
-
-function newQueue(nowSec) {
-  const rows = store.layout(db, params, SESSION_SIZE, nowSec);
-  return rows.map((r) => ({ word: r.word, sense_id: r.sense_id }));
-}
-
-function newSession(id) {
-  const s = {
-    id, queue: newQueue(store.now()), idx: 0, served: 0,
-    attempt: null, asked: 0, correct: 0, wrong: 0, pending: 0,
-  };
-  sessions.set(id, s);
-  return s;
-}
-
-function getSession(id) {
-  return sessions.get(id) || newSession(id);
-}
-
-function currentCard(s, bundleRef) {
-  while (s.idx < s.queue.length) {
-    const item = s.queue[s.idx];
-    const card = bundleRef.cards.find((c) => c.w === item.word && c.s === item.sense_id);
-    if (card && card.rows.length) return { item, card };
-    s.idx++;                      // 该卡没句子（句子还没生成），跳过
-  }
-  return null;
-}
-
 function json(res, code, obj) {
-  const body = JSON.stringify(obj);
   res.writeHead(code, {
     'content-type': 'application/json; charset=utf-8',
     'cache-control': 'no-store',
   });
-  res.end(body);
+  res.end(JSON.stringify(obj));
 }
 
 async function readBody(req) {
   const chunks = [];
   for await (const c of req) chunks.push(c);
   if (!chunks.length) return {};
-  return JSON.parse(Buffer.concat(chunks).toString('utf8'));
+  return JSON.parse(Buffer.concat(chunks).toString('utf-8'));
 }
 
-const STATIC = {
-  '/': ['index.html', 'text/html; charset=utf-8'],
-  '/index.html': ['index.html', 'text/html; charset=utf-8'],
-  '/app.js': ['app.js', 'text/javascript; charset=utf-8'],
-};
-
 const routes = {
+  /** 首页要的几个数（也用于 verify / 调试） */
   async '/api/bootstrap'(req, res) {
     json(res, 200, {
       bundle: bundle.stats,
       cards: bundle.cards.length,
-      sessionSize: SESSION_SIZE,
       overview: store.overview(db, params),
     });
   },
@@ -87,108 +54,83 @@ const routes = {
     json(res, 200, store.overview(db, params));
   },
 
-  async '/api/start'(req, res) {
-    const { sessionId } = await readBody(req);
-    const id = sessionId || `s${Date.now().toString(36)}`;
-    sessions.delete(id);
-    const s = getSession(id);
-    json(res, 200, {
-      sessionId: id,
-      total: s.queue.length,
-      overview: store.overview(db, params),
-    });
-  },
-
-  async '/api/next'(req, res) {
-    const { sessionId, sentIdx } = await readBody(req);
-    const s = getSession(sessionId);
-    if (sentIdx != null) s.idx = sentIdx;
-    const hit = currentCard(s, bundle);
-    if (!hit) {
-      json(res, 200, { done: true, summary: summary(s), overview: store.overview(db, params) });
+  /**
+   * tools/index.html 的 state 镜像。
+   *   GET  启动时读：本地 localStorage 为空时用它恢复
+   *   POST 每次 saveState() 推一份上来：清缓存/换机器后能找回
+   * 前端仍以 localStorage 为准，这里不做权威，只做备份 + 跨设备副本。
+   */
+  async '/api/ui-state'(req, res) {
+    if (req.method === 'GET') {
+      json(res, 200, store.loadUiState(db) || { state: null, ts: 0 });
       return;
     }
-    const sent = store.pickSentence(bundle, hit.item.word, hit.item.sense_id, s.asked);
-    // 每出一道题发一个 attempt_id：客户端作答时带回，同一次出题的重复提交
-    // 会被 review_log 的唯一索引折叠掉。
-    s.served += 1;
-    s.attempt = `${s.id}#${s.served}`;
-    json(res, 200, {
-      done: false,
-      total: s.queue.length,
-      position: s.idx + 1,
-      attemptId: s.attempt,
-      word: hit.card.w,
-      pos: hit.card.pos,
-      senseId: hit.card.s,
-      tier: hit.card.tier,
-      sentence: sent,
-      options: store.buildOptions(bundle, hit.card, 4),
-    });
+    const { state } = await readBody(req);
+    if (!state || typeof state !== 'object') { json(res, 400, { error: 'bad state' }); return; }
+    store.saveUiState(db, state);
+    json(res, 200, { ok: true });
   },
 
+  /** 记一次作答，SRS 在服务端算，落在 card_state / review_log */
   async '/api/answer'(req, res) {
-const body = await readBody(req);
-    const { sessionId, attemptId, word, senseId, picked, elapsedMs, isDue } = body;
-    const s = getSession(sessionId);
-    const card = bundle.cards.find((c) => c.w === word && c.s === senseId);
-    if (!card) { json(res, 400, { error: 'unknown card' }); return; }
-    // 只接受「当前这道题」的 attempt。同一 attempt 的重发走到下面被唯一索引折叠；
-    // 换了别的 attempt 说明客户端拿着上一题的答案乱交，直接拒。
-    if (!s.attempt || attemptId !== s.attempt) {
-      json(res, 409, { error: 'stale attempt', currentAttempt: s.attempt });
+    const { word, senseId, result, elapsedMs } = await readBody(req);
+    if (!['CORRECT', 'WRONG', 'PENDING'].includes(result)) {
+      json(res, 400, { error: 'bad result' });
       return;
     }
-
-    const result = picked === '__PENDING__' ? 'PENDING'
-      : picked === card.zh ? 'CORRECT' : 'WRONG';
-    const out = store.commitAnswer(db, params, bundle, {
-      sessionId, idx: s.idx, attemptId, word, senseId, result, elapsedMs,
-      isDue: isDue === false ? 0 : 1,
-    });
-
-    if (out.applied) {
-      s.asked++;
-      if (result === 'CORRECT') s.correct++;
-      else if (result === 'WRONG') s.wrong++;
-      else s.pending++;
-      s.idx++;
-      s.attempt = null;
+    try {
+      json(res, 200, store.recordAnswer(db, params, bundle,
+        { word, senseId, result, elapsedMs }));
+    } catch (e) {
+      json(res, 400, { error: String((e && e.message) || e) });
     }
-
-    const sent = store.pickSentence(bundle, word, senseId, 0);
-    json(res, 200, {
-      applied: out.applied,
-      result,
-      kind: out.kind,
-      grade: out.grade,
-      stability: out.stability,
-      difficulty: out.difficulty,
-      intervalDays: out.intervalDays,
-      dueAt: out.dueAt,
-      sameDay: out.sameDay,
-      truth: card.zh,
-      translation: sent?.translation || '',
-      note: sent?.note || '',
-    });
   },
 
-  async '/api/summary'(req, res) {
-    const { sessionId } = await readBody(req);
-    json(res, 200, { summary: summary(getSession(sessionId)), overview: store.overview(db, params) });
+  /** 用户手动标「我已学会」/ 取消 */
+  async '/api/mastered'(req, res) {
+    const { word, senseId, on } = await readBody(req);
+    try {
+      json(res, 200, store.setMastered(db, params, bundle, word, senseId, !!on));
+    } catch (e) {
+      json(res, 400, { error: String((e && e.message) || e) });
+    }
+  },
+
+  /** 只清 UI 存档，不动 SRS —— 想「重开一轮但保留记忆曲线」时用 */
+  async '/api/reset-ui'(req, res) {
+    store.clearUiState(db);
+    json(res, 200, { ok: true });
   },
 };
 
-function summary(s) {
-  const n = s.asked;
-  return {
-    asked: n,
-    correct: s.correct,
-    wrong: s.wrong,
-    pending: s.pending,
-    pct: n ? Math.round((100 * s.correct) / n) : 0,
-    total: s.queue.length,
-  };
+// ── 静态文件：只服务仓库里已有的文件，不做目录穿越 ──────
+const MIME = {
+  '.html': 'text/html; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+  '.tsv': 'text/tab-separated-values; charset=utf-8',
+  '.svg': 'image/svg+xml',
+  '.png': 'image/png',
+  '.ico': 'image/x-icon',
+};
+
+function serveStatic(res, pathname) {
+  // 原来的原型在 tools/ 下，保持那个路径可用，同时把 / 指到它
+  const rel = pathname === '/' || pathname === '/index.html'
+    ? 'tools/index.html'
+    : decodeURIComponent(pathname.replace(/^\/+/, ''));
+  const abs = path.resolve(PROJ, rel);
+  if (!abs.startsWith(path.resolve(PROJ)) || !fs.existsSync(abs)
+      || !fs.statSync(abs).isFile()) {
+    json(res, 404, { error: 'not found: ' + pathname });
+    return;
+  }
+  res.writeHead(200, {
+    'content-type': MIME[path.extname(abs)] || 'application/octet-stream',
+    'cache-control': 'no-store',
+  });
+  res.end(fs.readFileSync(abs));
 }
 
 const server = http.createServer(async (req, res) => {
@@ -198,21 +140,17 @@ const server = http.createServer(async (req, res) => {
     try {
       await route(req, res);
     } catch (e) {
-      json(res, 500, { error: String(e && e.message || e) });
+      json(res, 500, { error: String((e && e.message) || e) });
     }
     return;
   }
-  const hit = STATIC[url.pathname];
-  if (!hit) { json(res, 404, { error: 'not found' }); return; }
-  const body = fs.readFileSync(path.join(HERE, hit[0]));
-  res.writeHead(200, { 'content-type': hit[1], 'cache-control': 'no-store' });
-  res.end(body);
+  serveStatic(res, url.pathname);
 });
 
 server.listen(PORT, '127.0.0.1', () => {
   const ov = store.overview(db, params);
-  console.log(`card 投影: ${n} 张（bundle ${bundle.version}）`);
+  console.log(`页面      : http://127.0.0.1:${PORT}/  (tools/index.html，未改动)`);
+  console.log(`card 投影 : ${n} 张（bundle ${bundle.version}）`);
   console.log(`可练 ${ov.pool} / 到期 ${ov.due} / 已掌握 ${ov.mastered} / 错题 ${ov.wrong}`);
-  console.log(`user.db: ${store.USER_DB}`);
-  console.log(`打开 http://127.0.0.1:${PORT}`);
+  console.log(`user.db   : ${store.USER_DB}`);
 });

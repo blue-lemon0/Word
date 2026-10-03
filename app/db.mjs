@@ -199,6 +199,132 @@ const st = prev || {
 }
 
 /** 首页概览（04-使用体验 §1 要的那几个数）。 */
+/* ─────────────────────────────────────────────────────────
+   tools/index.html 的存档层
+   那份原型的 state 是一个小 JSON（queue/pos/stats/wrong/mastered/rowIdx），
+   原来只存 localStorage。这里存一份到 SQLite，作用是：
+     · localStorage 被清 / 换浏览器 / 换机器后能恢复
+     · SRS 的原始输入（每次作答）不依赖前端
+   前端仍以 localStorage 为准，这里只做镜像 + 恢复。
+   ───────────────────────────────────────────────────────── */
+
+export function saveUiState(db, obj) {
+  db.prepare(
+    `INSERT INTO ui_state(key, value, ts) VALUES('main', ?, ?)
+     ON CONFLICT(key) DO UPDATE SET value = excluded.value, ts = excluded.ts`)
+    .run(JSON.stringify(obj), now());
+}
+
+export function loadUiState(db) {
+  const row = db.prepare("SELECT value, ts FROM ui_state WHERE key = 'main'").get();
+  if (!row) return null;
+  try {
+    return { state: JSON.parse(row.value), ts: row.ts };
+  } catch {
+    return null;
+  }
+}
+
+export function clearUiState(db) {
+  db.exec("DELETE FROM ui_state");
+}
+
+/**
+ * 记一次作答（tools/index.html 的入口）。
+ * 与 commitAnswer 的区别：那边有会话队列做幂等键，这边没有 ——
+ * 前端用 answered 标志保证一次点击只发一次，所以 attempt_id 用随机串。
+ *
+ * session_id 固定 'ui'、idx 用子查询自增：这份 UI 没有"场次"的概念，
+ * 但 review_log 的主键是 (session_id, idx)，硬编码 idx=0 会让
+ * 第二道题起就撞主键被 INSERT OR IGNORE 静默吞掉（一次实测漏记 2 次作答）。
+ */
+export function recordAnswer(db, params, bundle, a) {
+  const card = bundle.cards.find((c) => c.w === a.word && c.s === a.senseId);
+  if (!card) throw new Error(`bundle 里没有这张卡: ${a.word}#${a.senseId}`);
+  const nSenses = bundle.cards.filter((c) => c.w === a.word).length;
+  const meta = {
+    sense_id: a.senseId, tier: card.tier || '',
+    is_trap: card.trap ? 1 : 0, n_senses: nSenses,
+  };
+  const prev = getState(db, a.word, a.senseId);
+  const st = prev || {
+    stability: 0, difficulty: 8, reps: 0, wrong_n: 0, due_at: 0,
+    pending_n: 0, mastered: 0, rusty: 0, last_review: null,
+  };
+  const ts = a.ts ?? now();
+  const next = applyReview(params, { ...st }, meta, a.result, a.elapsedMs ?? null, ts);
+  const attemptId = 'ui-' + Math.random().toString(36).slice(2, 10);
+
+  db.exec('BEGIN');
+  try {
+    const r = db.prepare(
+      `INSERT OR IGNORE INTO review_log
+         (session_id, idx, attempt_id, word, sense_id, result, grade, elapsed_ms,
+          is_due, stability_after, ts)
+       VALUES ('ui',
+               (SELECT COALESCE(MAX(idx), -1) + 1 FROM review_log WHERE session_id = 'ui'),
+               ?, ?, ?, ?, ?, ?, 1, ?, ?)`)
+      .run(attemptId, a.word, a.senseId, a.result, next.grade,
+        a.elapsedMs ?? null, next.stability, ts);
+    if (r.changes === 1) {
+      db.prepare(
+        `INSERT INTO card_state
+           (word, sense_id, stability, difficulty, last_review, due_at, reps,
+            wrong_n, pending_n, mastered, rusty)
+         VALUES (?,?,?,?,?,?,?,?,?,0,0)
+         ON CONFLICT(word, sense_id) DO UPDATE SET
+           stability = excluded.stability,
+           difficulty = excluded.difficulty,
+           last_review = excluded.last_review,
+           due_at = excluded.due_at,
+           reps = excluded.reps,
+           wrong_n = excluded.wrong_n,
+           pending_n = excluded.pending_n,
+           mastered = 0`)
+        .run(a.word, a.senseId, next.stability, next.difficulty, ts, next.dueAt,
+          next.reps, next.wrong_n, next.pending_n);
+    }
+    db.exec('COMMIT');
+    // return 必须在 try 块内：r 声明在块里（与 commitAnswer 同构）
+    return {
+      applied: r.changes === 1,
+      stability: next.stability,
+      difficulty: next.difficulty,
+      intervalDays: next.intervalDays,
+      dueAt: next.dueAt,
+      kind: next.kind,
+    };
+  } catch (e) {
+    db.exec('ROLLBACK');
+    throw e;
+  }
+}
+
+/** 用户手动标「我已学会」：置 mastered 并按 S>=90 天重排到期。 */
+export function setMastered(db, params, bundle, word, senseId, on) {
+  const card = bundle.cards.find((c) => c.w === word && c.s === senseId);
+  if (!card) throw new Error(`bundle 里没有这张卡: ${word}#${senseId}`);
+  const ts = now();
+  db.prepare(
+    `INSERT INTO card_state (word, sense_id, stability, difficulty, last_review,
+                             due_at, reps, wrong_n, pending_n, mastered, rusty)
+     VALUES (?,?,?,?,?,?,?,0,0,?,0)
+     ON CONFLICT(word, sense_id) DO UPDATE SET
+       mastered = excluded.mastered,
+       stability = MAX(card_state.stability, excluded.stability),
+       due_at = MAX(card_state.due_at, excluded.due_at)`)
+    .run(word, senseId,
+      on ? P_MASTER_S : 0, P_MASTER_D, ts, on ? ts + P_MASTER_S * 86400 : 0,
+      on ? P_MASTER_REPS : 0, on ? 1 : 0);
+  return { word, senseId, mastered: on ? 1 : 0 };
+}
+
+// 手动标记用的常量：与 srs_params.tsv 的 MASTER_S / MASTER_STREAK 语义对齐，
+// 但这里不需要依赖参数文件（手动标记是用户的显式声明，不是算法推出来的）。
+const P_MASTER_S = 90;
+const P_MASTER_D = 5.0;
+const P_MASTER_REPS = 6;
+
 export function overview(db, params, nowSec = now()) {
   const pool = db.prepare('SELECT COUNT(*) n FROM v_pool').get().n;
   const due = db.prepare('SELECT COUNT(*) n FROM v_due').get().n;

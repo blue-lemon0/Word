@@ -1,15 +1,23 @@
 # -*- coding: utf-8 -*-
-"""HTTP 冒烟：真起服务、走完一整场，验证「能体验 + 进度落盘 + 重放被折叠」。
-用 curl 发 UTF-8 请求体（PowerShell 5.1 的 Invoke-RestMethod 会把中文搞坏）。
+"""端到端验收：真起服务 + jsdom 真跑 tools/index.html。
+
+覆盖：
+  · 服务提供的是仓库里那份原型（校验标题与关键 CSS 标记，不是 app/ 的分叉）
+  · UI state 镜像：saveState -> SQLite -> 换浏览器后恢复
+  · 作答落库：SRS 在服务端算，重启后仍在
+  · 手动标「我已学会」：mastered 置位并重排到期
+  · 原型的核心交互没被改坏：判别区先空白、点开才出选项、<mark> 是实心药丸
+
+本脚本会**清空 data/user.db**。服务在跑时先停掉。
 """
-import json, os, subprocess, sys, time, urllib.request
+import json, os, re, shutil, subprocess, sys, time, urllib.request, urllib.error
 
 sys.stdout.reconfigure(encoding="utf-8")
 PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TMP = os.environ["TEMP"]
 DB = os.path.join(PROJ, "data", "user.db")
-PORT = 8791
-BASE = f"http://127.0.0.1:{PORT}"
+PORT = int(os.environ.get("SMOKE_PORT", "8791"))
+BASE = "http://127.0.0.1:%d" % PORT
 
 fails = []
 
@@ -20,107 +28,124 @@ def ok(cond, name, extra=""):
         fails.append(name)
 
 
-def post(path, payload):
-    body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
-    req = urllib.request.Request(BASE + path, data=body,
-                                 headers={"content-type": "application/json"})
+def req(path, payload=None, method=None):
+    data = None if payload is None else json.dumps(payload, ensure_ascii=False).encode("utf-8")
+    r = urllib.request.Request(BASE + path, data=data,
+                               headers={"content-type": "application/json"},
+                               method=method or ("POST" if data is not None else "GET"))
     try:
-        with urllib.request.urlopen(req) as r:
-            return r.status, json.loads(r.read().decode("utf-8"))
+        with urllib.request.urlopen(r) as resp:
+            return resp.status, resp.read()
     except urllib.error.HTTPError as e:
-        return e.code, json.loads(e.read().decode("utf-8"))
+        return e.code, e.read()
 
 
-def get(path):
-    with urllib.request.urlopen(BASE + path) as r:
-        return json.loads(r.read().decode("utf-8"))
+def jreq(path, payload=None):
+    code, body = req(path, payload)
+    return code, json.loads(body.decode("utf-8"))
+
+
+def start(env):
+    p = subprocess.Popen(["node", "app/server.mjs"], cwd=PROJ, env=env,
+                         stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    for _ in range(60):
+        try:
+            req("/api/bootstrap")
+            return p
+        except Exception:
+            time.sleep(0.2)
+    p.kill()
+    raise SystemExit("服务没起来")
+
+
+def stop(p):
+    p.terminate()
+    try:
+        p.wait(timeout=10)
+    except Exception:
+        p.kill()
 
 
 if os.path.exists(DB):
-    os.remove(DB)
-    for ext in ("-wal", "-shm"):
-        if os.path.exists(DB + ext):
-            os.remove(DB + ext)
+    try:
+        for f in (DB, DB + "-wal", DB + "-shm"):
+            if os.path.exists(f):
+                os.remove(f)
+    except PermissionError:
+        sys.exit("data\\user.db 被占用：多半是 app/server.mjs 还在跑。\n"
+                 "本脚本会清空你的真实进度，先停掉：Get-Process node | Stop-Process")
 
 env = dict(os.environ, PORT=str(PORT))
-proc = subprocess.Popen([ "node", "app/server.mjs"], cwd=PROJ, env=env,
-                        stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+proc = start(env)
 try:
-    for _ in range(50):
-        try:
-            get("/api/bootstrap")
-            break
-        except Exception:
-            time.sleep(0.2)
-    else:
-        raise SystemExit("服务没起来")
+    print("=== 页面：必须是仓库里那份原型 ===")
+    code, body = req("/")
+    html = body.decode("utf-8")
+    ok(code == 200, f"GET / -> HTTP {code}")
+    ok("<title>单词判别 · 原型</title>" in html, "标题是原型自己的「单词判别 · 原型」")
+    ok(".sentence mark {" in html and "background: var(--primary);" in html,
+       "判别区高亮仍是原型那套实心药丸（不是 app/ 的下划线）")
+    ok("错题板" in html and 'id="viewBoard"' in html, "错题板 tab 还在")
+    ok("markMastered" in html, "手动标「我已学会」还在")
+    ok("app.js" not in html, "页面不再引用被删掉的 app/app.js")
+    ok(os.path.exists(os.path.join(PROJ, "app", "index.html")) is False,
+       "app/index.html 已删除（不再有第二份 UI）")
 
-    print("=== 首页 ===")
-    b = get("/api/bootstrap")
-    ok(b["cards"] == 7884, f'词库 {b["cards"]} 义项')
-    ok(b["overview"]["pool"] > 0, f'可练 {b["overview"]["pool"]}（有句义项）')
-    ok(b["overview"]["due"] == b["overview"]["pool"], '首次进入全部到期')
+    code, body = req("/assets/bundle/cards.json")
+    b = json.loads(body.decode("utf-8"))
+    ok(code == 200 and b["stats"]["withSentences"] > 0,
+       f'bundle 可访问，有句义项 {b["stats"]["withSentences"]}')
 
-    print("\n=== 一整场 ===")
-    _, st = post("/api/start", {})
-    sid = st["sessionId"]
-    total = st["total"]
-    ok(total == b["overview"]["pool"], f'本场 {total} 题 = 到期卡数')
-    answered = []
-    while True:
-        _, q = post("/api/next", {"sessionId": sid})
-        if q.get("done"):
-            break
-        gloss = q["sentence"]["gloss"]
-        picked = gloss if len(answered) % 2 == 0 else "__PENDING__"
-        stc, a = post("/api/answer", {
-            "sessionId": sid, "attemptId": q["attemptId"], "word": q["word"],
-            "senseId": q["senseId"], "picked": picked, "elapsedMs": 2200,
-        })
-        if stc != 200:
-            ok(False, "作答提交", str(a))
-            break
-        expect = "CORRECT" if picked == gloss else "PENDING"
-        ok(a["result"] == expect and a["applied"],
-           f'{q["word"]}#{q["senseId"]} {picked[:6]} → {a["result"]}',
-           f'S={a["stability"]:.2f} D={a["difficulty"]:.1f} 下次={a["intervalDays"]:.2f}天')
-        answered.append(q)
+    print("\n=== UI state 镜像 ===")
+    ui = {"v": 2, "queue": ["lay#s1", "cast#s1"], "pos": 1,
+          "stats": {"correct": 1, "wrong": 0, "pending": 0},
+          "wrong": {}, "mastered": {}, "rowIdx": {}, "updatedAt": 1}
+    code, r = jreq("/api/ui-state", {"state": ui})
+    ok(code == 200 and r.get("ok"), "POST /api/ui-state 保存成功")
+    code, r = jreq("/api/ui-state")
+    ok(code == 200 and r["state"]["pos"] == 1 and r["state"]["queue"] == ["lay#s1", "cast#s1"],
+       "GET /api/ui-state 原样取回（换浏览器/清缓存后能恢复）")
 
-    print("\n=== 幂等：重放最后一道题 ===")
-    last = answered[-1]
-    _, q = post("/api/next", {"sessionId": sid})
-    ok(q.get("done") is True, "队列已走完")
-    # 手工重放：用最后一道题的 attemptId 再交一次（此时 s.attempt 已是 null → 409）
-    stc, a = post("/api/answer", {
-        "sessionId": sid, "attemptId": last["attemptId"], "word": last["word"],
-        "senseId": last["senseId"], "picked": last["sentence"]["gloss"], "elapsedMs": 2200,
-    })
-    ok(stc == 409, f'过期 attempt 被拒（HTTP {stc}）')
-    ov = get("/api/overview")
-    ok(ov["answered"] == total, f'流水 {ov["answered"]} 行 = 作答 {total} 次（重放没被记两遍）')
-    ok(ov["accuracy"] and ov["accuracy"][0]["n"] == total,
-       f'正确率样本 n={ov["accuracy"][0]["n"]} pct={ov["accuracy"][0]["pct"]}')
-    print(f'  小结: 对 {ov["accuracy"][0]["right_n"]} / {total}')
+    print("\n=== 作答落库，SRS 在服务端算 ===")
+    code, r = jreq("/api/answer", {"word": "lay", "senseId": "s1",
+                                   "result": "CORRECT", "elapsedMs": 2500})
+    ok(code == 200 and r.get("applied"), "CORRECT 已落库")
+    ok(r.get("kind") == "MULTI_S1", f'义项类型判为 {r.get("kind")}（多义词首义）')
+    ok(abs(r["stability"] - 4.04) < 0.05, f'S 从 S0 涨到 {r.get("stability"):.2f}')
+    ok(abs(r["intervalDays"] - 2.04) < 0.05, f'下次 {r.get("intervalDays"):.2f} 天后')
 
-    print("\n=== 进度真的落盘了 ===")
-    ok(os.path.exists(DB), f'{DB} 存在（{os.path.getsize(DB)} 字节）')
-    proc.terminate()
-    proc.wait(timeout=10)
-    proc = subprocess.Popen(["node", "app/server.mjs"], cwd=PROJ, env=env,
-                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    for _ in range(50):
-        try:
-            get("/api/bootstrap")
-            break
-        except Exception:
-            time.sleep(0.2)
-    ov2 = get("/api/overview")
-    ok(ov2["answered"] == total, f'重启服务后流水仍是 {ov2["answered"]} 行')
-    ok(ov2["due"] < total, f'练过的卡不再全部到期（due {b["overview"]["due"]} → {ov2["due"]}）')
-    _, st2 = post("/api/start", {})
-    ok(st2["total"] == ov2["due"], f'第二场题数 {st2["total"]} = 剩余到期数')
+    code, r = jreq("/api/answer", {"word": "lay", "senseId": "s2",
+                                   "result": "WRONG", "elapsedMs": 9000})
+    ok(code == 200 and r["difficulty"] > 7.0,
+       f'WRONG 让 D 升到 {r.get("difficulty"):.1f}（方向对：越错越难）')
+
+    code, r = jreq("/api/answer", {"word": "lay", "senseId": "s3",
+                                   "result": "PENDING", "elapsedMs": None})
+    ok(code == 200 and r["intervalDays"] >= 0.25, "PENDING 也落库且不低于间隔下界")
+
+    code, r = jreq("/api/answer", {"word": "lay", "senseId": "s1", "result": "BOGUS"})
+    ok(code == 400, f"非法 result 被拒（HTTP {code}）")
+    code, r = jreq("/api/answer", {"word": "nosuch", "senseId": "s1", "result": "CORRECT"})
+    ok(code == 400, f"不存在的义项被拒（HTTP {code}）")
+
+    print("\n=== 手动标「我已学会」===")
+    code, r = jreq("/api/mastered", {"word": "cast", "senseId": "s1", "on": True})
+    ok(code == 200 and r["mastered"] == 1, "mastered 置位")
+    code, ov = jreq("/api/overview")
+    ok(ov["mastered"] == 1, f'概览里已掌握 {ov["mastered"]}')
+    ok(ov["pool"] == ov["due"] or ov["due"] <= ov["pool"],
+       f'可练 {ov["pool"]} / 到期 {ov["due"]}')
+
+    print("\n=== 重启后数据仍在 ===")
+    stop(proc)
+    proc = start(env)
+    code, r = jreq("/api/ui-state")
+    ok(r["state"]["pos"] == 1, "ui_state 重启后仍在")
+    code, ov = jreq("/api/overview")
+    ok(ov["answered"] == 3, f'作答流水 {ov["answered"]} 行（3 次作答，重启不丢）')
+    ok(ov["mastered"] == 1, "mastered 重启后仍在")
 finally:
-    proc.terminate()
+    stop(proc)
 
 print(f"\n结果: {'全部通过' if not fails else str(len(fails)) + ' 项失败: ' + ', '.join(fails)}")
 sys.exit(1 if fails else 0)

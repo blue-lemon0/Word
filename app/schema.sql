@@ -18,6 +18,19 @@ CREATE TABLE IF NOT EXISTS meta (
   value TEXT NOT NULL
 );
 
+-- ── 前端 UI 状态 ───────────────────────────────────
+-- tools/index.html 原来把整套 state（queue/pos/stats/wrong/mastered/rowIdx）
+-- 塞进 localStorage。localStorage 换浏览器、清缓存、重装就没了，
+-- 而且没有事务。这里把它作为**备份与跨设备副本**存一份：
+-- 前端仍以 localStorage 为准（离线可用、秒开），
+-- 每次 saveState() 顺手推一份上来，启动时若本地为空就从这里恢复。
+-- 真正的记忆模型不在这里 —— S/D/due_at 在 card_state，作答流水在 review_log。
+CREATE TABLE IF NOT EXISTS ui_state (
+  key   TEXT PRIMARY KEY,     -- 固定 'main'
+  value TEXT NOT NULL,        -- state 的 JSON
+  ts    INTEGER NOT NULL
+);
+
 -- ── bundle 投影 ─────────────────────────────────────
 -- 为什么已有 bundle 还要存一份：到期查询与排布权重要 JOIN tier / is_trap，
 -- 没有它就只能把 7884 行拉到内存里做。存的是投影，不是内容，

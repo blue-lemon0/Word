@@ -20,7 +20,7 @@ D16 之后的要点：
   2. 句子目录不存在时（LLM 通道禁用期）自动降级为纯义项包。
   3. 干扰项池从全部义项的 glossZh 构建，不依赖句子。
 """
-import csv, json, os, sys, time, collections
+import csv, hashlib, json, os, sys, time, collections
 
 PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.stdout.reconfigure(encoding="utf-8")
@@ -93,8 +93,20 @@ for f in sorted(os.listdir(SE)):
             } for r in rs],
         })
 
+# version 必须对内容敏感，不能只用日期。
+# 句子是逐词增量加的，一天里常常改好几次；日期版 version 会让 app/db.mjs 的
+# syncBundle 判定「bundle 没变」而跳过重建 —— 于是新句子永远进不了 App，
+# 而界面上看不出任何异常。症状：刚生成的句子在浏览器里不出现。
+h = hashlib.sha1()
+for c in cards:
+    h.update(("%s\x1f%s\x1f%d\x1f%s\x1f%d\x1e" % (
+        c["w"], c["s"], len(c["rows"]), c["zh"], c["trap"])).encode("utf-8"))
+    for r in c["rows"]:
+        h.update(("%s\x1f%s\x1e" % (r["t"], r["c"])).encode("utf-8"))
+version = "%s-%s" % (time.strftime("%Y%m%d"), h.hexdigest()[:8])
+
 bundle = {
-    "version": time.strftime("%Y%m%d"),
+    "version": version,
     "stats": {
         "words": n_words,
         "senses": len(cards),
@@ -116,7 +128,7 @@ with open(OUT, "w", encoding="utf-8") as fh:
 
 size = os.path.getsize(OUT)
 st = bundle["stats"]
-print("构建完成  mode=%s" % st["mode"])
+print("构建完成  mode=%s  version=%s" % (st["mode"], version))
 print("  words           :", st["words"])
 print("  cards(义项级)   :", st["cards"])
 print("  sentences       :", st["sentences"])

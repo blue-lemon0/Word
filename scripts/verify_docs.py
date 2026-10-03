@@ -96,10 +96,37 @@ PIPE = ["parse_ecdict.py", "fix_pos.py", "diag_senses.py", "build_senses.py",
 for f in PIPE:
     d16.append(("流水线有 %s" % f, os.path.exists(os.path.join(PROJ, "scripts", f))))
 
-# D17：最小循环的必备件
-APP = ["schema.sql", "srs.mjs", "db.mjs", "server.mjs", "index.html", "app.js"]
+# D17：最小循环的必备件。**前端只有一份** —— tools/index.html（原型），
+# app/ 只放服务端。曾经另写了一套 app/index.html + app/app.js，
+# 结果是原型被晾在一边、用户看到的是另一个界面。
+APP = ["schema.sql", "srs.mjs", "db.mjs", "server.mjs"]
 for f in APP:
     d16.append(("app/ 有 %s" % f, os.path.exists(os.path.join(PROJ, "app", f))))
+d16 += [
+    ("没有第二份前端 app/index.html",
+     not os.path.exists(os.path.join(PROJ, "app", "index.html"))),
+    ("没有第二份前端 app/app.js",
+     not os.path.exists(os.path.join(PROJ, "app", "app.js"))),
+    ("原型在 tools/index.html",
+     os.path.exists(os.path.join(PROJ, "tools", "index.html"))),
+]
+# 原型的存档层必须接到服务端；CSS 与 markup 不能被改
+_proto_path = os.path.join(PROJ, "tools", "index.html")
+if os.path.exists(_proto_path):
+    proto = io.open(_proto_path, encoding="utf-8").read()
+    proto_base = os.path.join(PROJ, "archive", "2026-09-30-pre-ECDICT")
+    d16 += [
+        ("原型判别区高亮仍是实心药丸",
+         ".sentence mark {" in proto and "background: var(--primary);" in proto),
+        ("原型三件套还在（错题板/手动掌握/双 tab）",
+         all(k in proto for k in
+             ["markMastered", 'id="viewBoard"', "function switchTab", "错题板"])),
+        ("原型已接服务端存档",
+         all(k in proto for k in
+             ["/api/ui-state", "/api/answer", "/api/mastered", "pushState"])),
+        ("原型引用的是 /assets/bundle/cards.json",
+         'BUNDLE_URL = "/assets/bundle/cards.json"' in proto),
+    ]
 d16 += [
     ("SRS 参数文件存在", os.path.exists(os.path.join(
         PROJ, "assets", "profile", "srs_params.tsv"))),

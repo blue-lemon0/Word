@@ -1,0 +1,21 @@
+senseId	text	clue	span_start	span_len	translation	note	source
+s1	The cast of the new play meets in the hall each week.	cast	4	4	新剧的演员阵容每周在礼堂碰头。	the cast 作集体名词，指全部演员；后面 meet 的是「人」不是「物」，排除投掷/铸件。	GENERATED
+s1	A good cast can make a very simple story feel real.	cast	7	4	好的演员阵容能让一个很简单的故事显得真实。	cast 与 story 并列，宾语是故事而不是被投掷的东西。	GENERATED
+s1	Every member of the cast learned all the lines by heart.	cast	20	4	每一位演员都把全部台词背得滚瓜烂熟。	member + lines（台词）只可能用于演员阵容。	GENERATED
+s1	The whole cast sang the last song together at the very end.	cast	10	4	全体演员在最后一起唱了最后一首歌。	whole cast + sang，排除投掷（投掷不与唱歌同句）。	GENERATED
+s1	Her name was in the cast list printed in the paper.	cast	20	4	报纸上印的演员表里有她的名字。	cast list 是固定搭配，等于中文的「演员表」。	GENERATED
+s2	He cast the small stone far out into the water and waited.	cast	3	4	他把小石子远远抛进水里，然后等着。	宾语 stone 可抛；cast 在此是 throw 的过去式。	GENERATED
+s2	The old men cast their nets into the sea at dawn.	cast	12	4	老渔夫们在黎明时把网撒进海里。	net + into the sea 是「投出去」的典型场景，非演员阵容。	GENERATED
+s2	She cast a line into the river and then pulled hard.	cast	4	4	她把钓线甩进河里，然后用力拉。	cast a line 是固定搭配，与 fishing 场景绑定。	GENERATED
+s2	Each voter cast one paper into the box near the door.	cast	11	4	每位选民把一张选票投进门边的箱子里。	cast a paper/ballot 与 vote 同句；虽然涉及选举，但动作本身是「投」。	GENERATED
+s2	The boy cast the small white ball up against the wall.	cast	8	4	男孩把小白球朝墙上抛去。	球被抛出且方向明确；对比 s3 的铸件是被动的「铸件」。	GENERATED
+s3	The wheel fell off because one cast in it was broken.	cast	31	4	轮子掉了，因为里面有一个铸件裂了。	cast 作名词，指铸成的金属部件；in it 说明它是嵌在轮子里的零件。	GENERATED
+s3	They put a new metal cast into the machine last Friday.	cast	21	4	他们上周五往机器里装了一个新的金属铸件。	metal + machine 的替换件，是工厂语境。	GENERATED
+s3	This iron cast is too heavy for one man to lift.	cast	10	4	这个铁铸件太重了，一个人搬不动。	iron + heavy + lift：铸件是实体零件，不是被投出的东西。	GENERATED
+s3	A broken cast in the frame stopped the whole line.	cast	9	4	框架里一个铸件断了，整条生产线停了。	frame + line（生产线），典型铸造车间场景。	GENERATED
+s3	He melted the old cast and made a new small one.	cast	18	4	他把旧铸件熔掉，重新做了一个小的。	melt（熔化）只能作用于金属铸件，最强的判别词。	GENERATED
+s4	The old man cast serious doubt on the whole new plan.	cast	12	4	老人对这个新计划提出了严重的质疑。	cast doubt on 是固定搭配；宾语是抽象的「怀疑」不是实体。	GENERATED
+s4	Many people cast doubt on the news of the deal.	cast	12	4	许多人对这笔交易的消息表示怀疑。	cast doubt on + news，同 s1 是抽象义，与 s2/s3 的实物宾语分开。	GENERATED
+s4	The late result cast doubt on all the earlier tests.	cast	16	4	这个迟来的结果让所有早先的检测都受到怀疑。	cast doubt on 搭配；若无 on 直接接宾语则不是本义。	GENERATED
+s4	Please do not cast doubt on the work of honest men.	cast	14	4	请不要对老实人的工作表示怀疑。	cast doubt on 搭配，语义是「使人产生怀疑」。	GENERATED
+s4	The new facts cast doubt on the old story at once.	cast	14	4	新出现的事实立刻让旧说法站不住脚了。	cast doubt on 搭配；facts/story 都是抽象名词。	GENERATED
