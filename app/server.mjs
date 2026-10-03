@@ -96,6 +96,12 @@ const routes = {
     }
   },
 
+  /** 学过的题：最近 n 条作答流水。 */
+  async '/api/history'(req, res) {
+    const n = Number((new URL(req.url, 'http://x').searchParams.get('n')) || 60);
+    json(res, 200, { history: store.history(db, bundle, Math.min(n, 200)) });
+  },
+
   /**
    * 本轮队列。到期卡按 SRS 权重排序（03 §5.2），
    * 并剔除已被标记的问题句 —— 前端拿不到该出的题。

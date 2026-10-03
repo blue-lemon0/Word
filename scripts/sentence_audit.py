@@ -527,7 +527,7 @@ def find_target(text, word):
         tok = m.group(0)
         if stem_match(word, tok):
             return m.start(), len(tok)
-    return None, 0
+    return -1, 0        # 调用方一律按 -1 判失败，别返回 None
 
 
 def fix_spans(word=None, dry=False):

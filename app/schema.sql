@@ -98,6 +98,7 @@ CREATE TABLE IF NOT EXISTS review_log (
   attempt_id     TEXT    NOT NULL,     -- 出题时服务端下发，作答时带回
   word           TEXT    NOT NULL,
   sense_id       TEXT    NOT NULL,
+  sentence       TEXT,                 -- 当时出的那句原文；历史列表要显示它
   result         TEXT    NOT NULL,     -- CORRECT / WRONG / PENDING
   grade          INTEGER NOT NULL,     -- 0 / 2 / 4 / 5
   elapsed_ms     INTEGER,

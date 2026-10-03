@@ -317,16 +317,15 @@
 
   /* D17：标记「这句有问题」 */
   .flag-line { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
-  .flag-line a {
-    color: var(--ink-faint); font-size: 13px; cursor: pointer; white-space: nowrap;
-    border-bottom: 1px dashed var(--ink-faint);
-  }
+  .flag-line > span:first-child { color: var(--ink-faint); font-size: 13px; white-space: nowrap; }
   .flag-input {
     flex: 1; min-width: 0; font: inherit; font-size: 13px;
     border: 1px solid var(--line); border-radius: var(--radius-sm);
     padding: 6px 10px; background: #fbfcff; color: var(--ink);
   }
   .flag-input:focus { outline: none; border-color: var(--primary); }
+  .btn.tiny { padding: 6px 12px; font-size: 13px; border-radius: var(--radius-sm); }
+  .flag-hint { font-size: 12px; color: var(--ink-faint); margin-top: 2px; }
   .flagged-ok { color: var(--good); font-size: 13px; font-weight: 600; }
   .flag-bad { color: var(--bad); font-size: 13px; }
 </style>
@@ -373,11 +372,22 @@
     </div>
   </div>
 
+  <div id="viewHistory" style="display:none">
+    <div class="board">
+      <div class="board-head">
+        <h3>学过的题</h3>
+        <span class="board-count" id="historyCount"></span>
+      </div>
+      <div class="board-list" id="historyList"></div>
+    </div>
+  </div>
+
   <div id="viewSummary" style="display:none"></div>
 
   <div class="tabbar">
     <div class="tab" id="tabTrain" onclick="switchTab('train')">训练</div>
     <div class="tab" id="tabBoard" onclick="switchTab('board')">错题板</div>
+    <div class="tab" id="tabHistory" onclick="switchTab('history')">记录</div>
   </div>
 </div>
 
@@ -469,7 +479,8 @@ function pushState(){
 function commitAnswer(result, elapsedMs){
   if (!card) return Promise.resolve(null);
   return API.post("/api/answer", {
-    word: card.w, senseId: card.s, result, elapsedMs: elapsedMs ?? null,
+    word: card.w, senseId: card.s, sentence: row ? row.t : null,
+    result, elapsedMs: elapsedMs ?? null,
   });
 }
 function commitMastered(id){
@@ -478,19 +489,32 @@ function commitMastered(id){
   return API.post("/api/mastered", {word: c.w, senseId: c.s, on: true});
 }
 
-/** 这句有问题：标一下（备注可空），标完就不再出这句。
- *  事后跑 scripts/triage_flags.py 拿清单统一改。 */
+/* 这句有问题：填备注 → 点「提交」。**下一题不会自动提交**，
+ * 没提交就点下一题等于放弃这条备注（换题后这一行会重画）。
+ * 事后跑 scripts/triage_flags.py 拿清单统一改。 */
 function flagSentence(){
   if (!card || !row) return;
+  const btn = document.getElementById("flagGo");
   const input = document.getElementById("flagNote");
   const note = input ? input.value.trim() : "";
+  if (btn){ btn.disabled = true; btn.textContent = "提交中"; }
   API.post("/api/flag", {word: card.w, senseId: card.s, sentence: row.t, note})
     .then(r => {
       const line = document.querySelector(".flag-line");
+      const hint = document.querySelector(".flag-hint");
+      if (hint) hint.remove();
       if (!line) return;
-      line.innerHTML = (r && r.ok)
-        ? `<span class="flagged-ok">✓ 已标记，不再出这句${note ? `（${esc(note)}）` : ""}</span>`
-        : `<span class="flag-bad">标记失败：${esc((r && r.error) || "未知原因")}</span>`;
+      if (r && r.ok){
+        line.innerHTML = `<span class="flagged-ok">✓ 已提交，不再出这句` +
+          (note ? `（${esc(note)}）` : "") + `</span>`;
+      } else {
+        line.innerHTML = `<span class="flag-bad">提交失败：${esc((r && r.error) || "未知原因")}</span>`;
+        if (btn){ btn.disabled = false; btn.textContent = "重试"; }
+      }
+    }).catch(() => {
+      const line = document.querySelector(".flag-line");
+      if (line) line.innerHTML = `<span class="flag-bad">提交失败：连不上服务</span>`;
+      if (btn){ btn.disabled = false; btn.textContent = "重试"; }
     });
 }
 
@@ -810,8 +834,10 @@ function showExplain(status, node, key){
     `<span class="correct-ans">正确答案 <b>${esc(correct.zh)}</b></span></div>` +
     `<div class="trans"><b>译文：</b>${esc(row.tr)}</div>` +
     `<div class="note">${esc(row.n)}</div>` + masterBtn +
-    `<div class="note flag-line"><a onclick="flagSentence()">这句有问题</a>` +
-    `<input class="flag-input" id="flagNote" placeholder="备注（可空）" maxlength="60"></div>`;
+    `<div class="note flag-line"><span>这句有问题？</span>` +
+    `<input class="flag-input" id="flagNote" placeholder="备注（可空）" maxlength="60">` +
+    `<button class="btn tiny" id="flagGo" onclick="flagSentence()">提交</button></div>` +
+    `<div class="note flag-hint">标了之后这句不会再出现；下一题不会自动提交。</div>`;
 
   const act = document.getElementById("actions");
   act.style.display = "flex";
@@ -845,19 +871,47 @@ function showExplain(status, node, key){
 function switchTab(name){
   const vTrain = document.getElementById("viewTrain");
   const vBoard = document.getElementById("viewBoard");
+  const vHistory = document.getElementById("viewHistory");
   const vSum = document.getElementById("viewSummary");
-  const tabTrain = document.getElementById("tabTrain");
-  const tabBoard = document.getElementById("tabBoard");
-  if (name === "board"){
-    vTrain.style.display = "none"; vSum.style.display = "none";
-    vBoard.style.display = "block";
-    tabTrain.classList.remove("active"); tabBoard.classList.add("active");
-    renderBoard();
-  } else {
-    vBoard.style.display = "none"; vSum.style.display = "none";
-    vTrain.style.display = "block";
-    tabTrain.classList.add("active"); tabBoard.classList.remove("active");
+  const tabs = {train:"tabTrain", board:"tabBoard", history:"tabHistory"};
+  const views = {train:vTrain, board:vBoard, history:vHistory};
+  for (const k in views){
+    const on = (k === name);
+    views[k].style.display = on ? "block" : "none";
+    document.getElementById(tabs[k]).classList.toggle("active", on);
   }
+  vSum.style.display = "none";
+  if (name === "board") renderBoard();
+  if (name === "history") renderHistory();
+}
+
+/** 学过的题。数据在服务端 review_log（作答流水），本地不存副本。 */
+function renderHistory(){
+  const list = document.getElementById("historyList");
+  const cnt = document.getElementById("historyCount");
+  list.innerHTML = `<div class="board-empty">正在读取…</div>`;
+  API.get("/api/history?n=80").then(r => {
+    const h = (r && r.history) || [];
+    cnt.textContent = h.length ? `最近 ${h.length} 条` : "";
+    if (!h.length){
+      list.innerHTML = `<div class="board-empty">还没有作答记录。</div>`;
+      return;
+    }
+    const mark = {CORRECT:"✓ 对", WRONG:"✕ 错", PENDING:"· 不会"};
+    const cls  = {CORRECT:"cold", WRONG:"hot", PENDING:""};
+    list.innerHTML = h.map(x => {
+      const d = new Date(x.ts * 1000);
+      const when = `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
+      return `<div class="worst-item">
+        <span class="badge ${cls[x.result]}">${mark[x.result] || x.result}</span>
+        <div><div class="word">${esc(x.word)} <span class="sub">${esc(x.zh)}</span></div>
+        <div class="sub">${esc(x.sentence)}</div></div>
+        <span class="go">${when}</span>
+      </div>`;
+    }).join("");
+  }).catch(() => {
+    list.innerHTML = `<div class="board-empty">读取失败（没连上服务？）。</div>`;
+  });
 }
 
 function renderBoard(){

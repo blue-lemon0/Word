@@ -26,6 +26,7 @@ export function openDb(userPath = USER_DB) {
   fs.mkdirSync(path.dirname(userPath), { recursive: true });
   const db = new DatabaseSync(userPath);
   db.exec(fs.readFileSync(SCHEMA_SQL, 'utf8'));
+  migrate(db);
   const cur = getMeta(db, 'schema_version');
   if (cur == null) setMeta(db, 'schema_version', SCHEMA_VERSION);
   else if (cur !== SCHEMA_VERSION) {
@@ -34,6 +35,19 @@ export function openDb(userPath = USER_DB) {
       `个人工具不做降级迁移：备份 data/user.db 后删掉重建。`);
   }
   return db;
+}
+
+/**
+ * 加列。SQLite 的 CREATE TABLE IF NOT EXISTS 不会给已存在的表补字段，
+ * 所以 schema.sql 里新增的列要在这里显式补上。
+ * 个人工具，只加不改：历史数据一律保留。
+ */
+function migrate(db) {
+  const have = new Set(
+    db.prepare('PRAGMA table_info(review_log)').all().map((c) => c.name));
+  if (!have.has('sentence')) {
+    db.exec('ALTER TABLE review_log ADD COLUMN sentence TEXT');
+  }
 }
 
 export function getMeta(db, key) {
@@ -259,12 +273,12 @@ export function recordAnswer(db, params, bundle, a) {
   try {
     const r = db.prepare(
       `INSERT OR IGNORE INTO review_log
-         (session_id, idx, attempt_id, word, sense_id, result, grade, elapsed_ms,
-          is_due, stability_after, ts)
+         (session_id, idx, attempt_id, word, sense_id, sentence, result, grade,
+          elapsed_ms, is_due, stability_after, ts)
        VALUES ('ui',
                (SELECT COALESCE(MAX(idx), -1) + 1 FROM review_log WHERE session_id = 'ui'),
-               ?, ?, ?, ?, ?, ?, 1, ?, ?)`)
-      .run(attemptId, a.word, a.senseId, a.result, next.grade,
+               ?, ?, ?, ?, ?, ?, ?, 1, ?, ?)`)
+      .run(attemptId, a.word, a.senseId, a.sentence || null, a.result, next.grade,
         a.elapsedMs ?? null, next.stability, ts);
     if (r.changes === 1) {
       db.prepare(
@@ -388,6 +402,27 @@ export function queue(db, bundle, params, limit = 20) {
   const live = {};
   for (const x of picked) live[x.id] = x.idx;
   return { ids: picked.map((x) => x.id), live, dueTotal: out.length };
+}
+
+/**
+ * 学过的题：最近 n 条作答流水 + 对应释义。
+ * 「已经学过的题」原先在界面上完全看不到 —— 数据记着，没人显示。
+ */
+export function history(db, bundle, limit = 60) {
+  const rows = db.prepare(
+    `SELECT word, sense_id, sentence, result, grade, elapsed_ms, ts
+       FROM review_log ORDER BY ts DESC, rowid DESC LIMIT ?`).all(limit);
+  const zh = new Map();
+  for (const c of bundle.cards) zh.set(c.w + '#' + c.s, c.zh);
+  return rows.map((r) => ({
+    word: r.word,
+    senseId: r.sense_id,
+    zh: zh.get(r.word + '#' + r.sense_id) || '',
+    sentence: r.sentence || '',
+    result: r.result,
+    elapsedMs: r.elapsed_ms,
+    ts: r.ts,
+  }));
 }
 
 export function overview(db, params, nowSec = now()) {
