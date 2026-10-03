@@ -1,21 +1,21 @@
 senseId	text	clue	span_start	span_len	translation	note	source
-s1	She laid the keys on the kitchen counter.	keys	13	4	她把钥匙放在厨房台面上。	本义「放置」。宾语 keys 是随身小物，与 s3 的工程物料区分。	GENERATED
-s1	The nurse laid the blanket over the sleeping child.	blanket	19	7	护士把毯子盖在熟睡的孩子身上。	「盖上」是「放置」的引申；宾语是已制成物，不涉及 s4 的整体布置。	GENERATED
-s1	He laid his coat on the back of the chair.	coat	12	4	他把外套放在椅背上。	单纯的「放置」，无 lay out 的「摊开布置」意味，故属 s1 而非 s4。	GENERATED
-s1	Please lay the tools here before you start.	tools	15	5	开始之前请把工具放在这儿。	祈使句形式：此处 lay 是「把某物置于此处」的基本用法。	GENERATED
-s1	He laid the map on the desk and pointed at it.	map	12	3	他把地图摊在桌上，指着它讲。	原句用 laid his coat down，down 会被误读为躺下的习语；改为明确的「放置」。	GENERATED
-s2	The hen laid an egg in the straw.	egg	16	3	母鸡在稻草里下了一个蛋。	宾语 egg 决定是「产」而非「放置」——这是与 s1 最可靠的分界标志。	GENERATED
-s2	Every morning the sheep lay two lambs.	lambs	32	5	每天早上这些羊会生两只小羊。	「产仔」是动物专用义项，主语必须是动物。	GENERATED
-s2	The bird laid two eggs and sat on them.	eggs	18	4	那只鸟下了两个蛋，然后伏在蛋上。	原句主语是 She，人不会下蛋，脱离上下文会被误读；改为明确的鸟。	GENERATED
-s2	The young cat laid a litter last spring.	litter	21	6	那只小猫去年春天生了一窝崽。	lay a litter 是「产下一窝」的固定搭配。	GENERATED
-s2	The fish laid eggs in the shallow water.	eggs	14	4	鱼在浅水里产卵。	再补一个非家禽、非哺乳动物的场景，避免 s2 全是 hen/cat/sheep。	GENERATED
-s3	They laid pipes under the road last month.	pipes	10	5	他们上个月把管道铺在路底下。	lay pipes「铺设管道」，宾语是工程物料，句中有施工语境。	GENERATED
-s3	Workers laid cables along the new railway.	cables	13	6	工人们沿着新铁路铺设电缆。	与 s1 的偶然放置不同：cables 沿既定线路成系统敷设。	GENERATED
-s3	The city laid a new water line across the street.	line	26	4	市政府在街道下方铺设了一条新水管。	lay a line「铺设管线」，line 为名词宾语。	GENERATED
-s3	The crew laid a new road across the open land.	road	20	4	施工队在那片空地上铺了一条新路。	原句用 laid grass seed，那是「播种」，与「铺设」不是同一义项，已替换。	GENERATED
-s3	The men laid a floor of stone in the old hall.	floor	15	5	那些人在旧礼堂里铺了一层石地板。	lay a floor「铺设地板」，宾语是铺装面。	GENERATED
-s4	She laid the table with fresh bread before dinner.	table	13	5	她晚饭前在桌上摆好了新鲜面包。	lay the table 是「布置餐桌」的固定搭配，整体铺陈而非单件放置。	GENERATED
-s4	She laid out a beautiful garden behind her house.	garden	25	6	她在房子后面布置了一个美丽的花园。	lay out a garden 是「规划布局」，宾语是需要整体设计的空间。	GENERATED
-s4	The designer laid out the room around a big window.	room	26	4	设计师围绕一扇大窗布置了这个房间。	lay out a room：空间布局，与 s1 把东西搁在某处相反。	GENERATED
-s4	The city laid out a new park in the middle of town.	park	24	4	市政府在市中心规划了一个新公园。	原句用 laid out a plan（制定计划），那是 devise 而非「布置」；已改为空间布局。	GENERATED
-s4	They laid out the schedule for the whole week.	schedule	18	8	他们安排好了整整一周的日程。	lay out = arrange：这里是「安排」，是「布置」的另一常见义。原 soldiers/weapons 一句实为「摊开」，与 s1 难分，已删除。	GENERATED
+s1	She laid the keys on the kitchen counter.	keys	4	4	她把钥匙放在厨房台面上。	本义「放置」。宾语 keys 是随身小物，与 s3 的工程物料区分。	GENERATED
+s1	The nurse laid the blanket over the sleeping child.	blanket	10	4	护士把毯子盖在熟睡的孩子身上。	「盖上」是「放置」的引申；宾语是已制成物，不涉及 s4 的整体布置。	GENERATED
+s1	He laid his coat on the back of the chair.	coat	3	4	他把外套放在椅背上。	单纯的「放置」，无 lay out 的「摊开布置」意味，故属 s1 而非 s4。	GENERATED
+s1	Please lay the tools here before you start.	tools	7	3	开始之前请把工具放在这儿。	祈使句形式：此处 lay 是「把某物置于此处」的基本用法。	GENERATED
+s1	He laid the map on the desk and pointed at it.	map	3	4	他把地图摊在桌上，指着它讲。	原句用 laid his coat down，down 会被误读为躺下的习语；改为明确的「放置」。	GENERATED
+s2	The hen laid an egg in the straw.	egg	8	4	母鸡在稻草里下了一个蛋。	宾语 egg 决定是「产」而非「放置」——这是与 s1 最可靠的分界标志。	GENERATED
+s2	Every morning the sheep lay two lambs.	lambs	24	3	每天早上这些羊会生两只小羊。	「产仔」是动物专用义项，主语必须是动物。	GENERATED
+s2	The bird laid two eggs and sat on them.	eggs	9	4	那只鸟下了两个蛋，然后伏在蛋上。	原句主语是 She，人不会下蛋，脱离上下文会被误读；改为明确的鸟。	GENERATED
+s2	The young cat laid a litter last spring.	litter	14	4	那只小猫去年春天生了一窝崽。	lay a litter 是「产下一窝」的固定搭配。	GENERATED
+s2	The fish laid eggs in the shallow water.	eggs	9	4	鱼在浅水里产卵。	再补一个非家禽、非哺乳动物的场景，避免 s2 全是 hen/cat/sheep。	GENERATED
+s3	They laid pipes under the road last month.	pipes	5	4	他们上个月把管道铺在路底下。	lay pipes「铺设管道」，宾语是工程物料，句中有施工语境。	GENERATED
+s3	Workers laid cables along the new railway.	cables	8	4	工人们沿着新铁路铺设电缆。	与 s1 的偶然放置不同：cables 沿既定线路成系统敷设。	GENERATED
+s3	The city laid a new water line across the street.	line	9	4	市政府在街道下方铺设了一条新水管。	lay a line「铺设管线」，line 为名词宾语。	GENERATED
+s3	The crew laid a new road across the open land.	road	9	4	施工队在那片空地上铺了一条新路。	原句用 laid grass seed，那是「播种」，与「铺设」不是同一义项，已替换。	GENERATED
+s3	The men laid a floor of stone in the old hall.	floor	8	4	那些人在旧礼堂里铺了一层石地板。	lay a floor「铺设地板」，宾语是铺装面。	GENERATED
+s4	She laid the table with fresh bread before dinner.	table	4	4	她晚饭前在桌上摆好了新鲜面包。	lay the table 是「布置餐桌」的固定搭配，整体铺陈而非单件放置。	GENERATED
+s4	She laid out a beautiful garden behind her house.	garden	4	4	她在房子后面布置了一个美丽的花园。	lay out a garden 是「规划布局」，宾语是需要整体设计的空间。	GENERATED
+s4	The designer laid out the room around a big window.	room	13	4	设计师围绕一扇大窗布置了这个房间。	lay out a room：空间布局，与 s1 把东西搁在某处相反。	GENERATED
+s4	The city laid out a new park in the middle of town.	park	9	4	市政府在市中心规划了一个新公园。	原句用 laid out a plan（制定计划），那是 devise 而非「布置」；已改为空间布局。	GENERATED
+s4	They laid out the schedule for the whole week.	schedule	5	4	他们安排好了整整一周的日程。	lay out = arrange：这里是「安排」，是「布置」的另一常见义。原 soldiers/weapons 一句实为「摊开」，与 s1 难分，已删除。	GENERATED

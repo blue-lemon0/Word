@@ -388,8 +388,9 @@ def check(rows, senses, core_known=True):
             v.append(("G4", "clue '%s' 无法在句中定位" % clue))
 
         # SPAN 偏移准确性
-        # 注意约定：span 指向**线索词**（UI 用 <mark> 高亮它作为提示），
-        # 不是目标词。依据 archive/ 404 条人工句 404/404 span==clue。
+        # 约定：span 指向**目标词**——界面要猜义项的那个词。
+        # 高亮句中别处的短语等于没指示（目标词已经在顶部徽章上显示了）。
+        # clue 列仍要求可定位（G4），但它只是语境提示，不参与渲染。
         try:
             ss = int(r["span_start"]); sl = int(r["span_len"])
         except (ValueError, TypeError):
@@ -399,9 +400,13 @@ def check(rows, senses, core_known=True):
             if not (0 <= ss and ss + sl <= len(text)):
                 v.append(("SPAN", "span [%d,%d) 越界（句长 %d）"
                                   % (ss, ss + sl, len(text))))
-            elif clue and text[ss:ss + sl].lower() != clue.lower():
-                got = text[ss:ss + sl]
-                v.append(("SPAN", "span 指向 '%s'，应为 clue '%s'" % (got, clue)))
+            else:
+                exp_ss, exp_sl = find_target(text, word)
+                if exp_ss < 0:
+                    v.append(("SPAN", "句中找不到目标词 '%s' 的任何词形" % word))
+                elif (ss, sl) != (exp_ss, exp_sl):
+                    v.append(("SPAN", "span 指向 '%s'，应为目标词 '%s'"
+                              % (text[ss:ss + sl], text[exp_ss:exp_ss + exp_sl])))
 
         # G6 译文存在且非空、与句子长度相称
         if not tr or not tr.strip():
@@ -499,13 +504,37 @@ def audit(verbose=True, only=None):
             "by_code": dict(by_code), "per_word": per_word}
 
 
+def find_target(text, word):
+    """在句子里定位**目标词**（要考义项的那个词）的位置。
+
+    span 的约定：**指向目标词，不是句中别处的短语**。
+    高亮的必须是"你要猜意思的那个词" —— 界面顶部徽章之外的第二次指示，
+    指向别的词就等于没指示。clue 列保留为语境提示，但不再渲染。
+
+    定位靠 inflections()（规则 + 不规则 + 前缀派生 + 词干兜底），
+    优先精确匹配原形，再匹配变形，最后词干兜底。
+    """
+    t = text
+    forms = inflections(word)
+    # 原形优先，其次短的变形（避免 laid 抢在 laying 前面时长度乱序）
+    order = sorted(forms, key=lambda f: (len(f) != len(word), len(f)))
+    for f in order:
+        m = re.search(r"\b" + re.escape(f) + r"\b", t, re.I)
+        if m:
+            return m.start(), len(f)
+    # 词干兜底：句中用了前缀派生或同词族的其他词形
+    for m in re.finditer(r"[A-Za-z]+", t):
+        tok = m.group(0)
+        if stem_match(word, tok):
+            return m.start(), len(tok)
+    return None, 0
+
+
 def fix_spans(word=None, dry=False):
-    """按 clue 重新计算 span_start/span_len 并回写。
+    """按**目标词**重新计算 span_start/span_len 并回写。
 
     人工/模型给出的偏移容易算错（尤其中文 prompt 要求"逐字节偏移"，
     而实际 UI 用的是字符偏移）。这个函数把它变成机械操作。
-
-    约定：span 指向 clue 在 text 中的首次出现位置。
     """
     if not os.path.isdir(SDIR):
         print("assets/sentences/ 不存在")
@@ -514,7 +543,7 @@ def fix_spans(word=None, dry=False):
     if word:
         words = [word]
 
-    n_fixed = 0
+    n_fixed = n_missing = 0
     for w in words:
         p = os.path.join(SDIR, w + ".tsv")
         with io.open(p, encoding="utf-8") as fh:
@@ -524,16 +553,15 @@ def fix_spans(word=None, dry=False):
         fields = list(rows[0].keys())
         changed = False
         for r in rows:
-            clue = (r.get("clue") or "").strip()
             text = r.get("text") or ""
-            if not clue:
-                continue
-            idx = text.lower().find(clue.lower())
+            idx, ln = find_target(text, w)
             if idx < 0:
+                n_missing += 1
+                r["span_start"], r["span_len"] = "0", "0"
                 continue
-            if str(r.get("span_start")) != str(idx) or str(r.get("span_len")) != str(len(clue)):
+            if str(r.get("span_start")) != str(idx) or str(r.get("span_len")) != str(ln):
                 r["span_start"] = str(idx)
-                r["span_len"] = str(len(clue))
+                r["span_len"] = str(ln)
                 changed = True
                 n_fixed += 1
         if changed and not dry:
@@ -542,7 +570,9 @@ def fix_spans(word=None, dry=False):
                                     lineterminator="\n")
                 wr.writeheader()
                 wr.writerows(rows)
-    print("span 重算: %d 条%s" % (n_fixed, "（dry-run，未写入）" if dry else ""))
+    print("span 重算(目标词): %d 条%s" % (n_fixed, "（dry-run，未写入）" if dry else ""))
+    if n_missing:
+        print("  [FAIL] 句子里找不到目标词: %d 条 —— 这是 G1 该拦的" % n_missing)
     return n_fixed
 
 

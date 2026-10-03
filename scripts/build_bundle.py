@@ -9,7 +9,11 @@
   "cards": [
     {"id":"lay#s1","w":"lay","s":"s1","pos":"vt.","zh":"放置","en":"","trap":0,
      "tier":"T1",
-     "rows":[{"t":"...","c":"clue","ss":4,"sl":3,"tr":"...","n":"...","src":"GENERATED"}]}
+     "rows": [{
+                # k = 目标词在句中的实际词形（laid / cast / running…），
+                #    ss/sl 指向的就是它。下游不必再猜词形规则。
+                "t": "...", "k": "laid", "c": "clue", "ss": 4, "sl": 4,
+                "tr": "...", "n": "...", "src": "GENERATED"}]}
   ]
 }
 
@@ -86,7 +90,12 @@ for f in sorted(os.listdir(SE)):
             "trap": 1 if s.get("trap") == "1" else 0,
             "tier": s.get("tier", ""),
             "rows": [{
-                "t": r["text"], "c": r.get("clue", ""),
+                "t": r["text"],
+                # k = span 处那段文本，即目标词的实际词形。
+                # 不规则动词（lay->laid）猜不出来，直接把结果带进 bundle。
+                "k": r["text"][int(r.get("span_start") or 0):
+                               int(r.get("span_start") or 0) + int(r.get("span_len") or 0)],
+                "c": r.get("clue", ""),
                 "ss": int(r.get("span_start") or 0), "sl": int(r.get("span_len") or 0),
                 "tr": r.get("translation", ""), "n": r.get("note", ""),
                 "src": r.get("source", ""),

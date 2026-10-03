@@ -207,10 +207,16 @@ if os.path.exists(bp):
          all(c["tier"] == tsv_tier[c["w"]] for c in b["cards"])),
         ("每词义项数 <= keep[tier]",
          all(tsv_n[w] <= keep[tsv_tier[w]] for w in tsv_n)),
-        # span 约定：精确指向 clue（UI 用 <mark> 高亮作提示）
-        ("bundle span 全部指向 clue",
-         all(r["t"][r["ss"]:r["ss"] + r["sl"]] == r["c"]
+        # span 约定：精确指向**目标词**（界面要猜义项的那个词）。
+        # 高亮句中别处的提示词等于没指示 —— 目标词已在顶部徽章上，
+        # 句子里的第二次指示才告诉眼睛"看这个"。
+        # 判定不猜词形：bundle 的 k 字段就是 span 处那段文本（laid/cast/…），
+        # 由 sentence_audit.py --fix-spans 用 inflections() 机械算出。
+        ("bundle span 全部指向目标词",
+         all(r["k"] and r["k"] == r["t"][r["ss"]:r["ss"] + r["sl"]]
              for c in b["cards"] for r in c["rows"])),
+        ("bundle 每句都带目标词词形 k",
+         all(r.get("k") for c in b["cards"] for r in c["rows"])),
     ]
 else:
     d16.append(("bundle 存在", False))

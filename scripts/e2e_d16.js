@@ -149,16 +149,16 @@ new Promise(res => setTimeout(res, 300)).then(() => {
     const rr = safe(() => { startSolo(full.id); });
     ok("有句义项可正常开练", rr.err === null, rr.err);
     const qh = document.getElementById("sentence").innerHTML;
-    // <mark> 包住的正是 clue —— span 约定在 UI 层生效的端到端证据
+    // <mark> 包住的正是**目标词**（界面要猜义项的那个词）—— span 约定在 UI 层生效的端到端证据
     // 注意：本段代码在模板字符串里，\/ 会被吃掉，所以不用正则字面量
     const i0 = qh.indexOf("<mark>");
     const i1 = qh.indexOf(">", i0) + 1;
     const marked = i0 >= 0 ? qh.slice(i1, qh.indexOf("</mark>", i1)) : null;
     ok("渲染句子文本", qh.indexOf(row.v.t.slice(0, 12)) >= 0 || marked,
        qh.slice(0, 80));
-    ok("<mark> 高亮的正是 clue",
-       !!marked && full.rows.some(r => r.c === marked),
-       "marked=" + marked + " 期望 clue ∈ " + full.rows.map(r => r.c).join(","));
+    ok("<mark> 高亮的是目标词",
+       !!marked && full.w.toLowerCase().startsWith(marked.toLowerCase().slice(0, full.w.length)),
+       "marked=" + marked + " 期望以目标词 " + full.w + " 开头");
     // 选项先隐藏，点「我不会 / 显示释义」才 reveal（这是设计，不是 bug）
     const optBox = document.getElementById("options");
     ok("出题时选项默认隐藏（先自己回忆）",
@@ -179,13 +179,14 @@ new Promise(res => setTimeout(res, 300)).then(() => {
      CARDS.filter(hasRows).every(c => c.rows.length === 5),
      CARDS.filter(c => hasRows(c) && c.rows.length !== 5)
            .slice(0, 5).map(c => c.w + "#" + c.s + ":" + c.rows.length).join(", "));
-  // span 指向 clue（UI 用 <mark> 高亮作提示），实测 404/404 人工句均如此
+// span 指向目标词（UI 用 <mark> 高亮"要猜义项的那个词"）。
+  // 不猜词形规则：bundle 的 k 就是 span 处那段文本，由 --fix-spans 机械算出。
   const badSpan = [];
   CARDS.filter(hasRows).forEach(c => c.rows.forEach(r => {
     const seg = (r.t || "").slice(r.ss, r.ss + (r.sl || 0));
-    if (seg !== r.c) badSpan.push(c.w + "#" + c.s + ":'" + seg + "'!='" + r.c + "'");
+    if (!r.k || r.k !== seg) badSpan.push(c.w + "#" + c.s + ":span='" + seg + "' k='" + (r.k || "") + "'");
   }));
-  ok("所有 span 精确指向 clue", badSpan.length === 0, badSpan.slice(0, 5).join(" | "));
+  ok("所有 span 精确指向目标词", badSpan.length === 0, badSpan.slice(0, 5).join(" | "));
   ok("无未捕获错误", __ERRORS__.length === 0, __ERRORS__.join(" | "));
 
   __REPORT__ = R;

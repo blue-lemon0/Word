@@ -659,14 +659,20 @@ function esc(s){
 }
 
 function renderQuestion(){
-  // 高亮：优先用数据里的 span，缺失时回退到词匹配
+  // 高亮**要猜义项的那个词**（目标词），不是句中别处的提示词。
+  // 顶部徽章虽然也显示目标词，但句子里的第二次指示才告诉眼睛"看这里"。
+  // 定位优先用数据里的 span（由 sentence_audit.py --fix-spans 按目标词机械重算），
+  // 缺失或对不上时回退到词形正则。
   const t = row.t;
   let html;
-  if (typeof row.ss === "number" && row.ss >= 0 && row.ss + row.sl <= t.length){
+  // k 是目标词在句中的实际词形（laid / cast / running…），由 build_bundle 机械算出。
+  // 优先直接按 span 切；span 缺失或对不上时回退到以 k（或原形）做词形正则。
+  const spanOk = typeof row.ss === "number" && row.ss >= 0 && row.ss + row.sl <= t.length;
+  if (spanOk){
     html = esc(t.slice(0, row.ss)) + "<mark>" + esc(t.slice(row.ss, row.ss + row.sl)) + "</mark>" + esc(t.slice(row.ss + row.sl));
   } else {
-    const e = card.w.replace(/[-\\^$*+?.()|[\]{}]/g, "\\$&");
-    html = esc(t).replace(new RegExp(`\\b(${e}[a-z]*)\\b`, "ig"), m => `<mark>${m}</mark>`);
+    const stem = (row.k || card.w).replace(/[-\\^$*+?.()|[\]{}]/g, "\\$&");
+    html = esc(t).replace(new RegExp(`\\b(${stem}[a-z]*)\\b`, "ig"), m => `<mark>${m}</mark>`);
   }
   document.getElementById("sentence").innerHTML = html;
   document.getElementById("wordBadge").textContent = card.w;
