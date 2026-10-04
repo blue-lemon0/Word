@@ -1,0 +1,16 @@
+senseId	text	clue	span_start	span_len	translation	note	source
+s1	I bought the new edition of that English book.	of that English book	17	7	我买了那本英语书的新版。	同一本书的新版 = 版本。	GENERATED
+s1	This is the third edition of the same work.	of the same work	18	7	这是同一作品的第三个版本。	first/second/third edition = 版本。	GENERATED
+s1	The new edition has much more useful data.	new	8	7	新版多了很多有用的数据。	更新后的版本 = 版本。	GENERATED
+s1	She read the latest edition of the paper on the train.	of the paper	20	7	她在火车上读了这份论文的最新版本。	论文版本 = 版本。	GENERATED
+s2	We printed a cheap edition for the students.	printed	19	7	我们给学生印了一版便宜的。	一次印刷的版本 = 版。	GENERATED
+s2	The first edition of that book came out in 1990.	book	10	7	那本书的第一版出版于 1990 年。	出版的一次 = 版。	GENERATED
+s2	This edition is smaller but costs the same.	costs the same	5	7	这一版更小，但价钱一样。	同样是纸本上的版 = 版。	GENERATED
+s2	The paper came out in a revised edition last month.	paper	32	7	这篇论文上个月出了修订版。	修订后印的一版 = 版。	GENERATED
+s3	His answer was only an edition of what I said.	of what I said	23	7	他的回答不过是我所说的话的翻版。	edition of = 翻版（雷同的说法）。	GENERATED
+s3	The two paintings are an edition of the same design.	of the same design	25	7	这两幅画是同一设计的翻版。	同一设计的复制品 = 翻版。	GENERATED
+s3	His book seems an edition of his sister's.	of his sister's	18	7	他的书看起来是他姐姐那本的翻版。	edition of someone's = 翻版。	GENERATED
+s3	That new game is just an edition of an old one.	of an old one	25	7	那个新游戏不过是老游戏的翻版。	缺乏新意的复制 = 翻版。	GENERATED
+s1	This edition has notes on every page.	notes	5	7	这一版每页都有注释。	某个版本 = 版本。	GENERATED
+s2	Ten thousand copies of this edition were sold.	thousand	28	7	这一版卖出了一万册。	一次印量 = 版。	GENERATED
+s3	The final scene is an edition of the first one.	of the first one	22	7	最后一幕是第一幕的翻版。	edition of = 翻版。	GENERATED

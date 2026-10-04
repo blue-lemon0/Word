@@ -1,0 +1,16 @@
+senseId	text	clue	span_start	span_len	translation	note	source
+s1	The prisoner asked to see his family again.	his family	4	8	囚犯请求再见家人一面。	prisoner = 在押的囚犯。	GENERATED
+s1	Every prisoner gets one hot meal a day.	hot meal	6	8	每名囚犯每天有一顿热饭。	监狱里的在押人员 = 囚犯。	GENERATED
+s1	The young prisoner had been there for two years.	two years	10	8	这名年轻囚犯已被关了两年。	长期在押 = 囚犯。	GENERATED
+s1	They moved the prisoner to another city last week.	moved	15	8	他们上周把那名囚犯转到另一座城市。	被关押的人 = 囚犯。	GENERATED
+s2	The police caught the prisoner near the river.	police	22	8	警察在河边抓住了那个犯人。	被警方抓住的罪犯 = 犯人（泛指）。	GENERATED
+s2	He spoke about the prisoner who is still in prison.	spoke	19	8	他谈起了那个仍在狱中的犯人。	泛指的罪犯 = 犯人。	GENERATED
+s2	Nobody knows who killed that prisoner ten years ago.	Nobody	29	8	没人知道十年前是谁杀了那个犯人。	作为案件的被害者 = 犯人。	GENERATED
+s2	The film tells the story of one wrongly caught prisoner.	film	47	8	这部电影讲了一个被冤抓的犯人的故事。	被误抓的人 = 犯人。	GENERATED
+s3	The two sides swapped three prisoners after the deal.	swapped three	28	9	协议达成后双方交换了三名战俘。	swap prisoners + 战争 = 战俘。	GENERATED
+s3	They kept the prisoners in the old stone camp.	the old stone camp	14	9	他们把战俘关在旧石砌营地里。	战俘营 = 战俘。	GENERATED
+s3	Every soldier searched the prisoners for weapons.	soldier	27	9	每名士兵都搜查战俘身上有没有武器。	搜身对象 = 战俘。	GENERATED
+s3	The prisoners were sent home in a single ship.	sent	4	9	战俘们被一艘船送回了家。	按船送返 = 战俘交换。	GENERATED
+s1	A doctor came to see the sick prisoner.	the sick prisoner	30	8	有位医生来看那名生病的囚犯。	在押人员 = 囚犯。	GENERATED
+s2	That prisoner was released after five years.	was released	5	8	那个犯人在五年后被释放。	被判刑的人 = 犯人。	GENERATED
+s3	Both countries must bring all prisoners home.	bring all prisoners	30	9	两国都必须把所有战俘送回国。	bring prisoners home = 战俘遣返。	GENERATED

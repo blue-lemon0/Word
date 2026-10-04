@@ -1,0 +1,16 @@
+senseId	text	clue	span_start	span_len	translation	note	source
+s1	The meeting was dismissed after only ten minutes.	after only ten minutes	16	9	会议开了十分钟就被宣布散会了。	会议被结束 = 解散/散会。	GENERATED
+s1	At noon the judge dismissed the people in the room.	noon	18	9	中午法官让房里的人散去。	让人散去 = 解散。	GENERATED
+s1	The crowd was told to leave, and the group was dismissed.	crowd	47	9	人群被要求离开，那个团体被解散。	团体被解散 = 解散。	GENERATED
+s1	They dismissed the class early because of the snow.	class	5	9	因为下雪，他们提前下课了。	dismiss the class = 解散（散课）。	GENERATED
+s2	The school dismissed the boy for hitting a classmate.	for hitting	11	9	学校因那个男孩打了同学而把他开除。	dismiss sb for sth = 开除。	GENERATED
+s2	He was dismissed from his job for telling lies.	for telling lies	7	9	他因说谎被解雇。	dismiss from job = 开除（正式解雇）。	GENERATED
+s2	They dismissed two workers last Friday without any reason.	workers	5	9	上周五他们没有任何理由就开除了两名工人。	开��� = 开除。	GENERATED
+s2	She dismissed the young man with a short word.	young	4	9	她用简短的话把那个年轻人打发了。	dismiss a person（口语）= 打发/开除。	GENERATED
+s3	He dismissed the job and took a year off.	dismissed the job	3	9	他把工作辞了，休了一年假。	dismiss the job = 解职、不干。	GENERATED
+s3	The new manager dismissed his old title away.	new	16	9	新经理解除了他的旧职务。	解除职务 = 解职。	GENERATED
+s3	They dismissed him from his post last month.	from his post	5	9	他们上月解除了他的职务。	from one's post = 解职。	GENERATED
+s3	He was dismissed from office after the vote.	office	7	9	投票后他被解职了。	dismiss from office = 解职。	GENERATED
+s1	The teacher dismissed them early with a nod.	teacher	12	9	老师点头让他们提前下课。	dismiss them = 散会。	GENERATED
+s2	He dismissed the waiter and called the manager.	waiter	3	9	他把服务员打发走，叫来了经理。	dismiss a person = 打发、开除。	GENERATED
+s3	He was dismissed from the navy that year.	from the navy	7	9	那一年他被海军解职了。	dismiss from = 解职。	GENERATED

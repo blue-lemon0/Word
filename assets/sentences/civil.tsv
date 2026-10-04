@@ -1,0 +1,16 @@
+senseId	text	clue	span_start	span_len	translation	note	source
+s1	Every civil servant must obey the new rule.	must obey	6	5	每个公务员都必须遵守新规定。	civil servant = 公务员（市民的/文职的）。	GENERATED
+s1	He worked as a civil engineer for ten years.	worked	15	5	他做了十年土木工程师。	civil engineer = 土木工程师。	GENERATED
+s1	The city hired fifty civil workers last month.	city	21	5	上个月这个城市雇了五十名市政工人。	civil worker = 市政员工。	GENERATED
+s1	Civil rights are the first thing we must protect.	rights	0	5	公民权利是我们首先要保护的东西。	civil rights = 公民权利。	GENERATED
+s2	He was a civil man with a quiet voice.	a civil man	9	5	他是个彬彬有礼、声音温和的人。	be civil to sb = 有礼貌的。	GENERATED
+s2	It was civil of you to wait for me.	wait	7	5	你等我真是有礼貌。	It was civil of you = 有礼貌的。	GENERATED
+s2	She answered the rude boy in a civil way.	in a civil way	31	5	她以有礼貌的方式回答那个粗鲁的男孩。	in a civil way = 有礼貌地。	GENERATED
+s2	His civil voice made the teacher calm again.	voice	4	5	他礼貌的语气让老师重新平静下来。	a civil voice = 有礼貌的（指举止）。	GENERATED
+s3	The civil war left half the farms in ruins.	left half the farms	4	5	内战使一半农场变成废墟。	civil war = 内战（公民之间的战争）。	GENERATED
+s3	Their small civil war went on for three years.	went on for three years	12	5	他们那场内战持续了三年。	a civil war = 内战（内部冲突）。	GENERATED
+s3	He said the whole matter had become too civil to speak.	said	40	5	他说整件事已经太乱，无法再谈。	civil（乱、失控）= 内战式的。	GENERATED
+s3	Nobody wins in a long civil war.	Nobody	22	5	持久的内战里没人会赢。	in a long civil war = 内战。	GENERATED
+s1	The city employs two hundred civil servants.	city	29	5	这个市雇了两百名公务员。	civil servants = 公务员。	GENERATED
+s2	He was civil to everyone, even his enemy.	everyone	7	5	他对每个人都很有礼貌，连敌人也是。	be civil to = 有礼貌的。	GENERATED
+s3	Their civil war lasted longer than the war itself.	longer than the war itself	6	5	他们的内战持续得比那场战争还久。	a civil war = 内战。	GENERATED

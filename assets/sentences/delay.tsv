@@ -1,0 +1,16 @@
+senseId	text	clue	span_start	span_len	translation	note	source
+s1	The heavy snow delayed the train for three hours.	the train	15	7	大雪使火车晚点了三小时。	delay the train = 耽搁（使误点）。	GENERATED
+s1	Rain delayed their work for a whole week.	their work	5	7	雨耽搁了他们整整一周的工作。	delay work = 耽搁。	GENERATED
+s1	Sorry to delay you; the news is here now.	to delay you	9	5	抱歉耽搁你了，现在消息来了。	delay sb = 耽搁他人。	GENERATED
+s1	The old bridge delayed every car on that road.	every car	15	7	那座旧桥使那条路上每辆车都耽搁了。	delay = 耽搁（阻碍）。	GENERATED
+s2	The medicine brings relief after a short delay.	after a short delay	41	5	这药过一会儿就见效。	a delay before effect = 迟滞（生效慢）。	GENERATED
+s2	There is a short delay before the plane can leave.	short	17	5	飞机要等一会儿才能起飞。	a delay = 迟滞。	GENERATED
+s2	His voice has a strange delay, as if from a wall.	strange delay	24	5	他的声音有一种奇怪的迟滞，像从墙后传来。	a delay in sound = 迟滞。	GENERATED
+s2	After some delay they found the right door.	found	11	5	迟滞片刻后他们找到了那扇门。	after some delay = 迟滞。	GENERATED
+s3	Do not delay the letter; send it today.	the letter	7	5	别把这封信延迟了，今天就寄。	delay sth（推迟做）= 延迟。	GENERATED
+s3	She delayed the answer until the next week.	the answer	4	7	她把答复延迟到了下周。	delay the answer = 延迟（推迟时间）。	GENERATED
+s3	Bad weather delayed the building work again.	the building work	12	7	恶劣天气又一次延迟了建筑工程。	delay work = 延迟（工期）。	GENERATED
+s3	Rain may delay the train for a long time.	for a long time	9	5	下雨可能让火车长时间晚点。	delay = 延迟。	GENERATED
+s1	A broken gate delayed them for half an hour.	for half an hour	14	7	一个坏门栏让他们耽搁了半小时。	delay sb = 耽搁。	GENERATED
+s2	There was a two second delay before the sound.	two second	23	5	声音前有两秒的迟滞。	a delay = 迟滞。	GENERATED
+s3	Do not delay; the shop closes at six.	shop	7	5	别拖延，商店六点关门。	delay（做某事）= 延迟。	GENERATED

@@ -1,0 +1,16 @@
+senseId	text	clue	span_start	span_len	translation	note	source
+s1	The night was terrible and nobody slept.	nobody slept	14	8	那夜糟透了，谁都没睡着。	糟糕透顶 = 极坏的。	GENERATED
+s1	The food in that shop was simply terrible.	simply terrible	33	8	那家店的食物简直糟透了。	terrible food = 极坏的。	GENERATED
+s1	His handwriting is terrible; nobody can read it.	nobody can read it	19	8	他的字糟透了，没人看得懂。	质量差 = 极坏的。	GENERATED
+s1	The weather was terrible, so we stayed at home.	weather	16	8	天气很糟，我们就待在家里。	天气恶劣 = 极坏的。	GENERATED
+s2	She looked terrible after the long flight.	looked	11	8	长途飞行后她看起来糟透了。	外表糟 = 极坏的。	GENERATED
+s2	His shoes were wet and his coat was terrible.	shoes	36	8	他的鞋湿了，外套糟透了。	东西的状态差 = 极坏的。	GENERATED
+s2	The road was terrible after the heavy rain.	after the heavy rain	13	8	大雨之后路很糟。	路况差 = 极坏的。	GENERATED
+s2	Her voice sounded terrible on the small speaker.	voice	18	8	在小喇叭上她的声音听着很糟。	效果差 = 极坏的。	GENERATED
+s3	A terrible noise came from the empty house.	noise	2	8	空房子里传来一声可怕的巨响。	令人恐惧的声响 = 令人恐惧的。	GENERATED
+s3	He heard a terrible cry in the middle of the night.	heard	11	8	半夜他听到一声凄厉的喊叫。	terrible cry = 令人恐惧的（惨叫）。	GENERATED
+s3	A terrible smell filled the whole room.	filled the whole room	2	8	一股可怕的气味充满了整个房间。	可怕的气味 = 令人恐惧的。	GENERATED
+s3	The dog gave a terrible howl and ran away.	dog	15	8	那只狗发出可怕的嚎叫跑了。	terrible howl = 令人恐惧的。	GENERATED
+s1	The service in that hotel was terrible.	service	30	8	那家酒店的服务糟透了。	quality bad = 极坏的。	GENERATED
+s2	He looked terrible in that thin coat.	looked	10	8	他穿那件薄外套看起来糟透了。	appearance bad = 极坏的。	GENERATED
+s3	Then came a terrible crash from the dark street.	from the dark street	12	8	接着暗巷里传来一声可怕的撞击。	terrible crash = 令人恐惧的。	GENERATED
