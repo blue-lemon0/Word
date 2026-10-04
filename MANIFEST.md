@@ -103,19 +103,25 @@ e2e 需要 jsdom：
 
 ## 已知缺口
 
-1. **53 条例句的 note 释义与词库对不上**（`sentence_audit.py` 的 GLOSS 规则）。
-   其中 **36 句在教错的义项**：`terrible`（3 义项整体错位）、
-   `civil`（s3 写的"内战"根本不是 ECDICT 的义项）、`injury` s2、
-   `coast` s3、`grand` s1、`motor` s3。这些是内容 bug，不是检查 bug。
-   另 17 条是措辞差异（`解散/散会` vs `解散`），非错误。
+1. ~~53 条例句的 note 释义与词库对不上~~ **已修（2026-10）**。GLOSS 规则查出
+   36 句在教错的义项：`terrible`（3 义项整体错位，`可怕的` 那个义项原本
+   根本没有内容）、`civil`（s2 装的是 s3 的内容，s3 装的是**根本不在字典里的
+   「内战」**，s1 是「公民的/公务员的」而非「市民的」）、`injury` s2
+   （label 标成了 s1 的「伤害」）、`coast` s3、`grand` s1、`motor` s3。
+   全部重写内容并把 note 的释义字段统一成词库 `glossZh` 原文。
+   现在 930 句 PASS 930 / REJECT 0。
 2. **`data/spec.yaml` 尚未被 `sentence_audit.py` 加载**，目前靠
-   `scripts/make_spec.py` 同步。规格还是代码里的常量。
+   `scripts/make_spec.py` 从代码常量同步。规格还是代码里的常量，
+   改 spec.yaml 不会影响审核行为。
 3. `scripts/build_senses.py` / `select_tier_b.py` 的输入输出路径已随本次迁移
    更新，但**未在本次验证可重跑**（重跑会覆写已入库的 `kaoyan_dagang_core.tsv`）。
 4. `archive/tools/etl-2026-09/` 里 4 个脚本**永久不可运行**：输入是仓库外的临时
    CSV，或会就地改写不可再生的快照。保留仅为溯源。
 5. `docs/decisions/` 与根目录两份 `*.md`（`单词记忆逻辑-v2.4.md`、`学习逻辑记录.md`）
    存在近重复，尚未合并。
+6. `civil` 的「市民的 / 公民的」两个义项在中文里近乎同义，实际难以判别。
+   内容已改正确，但这个词本身判别价值低，已加入 `pick_words.py` 的
+   `UNSEPARABLE` 表以免再生成。
 
 ## 决策记录
 

@@ -1,16 +1,16 @@
 senseId	text	clue	span_start	span_len	translation	note	source
 s1	His mother accused him of being late again.	of being late	11	7	他妈妈指责他又迟到了。	accuse sb of sth（为小���）= 指责。	GENERATED
-s1	She accused me of telling lies to her.	of telling lies	4	7	她指责我对她说谎。	accuse sb of + 行为 = 指责（非正式指控）。	GENERATED
-s1	They accused him of forgetting the money.	forgetting	5	7	他们指责他忘了那笔钱。	accuse of + 名词/动名词 = 指责。	GENERATED
-s1	My friend accused me of caring too much about money.	of caring	10	7	朋友指责我太在意钱。	accuse sb of + 在意什么 = 指责（非正式）。	GENERATED
-s1	The whole class accused him of copying her paper.	of copying her paper	16	7	全班都指责他抄了她的卷子。	accuse sb of + 具体行为 = 指责。	GENERATED
-s2	The young man accused his boss of stealing money.	young	14	7	那名年轻人控告老板偷钱。	向司法指控 = 控告。	GENERATED
-s2	Two workers accused the company of lying to them.	workers	12	7	两名工人控告公司欺骗他们。	正式提出指控 = 控告。	GENERATED
-s2	He was accused of murder but never went to prison.	of murder	7	7	他被控谋杀，却从未入狱。	被控告 = 控告。	GENERATED
-s2	The judge asked why no one accused the driver.	accused the driver	27	7	法官问为什么没人控告那名司机。	控告 = 向法院提出。	GENERATED
-s3	He accused the rain for the broken window.	the rain	3	7	他把窗户碎了怪罪于下雨。	把责任推给外部因素 = 归咎于。	GENERATED
-s3	Do not accuse your teacher of making it hard.	teacher	7	6	不要把难归咎于你的老师。	accuse X of/for + 人/事 = 归咎于。	GENERATED
+s1	She accused me of telling lies to her.	of telling lies	4	7	她指责我对她说谎。	accuse sb of + 行为 = 指责	GENERATED
+s1	They accused him of forgetting the money.	forgetting	5	7	他们指责他忘了那笔钱。	accuse of + 名词/动名词 = 指责	GENERATED
+s1	My friend accused me of caring too much about money.	of caring	10	7	朋友指责我太在意钱。	accuse sb of + 在意什么 = 指责	GENERATED
+s1	The whole class accused him of copying her paper.	of copying her paper	16	7	全班都指责他抄了她的卷子。	accuse sb of + 具体行为 = 指责	GENERATED
+s2	The young man accused his boss of stealing money.	young	14	7	那名年轻人控告老板偷钱。	向司法指控 = 控告	GENERATED
+s2	Two workers accused the company of lying to them.	workers	12	7	两名工人控告公司欺骗他们。	正式提出指控 = 控告	GENERATED
+s2	He was accused of murder but never went to prison.	of murder	7	7	他被控谋杀，却从未入狱。	被控告 = 控告	GENERATED
+s2	The judge asked why no one accused the driver.	accused the driver	27	7	法官问为什么没人控告那名司机。	控告 = 控告	GENERATED
+s3	He accused the rain for the broken window.	the rain	3	7	他把窗户碎了怪罪于下雨。	把责任推给外部因素 = 归咎于	GENERATED
+s3	Do not accuse your teacher of making it hard.	teacher	7	6	不要把难归咎于你的老师。	accuse X of/for + 人/事 = 归咎于	GENERATED
 s3	Drivers often accuse the road, not themselves.	not themselves	14	6	司机们常常怪路，而不怪自己。	归咎于 ≠ 指责他人，是推卸。	GENERATED
-s3	It is easy to accuse the weather for everything.	the weather	14	6	凡事都怪天气是很容易的。	accuse the weather = 归咎于天气。	GENERATED
-s2	The company was accused of wasting our money.	of wasting	16	7	公司被控浪费了我们的钱。	被正式控告 = 控告。	GENERATED
-s3	They blamed him, but he accused the old map.	the old map	24	7	他们怪他，他却归咎于那张旧地图。	归咎于外部东西 = 归咎于。	GENERATED
+s3	It is easy to accuse the weather for everything.	the weather	14	6	凡事都怪天气是很容易的。	accuse the weather = 归咎于	GENERATED
+s2	The company was accused of wasting our money.	of wasting	16	7	公司被控浪费了我们的钱。	被正式控告 = 控告	GENERATED
+s3	They blamed him, but he accused the old map.	the old map	24	7	他们怪他，他却归咎于那张旧地图。	归咎于外部东西 = 归咎于	GENERATED

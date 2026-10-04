@@ -1,6 +1,6 @@
 senseId	text	clue	span_start	span_len	translation	note	source
 s1	The army accepted its defeat and left the field.	accepted its defeat	22	6	军队承认败北，撤离了战场。	败北是战败这个状态，不是一次具体战役。	GENERATED
-s1	Their defeat made the whole country change.	Their defeat	6	6	他们的败北让整个国家发生改变。	the defeat = 败北这件事。	GENERATED
+s1	Their defeat made the whole country change.	Their defeat	6	6	他们的败北让整个国家发生改变。	the defeat = 败北	GENERATED
 s1	The old leader never spoke of his defeat.	of his defeat	34	6	这位老领导人从不提自己的败北。	他的败北 —— 名词用法。	GENERATED
 s1	Such a defeat would end the war at once.	Such a defeat	7	6	这样的败北会立刻结束战争。	such a defeat 指战败的结果。	GENERATED
 s1	The news of the defeat reached the capital that night.	of the defeat	16	6	败北的消息当晚传到首都。	the news of the defeat。	GENERATED
@@ -9,13 +9,13 @@ s2	Her last book was a defeat that nobody read.	a defeat that	20	6	她最后一�
 s2	The long trip was a defeat for all of us.	a defeat for	20	6	那次长途旅行对我们所有人都是失败。	非战事的失败。	GENERATED
 s2	She called the show a complete defeat from the start.	a complete defeat	31	6	她说这个剧从一开始就彻底失败。	剧本身失败。	GENERATED
 s2	The whole evening was a total defeat.	a total defeat	30	6	整个晚上彻底失败。	社交场合的失败，不是战败。	GENERATED
-s3	Our army will defeat the enemy in three days.	defeat the enemy	14	6	我军将在三天内击败敌军。	defeat + 宾语 = 击败，宾语是被战胜的一方。	GENERATED
-s3	They voted to defeat the old plan at once.	defeat the old plan	14	6	他们投票立刻否决那个旧方案。	击败一个方案 = 让它不通过。	GENERATED
+s3	Our army will defeat the enemy in three days.	defeat the enemy	14	6	我军将在三天内击败敌军。	defeat + 宾语 = 击败	GENERATED
+s3	They voted to defeat the old plan at once.	defeat the old plan	14	6	他们投票立刻否决那个旧方案。	击败一个方案 = 击败	GENERATED
 s3	No one can defeat him in a fair fight.	defeat him	11	6	在公平战斗中没人能击败他。	在战斗语境里 defeat 某人。	GENERATED
 s3	She worked hard to defeat her fear of the dark.	defeat her fear	19	6	她努力工作以战胜对黑暗的恐惧。	战胜一种情绪也用 defeat。	GENERATED
 s3	The new team defeated them by twenty points.	defeated them	13	8	新队以二十分击败了他们。	比分语境，defeat 是击败。	GENERATED
-s4	The rain defeated our plan to go out.	defeated our plan	9	8	这场雨让我们的外出计划落了空。	使计划落空 = 让期待泡汤，不是击败敌人。	GENERATED
+s4	The rain defeated our plan to go out.	defeated our plan	9	8	这场雨让我们的外出计划落了空。	使计划落空 = 使落空	GENERATED
 s4	A late train defeated all our careful plans.	defeated all our	13	8	一列晚点的火车让我们周密的计划全落空。	客观因素使努力白费。	GENERATED
 s4	His busy week defeated every chance to rest.	defeated every chance	14	8	他忙的一周让每个休息的机会都没了。	使机会落空。	GENERATED
 s4	The bad road defeated our hope of arriving early.	defeated our hope	13	8	这条烂路让我们早到的希望落空。	hope 落空这个义项最典型。	GENERATED
-s4	Thick clouds defeated the sun all week.	defeated the sun	13	8	厚云整周遮住了太阳。	使某物无法发挥作用 = 使落空。	GENERATED
+s4	Thick clouds defeated the sun all week.	defeated the sun	13	8	厚云整周遮住了太阳。	使某物无法发挥作用 = 使落空	GENERATED

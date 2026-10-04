@@ -2,20 +2,20 @@ senseId	text	clue	span_start	span_len	translation	note	source
 s1	The king spoke to his queen before the war.	king	22	5	战前国王与王后交谈。	queen 前面是 his king —— 国王的妻子，不是女王。	GENERATED
 s1	She met the young queen at the palace gate.	at the palace	18	5	她在宫门见到了年轻的王后。	王宫里国王的妻子，与 s2 女王的统治职能区分。	GENERATED
 s1	Every queen must stand beside the king.	beside the king	6	5	每位王后都必须站在国王身边。	beside the king 只可能是妻子，不是女王。	GENERATED
-s1	The old king loved his queen very much.	his queen	23	5	老国王非常爱他的王后。	his queen = 王后。	GENERATED
+s1	The old king loved his queen very much.	his queen	23	5	老国王非常爱他的王后。	his queen = 王后	GENERATED
 s1	Her mother became the king's happy queen.	the king's happy	35	5	她母亲成了国王快乐的王后。	王后是「国王的妻子」这一身份。	GENERATED
 s2	The young queen ruled her country for forty years.	ruled her country	10	5	这位年轻女王统治她的国家四十年。	ruled a country 是君主，s1 王后不统治。	GENERATED
 s2	The whole country came to see the new queen.	new queen	38	5	全国人民都来看新女王。	一国之君，与「国王的妻子」不同。	GENERATED
 s2	People stood up when the queen walked into the room.	queen walked	25	5	女王走进房间时人们都站了起来。	对君主行礼。	GENERATED
 s2	The queen of this land is the oldest woman alive.	of this land	4	5	这片土地的女王是当地最年长的女性。	of a land 表明是君主。	GENERATED
 s2	Even in war time the queen kept her calm.	kept her calm	21	5	即使在战时，女王仍保持镇定。	女王是国家元首，s1 王后没有这个职能。	GENERATED
-s3	The people chose to queen their old singer.	queen their	20	5	人民选择让那位老歌手当上女王。	queen somebody = 立为女王，被动含义。	GENERATED
-s3	They will queen a new leader next month.	queen a new leader	10	5	他们下个月将立一位新领袖为女王。	queen + 宾语 = 立为女王。	GENERATED
+s3	The people chose to queen their old singer.	queen their	20	5	人民选择让那位老歌手当上女王。	queen somebody = 立为女王	GENERATED
+s3	They will queen a new leader next month.	queen a new leader	10	5	他们下个月将立一位新领袖为女王。	queen + 宾语 = 立为女王	GENERATED
 s3	The army wanted to queen their young king.	queen their young	19	5	军队想立他们的年轻国王为女王。	queen 后面直接跟宾语是「立为」。	GENERATED
 s3	It is rare for a country to queen a common man.	queen a common man	28	5	一个国家立平民为女王是很少见的。	立为女王这个动作本身。	GENERATED
 s3	The old story tells of a fish that became queen.	became queen	42	5	这个老故事讲了一条被加冕成女王的鱼。	故事里被加冕；s4 是「以女王身份存在」。	GENERATED
 s4	A queen bee rules the whole hive for years.	queen bee	2	5	蜂后在整个蜂群里统治许多年。	固定搭配「蜂后」，是「做女王」这一义。	GENERATED
 s4	The cat sat there like a queen on her chair.	like a queen	25	5	那只猫像女王一样坐在椅子上。	像女王一样 —— s3 是「加冕成女王」。	GENERATED
-s4	She reigns as a queen in that small shop.	reigns as	16	5	她在那个小店里以女王姿态经营。	reign as = 做女王，不是被立为。	GENERATED
+s4	She reigns as a queen in that small shop.	reigns as	16	5	她在那个小店里以女王姿态经营。	reign as = 做女王	GENERATED
 s4	The widow would rather be a queen than a wife.	rather be	28	5	那寡妇宁愿做女王也不愿做妻子。	宁愿做女王：身份选择。	GENERATED
-s4	To queen the land is to rule it well.	To queen the land	3	5	做女王就是要好好统治这片土地。	to queen = 去做女王。	GENERATED
+s4	To queen the land is to rule it well.	To queen the land	3	5	做女王就是要好好统治这片土地。	to queen = 做女王	GENERATED

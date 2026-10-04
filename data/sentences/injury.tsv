@@ -4,8 +4,8 @@ s1	The car crash caused serious injury to two men.	serious injury	29	6	车祸导
 s1	Her injury kept her in bed for a month.	kept her in bed	4	6	她的伤让她卧床一个月。	受伤 = 伤害	GENERATED
 s1	That old leg injury still pains him in winter.	in winter	13	6	腿上的旧伤每到冬天还疼。	旧伤 = 伤害	GENERATED
 s1	The nurse saw his injury after the fall.	after the fall	18	6	护士在他摔倒后查看了伤处。	伤处 = 伤害	GENERATED
-s2	His words were a real injury to her pride.	to her pride	22	6	他的话深深伤害了她的自尊。	对情感的伤害 = 伤害	GENERATED
-s2	The long list was an injury to his open pride.	to his open pride	21	6	那串名单伤了他公开的自尊。	名誉上的伤害 = 伤害	GENERATED
-s2	That cruel review was a clear injury to the writer.	to the writer	30	6	那篇刻薄评论是对作者的伤害。	精神伤害 = 伤害	GENERATED
-s2	She felt the injury of his silence for weeks.	of his silence	13	6	他的沉默让她受伤好几周。	抽象的伤害 = 伤害	GENERATED
-s2	Every word was a small injury to her heart.	to her heart	23	6	每个字都是对她心的小伤。	反复的伤害 = 伤害	GENERATED
+s2	His last words were an injury she never forgot.	an injury	23	6	他最后的话是句让她永不忘怀的侮辱。	中伤的话 = 侮辱	GENERATED
+s2	The long list was a public injury to his whole family.	a public injury	27	6	那份名单是对他全家的公开侮辱。	当众羞辱 = 侮辱	GENERATED
+s2	That cruel review was a clear injury to the writer.	a clear injury	30	6	那篇刻薄的评论是对那位作者的公然侮辱。	恶意评论 = 侮辱	GENERATED
+s2	His silence for weeks was a quiet injury to her.	a quiet injury	34	6	他沉默数周是对她的一种无声侮辱。	冷处理 = 侮辱	GENERATED
+s2	Every public correction felt like an injury to him.	an injury to him	37	6	每一次当众纠正都让他感到被侮辱。	当众使人难堪 = 侮辱	GENERATED

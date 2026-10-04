@@ -1,6 +1,6 @@
 senseId	text	clue	span_start	span_len	translation	note	source
 s1	She is the elected representative of our whole street.	of our whole street	19	14	她是我们整条街选出的代表。	选出来的人 = 众议员	GENERATED
-s1	Every worker sent a representative to the meeting.	to the meeting	20	14	每位员工派了一名代表去开会。	派人参会 = 众议员/代表	GENERATED
+s1	Every worker sent a representative to the meeting.	to the meeting	20	14	每位员工派了一名代表去开会。	派人参会 = 众议员	GENERATED
 s1	The new representative spoke for an hour.	The new representative	8	14	新代表讲了一个小时。	民选代表 = 众议员	GENERATED
 s1	He met the representative before the vote.	before the vote	11	14	他在投票前见了那位代表。	投票前会见 = 众议员	GENERATED
 s2	That representative map shows every small road.	map shows	5	14	那幅有代表性的地图画出了每条小路。	有代表性的 = 描写的	GENERATED
