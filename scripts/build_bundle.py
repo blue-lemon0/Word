@@ -24,7 +24,7 @@ D16 之后的要点：
   2. 句子目录不存在时（LLM 通道禁用期）自动降级为纯义项包。
   3. 干扰项池从全部义项的 glossZh 构建，不依赖句子。
 """
-import csv, hashlib, json, os, sys, time, collections
+import csv, hashlib, io, json, os, sys, time, collections
 
 PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.stdout.reconfigure(encoding="utf-8")
@@ -48,7 +48,38 @@ if has_judge:
                 if r.get("passed") == "PASS":
                     pass_set[lemma].add((r["senseId"], r["text"]))
 
+def load_ipa():
+    """word\tbyPos\tipa\t... —— byPos 形如 "n=ɹɛd v=ɹid"（CMUdict 转 IPA）。
+
+    音标是**词性相关**的：read 名词 /ɹɛd/、动词 /ɹid/，所以按卡片自己的
+    pos 取，取不到就退回该词的主读音。查不到音标的词返回空串，界面上不显示。
+    """
+    path = os.path.join(PROJ, "assets", "wordlists", "ipa.tsv")
+    if not os.path.exists(path):
+        sys.stderr.write(
+            "缺少 assets/wordlists/ipa.tsv —— 先跑  python scripts/build_ipa.py\n")
+        return {}
+    out = {}
+    with io.open(path, encoding="utf-8") as fh:
+        for r in csv.DictReader(fh, delimiter="\t"):
+            by_pos = {}
+            for kv in (r.get("byPos") or "").split():
+                if "=" in kv:
+                    k, v = kv.split("=", 1)
+                    by_pos[k.strip(".")] = v
+            out[r["lemma"]] = {"byPos": by_pos, "ipa": r.get("ipa", "")}
+    return out
+
+
+def ipa_of(tbl, lemma, pos):
+    e = tbl.get(lemma)
+    if not e:
+        return ""
+    return e["byPos"].get((pos or "").strip(".").lower()) or e["ipa"] or ""
+
+
 cards = []
+ipa_tbl = load_ipa()
 gloss_pool = []
 gloss_seen = set()
 n_sent = 0
@@ -85,6 +116,7 @@ for f in sorted(os.listdir(SE)):
             "id": f"{lemma}#{sid}",
             "w": lemma, "s": sid,
             "pos": s.get("pos", ""),
+            "ipa": ipa_of(ipa_tbl, lemma, s.get("pos", "")),
             "zh": zh,
             "en": s.get("glossEn", ""),
             "trap": 1 if s.get("trap") == "1" else 0,
@@ -102,7 +134,6 @@ for f in sorted(os.listdir(SE)):
             } for r in rs],
         })
 
-# version 必须对内容敏感，不能只用日期。
 # 句子是逐词增量加的，一天里常常改好几次；日期版 version 会让 app/db.mjs 的
 # syncBundle 判定「bundle 没变」而跳过重建 —— 于是新句子永远进不了 App，
 # 而界面上看不出任何异常。症状：刚生成的句子在浏览器里不出现。

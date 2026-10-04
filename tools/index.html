@@ -69,6 +69,10 @@
     font-weight: 700; font-size: 22px; letter-spacing: .02em;
     color: var(--primary); display: inline-flex; align-items: center; gap: 6px;
   }
+  .word-badge.speakable { cursor: pointer; border-bottom: 2px solid var(--primary-soft); }
+  .word-badge.speakable:hover { border-bottom-color: var(--primary); }
+  .word-badge.speakable:active { opacity: .6; }
+  .tag-line .ipa { font-family: "Segoe UI", "Times New Roman", serif; letter-spacing: .3px; }
   .word-badge small {
     font-size: 12px; font-weight: 500; color: var(--ink-faint);
     background: var(--line); padding: 3px 8px; border-radius: 999px;
@@ -489,6 +493,50 @@ function commitMastered(id){
   return API.post("/api/mastered", {word: c.w, senseId: c.s, on: true});
 }
 
+/* =========================================================================
+   D18 · 朗读
+   ---------------------------------------------------------------------------
+   音标来自 CMUdict（免费离线，已烘进 bundle 的 card.ipa，按词性选读音）。
+   发音用浏览器内置的 speechSynthesis —— 零安装、零成本、不联网、不调服务。
+
+   代价要说清楚：**音色取决于这台机器**。
+     · Windows 桌面版只有系统自带的 Microsoft Zira，音质一般
+     · 手机 Chrome 走 Google TTS，好得多
+   所以这是「先跑通」的方案。真嫌难听再换本地 piper（同样免费离线，
+   但要 pip install piper-tts + 下 63MB 模型），只换这一段即可。
+   ========================================================================= */
+let VOICE = null;
+function pickVoice(){
+  if (!window.speechSynthesis) return null;
+  let vs = [];
+  try { vs = speechSynthesis.getVoices() || []; } catch(e){ return null; }
+  if (!vs.length) return null;
+  VOICE = vs.find(v => /^en[-_]US/i.test(v.lang) && !v.localService)
+       || vs.find(v => /^en[-_]US/i.test(v.lang))
+       || vs.find(v => /^en[-_]/i.test(v.lang))
+       || null;
+  return VOICE;
+}
+if (window.speechSynthesis){
+  pickVoice();
+  try { speechSynthesis.onvoiceschanged = pickVoice; } catch(e){ /* 老浏览器没这个事件 */ }
+}
+function canSpeak(){ return !!(window.speechSynthesis && window.SpeechSynthesisUtterance); }
+
+function speak(text, slow){
+  if (!canSpeak() || !text) return false;
+  try { speechSynthesis.cancel(); } catch(e){}
+  if (!VOICE) pickVoice();
+  const u = new SpeechSynthesisUtterance(String(text));
+  u.lang = "en-US";
+  u.rate = slow ? 0.75 : 1.0;          // 读句子慢一点听得清
+  if (VOICE) u.voice = VOICE;
+  try { speechSynthesis.speak(u); } catch(e){ return false; }
+  return true;
+}
+function speakWord(){ if (card) speak(card.w, false); }
+function speakSentence(){ if (row) speak(row.t, true); }
+
 /* 这句有问题：填备注 → 点「提交」。**下一题不会自动提交**，
  * 没提交就点下一题等于放弃这条备注（换题后这一行会重画）。
  * 事后跑 scripts/triage_flags.py 拿清单统一改。 */
@@ -619,7 +667,10 @@ function renderNoSentence(){
        <div class="nosent-sub">例句由句子生成流水线产出，需要启用 LLM 通道后批量生成。</div>
      </div>`;
   g("wordBadge").textContent = card.w;
+  g("wordBadge").className = canSpeak() ? "speakable" : "";
+  g("wordBadge").onclick = canSpeak() ? speakWord : null;
   g("tagLine").innerHTML = `<span>${esc(card.pos)}</span>` +
+    (card.ipa ? ` <span class="ipa">/${esc(card.ipa)}/</span>` : "") +
     (card.tier ? ` <span class="tier">${esc(card.tier)}</span>` : "") +
     (card.trap ? ' <span class="trap">TRAP · 熟词僻义</span>' : "");
   g("blankBox").style.display = "none";
@@ -752,9 +803,16 @@ function renderQuestion(){
     html = esc(t).replace(new RegExp(`\\b(${stem}[a-z]*)\\b`, "ig"), m => `<mark>${m}</mark>`);
   }
   document.getElementById("sentence").innerHTML = html;
-  document.getElementById("wordBadge").textContent = card.w;
+  const badge = document.getElementById("wordBadge");
+  badge.textContent = card.w;
+  badge.className = canSpeak() ? "speakable" : "";
+  badge.onclick = canSpeak() ? speakWord : null;
+  badge.title = canSpeak() ? "点一下朗读" : "";
   document.getElementById("tagLine").innerHTML =
-    `<span>${esc(card.pos)}</span>${card.trap ? ' <span class="trap">TRAP · 熟词僻义</span>' : ""}`;
+    `<span>${esc(card.pos)}</span>` +
+    (card.ipa ? ` <span class="ipa">/${esc(card.ipa)}/</span>` : "") +
+    (card.tier ? ` <span class="tier">${esc(card.tier)}</span>` : "") +
+    (card.trap ? ' <span class="trap">TRAP · 熟词僻义</span>' : "");
 
   document.getElementById("blankBox").style.display = "flex";
   document.getElementById("giveupStage1").style.display = "block";
