@@ -10,9 +10,10 @@ fin_path = os.path.join(PROJ, "build", "intermediate", "ecdict_senses_final.json
 if not (os.path.exists(sel_path) and os.path.exists(fin_path)):
     # 这两个是切分中间产物，已被 .gitignore 排除（D17）。新克隆的仓库要重跑一遍。
     sys.stderr.write(
-        "缺少 ECDICT 切分中间产物（不在版本库里，属派生产物）。请先跑：\n"
-        "  python scripts/build_senses.py     # raw -> final\n"
-        "  python scripts/select_tier_b.py    # final -> b\n")
+        "缺少 ECDICT 切分中间产物（不在版本库里，属派生产物）。\n"
+        "词库管线已于 2026-10 完成并归档到 archive/2026-10-retire/scripts/：\n"
+        "  build_senses.py -> select_tier_b.py -> emit_senses_b.py\n"
+        "如需重跑，先把它们移回 scripts/（会覆写已入库的 data/wordlist/，谨慎）。\n")
     sys.exit(2)
 sel = json.load(io.open(sel_path, encoding="utf-8"))
 fin = json.load(io.open(fin_path, encoding="utf-8"))
@@ -90,23 +91,28 @@ d16 = [
                                                      "2026-09-30-pre-ECDICT", "scripts"))),
 ]
 
-# 词库流水线分两类，分别断言 —— 2026-10 目录迁移后不再要求全在 scripts/：
+# 脚本分三类断言 —— 2026-10 断舍离后 scripts/ 只留使用期需要的：
 #
-#   活链路（source/ -> data/wordlist/senses/，唯一路径，必须在 scripts/）
-#   归档件（永久不可运行：输入是仓库外临时 CSV，或会就地改写不可再生快照；
-#           保留只为溯源，断言它们在 archive/tools/etl-2026-09/）
-PIPE_LIVE = ["build_senses.py", "select_tier_b.py", "emit_senses_b.py",
-             "build_bundle.py"]
-PIPE_ARCHIVED = ["parse_ecdict.py", "fix_pos.py", "diag_senses.py", "emit_senses.py"]
+#   活脚本（build_bundle，重建 bundle 的唯一入口，必须在 scripts/）
+#   不可运行 ETL（输入是仓库外临时 CSV，或会就地改写不可再生快照；
+#           保留只为溯源，在 archive/tools/etl-2026-09/）
+#   已完成管线（source/ -> data/wordlist/senses/ 已交付，重跑会覆写
+#           入库数据，归档在 archive/2026-10-retire/scripts/）
+PIPE_LIVE = ["build_bundle.py"]
+PIPE_ARCHIVED_ETL = ["parse_ecdict.py", "fix_pos.py", "diag_senses.py",
+                     "emit_senses.py"]
+PIPE_ARCHIVED_DONE = ["build_senses.py", "select_tier_b.py", "emit_senses_b.py",
+                      "build_ipa.py", "fix_gloss_2026-10.py"]
 for f in PIPE_LIVE:
-    d16.append(("活链路 %s 在 scripts/" % f,
+    d16.append(("活脚本 %s 在 scripts/" % f,
                 os.path.exists(os.path.join(PROJ, "scripts", f))))
-for f in PIPE_ARCHIVED:
+for f in PIPE_ARCHIVED_ETL:
     d16.append(("不可运行 ETL %s 已归档" % f,
                 os.path.exists(os.path.join(PROJ, "archive", "tools",
                                             "etl-2026-09", f))))
-
-# 正式流水线必须齐备 —— 见上方 PIPE_LIVE / PIPE_ARCHIVED（已按目录迁移拆分）
+for f in PIPE_ARCHIVED_DONE:
+    d16.append(("已完成管线 %s 不在 scripts/" % f,
+                not os.path.exists(os.path.join(PROJ, "scripts", f))))
 
 # D17：最小循环的必备件。**前端只有一份** —— tools/index.html（原型），
 # app/ 只放服务端。曾经另写了一套 app/index.html + app/app.js，
@@ -144,8 +150,8 @@ d16 += [
         PROJ, "data", "profile", "srs_params.tsv"))),
     ("有 e2e_loop", os.path.exists(os.path.join(PROJ, "scripts", "e2e_loop.mjs"))),
     ("有 smoke_http", os.path.exists(os.path.join(PROJ, "scripts", "smoke_http.py"))),
-    # 选词范围表被正式流水线读取（parse_ecdict / build_senses / select_tier_b /
-    # diag_senses / emit_senses），不是 archive 专属的参考件。
+    # 选词范围表被活跃脚本读取（sentence_audit 的 CORE / pick_words），
+    # 不是 archive 专属的参考件。
     # 曾在"清理冗余"时把它当成 archive 的重复件删掉，流水线直接 FileNotFoundError。
     ("选词范围表在位", os.path.exists(os.path.join(
         PROJ, "data", "wordlist", "kaoyan_dagang_core.tsv"))),

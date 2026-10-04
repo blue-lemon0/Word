@@ -114,6 +114,10 @@ python scripts/emit_senses_b.py    # -> data/wordlist/senses/*.tsv（正式词�
 python scripts/build_bundle.py     # -> build/bundle/cards.json
 ```
 
+> 2026-10：词库管线已交付完毕并归档 —— ETL 四件在 `archive/tools/etl-2026-09/`，
+> `build_senses / select_tier_b / emit_senses_b / build_ipa` 在
+> `archive/2026-10-retire/scripts/`。以下为历史记录，重跑前先移回 `scripts/`。
+
 `fix_pos.py` 必须在 `build_senses.py` **之前**——否则缺 pos 的义项
 会一路传到 UI。
 

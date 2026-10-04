@@ -4,10 +4,11 @@
 # 「一个句子该不该被接受」是内容决策，不是程序逻辑。规格要调，不该改代码、
 # 跑回归、重发布，改这一个文件即可。
 #
-# 本文件由 scripts/make_spec.py 从代码常量生成，**不要手改** ——
-# 要调规格就改 sentence_audit.py 的常量，然后重跑 make_spec.py。
+# 加载方：scripts/sentence_audit.py（每次运行直接读这份文件）。
 #
-# 加载方：scripts/sentence_audit.py（当前仍从常量加载，见 MANIFEST「已知缺口」）
+# 2026-10 规格反转完成：此前真相源是 sentence_audit.py 的代码常量，本文件
+# 只是 make_spec.py 生成的镜像。现在反过来了 —— **手改这里立即生效**，
+# 不用碰代码。make_spec.py 已删除。
 
 # 句长区间，单位「词」，按句子数分档（第 1 批短句，第 3 批长句）
 sentence_length:

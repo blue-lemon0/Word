@@ -13,6 +13,8 @@ opencode（我）生成的句子写到 data/sentences/<word>.tsv，
 """
 import csv, io, json, os, re, sys, collections, hashlib
 
+import yaml
+
 sys.stdout.reconfigure(encoding="utf-8")
 PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SDIR = os.path.join(PROJ, "data", "sentences")
@@ -22,9 +24,14 @@ WL = os.path.join(PROJ, "data", "wordlist")
 HEADER = ["senseId", "text", "clue", "span_start", "span_len",
           "translation", "note", "source"]
 
-# 难度档句长（词数）
-LEN_RANGE = {1: (7, 12), 2: (12, 16), 3: (14, 20)}
-TARGET_SENTS = 5
+# 内容规格（句长/每义项句数/生僻词名单）从 data/spec.yaml 加载——
+# 「一个句子该不该被接受」是内容决策，真相源在数据层不在代码。
+# 2026-10 规格反转前这里是硬编码常量，由 make_spec.py 反向同步；
+# 现已反转：改规格只改 spec.yaml，立即生效，无需动代码。
+with io.open(os.path.join(PROJ, "data", "spec.yaml"), encoding="utf-8") as _fh:
+    _SPEC = yaml.safe_load(_fh)
+LEN_RANGE = {int(k): tuple(v) for k, v in _SPEC["sentence_length"].items()}
+TARGET_SENTS = int(_SPEC["sentences_per_sense"])
 
 CORE = set()
 _core_path = os.path.join(WL, "kaoyan_dagang_core.tsv")
@@ -252,58 +259,11 @@ def core_forms():
 
 CORE_FORMS = None
 
-# G3 的实际拦截名单：真正的超纲生词。
-# 刻意保持很短——宁可放过，也不误杀。
+# G3 的实际拦截名单：真正的超纲生词。真相源是 data/spec.yaml 的 too_hard，
+# 这里只加载不定义。刻意保持很短——宁可放过，也不误杀。
 # 加入标准：在 3000 考研词表之外，且不属于任何 8000+ 高频词，
 #         且对非母语读者会卡住。常见生活名词（soup/deer/children）不在此列。
-TOO_HARD = set("""
-abscissa accretion acumen adipose agglomerate amalgamation anathema antithesis
-apocryphal arcane archetype asymptotic atavistic augury auspicious avatar
-basilica biennial bifurcated cacophony candescent capstone catharsis cephalopod
-chicanery chromatic clarion coalesce cognate commensurate confluence congenial
-conjecture contortion convolute corollary corollary corroborate coterie crux
-culminate culpable cupidity debase decorum deleterious demur denouement deride
-desiccate diaphanous didactic diffident dilettante discursive dissonance
-dogmatic dormant dubious ebullient eclectic edifice effervescent egregious
-elicit eloquence elucidate emollient encapsulate enigma entropic ephemeral
-equivocal erudite esoteric espouse ethereal eulogy evanescent exacerbate
-exacting exonerate expatiate extant extant fallacy fastidious fatuous
-fecund felicity fissure flamboyant flotsam fortuitous fractious frenetic
-garrulous germane gregarious guileless hackneyed halcyon hapless harangue
-hermetic hiatus homogeneous hyperbole iconoclast idiosyncrasy imbroglio
-immure impecunious imperious impervious impetuous implausible imprimatur
-inchoate incisive incontrovertible indelible indolent ineffable ineluctable
-inexorable infallible ingenuous inimical iniquitous innocuous inordinate
-inscrutable insensible insidious insipid insolent interstice intransigent
-inured irascible irksome jaded jargon jocular juxtaposition ken
-labyrinth laconic lacuna lambaste laudable lax lethargic licentious limpid
-loquacious lucid lugubrious luminary magnanimous malevolent malinger
-maraschino mercurial meritorious minutiae mollify morose munificent
-nadir nebulous nefarious negligent nemesisnexus niche nomad nonchalant
-nostalgia obfuscate oblique obsequious obstinate onerous opulent ostensible
-palatable palpable panacea panache paragon paradox paramount parochial
-parsimony partisan patent pathetic pedantic penchant penitent pensive
-perfunctory peripatetic pernicious perspicacious pertinent pervade
-petulant phlegmatic pillory pithy placate placate platitude plurality polemic
-portent posit postulate pragmatic precipitate preeminent prelate presumption
-probity proclivity prodigal profligate profuse prosaic prosaic provenance
-punitive quagmire quandary quell querulous quiescent quintessential
-quotidian rancid rapacious rational recant recluse recondite redolent
-refractory refute regime remonstrate renunciate repartee reproof rescind
-resilient resonant respite restive reticent reverie rhetoric rigor
-salutary sanguine sardonic satiate saturnine savant scanty scrupulous
-scurrilous sedulous semblance sentimentality serendipity servile shibboleth
-simulacrum singular sojourn solace solicitous somnolent sonorous sordid
-specious spurious squander stalwart stanch staid stoic stolid stratagem
-strident stringent stymie sublime substantive succinct sumptuous superficial
-supplant surmise surreptitious susceptibility sycophant tacit taciturn
-taciturn temerity temperate tenacity tenable tirade torpor tortuous
-tractable traduce transient transgress traverse turbid ubiquitous umbrage
-unanimous unconscionable untenable urbane vacillate vagrant vapid variegated
-vaunt vehemence venerable veracity verbose verdant vestige vex vicarious
-vicissitude vindicate virulent visage vitiate vitriol volition voracious
-waggish waive wan warrant winsome wistful xenophobe yclept zealot zenith
-""".split())
+TOO_HARD = set(_SPEC["too_hard"])
 
 
 def in_core(tok):

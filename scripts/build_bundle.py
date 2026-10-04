@@ -57,7 +57,8 @@ def load_ipa():
     path = os.path.join(PROJ, "data", "wordlist", "ipa.tsv")
     if not os.path.exists(path):
         sys.stderr.write(
-            "缺少 data/wordlist/ipa.tsv —— 先跑  python scripts/build_ipa.py\n")
+            "缺少 data/wordlist/ipa.tsv —— 该文件平时已入库，真缺失说明 data/ 损坏；\n"
+            "重生成需把 archive/2026-10-retire/scripts/build_ipa.py 移回 scripts/（需 cmudict）\n")
         return {}
     out = {}
     with io.open(path, encoding="utf-8") as fh:
