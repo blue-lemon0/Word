@@ -1,0 +1,11 @@
+senseId	text	clue	span_start	span_len	translation	note	source
+s1	The whole army marched past the old gate.	marched past	10	4	整支军队从旧门前行进而过。	有组织的武装 = 军队	GENERATED
+s1	His father joined the army at twenty years old.	joined the army	22	4	他父亲二十岁参了军。	join the army = 军队	GENERATED
+s1	An army of workers cleared the road in a day.	An army of workers	3	4	一大群工人在一天内清清了路。	a large organized group = 军队（比喻）	GENERATED
+s1	The small army put down the long war.	small	10	4	那支小军队平息了长期的战事。	武装力量 = 军队	GENERATED
+s2	His brother is a captain in the army.	captain in the army	32	4	他哥哥是陆军上尉。	常备军 = 陆军	GENERATED
+s2	The army has five thousand men under arms.	under arms	4	4	陆军有五千名现役军人。	有现役人员的 = 陆军	GENERATED
+s2	He spent four years in the army.	four years in the army	27	4	他在陆军里待了四年。	in the army = 陆军	GENERATED
+s2	The whole army moved south that winter.	moved south	10	4	那年冬天整支陆军南下。	陆军整体行动 = 陆军	GENERATED
+s1	A whole army of men and machines crossed the bridge.	men and machines	8	4	一整支由人和机器组成的军队过了桥。	an army of = 军队（比喻）	GENERATED
+s2	His father left the army after ten years.	after ten years	20	4	他父亲服役十年后离开了陆军。	leave the army = 陆军	GENERATED

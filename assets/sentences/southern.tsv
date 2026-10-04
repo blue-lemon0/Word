@@ -1,0 +1,21 @@
+senseId	text	clue	span_start	span_len	translation	note	source
+s1	The southern part of the island is very wet.	The southern part	4	8	岛的南部很潮湿。	南方的 = 南方人	GENERATED
+s1	Many southern towns keep old stone walls.	southern towns	5	8	许多南方小镇保留着旧石墙。	位于南方的 = 南方人	GENERATED
+s1	A young southern man spoke to us slowly.	A young southern man	8	8	一个南方年轻人慢慢跟我们说话。	来自南方的人 = 南方人	GENERATED
+s1	They could tell each southern man by his long coat.	tell	21	8	他们能凭长外套认出每个南方人。	eastern/southern + man = 南方人	GENERATED
+s2	In old poems the south means a man's love.	a man's love	17	5	旧诗里「南风」指男子的爱。	南风（男风）= 男风	GENERATED
+s2	The south wind blew gently on his window.	The south wind	4	5	南风轻轻吹在他的窗上。	南风 = 男风	GENERATED
+s2	A man wrote that the south had won his heart.	man	21	5	一个男人写道南风赢了他的心。	the south = 男风	GENERATED
+s2	She called the warm south wind by that old name.	called	20	5	她用那个古老的名字称呼温暖的南风。	南风 = 男风	GENERATED
+s3	We took a southern road along the field.	a southern road	10	8	我们沿着田边一条朝南的路走。	朝南的 = 向南方	GENERATED
+s3	His face turned southern in the cold wind.	turned southern	16	8	冷风里他的脸转向南边。	转向南 = 向南方	GENERATED
+s3	The ship sailed in a southern direction all day.	in a southern direction	21	8	船向南航行了一整天。	in a southern direction = 向南方	GENERATED
+s3	We drove southern for two long miles.	drove	9	8	我们向南开了两英里。	drive southern = 向南方的	GENERATED
+s4	This wine comes from the south of France.	from the south	25	5	这种酒产自法国南部。	来自南方 = 来自南方	GENERATED
+s4	She is a singer from the south with a low voice.	singer	25	5	她是来自南方的歌手，嗓音低沉。	a singer from the south = 来自南方	GENERATED
+s4	Their new house is in the south of the city.	in the south of the city	26	5	他们的新家在城南部。	in the south = 来自南方	GENERATED
+s4	His accent says he is from the south.	accent	31	5	他的口音说明他来自南方。	be from the south = 来自南方	GENERATED
+s1	She married a young southern man last summer.	a young southern man	20	8	她去年夏天嫁给了一个南方年轻人。	southern + man = 南方人	GENERATED
+s2	The south wind sang against his window all night.	sang against his window	4	5	南风整夜对着他的窗子歌唱。	南风 = 男风	GENERATED
+s3	They drove southern for an hour before lunch.	before lunch	11	8	午饭前他们向南开了一个小时。	drive southern = 向南方	GENERATED
+s4	He plays music from the south on that old radio.	from the south	24	5	他用那台旧收音机放着来自南方的音乐。	music from the south = 来自南方	GENERATED

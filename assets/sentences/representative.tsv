@@ -1,0 +1,21 @@
+senseId	text	clue	span_start	span_len	translation	note	source
+s1	She is the elected representative of our whole street.	of our whole street	19	14	她是我们整条街选出的代表。	选出来的人 = 众议员	GENERATED
+s1	Every worker sent a representative to the meeting.	to the meeting	20	14	每位员工派了一名代表去开会。	派人参会 = 众议员/代表	GENERATED
+s1	The new representative spoke for an hour.	The new representative	8	14	新代表讲了一个小时。	民选代表 = 众议员	GENERATED
+s1	He met the representative before the vote.	before the vote	11	14	他在投票前见了那位代表。	投票前会见 = 众议员	GENERATED
+s2	That representative map shows every small road.	map shows	5	14	那幅有代表性的地图画出了每条小路。	有代表性的 = 描写的	GENERATED
+s2	She gave a representative example of good work.	of good work	11	14	她举了一个关于出色工作的代表性例子。	a representative example = 描写的	GENERATED
+s2	His face is not representative of the whole class.	of the whole class	16	14	他的脸不代表全班。	not representative of = 描写的	GENERATED
+s2	Choose a representative word from these thirty.	representative word	9	14	从这三十个里挑一个典型的词。	典型的 = 描写的	GENERATED
+s3	His performance was a poor representative of his skill.	of his skill	27	14	他的表现没有代表出他的水平。	表现代表水平 = 表现的	GENERATED
+s3	Choose a colour that is representative of the sea.	of the sea	24	14	选一个能代表大海的颜色。	代表性地体现 = 表现的	GENERATED
+s3	That number is not representative of our whole year.	of our whole year	19	14	那个数字不能代表我们全年。	有代表性的数据 = 表现的	GENERATED
+s3	The final result was representative of ten years of work.	of ten years	21	14	最终结果体现了十年的工作。	体现 = 表现的	GENERATED
+s4	She acts as our representative at every meeting.	as our representative	16	14	她在每次会议上都当我们的代表。	代人出席 = 代理的	GENERATED
+s4	He is the company representative in the north.	company representative	18	14	他是公司驻北方的代理。	公司代理 = 代理的	GENERATED
+s4	I will send my representative to talk to them.	my representative	15	14	我会派我的代表去和他们谈。	派代表去 = 代理的	GENERATED
+s4	Their representative agreed to all our terms.	agreed	6	14	他们的代表同意了我们的全部条件。	代表 = 代理的	GENERATED
+s1	The people sent one more representative to the seat.	to the seat	25	14	民众又向议会送了一名代表。	选区代表 = 众议员	GENERATED
+s2	Take one representative case and learn it well.	representative case	9	14	挑一个典型的案例学透。	a representative case = 描写的	GENERATED
+s3	Her answer was not representative of her real skill.	of her real skill	19	14	她的回答没有体现出她真正的水平。	not representative of = 表现的	GENERATED
+s4	Their representative signed the paper in ten minutes.	in ten minutes	6	14	他们的代理十分钟内签了文件。	代表签字 = 代理的	GENERATED

@@ -1,0 +1,21 @@
+senseId	text	clue	span_start	span_len	translation	note	source
+s1	The medicine brings quick relief from the pain.	from the pain	26	6	这药能很快缓解疼痛。	缓解痛苦 = 减轻	GENERATED
+s1	We felt great relief after the heavy rain stopped.	after the heavy rain	14	6	大雨停后我们感到轻松多了。	宽慰的感觉 = 减轻	GENERATED
+s1	The plan was made to bring relief to the poor.	bring relief to	27	6	这个计划是为缓解穷人的困境。	缓解困境 = 减轻	GENERATED
+s1	His answer brought no relief to her worry.	to her worry	22	6	他的回答并没有减轻她的忧虑。	减轻忧虑 = 减轻	GENERATED
+s2	The doctor ordered the relief of her pain at once.	of her pain	23	6	医生立刻下令解除她的疼痛。	解除痛苦 = 解除	GENERATED
+s2	A small pill gave relief from the sharp pain.	from the sharp pain	18	6	一小片药解除了剧痛。	止痛 = 解除	GENERATED
+s2	They prayed for the relief of the long drought.	of the long drought	20	6	他们祈求干旱的解除。	解除困境（书面语）= 解除	GENERATED
+s2	Nobody expected such a quick relief from worry.	from worry	29	6	没人料想到忧虑这么快就解除了。	解除 = 解除	GENERATED
+s3	The government sent money as relief to the flood.	as relief to the flood	29	6	政府送钱作为水灾的救济。	救灾物资 = 救济	GENERATED
+s3	A small relief team reached the poor village.	relief team	8	6	一支小型救援队赶到了贫困村庄。	救灾 = 救济	GENERATED
+s3	The church gave relief to many poor families.	to many poor families	16	6	教会救济了许多贫困家庭。	施舍帮助 = 救济	GENERATED
+s3	They worked there to bring relief to the hungry.	to bring relief	27	6	他们在那里为饥饿者带去救济。	救济 = 救济	GENERATED
+s4	Her soft words brought him real relief at last.	real relief	32	6	她温柔的话终于给了他真正的安慰。	精神安慰 = 安慰	GENERATED
+s4	He looked for relief in a long sleep.	in a long sleep	14	6	他靠一次长睡寻求安慰。	从痛苦中解脱 = 安慰	GENERATED
+s4	The joke gave us all a moment of relief.	a moment of relief	33	6	那个笑话让我们都轻松了一会儿。	宽慰 = 安慰	GENERATED
+s4	She found no relief in his cold answer.	in his cold answer	13	6	在他冷淡的回答里她没有得到一点安慰。	没有慰藉 = 安慰	GENERATED
+s1	A short sleep brought him some relief at last.	some relief	31	6	睡了一小觉后他终于轻松了些。	bring relief = 减轻	GENERATED
+s2	The doctor gave it to her for the relief of pain.	for the relief of pain	34	6	医生给她用这个是为了解除疼痛。	the relief of pain = 解除	GENERATED
+s3	A small relief fund was set up for them.	A small relief fund	8	6	为他们设立了一笔小额救济款。	relief fund = 救济	GENERATED
+s4	She turned to him for relief and got nothing at all.	turned to him for relief	22	6	她向他寻求安慰，却什么也没得到。	turn to sb for relief = 安慰	GENERATED

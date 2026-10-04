@@ -1,0 +1,21 @@
+senseId	text	clue	span_start	span_len	translation	note	source
+s1	She bought a small camera for her long trip.	a small camera	19	6	她为长途旅行买了一台小相机。	拍照设备 = 照相机	GENERATED
+s1	This old camera still works very well.	still works	9	6	这台旧相机还能用得很好。	照相机 = 照相机	GENERATED
+s1	He put the camera down and sat there.	put the camera down	11	6	他放下相机坐在那里。	手里的相机 = 照相机	GENERATED
+s1	My camera is heavier than the whole bag.	heavier	3	6	我的相机比整个包都重。	camera = 照相机	GENERATED
+s2	A film camera is much heavier than this one.	A film camera	7	6	电影摄影机比这台重得多。	拍电影的机器 = 摄影机	GENERATED
+s2	They carried three camera up the cold hill.	three camera	19	6	他们把三台摄影机搬上那座冷山。	camera 作可数名词 = 摄影机	GENERATED
+s2	The camera was too big for that small room.	The camera	4	6	摄影机对那个小房间来说太大了。	摄影机（可数）= 摄影机	GENERATED
+s2	Each camera cost more than his old car.	cost	5	6	每台摄影机都比他那辆旧车贵。	camera（可数）= 摄影机	GENERATED
+s3	The deal was done in camera, with no witness.	in camera	21	6	这笔交易是在密室里做的，没有证人。	in camera = 密谈室	GENERATED
+s3	They sat in camera for three long hours.	in camera	12	6	他们在密谈室里坐了整整三小时。	密谈 = 密谈室	GENERATED
+s3	Nothing was decided outside that small camera.	that small camera	39	6	那个小密谈室里没有决定任何事。	密谈室（实体）= 密谈室	GENERATED
+s3	Even in camera they did not tell the whole truth.	tell	8	6	即使在密谈室里他们也没有说出全部真相。	私下场合 = 密谈室	GENERATED
+s4	The real cost is hidden in a dark camera.	a dark camera	34	6	真正的成本藏在一个暗箱里。	a dark camera = 暗箱	GENERATED
+s4	He worked in that dark camera for six long years.	that dark camera	23	6	他在那个暗箱里干了六年。	暗箱（比喻机构）= 暗箱	GENERATED
+s4	They made the decision in that dark camera.	made	36	6	他们在那暗箱里作出了决定。	暗箱操作 = 暗箱	GENERATED
+s4	The whole thing was a dark camera from the start.	from the start	27	6	整件事从一开始就是个暗箱。	黑箱 = 暗箱	GENERATED
+s1	She left her camera on the table all morning.	on the table	13	6	她把相机在桌上放了一上午。	相机 = 照相机	GENERATED
+s2	That new camera cost more than his old house.	cost more than	9	6	那台新摄影机比他旧房子还贵。	摄影机（可数）= 摄影机	GENERATED
+s3	They spoke in that camera for two long days.	for two long days	19	6	他们在那间密谈室里谈了两天。	密谈室 = 密谈室	GENERATED
+s4	The true cost is hidden in a dark camera.	a dark camera	34	6	真正的成本藏在一个暗箱里。	in a dark camera = 暗箱	GENERATED

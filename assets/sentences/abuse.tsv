@@ -1,0 +1,21 @@
+senseId	text	clue	span_start	span_len	translation	note	source
+s1	He abused the new power the company gave him.	the new power	3	6	他滥用了公司给他的新权力。	滥用权力 = 滥用	GENERATED
+s1	Many workers abuse the sick leave they are given.	the sick leave	13	5	很多员工滥用病假。	滥用待遇 = 滥用	GENERATED
+s1	They abuse the word meaning until it means nothing.	the word meaning	5	5	他们滥用词义直到它失去意义。	滥用词语 = 滥用	GENERATED
+s1	It is easy to abuse a weak old system.	a weak old system	14	5	滥用一个脆弱的旧制度很容易。	滥用（抽象）= 滥用	GENERATED
+s2	The old man abused his wife for many years.	abused his wife	12	6	那老人虐待妻子多年。	虐待人 = 虐待	GENERATED
+s2	Do not abuse a child for small mistakes.	abuse a child	7	5	不要因为小错虐待孩子。	虐待儿童 = 虐待	GENERATED
+s2	He abused his old body for forty hard years.	his old body	3	6	他辛苦劳作四十年糟践了自己的身体。	过度使用（身体）= 虐待	GENERATED
+s2	No one should abuse an old sick animal.	an old sick animal	14	5	不该有人虐待一只年老生病的动物。	虐待动物 = 虐待	GENERATED
+s3	He stopped one abuse of his habit years ago.	one abuse	15	5	他多年前戒掉了一个恶习。	abuse 作名词 = 恶习	GENERATED
+s3	This abuse of the language makes it hard to learn.	This abuse	5	5	这种对语言的滥用让它很难学。	abuse = 恶习（坏习惯）	GENERATED
+s3	Overwork is a common abuse among young workers.	a common abuse	21	5	过度劳累在年轻工人中是一种常见恶习。	abuse = 恶习	GENERATED
+s3	It is a national abuse to believe such talk.	a national abuse	17	5	相信这种话是一种国民的恶习。	abuse = 恶习	GENERATED
+s3	They kept an old abuse of long talks for years.	an old abuse	17	5	他们保留着长谈的老恶习很多年。	abuse 作名词 = 恶习	GENERATED
+s4	Do not abuse your parents with such words.	with such words	7	5	不要用这样的话辱骂父母。	言语辱骂 = 辱骂	GENERATED
+s4	He abused the workers who came to ask for pay.	the workers	3	6	他辱骂了来要工钱的工人。	辱骂 = 辱骂	GENERATED
+s4	They abused her in the cruelest words they knew.	in the cruelest words	5	6	他们用所知道的最狠的话辱骂她。	恶言 = 辱骂	GENERATED
+s4	No one may abuse the flag of any country.	the flag	11	5	任何人都不得辱骂别国的旗帜。	辱骂（庄严对象）= 辱骂	GENERATED
+s1	Drivers here abuse the new road every day.	the new road	13	5	这里的司机每天都滥用车行道。	滥用（权利）= 滥用	GENERATED
+s2	He abused the dog for years before the police knew.	before the police knew	3	6	在警方知道之前，他虐待那只狗很多年。	虐待动物 = 虐待	GENERATED
+s4	She abused him again in front of the whole room.	in front of the whole room	4	6	她又在满屋子人面前辱骂他。	当众辱骂 = 辱骂	GENERATED
