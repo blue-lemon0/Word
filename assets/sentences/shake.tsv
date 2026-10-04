@@ -1,0 +1,21 @@
+senseId	text	clue	span_start	span_len	translation	note	source
+s1	She shook the bottle before she drank it.	the bottle	4	5	她喝之前摇了摇瓶子。	摇动容器 = 摇动。	GENERATED
+s1	He shook my hand very warmly at the gate.	my hand	3	5	他在门口热情地握了我的手。	握手也是摇 = 摇动。	GENERATED
+s1	Shake the paint well before you use it.	paint	0	5	使用前把漆充分摇匀。	摇匀 = 摇动。	GENERATED
+s1	The dog shook the water off its back.	the water off	8	5	狗把背上的水甩掉了。	甩掉水 = 摇动。	GENERATED
+s1	She shook her head and said nothing at all.	head	4	5	她摇摇头，什么也没说。	摇头 = 摇动。	GENERATED
+s2	A small earthquake shook the whole town last night.	the whole town	19	5	昨夜一场小地震震动了整个镇子。	地震使建筑动 = 震动。	GENERATED
+s2	The heavy door shook when the wind blew.	heavy	15	5	起风时那扇重门震动起来。	物体颤动 = 震动。	GENERATED
+s2	His hand shook as he took the money.	hand	9	5	他拿钱时手在发抖。	因害怕/紧张而颤 = 震动。	GENERATED
+s2	The ground shook under our feet that night.	ground	11	5	那夜我们脚下的地在震动。	地面震动 = 震动。	GENERATED
+s2	The whole glass shook when the truck passed.	whole	16	5	卡车经过时整块玻璃都在震动。	震动 = 震动。	GENERATED
+s3	Nothing could shake his faith in that old man.	his faith	14	5	什么也动摇不了他对那位老人的信任。	使动摇 = 动摇。	GENERATED
+s3	The news did not shake his calm face.	his calm face	17	5	这消息没有动摇他平静的表情。	使镇定被破坏 = 动摇。	GENERATED
+s3	Her answer shook my whole plan for years.	my whole plan	11	5	她的回答动摇了我多年的整个计划。	计划被动摇 = 动摇。	GENERATED
+s3	They tried to shake the new members' confidence.	the new members	14	5	他们想动摇新成员的信心。	shake confidence = 动摇。	GENERATED
+s3	Years of hard work cannot shake the boy's will.	Years	26	5	多年的努力动摇不了这孩子的意志。	意志被动摇 = 动摇。	GENERATED
+s4	That long day shook her health for good.	her health	14	5	那漫长的一天永久损害了她的健康。	使健康受损 = 使震动。	GENERATED
+s4	The news of the war shook the whole town.	the news of the war	20	5	战争的消息震动了全镇。	消息造成震荡 = 使震动。	GENERATED
+s4	The failure shook my confidence in the plan.	failure	12	5	这次失败动摇了我对计划的信心。	使震动（抽象）= 使震动。	GENERATED
+s4	Nothing could shake his belief in her.	Nothing	14	5	什么都动摇不了他对她的信念。	使信念震动 = 使震动。	GENERATED
+s4	Her cry shook the walls of the empty room.	cry	8	5	她的喊叫声震动了空屋的墙壁。	声响震动 = 使震动。	GENERATED

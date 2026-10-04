@@ -1,0 +1,21 @@
+senseId	text	clue	span_start	span_len	translation	note	source
+s1	The fellow at the next desk works very late.	at the next desk	4	6	隔壁桌那位男同事工作得很晚。	fellow（男性称呼）= 男人。	GENERATED
+s1	That young fellow wants to learn two languages.	That young fellow	11	6	那个年轻人想学两门语言。	fellow = 男人（口语）。	GENERATED
+s1	A nice old fellow lives across the road.	nice	11	6	路对面住着一位 nice 老头。	a fellow = 男人。	GENERATED
+s1	The fellow looked tired after the long shift.	looked	4	6	那个男的下了长班后看起来很累。	fellow = 男人。	GENERATED
+s1	My fellow says the whole thing was wrong.	says	3	6	我的同伴说整件事都错了。	同伴 = 男人/伙伴。	GENERATED
+s2	She was a dear fellow to all of us here.	a dear fellow	15	6	她是我们这里人人喜爱的伙伴。	伙伴 = 朋友。	GENERATED
+s2	He has been a real fellow since school days.	a real fellow	19	6	从上学起他就是个好朋友。	a fellow = 朋友。	GENERATED
+s2	My fellow gave me half his bread.	My fellow	3	6	我的朋友给了我半个面包。	同伴 = 朋友。	GENERATED
+s2	Nobody here is such a kind fellow as she is.	Nobody	27	6	这里没有谁像她这样好的朋友。	a kind fellow = 朋友。	GENERATED
+s2	I met a pleasant fellow on the train.	met	17	6	我在火车上遇到一位和气的朋友。	fellow = 朋友。	GENERATED
+s3	The two young fellows talked about books.	fellows talked	14	7	那两个年轻人谈论书本。	fellows（相互）= 同伴的。	GENERATED
+s3	Fellow students share the same small room.	Fellow students	0	6	同学朋友们共用那间小屋。	fellow students = 同伴的（同学的）。	GENERATED
+s3	She felt no fellow feeling among them all.	fellow feeling	12	6	在他们当中她感到格格不入。	fellow feeling = 同伴的（同类相属）。	GENERATED
+s3	He is not my fellow worker any more.	my fellow worker	13	6	他不再是我的同行了。	fellow worker = 同伴的（同行）。	GENERATED
+s3	No fellow citizen needs to fear the police.	citizen	3	6	没有哪个公民需要害怕警察。	fellow citizen = 同伴的（同胞的）。	GENERATED
+s4	Her fellow doctors met her at the door.	fellow doctors	4	6	她的医生同事们在门口迎接她。	fellow doctors = 同事的。	GENERATED
+s4	A fellow worker told me the whole story.	worker	2	6	一个同事把整件事告诉了我。	fellow worker = 同事。	GENERATED
+s4	He will meet his fellow teachers on Monday.	meet	17	6	他周一要见他的教师同事们。	fellow teachers = 同事的。	GENERATED
+s4	Her fellow students paid for the small gift.	students	4	6	她的同学们付了那份小礼物的钱。	fellow students = 同事的（同学的）。	GENERATED
+s4	Every fellow lawyer knows that old rule.	lawyer	6	6	每位律师同行都知道那条老规矩。	fellow lawyers = 同事的。	GENERATED

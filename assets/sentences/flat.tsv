@@ -1,0 +1,21 @@
+senseId	text	clue	span_start	span_len	translation	note	source
+s1	The road here is wide and perfectly flat.	perfectly flat	36	4	这条路又宽又完全平坦。	没有起伏 = 平坦的。	GENERATED
+s1	We walked across the flat land to the river.	the flat land	21	4	我们走过平坦的地去河边。	flat land = 平坦的。	GENERATED
+s1	Put the plate on the flat top of the stove.	the flat top	21	4	把盘子放在炉子平坦的顶面上。	平的 = 平坦的。	GENERATED
+s1	A flat roof collects the rain and the snow.	A flat roof	2	4	平屋顶会积雨水和雪。	平顶 = 平坦的。	GENERATED
+s1	The sea looked flat grey under the low sky.	flat grey	15	4	低沉的天空下，海面灰而平。	flat grey = 平坦的。	GENERATED
+s2	His life has been flat since he lost his job.	has been flat	18	4	自从失业后他的生活一直很平淡。	无起伏 = 单调的。	GENERATED
+s2	She gave a flat answer to every question.	gave	11	4	她对每个问题都给了平淡的回答。	语调平淡 = 单调的。	GENERATED
+s2	The last chapter of the book was rather flat.	chapter	40	4	这本书最后一章相当平淡。	情节平淡 = 单调的。	GENERATED
+s2	Everything felt flat on that grey winter day.	Everything	16	4	那个灰暗的冬日一切都显得平淡。	感觉平淡 = 单调的。	GENERATED
+s2	His flat tone made the news sound less bad.	tone	4	4	他平淡的语气让这消息听起来没那么糟。	flat tone = 单调的。	GENERATED
+s3	He felt flat and empty after the long trip.	flat and empty	8	4	长途旅行后他感到无力而空虚。	提不起劲 = 无力的。	GENERATED
+s3	She answered in a flat, tired voice.	a flat, tired voice	18	4	她用疲惫而平淡的声音回答。	无力 = 无力的。	GENERATED
+s3	The long illness left him flat and thin.	long	26	4	长病使他虚弱而消瘦。	虚弱 = 无力的。	GENERATED
+s3	He looked flat after hearing the bad news.	looked	10	4	听到坏消息后他显得无精打采。	无精打采 = 无力的。	GENERATED
+s3	A flat refusal ended the long talk.	refusal	2	4	一次无力的拒绝结束了长谈。	拒绝无力 = 无力的。	GENERATED
+s4	He crossed the flat water near the shore.	the flat water	15	4	他涉过岸边齐膝的浅水。	水浅 = 浅的。	GENERATED
+s4	A flat dish of soup is on the table.	dish	2	4	桌上有一浅盘汤。	浅的器皿 = 浅的。	GENERATED
+s4	A flat laugh came from the corner seat.	laugh	2	4	角落的座位发出一声轻笑。	flat laugh = 浅的（轻声的）。	GENERATED
+s4	The bank is flat here, only a foot deep.	only a foot deep	12	4	这里的河岸很浅，只有一英尺深。	水深 = 浅的。	GENERATED
+s4	His voice stayed flat all through the talk.	voice	17	4	整个谈话中他的声音一直很平。	平缓 = 浅的。	GENERATED

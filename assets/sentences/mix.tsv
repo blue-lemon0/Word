@@ -1,0 +1,21 @@
+senseId	text	clue	span_start	span_len	translation	note	source
+s1	Add water to the mix and it will turn into paste.	the mix	17	3	往混合物里加水，它会变成糊。	掺在一起的东西 = 混合物。	GENERATED
+s1	He bought a mix of red and blue for the wall.	a mix of red and blue	12	3	他买了红蓝混合的墙漆。	a mix of = 混合物。	GENERATED
+s1	That cake mix comes in three different tastes.	cake mix	10	3	那款蛋糕预拌粉有三种口味。	mix（商品）= 混合物。	GENERATED
+s1	The mix of colours on that wall is very warm.	of colours	4	3	那面墙上的颜色混合很温暖。	混合 = 混合物。	GENERATED
+s1	I like the mix of sweet and salt in it.	of sweet and salt	11	3	我喜欢里面甜咸交织的味道。	a mix of = 混合物。	GENERATED
+s2	There was a real mix in the city after the storm.	in the city	17	3	风暴后城里一片混乱。	杂乱状态 = 混乱。	GENERATED
+s2	The whole mix of people and noise tired her out.	of people and noise	10	3	人和噪音混杂让她疲惫不堪。	混杂 = 混乱。	GENERATED
+s2	His life has been a mix of luck and hard work.	of luck and hard work	20	3	他的人生是运气与努力混杂的。	a mix of = 混乱。	GENERATED
+s2	Nobody could sort out the mix of feelings inside her.	of feelings	26	3	没人能理清她内心混乱的情绪。	情绪混杂 = 混乱。	GENERATED
+s2	The office was in a mix after the sudden move.	office	20	3	突然搬动后办公室一片混乱。	in a mix = 混乱。	GENERATED
+s3	He looked mix after the long night drive.	looked mix	10	3	长途夜驾后他看起来很糊涂。	人迷糊 = 糊涂。	GENERATED
+s3	She felt mix when no one explained it well.	felt mix	9	3	没人好好解释时她感到糊涂。	感到不明白 = 糊涂。	GENERATED
+s3	Their answers were so mix that nobody trusted them.	answers	22	3	他们的答复含糊得没人相信。	言语含混 = 糊涂。	GENERATED
+s3	I was really mix for a whole day after that news.	really	13	3	听到那消息后我一整天都很糊涂。	mix = 糊涂。	GENERATED
+s3	His mix reply made the plan go wrong.	reply	4	3	他含糊的答复把计划弄乱了。	mix reply = 糊涂。	GENERATED
+s4	Mix the eggs and the flour in one big bowl.	the eggs and the flour	0	3	把鸡蛋和面粉在一只大碗里混合。	mix A and B = 使混合。	GENERATED
+s4	I always mix sugar into my morning tea.	sugar into	9	3	我总把糖拌进早茶里。	mix into = 使混合。	GENERATED
+s4	Mix the paint before you use it, please.	paint	0	3	用之前请把漆搅拌一下。	mix（搅拌）= 使混合。	GENERATED
+s4	She mixed the old words with the new ones.	the old words with the new	4	5	她把旧词和新词混在一起。	mix = 使混合。	GENERATED
+s4	Do not mix those two kinds of wood together.	those two kinds	7	3	那两种木头不要混着用。	mix A and B = 使混合。	GENERATED

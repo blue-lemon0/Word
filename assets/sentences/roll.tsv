@@ -1,0 +1,21 @@
+senseId	text	clue	span_start	span_len	translation	note	source
+s1	She rolled the dough into a long thin sheet.	the dough	4	6	她把面团擀成一张薄薄的长片。	卷起来或擀 = 卷。	GENERATED
+s1	He rolled the paper into a thin tube.	paper	3	6	他把纸卷成细筒。	roll A into B = 卷。	GENERATED
+s1	Roll the pastry flat and put it in the pan.	pastry	0	4	把面皮擀平放进烤盘。	roll flat = 卷/擀。	GENERATED
+s1	They rolled the tent and put it away.	the tent	5	6	他们把帐篷卷起来收好。	圆筒形物 = 卷。	GENERATED
+s1	The child rolled the ball under the bed.	child	10	6	孩子把球滚到床底下。	使物体转动 = 卷。	GENERATED
+s2	The ball rolled under the heavy bed.	rolled under	9	6	球滚到重床底下去了。	转动前进 = 滚动。	GENERATED
+s2	She rolled down the hill on her old coat.	down the hill	4	6	她裹着旧外套滚下了山坡。	滚下 = 滚动。	GENERATED
+s2	The wheels rolled quietly on the wet road.	on the wet road	11	6	轮子在湿路上安静地滚动。	轮子转 = 滚动。	GENERATED
+s2	He rolled over twice and stood up.	rolled over	3	6	他滚了两圈站起来。	翻身打滚 = 滚动。	GENERATED
+s2	The coin rolled right up to my foot.	right up to my foot	9	6	硬币一直滚到我脚边。	滚动 = 滚动。	GENERATED
+s3	Please read the roll of names very slowly.	roll of names	16	4	请慢慢念这份名单。	一长串名单 = 名单。	GENERATED
+s3	The roll of the new members was on the wall.	new	4	4	新成员的名单在墙上。	a roll of = 名单。	GENERATED
+s3	He read the whole roll of numbers aloud.	read	18	4	他把整串数字大声念了出来。	连续一串 = 名单。	GENERATED
+s3	Put your name at the top of the roll.	Put	32	4	把你的名字写在名单最上面。	名单 = 名单。	GENERATED
+s3	The roll of voters is kept by the clerk.	voters	4	4	选民名单由书记员保管。	官方名单 = 名单。	GENERATED
+s4	The clerk put the old case away in the roll.	the old case	39	4	书记员把旧案卷收起来。	成卷的档案 = 案卷。	GENERATED
+s4	His whole life is written in that roll.	whole	34	4	他的一生都记在那卷档案里。	记录成卷 = 案卷。	GENERATED
+s4	She found the paper roll under the desk.	paper roll	20	4	她在桌子底下找到了那卷纸。	一卷纸 = 案卷（成卷物）。	GENERATED
+s4	The old roll of letters was tied with string.	old	8	4	那卷旧信件用绳子捆着。	成卷 = 案卷。	GENERATED
+s4	He read the whole roll from the first page.	read	18	4	他从第一页开始把整卷读完了。	一整卷 = 案卷。	GENERATED

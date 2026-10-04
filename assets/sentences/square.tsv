@@ -1,0 +1,21 @@
+senseId	text	clue	span_start	span_len	translation	note	source
+s1	They lived on the same square for ten years.	the same square	23	6	他们在同一个街区住了十年。	城市的街区 = 街区。	GENERATED
+s1	Our shop is on the next square.	shop	24	6	我们的店在下一个街区。	on a square = 街区。	GENERATED
+s1	He walked across the square to the station.	walked	21	6	他穿过街区走到车站。	街区中间的空地 = 街区。	GENERATED
+s1	Children play football on that square every day.	on that square	31	6	孩子们每天在那街区踢足球。	街区空地 = 街区。	GENERATED
+s1	The whole square was full of market stalls.	The whole square	10	6	整个街区摆满了市场摊位。	街区 = 街区。	GENERATED
+s2	We met at the square in front of the museum.	the square	14	6	我们在博物馆前的广场见面。	城市广场 = 广场。	GENERATED
+s2	A big square with a tree in the middle.	big	6	6	中间有一棵树的大广场。	a square = 广场。	GENERATED
+s2	The speaker stood on the square and waited.	speaker	25	6	演讲者站在广场上等着。	广场 = 广场。	GENERATED
+s2	Ten thousand people filled the central square.	the central square	39	6	一万人挤满了中心广场。	central square = 广场。	GENERATED
+s2	They met under the old tree in the square.	met	35	6	他们在广场那棵老树下见面。	广场 = 广场。	GENERATED
+s3	Use a square to check that the wall is straight.	a square	6	6	用直角尺检查墙是否笔直。	画直角的工具 = 直角尺。	GENERATED
+s3	He drew the shape with a small square.	drew	31	6	他用一把小直角尺画出那个形状。	直角尺 = 直角尺。	GENERATED
+s3	Put the square away and take the ruler.	Put	8	6	把直角尺收起来，拿直尺。	square 与 ruler 相对 = 直角尺。	GENERATED
+s3	She checked each corner with her square.	checked	33	6	她用直角尺检查每个角。	checking angles = 直角尺。	GENERATED
+s3	A broken square cannot measure any angle well.	broken	9	6	坏掉的直角尺量不好任何角。	量角 = 直角尺。	GENERATED
+s4	He drew a square with four equal sides.	four equal sides	10	6	他画了一个四边相等的正方形。	四个等边 = 正方形的。	GENERATED
+s4	The floor is square, not round at all.	floor	13	6	地板是方的，一点也不圆。	形状为方 = 正方形的。	GENERATED
+s4	A square table sits in the middle of the room.	table	2	6	房间中间放着一张方桌。	方形的 = 正方形的。	GENERATED
+s4	His square face told us nothing at all.	face	4	6	他那张方脸什么也没告诉我们。	方形的脸 = 正方形的。	GENERATED
+s4	Cut the paper into a neat square shape.	a neat square	26	6	把纸裁成一个整齐的正方形。	square shape = 正方形的。	GENERATED

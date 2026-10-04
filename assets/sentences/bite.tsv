@@ -1,0 +1,21 @@
+senseId	text	clue	span_start	span_len	translation	note	source
+s1	The dog wanted to bite my hand away.	bite my hand	18	4	那只狗想咬我的手。	用牙夹 = 咬。	GENERATED
+s1	He tried to bite the hard bread but failed.	the hard bread	12	4	他试着咬那块硬面包但没咬动。	咬不动 = 咬。	GENERATED
+s1	Do not bite your nails when you read.	your nails	7	4	读书时别咬指甲。	咬（自己的东西）= 咬。	GENERATED
+s1	Fish bite best in the early morning light.	Fish	5	4	鱼在清晨的光里最容易被咬。	鱼咬钩 = 咬。	GENERATED
+s1	She bit her lip and said nothing at all.	bit her lip	4	3	她咬了咬嘴唇，什么也没说。	咬唇 = 咬。	GENERATED
+s2	He took a big bite of the hot bread.	a big bite	14	4	他咬了一大口热面包。	一口的量 = 一口。	GENERATED
+s2	The dog gave a small bite to her hand.	a small bite	21	4	那只狗在她手上轻轻咬了一口。	一次咬合 = 一口。	GENERATED
+s2	She ate the whole fish in three bites.	in three bites	32	5	她三口吃掉了整条鱼。	bite（计数）= 一口。	GENERATED
+s2	One bite of that cold soup is enough.	cold	4	4	那碗冷汤一口就够了。	bite of = 一口。	GENERATED
+s2	He felt the sharp bite of the winter air.	of the winter air	18	4	他感到冬日寒风的刺骨。	bite（名词，刺痛）= 一口。	GENERATED
+s3	The cold wind bit my face all morning.	bit my face	14	3	冷风一上午刺我的脸。	刺痛（风）= 刺痛。	GENERATED
+s3	His eyes bit from the long smoke.	bit from	9	3	长时间熏烟刺得他眼睛疼。	眼睛刺痛 = 刺痛。	GENERATED
+s3	The sharp soap bit into my skin at once.	bit into	15	3	那块刺激性很强的肥皂立刻刺进我的皮肤。	刺痛 = 刺痛。	GENERATED
+s3	The icy water bit at his frozen hands.	bit at	14	3	冰雪刺向他冻僵的双手。	刺痛（寒）= 刺痛。	GENERATED
+s3	Her words bit deeper than the cold wind.	bit deeper	10	3	她的话比寒风更刺人。	言语刺痛 = 刺痛。	GENERATED
+s4	The new bullet bit through the old door.	bit through	15	3	新子弹打穿了那扇旧门。	穿透 = 穿透。	GENERATED
+s4	The sharp knife bit deep into the wood.	deep into	16	3	锋利的刀深深扎进木头里。	穿透物体 = 穿透。	GENERATED
+s4	A cold wind bit through his thin coat.	through his thin coat	12	3	冷风穿透了他的薄外套。	穿透（风）= 穿透。	GENERATED
+s4	The bullet bit through both walls last night.	through both walls	11	3	昨夜子弹打穿了两道墙。	穿透 = 穿透。	GENERATED
+s4	His sharp words bit right through my hope.	through my hope	16	3	他尖刻的话语彻底穿透了我的希望。	穿透（抽象）= 穿透。	GENERATED

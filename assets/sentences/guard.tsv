@@ -1,0 +1,21 @@
+senseId	text	clue	span_start	span_len	translation	note	source
+s1	The old guard watched the gate all night.	the gate	8	5	那位老守卫整夜看着大门。	看守的人 = 守卫者。	GENERATED
+s1	A young guard stood at the front door.	young	8	5	一名年轻守卫站在前门。	门口的人 = 守卫者。	GENERATED
+s1	The guards wore warm coats that night.	wore	4	6	守卫们那晚穿着暖外套。	守卫（复数）= 守卫者。	GENERATED
+s1	She became the guard of her little brother.	of her little brother	15	5	她成了弟弟的守护人。	guard of sb = 守卫者。	GENERATED
+s1	Every guard carried a small black stick.	carried	6	5	每个守卫都带一根黑色小棍。	守卫 = 守卫者。	GENERATED
+s2	Two guards stood outside the locked door.	stood	4	6	两名守卫站在锁着的门外。	门外站岗的人 = 警戒。	GENERATED
+s2	The guard shouted at the boys to stop.	shouted	4	5	守卫朝那些男孩喊停下。	guard（动词）= 警戒。	GENERATED
+s2	A big dog guards the front of the shop.	the front of the shop	10	6	一条大狗警守着店门口。	防守 = 警戒。	GENERATED
+s2	We must guard against any sign of fire.	against any sign of fire	8	5	我们必须警惕任何火警迹象。	guard against = 警戒。	GENERATED
+s2	Her face was guarded by a small hat.	by a small hat	13	7	一顶小帽子遮住了她的脸。	遮挡 = 警戒（防御）。	GENERATED
+s3	A small guard of soldiers walked past the house.	of soldiers	8	5	一小队士兵从房子旁走过。	小队 = 护卫队。	GENERATED
+s3	The whole guard stood at attention that morning.	whole	10	5	整支护卫队那天早上立正站着。	whole guard = 护卫队。	GENERATED
+s3	His guard arrived three hours after him.	arrived	4	5	他的护卫队比他晚到三小时。	随行的一队人 = 护卫队。	GENERATED
+s3	The young guard rode beside the king all day.	young	10	5	那位年轻护卫整天骑在国王旁边。	随行护卫 = 护卫队。	GENERATED
+s3	A guard of four men watched the door.	men	2	5	四人的护卫队看着那扇门。	a guard of N = 护卫队。	GENERATED
+s4	A tall guard stood on the wall of the prison.	on the wall	7	5	监狱墙上立着一个高高的防护装置。	墙上的设施 = 防护装置。	GENERATED
+s4	The machine has a guard that stops the belt.	a guard that stops	18	5	机器有一个能停传送带的防护装置。	机器上的安全件 = 防护装置。	GENERATED
+s4	Keep your finger behind the guard on the press.	behind the guard	28	5	手指要放在压机的防护挡板后面。	防护挡板 = 防护装置。	GENERATED
+s4	He fell because the guard on the machine was off.	the guard on the machine	20	5	他摔了，因为机器上的防护装置没开。	防护装置失效 = 防护装置。	GENERATED
+s4	That yellow guard keeps your hand safe here.	yellow	12	5	那个黄色防护挡板在这里保护你的手。	防护挡板 = 防护装置。	GENERATED

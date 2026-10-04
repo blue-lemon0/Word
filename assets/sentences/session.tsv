@@ -1,0 +1,21 @@
+senseId	text	clue	span_start	span_len	translation	note	source
+s1	The doctor saw him in a short session at noon.	short session	30	7	医生在中午给他看了短短一节课时间。	一段有限的时间 = 期间。	GENERATED
+s1	Our talk was a long session before the exam.	a long session	20	7	考试前我们谈了很久。	一次谈时间的场合 = 期间。	GENERATED
+s1	After one more session the pain was gone.	one more session	15	7	再做一次治疗疼痛就消失了。	一次治疗时段 = 期间。	GENERATED
+s1	It took two sessions to fix the broken leg.	two sessions	12	8	治好这条断腿花了两次治疗。	多次治疗时段 = 期间。	GENERATED
+s1	During that session nobody spoke a word.	nobody	12	7	那段时间里没人说一句话。	during the session = 期间。	GENERATED
+s2	The court will hold its session next Monday.	its session	24	7	法院下周一开庭。	法庭的开庭期 = 开庭期。	GENERATED
+s2	He was questioned in a long court session.	court session	34	7	他在一次漫长的庭审中被审问。	court session = 开庭期。	GENERATED
+s2	The judge ended the session before six o'clock.	judge	20	7	法官在六点前结束了开庭。	结束开庭 = 开庭期。	GENERATED
+s2	She sat through the whole court session quietly.	sat	32	7	她安静地坐完了整个庭审。	whole court session = 开庭期。	GENERATED
+s2	His case will not come to session this year.	to session	26	7	他的案子今年不会开庭。	come to session = 开庭期。	GENERATED
+s3	Everyone at the last session voted for her.	at the last session	21	7	上次会上所有人都投了她一票。	一次会议 = 会议。	GENERATED
+s3	The final session runs from nine to five.	final	10	7	最后一次会议从九点开到五点。	session = 会议。	GENERATED
+s3	He spoke for five minutes in that session.	spoke	34	7	他在那次会上讲了五分钟。	in that session = 会议。	GENERATED
+s3	The morning session was short but useful.	morning session	12	7	上午那场会议虽短但有用。	分场次的会议 = 会议。	GENERATED
+s3	We need one more session to settle it.	need	17	7	我们还需要一次会议才能定下来。	another session = 会议。	GENERATED
+s4	This term has been the hardest session of my life.	the hardest session	31	7	这个学期是我一生中最难的一学期。	一学期的教学期 = 学期。	GENERATED
+s4	She failed her final session at the college.	failed	21	7	她大学最后一学期挂科了。	final session = 学期末。	GENERATED
+s4	He came back for the winter session only.	came	28	7	他只为冬季学期回来了。	winter session = 学期。	GENERATED
+s4	That was easy compared with this session.	easy	33	7	和这个学期比那 easy 算轻松了。	this session = 本学期。	GENERATED
+s4	I will study English in every session.	every session	30	7	我每个学期都会学英语。	每个学期 = 学期。	GENERATED
