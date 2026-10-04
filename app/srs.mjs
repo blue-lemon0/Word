@@ -1,6 +1,6 @@
 // SRS 引擎 —— 03-记忆曲线与复习.md 的可执行版本。
 //
-// 公式与参数分离：参数全部读 assets/profile/srs_params.tsv，代码里没有魔法数。
+// 公式与参数分离：参数全部读 data/profile/srs_params.tsv，代码里没有魔法数。
 // scripts/verify_srs.py 是同一批公式的 Python 参考实现，
 // scripts/e2e_loop.mjs 会逐个比对两边的输出（黄金向量），
 // 所以将来移植到 Kotlin 时有一份可对照的数值基准。
@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const PROJ = path.resolve(HERE, '..');
-const PARAMS_TSV = path.join(PROJ, 'assets', 'profile', 'srs_params.tsv');
+const PARAMS_TSV = path.join(PROJ, 'data', 'profile', 'srs_params.tsv');
 
 const NUM_KEYS = new Set([
   'S0_TRAP', 'D0_TRAP', 'S0_MULTI_S1', 'D0_MULTI_S1', 'S0_SINGLE', 'D0_SINGLE',

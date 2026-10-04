@@ -38,7 +38,7 @@
 >            result, grade, elapsed_ms, is_due, stability_after, ts)
 > ```
 >
-> 相比下面的完整设计去掉了 `sense` / `sentence`（内容在 `assets/bundle/cards.json`，
+> 相比下面的完整设计去掉了 `sense` / `sentence`（内容在 `build/bundle/cards.json`，
 > 一次性读进内存）、`new_word` / `user_flag` / `setting`（对应功能未开工）。
 > 三处与本文原文不同：
 > `srs.due_at` 单列（D17 §5.1）、`review_log.attempt_id` 幂等（D17 §5.4）、

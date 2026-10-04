@@ -3,10 +3,10 @@
 import csv, io, json, os, re, sys, collections
 sys.stdout.reconfigure(encoding="utf-8")
 PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-raw = json.load(io.open(os.path.join(PROJ, "assets", "wordlists", "ecdict_senses_raw.json"),
+raw = json.load(io.open(os.path.join(PROJ, "source", "ecdict_snapshot.json"),
                         encoding="utf-8"))
 core = list(csv.reader(
-    io.open(os.path.join(PROJ, "assets", "wordlists", "kaoyan_dagang_core.tsv"),
+    io.open(os.path.join(PROJ, "data", "wordlist", "kaoyan_dagang_core.tsv"),
             encoding="utf-8"), delimiter="\t"))[1:]
 words = [r[0] for r in core]
 

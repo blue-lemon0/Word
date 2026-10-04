@@ -2,14 +2,14 @@
 """ECDICT 词库最终验收：数量/分布/噪声/与旧库对比。
 
 D16 起：
-  NEW = 正式词库 assets/senses/（B 方案 7884 义项）
+  NEW = 正式词库 data/wordlist/senses/（B 方案 7884 义项）
   OLD = 归档的旧库 archive/2026-09-30-pre-ECDICT/old-senses/（3641 义项）
        只用于对比统计，**不做迁移**。
 """
 import collections, csv, io, json, os, re, sys
 sys.stdout.reconfigure(encoding="utf-8")
 PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-NEW = os.path.join(PROJ, "assets", "senses")
+NEW = os.path.join(PROJ, "data", "wordlist", "senses")
 OLD = os.path.join(PROJ, "archive", "2026-09-30-pre-ECDICT",
                    "old-senses", "TRAP_AND_GLOSSEN.tsv")
 OLD_DIR = os.path.dirname(OLD)
@@ -95,7 +95,7 @@ print("新库有 glossEn 的义项 %d 个（ECDICT definition 不覆盖逐义项
 
 # 句子：D16 后从零生成
 need = sum(len(v) for v in n.values()) * 5
-S = os.path.join(PROJ, "assets", "sentences")
+S = os.path.join(PROJ, "data", "sentences")
 tot = 0
 if os.path.isdir(S):
     tot = sum(len(io.open(os.path.join(S, f), encoding="utf-8").readlines()) - 1

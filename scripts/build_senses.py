@@ -12,7 +12,7 @@
 import csv, io, json, os, re, sys, collections
 sys.stdout.reconfigure(encoding="utf-8")
 PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-RAW = os.path.join(PROJ, "assets", "wordlists", "ecdict_senses_raw.json")
+RAW = os.path.join(PROJ, "source", "ecdict_snapshot.json")
 
 # 1. 变位形式
 INFLECT = re.compile(r"的(过去式|过去分词|现在分词|比较级|最高级|第三人称)")
@@ -112,7 +112,7 @@ def merge(zs):
 def main():
     raw = json.load(io.open(RAW, encoding="utf-8"))
     core = list(csv.reader(
-        io.open(os.path.join(PROJ, "assets", "wordlists", "kaoyan_dagang_core.tsv"),
+        io.open(os.path.join(PROJ, "data", "wordlist", "kaoyan_dagang_core.tsv"),
                 encoding="utf-8"), delimiter="\t"))[1:]
     words = [r[0] for r in core]
 
@@ -173,7 +173,7 @@ def main():
         for s in v["senses"]:
             print("        [%-3s] %s" % (s["pos"] or "?", s["zh"]))
 
-    p = os.path.join(PROJ, "assets", "wordlists", "ecdict_senses_final.json")
+    p = os.path.join(PROJ, "build", "intermediate", "ecdict_senses_final.json")
     with io.open(p, "w", encoding="utf-8") as fh:
         json.dump(result, fh, ensure_ascii=False, separators=(",", ":"))
     print("\n-> %s (%.2f MB)" % (p, os.path.getsize(p) / 1024 / 1024))

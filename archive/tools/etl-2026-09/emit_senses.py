@@ -13,7 +13,7 @@
 import csv, io, json, os, re, sys, collections
 sys.stdout.reconfigure(encoding="utf-8")
 PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-FINAL = os.path.join(PROJ, "assets", "wordlists", "ecdict_senses_final.json")
+FINAL = os.path.join(PROJ, "build", "intermediate", "ecdict_senses_final.json")
 
 SKIP_TAGS = re.compile(
     r"^\s*[\[【](计|计算机|医|体|生|化|物|数|法|商|金融|地|政|军|体|音|语|哲|心|"
@@ -87,11 +87,11 @@ def cluster(senses):
 def main():
     final = json.load(io.open(FINAL, encoding="utf-8"))
     core = list(csv.reader(
-        io.open(os.path.join(PROJ, "assets", "wordlists", "kaoyan_dagang_core.tsv"),
+        io.open(os.path.join(PROJ, "data", "wordlist", "kaoyan_dagang_core.tsv"),
                 encoding="utf-8"), delimiter="\t"))[1:]
     words = [r[0] for r in core]
 
-    # 不覆盖现有 assets/senses（那里有 642 TRAP 标记、glossEn，
+    # 不覆盖现有 data/wordlist/senses（那里有 642 TRAP 标记、glossEn，
     # 且被 18610 条句子按 senseId 引用）。先落到独立目录做交叉验证。
     SDIR = os.path.join(PROJ, "assets", "senses_ecdict")
     os.makedirs(SDIR, exist_ok=True)

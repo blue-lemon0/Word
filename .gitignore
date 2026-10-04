@@ -1,3 +1,11 @@
+# ─────────────────────────────────────────────────────────────
+# 三层单向结构：source/ → data/ → build/
+#   source/  外部快照，不可再生，唯一必须备份的
+#   data/    真相源，人可读可改，全部入库
+#   build/   派生产物，一条命令重建，永不入库
+# 详见仓库根 MANIFEST.md
+# ─────────────────────────────────────────────────────────────
+
 # Python
 __pycache__/
 *.pyc
@@ -5,18 +13,15 @@ __pycache__/
 # Node（e2e 测试用 jsdom）
 node_modules/
 
-# ── 派生产物：由脚本一条命令重建，不入库 ──────────────
-# bundle 是打包结果，真相源是 assets/senses + assets/sentences
-assets/bundle/
+# ── 派生产物 ──────────────────────────────────────────────
+build/
 
-# ECDICT 切分中间产物（可由 raw 重跑得到）
-# 注意：ecdict_senses_raw.json **不入库忽略**——它是 ECDICT CSV 的唯一快照，
-# CSV 在仓库外，删掉就再也拿不回来。
-assets/wordlists/ecdict_senses_final.json
-assets/wordlists/ecdict_senses_b.json
+# ── 中间产物（旧 ECDICT 切分链的可重建结果，不再是任何脚本的输入）──
+# ecdict_senses_final.json / _b.json 曾被 pick_words.py 当输入，
+# 该依赖已解除：词表改读 data/wordlist/senses/ + data/wordlist/kaoyan_dagang_core.tsv
 
-# 本地运行时数据库（学习进度，由 sqlite 重建/迁移，不入库）
-data/
+# ── 运行时数据库（学习进度，本地状态，不入库）──────────────
+# 注意：只忽略 db 文件本身。data/ 下其余是真相源，必须入库。
 *.db
 *.db-wal
 *.db-shm

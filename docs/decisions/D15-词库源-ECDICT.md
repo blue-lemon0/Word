@@ -2,14 +2,14 @@
 
 ## 问题
 
-原词库 `assets/senses/` 共 3000 词 / 3641 义项，**平均 1.21 义项/词**，
+原词库 `data/wordlist/senses/` 共 3000 词 / 3641 义项，**平均 1.21 义项/词**，
 2402 词（80%）是单义词。这个结构无法支撑"义项判别"训练：
 
 - 单义词只能出"识别题"（认出中文意思），没有"熟词僻义"的辨析压力；
 - 同词干扰项缺失，`abandon` 只有「抛弃」一个义项，做不出"陷阱"；
 - 用户明确指出：真实背单词 App 每个词 3-5 个义项，最多 7-8 个。
 
-根源是数据源错了：`assets/wordlists/source_netem_full_list.json` 是
+根源是数据源错了：`data/wordlist/source_netem_full_list.json` 是
 **NETEMVocabulary 考纲词频表**，每行一个词 + 一串中文释义，
 按中文标点切分后平均只有 1.25 义项/词。词频表根本不是义项词典。
 
@@ -117,12 +117,12 @@ TRAP 义项存活 304 / 706
 | `scripts/emit_senses_b.py` | → tsv 输出 |
 | `scripts/map_senses.py` | 旧库 → 新库模糊匹配（**历史工具，勿用于迁移**） |
 | `scripts/verify_ecdict.py` | 验收（噪声残留 / 分布 / 对比） |
-| `assets/wordlists/ecdict_senses_raw.json` | 原始切分 1.4MB |
-| `assets/wordlists/ecdict_senses_final.json` | 清洗后 14237 义项 |
-| `assets/wordlists/ecdict_senses_b.json` | **B 方案 7884 义项 0.81MB** |
-| `assets/senses/` | 2998 个 tsv，**D16 后已启用为正式词库** |
-| ~~`assets/senses_b/`~~ | 已重命名为 `assets/senses/` |
-| ~~`assets/senses_ecdict/`~~ | 全量 13703 义项，已删除（原料在 `ecdict_senses_final.json`） |
+| `source/ecdict_snapshot.json` | 原始切分 1.4MB |
+| `build/intermediate/ecdict_senses_final.json` | 清洗后 14237 义项 |
+| `build/intermediate/ecdict_senses_b.json` | **B 方案 7884 义项 0.81MB** |
+| `data/wordlist/senses/` | 2998 个 tsv，**D16 后已启用为正式词库** |
+| ~~`data/wordlist/senses_b/`~~ | 已重命名为 `data/wordlist/senses/` |
+| ~~`data/wordlist/senses_ecdict/`~~ | 全量 13703 义项，已删除（原料在 `ecdict_senses_final.json`） |
 
 ## 未做 / 开放
 
@@ -135,7 +135,7 @@ TRAP 义项存活 304 / 706
 3. **2 词缺口**。`laptop` 在 ECDICT 无此词（3000→2998），另有 1 词清洗后无可用义项。
    需手工补义项或从 CORE 词表移除。
 4. **14237→7884 丢掉的 6353 义项未归档**，但全量在
-   `assets/wordlists/ecdict_senses_final.json`，随时可放宽 K 重跑。
+   `build/intermediate/ecdict_senses_final.json`，随时可放宽 K 重跑。
 
 ## 验证
 

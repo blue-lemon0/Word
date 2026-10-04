@@ -12,8 +12,43 @@ import argparse, csv, io, json, os, sys
 
 sys.stdout.reconfigure(encoding="utf-8")
 PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-B = os.path.join(PROJ, "assets", "wordlists", "ecdict_senses_b.json")
-SDIR = os.path.join(PROJ, "assets", "sentences")
+SDIR = os.path.join(PROJ, "data", "sentences")
+SENSES = os.path.join(PROJ, "data", "wordlist", "senses")
+FREQ_TSV = os.path.join(PROJ, "data", "wordlist", "kaoyan_dagang_core.tsv")
+
+
+def load_wordlist():
+    """义项真相源 = data/wordlist/senses/*.tsv + data/wordlist/kaoyan_dagang_core.tsv
+
+    原来读的是 build/intermediate/ecdict_senses_b.json —— 那个文件被 gitignore，
+    换台机器就没了，脚本直接跑不起来，属于「代码依赖派生产物」的反模式。
+    改成只读 data/ 层（两层单向结构的第二层）之后，本脚本在干净 clone 上可用。
+
+    数据等价性已核对：b.json 的 2998 个词，freq 全部能在 kaoyan_dagang_core.tsv
+    里找到且一致（eastern 35 / bomb 43 / representative 48）。
+    返回 {word: {"tier", "freq", "senses": [{"zh"}...]}}
+    """
+    freq = {}
+    if not os.path.exists(FREQ_TSV):
+        sys.exit("缺少 %s —— 词频真相源" % FREQ_TSV)
+    with io.open(FREQ_TSV, encoding="utf-8") as fh:
+        for r in csv.DictReader(fh, delimiter="\t"):
+            f = (r.get("freq") or "").strip()
+            freq[r["lemma"]] = int(f) if f.isdigit() else 999999
+
+    sel = {}
+    for fn in sorted(os.listdir(SENSES)):
+        if not fn.endswith(".tsv"):
+            continue
+        w = fn[:-4]
+        zh, tier = [], ""
+        with io.open(os.path.join(SENSES, fn), encoding="utf-8") as fh:
+            for r in csv.DictReader(fh, delimiter="\t"):
+                zh.append(r["glossZh"])
+                tier = tier or r.get("tier", "")
+        sel[w] = {"tier": tier, "freq": freq.get(w, 999999),
+                  "senses": [{"zh": z} for z in zh]}
+    return sel
 
 # ── 义项可分性启发式 ────────────────────────────────────
 # ECDICT 把一个词切成 N 个义项，N 越多越难分。这里用两个信号：
@@ -102,8 +137,7 @@ def main():
     ap.add_argument("--done", action="store_true", help="只看已完成的")
     a = ap.parse_args()
 
-    with io.open(B, encoding="utf-8") as fh:
-        sel = json.load(fh)
+    sel = load_wordlist()
     done = already_done()
 
     rows = []
@@ -115,8 +149,8 @@ def main():
             continue                      # 4 义项以上先不做
         if n == 1:
             continue                      # 单义项词不需例句
-        f = v["meta"].get("freq")
-        freq = int(f) if f and f.isdigit() else 999999
+        f = v.get("freq", 999999)
+        freq = int(f) if f is not None else 999999
         rows.append({
             "w": w, "tier": v["tier"], "n": n, "freq": freq,
             "sep": separability(w, v["senses"]),

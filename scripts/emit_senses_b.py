@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-"""B 方案 -> assets/senses/（正式词库）。
+"""B 方案 -> data/wordlist/senses/（正式词库）。
 
 D16 之前，这个脚本输出到 senses_b/ 并与旧库交叉验证，
 为"要不要迁移"提供决策依据。
 D16 已决定**不迁移**，因此现在的职责只剩一个：**写出正式词库**。
 与旧库的对比保留为信息性输出（读归档快照，不参与任何迁移）。
 
-输出 assets/senses/<word>.tsv：
+输出 data/wordlist/senses/<word>.tsv：
     senseId \t pos \t glossZh \t glossEn \t trap \t tier \t note
     s1        n.      飞机场      (空)      0     T1    (空)
 
@@ -19,8 +19,8 @@ import csv, io, json, os, re, sys, collections
 
 sys.stdout.reconfigure(encoding="utf-8")
 PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-B = os.path.join(PROJ, "assets", "wordlists", "ecdict_senses_b.json")
-SDIR = os.path.join(PROJ, "assets", "senses")
+B = os.path.join(PROJ, "build", "intermediate", "ecdict_senses_b.json")
+SDIR = os.path.join(PROJ, "data", "wordlist", "senses")
 ARCHIVE = os.path.join(PROJ, "archive", "2026-09-30-pre-ECDICT",
                        "old-senses", "TRAP_AND_GLOSSEN.tsv")
 
@@ -55,7 +55,7 @@ def main():
                          % (i, pos, s["zh"], v["tier"]))
 
     n_sense = sum(len(v["senses"]) for v in sel.values())
-    print("写出 assets/senses/: %d 词 / %d 义项" % (len(sel), n_sense))
+    print("写出 data/wordlist/senses/: %d 词 / %d 义项" % (len(sel), n_sense))
     print("词性为空的义项: %d  %s"
           % (npos_blank, "(OK, fix_pos.py 已补齐)" if npos_blank == 0 else "<-- 需检查"))
 

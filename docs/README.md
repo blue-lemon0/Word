@@ -49,7 +49,7 @@ node app/server.mjs               # → http://127.0.0.1:8777
 ## 当前状态
 
 ```
-词库       ✅ 7884 义项已启用（assets/senses/，ECDICT B 方案），tier 已落到 bundle
+词库       ✅ 7884 义项已启用（data/wordlist/senses/，ECDICT B 方案），tier 已落到 bundle
 句子       🟡 20 条（lay 试点 4 义项 × 5 句），需求 39420
 TRAP       ❌ 0 个（642 个旧标记已归档，不迁移）
 词性       ✅ 400 个缺失 pos 已补齐（scripts/fix_pos.py）
@@ -57,7 +57,7 @@ glossEn    ❌ 全部为空
 bundle     ✅ SENSES_ONLY→PARTIAL，7884 卡，其中 4 张有句
 原型       ✅ 24 项测试通过（scripts/e2e_d16.js），正确显示「暂无例句」
 最小循环   ✅ node app/server.mjs —— 首页/三步答题/小结，进度落 data/user.db
-SRS        ✅ app/srs.mjs + assets/profile/srs_params.tsv，78 项 e2e 全绿
+SRS        ✅ app/srs.mjs + data/profile/srs_params.tsv，78 项 e2e 全绿
 SQLite     ✅ app/schema.sql 4 表 3 视图，Node 与 Android 共用
 设计文档   ✅ 5 篇 + D15/D16/D17 决策记录，关键数字全部脚本校验
 安卓       ❌ 未开始（按要求先放放）
@@ -85,18 +85,24 @@ SQLite     ✅ app/schema.sql 4 表 3 视图，Node 与 Android 共用
 
 ## 目录
 
+> 目录结构已在 2026-10 迁移为 source → data → build 三层。
+> **以仓库根目录的 `MANIFEST.md` 为准**，本页只作历史记录。
+
 ```
-app/         最小循环：schema.sql / srs.mjs / db.mjs / server.mjs / index.html / app.js
-assets/      内容真相源：senses/ sentences/ prompts/ profile/ bundle/(派生) wordlists/
+source/      外部快照（ECDICT CSV 唯一快照），不可再生
+data/        真相源：wordlist/senses/ wordlist/*.tsv sentences/ profile/ spec.yaml
+build/       派生产物：bundle/cards.json intermediate/，不入库
+content/     创作过程产物：prompts/
+app/         最小循环：schema.sql / srs.mjs / db.mjs / server.mjs
 scripts/     流水线 + 校验脚本
 tools/       零句最坏路径的回归基线（e2e_d16.js 依赖，功能上已被 app/ 取代）
-archive/     不可再生产物（405 人工句 / 642 TRAP / 旧规格）
-data/        user.db，运行时进度，不入库
+archive/     不可再生产物（405 人工句 / 642 TRAP / 旧格式词表 / 不可运行 ETL）
+data/user.db 运行时进度，不入库
 ```
 
 ## 词库重建流水线
 
-从 ECDICT CSV 到 `assets/senses/` 的可重跑顺序：
+从 ECDICT CSV 到 `data/wordlist/senses/` 的可重跑顺序：
 
 ```bash
 python scripts/parse_ecdict.py     # CSV -> ecdict_senses_raw.json（含字面 \n 修复）
@@ -104,8 +110,8 @@ python scripts/fix_pos.py          # 补齐 pos，剥 pl. 前缀（就地改 raw
 python scripts/diag_senses.py      # 5 类噪声量化诊断
 python scripts/build_senses.py     # 清洗 + 跨词性合并 + 排序 -> ecdict_senses_final.json
 python scripts/select_tier_b.py    # T1-T4 分档 -> ecdict_senses_b.json
-python scripts/emit_senses_b.py    # -> assets/senses/*.tsv（正式词库）
-python scripts/build_bundle.py     # -> assets/bundle/cards.json
+python scripts/emit_senses_b.py    # -> data/wordlist/senses/*.tsv（正式词库）
+python scripts/build_bundle.py     # -> build/bundle/cards.json
 ```
 
 `fix_pos.py` 必须在 `build_senses.py` **之前**——否则缺 pos 的义项
@@ -113,7 +119,7 @@ python scripts/build_bundle.py     # -> assets/bundle/cards.json
 
 ## 阻塞项
 
-1. **句子**：20 / 39420。`assets/sentences/<word>.tsv` 一词一文件，
+1. **句子**：20 / 39420。`data/sentences/<word>.tsv` 一词一文件，
    写完立刻 `python scripts/sentence_audit.py` 校验。
    T1 档 663 词 × 4 义项 × 5 句 = 13260 句是首批。
    G5（义项唯一性）机械规则查不出来，必须逐句自审 —— 这是产能瓶颈所在。

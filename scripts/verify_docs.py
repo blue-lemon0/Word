@@ -5,8 +5,8 @@ sys.stdout.reconfigure(encoding="utf-8")
 PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DOCS = os.path.join(PROJ, "docs")
 
-sel_path = os.path.join(PROJ, "assets", "wordlists", "ecdict_senses_b.json")
-fin_path = os.path.join(PROJ, "assets", "wordlists", "ecdict_senses_final.json")
+sel_path = os.path.join(PROJ, "build", "intermediate", "ecdict_senses_b.json")
+fin_path = os.path.join(PROJ, "build", "intermediate", "ecdict_senses_final.json")
 if not (os.path.exists(sel_path) and os.path.exists(fin_path)):
     # 这两个是切分中间产物，已被 .gitignore 排除（D17）。新克隆的仓库要重跑一遍。
     sys.stderr.write(
@@ -77,12 +77,12 @@ d16 = [
         PROJ, "archive", "2026-09-30-pre-ECDICT", "manual-sentences", "MANUAL.tsv"))),
     ("TRAP 快照已归档", os.path.exists(os.path.join(
         PROJ, "archive", "2026-09-30-pre-ECDICT", "old-senses", "TRAP_AND_GLOSSEN.tsv"))),
-    # 注意：assets/sentences/ 现为新语料的正式生成目标（不是 D16 删掉的旧垃圾）。
+    # 注意：data/sentences/ 现为新语料的正式生成目标（不是 D16 删掉的旧垃圾）。
     # 这里要确认的是「旧句已归档」，而不是该目录不存在。
     ("旧句子已归档到 archive",
      os.path.exists(os.path.join(
          PROJ, "archive", "2026-09-30-pre-ECDICT", "manual-sentences", "MANUAL.tsv"))),
-    ("旧 judge_results 已删除", not os.path.exists(os.path.join(PROJ, "assets", "judge_results"))),
+    ("旧 judge_results 已删除", not os.path.exists(os.path.join(PROJ, "build", "judge_results"))),
     ("senses_b 已并入 senses", not os.path.exists(os.path.join(PROJ, "assets", "senses_b"))),
     ("senses_ecdict 已删除", not os.path.exists(os.path.join(PROJ, "assets", "senses_ecdict"))),
     ("user_flags 已删除", not os.path.exists(os.path.join(PROJ, "assets", "user_flags.jsonl"))),
@@ -90,11 +90,23 @@ d16 = [
                                                      "2026-09-30-pre-ECDICT", "scripts"))),
 ]
 
-# 正式流水线必须齐备
-PIPE = ["parse_ecdict.py", "fix_pos.py", "diag_senses.py", "build_senses.py",
-        "select_tier_b.py", "emit_senses_b.py", "build_bundle.py"]
-for f in PIPE:
-    d16.append(("流水线有 %s" % f, os.path.exists(os.path.join(PROJ, "scripts", f))))
+# 词库流水线分两类，分别断言 —— 2026-10 目录迁移后不再要求全在 scripts/：
+#
+#   活链路（source/ -> data/wordlist/senses/，唯一路径，必须在 scripts/）
+#   归档件（永久不可运行：输入是仓库外临时 CSV，或会就地改写不可再生快照；
+#           保留只为溯源，断言它们在 archive/tools/etl-2026-09/）
+PIPE_LIVE = ["build_senses.py", "select_tier_b.py", "emit_senses_b.py",
+             "build_bundle.py"]
+PIPE_ARCHIVED = ["parse_ecdict.py", "fix_pos.py", "diag_senses.py", "emit_senses.py"]
+for f in PIPE_LIVE:
+    d16.append(("活链路 %s 在 scripts/" % f,
+                os.path.exists(os.path.join(PROJ, "scripts", f))))
+for f in PIPE_ARCHIVED:
+    d16.append(("不可运行 ETL %s 已归档" % f,
+                os.path.exists(os.path.join(PROJ, "archive", "tools",
+                                            "etl-2026-09", f))))
+
+# 正式流水线必须齐备 —— 见上方 PIPE_LIVE / PIPE_ARCHIVED（已按目录迁移拆分）
 
 # D17：最小循环的必备件。**前端只有一份** —— tools/index.html（原型），
 # app/ 只放服务端。曾经另写了一套 app/index.html + app/app.js，
@@ -124,19 +136,19 @@ if os.path.exists(_proto_path):
         ("原型已接服务端存档",
          all(k in proto for k in
              ["/api/ui-state", "/api/answer", "/api/mastered", "pushState"])),
-        ("原型引用的是 /assets/bundle/cards.json",
-         'BUNDLE_URL = "/assets/bundle/cards.json"' in proto),
+        ("原型引用的是 /build/bundle/cards.json",
+         'BUNDLE_URL = "/build/bundle/cards.json"' in proto),
     ]
 d16 += [
     ("SRS 参数文件存在", os.path.exists(os.path.join(
-        PROJ, "assets", "profile", "srs_params.tsv"))),
+        PROJ, "data", "profile", "srs_params.tsv"))),
     ("有 e2e_loop", os.path.exists(os.path.join(PROJ, "scripts", "e2e_loop.mjs"))),
     ("有 smoke_http", os.path.exists(os.path.join(PROJ, "scripts", "smoke_http.py"))),
     # 选词范围表被正式流水线读取（parse_ecdict / build_senses / select_tier_b /
     # diag_senses / emit_senses），不是 archive 专属的参考件。
     # 曾在"清理冗余"时把它当成 archive 的重复件删掉，流水线直接 FileNotFoundError。
     ("选词范围表在位", os.path.exists(os.path.join(
-        PROJ, "assets", "wordlists", "kaoyan_dagang_core.tsv"))),
+        PROJ, "data", "wordlist", "kaoyan_dagang_core.tsv"))),
     # schema.sql 里的关键不变量不能被改掉
     ("schema 有 due_at 列", "due_at" in io.open(
         os.path.join(PROJ, "app", "schema.sql"), encoding="utf-8").read()),
@@ -165,12 +177,12 @@ for f in DEAD:
     d16.append(("scripts/ 已无 %s" % f,
                 not os.path.exists(os.path.join(PROJ, "scripts", f))))
 # 正式词库必须等于 B 方案
-senses_dir = os.path.join(PROJ, "assets", "senses")
+senses_dir = os.path.join(PROJ, "data", "wordlist", "senses")
 n_tsv = len([f for f in os.listdir(senses_dir) if f.endswith(".tsv")]) if os.path.isdir(senses_dir) else -1
 d16.append(("正式词库 = 2998 tsv", n_tsv == 2998))
 
 # bundle 必须与新基线一致
-bp = os.path.join(PROJ, "assets", "bundle", "cards.json")
+bp = os.path.join(PROJ, "build", "bundle", "cards.json")
 if os.path.exists(bp):
     b = json.load(io.open(bp, encoding="utf-8"))
     st = b["stats"]

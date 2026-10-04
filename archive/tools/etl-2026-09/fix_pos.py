@@ -44,7 +44,7 @@ import collections, io, json, os, re, sys
 
 sys.stdout.reconfigure(encoding="utf-8")
 PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-RAW = os.path.join(PROJ, "assets", "wordlists", "ecdict_senses_raw.json")
+RAW = os.path.join(PROJ, "source", "ecdict_snapshot.json")
 
 # ECDICT definition 的行首词性标记 -> 内部简称
 DEF_POS = {

@@ -13,7 +13,7 @@ import argparse, io, json, os, sqlite3, sys, time
 sys.stdout.reconfigure(encoding="utf-8")
 PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB = os.path.join(PROJ, "data", "user.db")
-BUNDLE = os.path.join(PROJ, "assets", "bundle", "cards.json")
+BUNDLE = os.path.join(PROJ, "build", "bundle", "cards.json")
 
 
 def read_flags(limit=500):
@@ -67,7 +67,7 @@ def main():
             print("   [%s] %s" % (f["sense_id"], zh))
             print("      %s   %s%s" % (f["sentence"], when, note))
 
-    print("\n改完 assets/sentences/<word>.tsv 后：")
+    print("\n改完 data/sentences/<word>.tsv 后：")
     print("  python scripts/sentence_audit.py --fix-spans")
     print("  python scripts/build_bundle.py")
     print("  再把 data/user.db 里 sentence_flag 的对应行删掉，否则这句永远不出：")

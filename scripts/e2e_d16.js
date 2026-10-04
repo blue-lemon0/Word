@@ -9,7 +9,7 @@ const path = require("path");
 const { JSDOM } = require("jsdom");
 
 const PROJ = "D:\\projectX\\android\\Word";
-const BUNDLE = path.join(PROJ, "assets", "bundle", "cards.json");
+const BUNDLE = path.join(PROJ, "build", "bundle", "cards.json");
 const HTML = path.join(PROJ, "tools", "index.html");
 
 const bundle = JSON.parse(fs.readFileSync(BUNDLE, "utf8"));

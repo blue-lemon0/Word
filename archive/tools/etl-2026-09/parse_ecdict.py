@@ -89,7 +89,7 @@ def main():
     print("词条 %d" % len(db))
 
     core = list(csv.DictReader(
-        io.open(os.path.join(PROJ, "assets", "wordlists", "kaoyan_dagang_core.tsv"),
+        io.open(os.path.join(PROJ, "data", "wordlist", "kaoyan_dagang_core.tsv"),
                 encoding="utf-8"), delimiter="\t"))
     words = [r["lemma"] for r in core]
     freq = {r["lemma"]: r.get("freq", "") for r in core}
@@ -143,7 +143,7 @@ def main():
         if len(v["senses"]) > 9:
             print("       ... 还有 %d 个" % (len(v["senses"]) - 9))
 
-    p = os.path.join(PROJ, "assets", "wordlists", "ecdict_senses_raw.json")
+    p = os.path.join(PROJ, "source", "ecdict_snapshot.json")
     with io.open(p, "w", encoding="utf-8") as fh:
         json.dump(out, fh, ensure_ascii=False, separators=(",", ":"))
     print("\n-> %s  (%.1f MB)" % (p, os.path.getsize(p) / 1024 / 1024))

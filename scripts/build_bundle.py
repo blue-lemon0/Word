@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """构建原型/Stage4 用的紧凑聚合包。
 
-产物 assets/bundle/cards.json：
+产物 build/bundle/cards.json：
 {
   "version": "...",
   "stats": {"words":2998,"senses":7884,"withSentences":0,"cards":7884,"glossPool":N},
@@ -28,10 +28,10 @@ import csv, hashlib, io, json, os, sys, time, collections
 
 PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.stdout.reconfigure(encoding="utf-8")
-S = os.path.join(PROJ, "assets", "sentences")
-SE = os.path.join(PROJ, "assets", "senses")
-J = os.path.join(PROJ, "assets", "judge_results")
-OUT = os.path.join(PROJ, "assets", "bundle", "cards.json")
+S = os.path.join(PROJ, "data", "sentences")
+SE = os.path.join(PROJ, "data", "wordlist", "senses")
+J = os.path.join(PROJ, "build", "judge_results")
+OUT = os.path.join(PROJ, "build", "bundle", "cards.json")
 
 has_sent = os.path.isdir(S)
 has_judge = os.path.isdir(J)
@@ -54,10 +54,10 @@ def load_ipa():
     音标是**词性相关**的：read 名词 /ɹɛd/、动词 /ɹid/，所以按卡片自己的
     pos 取，取不到就退回该词的主读音。查不到音标的词返回空串，界面上不显示。
     """
-    path = os.path.join(PROJ, "assets", "wordlists", "ipa.tsv")
+    path = os.path.join(PROJ, "data", "wordlist", "ipa.tsv")
     if not os.path.exists(path):
         sys.stderr.write(
-            "缺少 assets/wordlists/ipa.tsv —— 先跑  python scripts/build_ipa.py\n")
+            "缺少 data/wordlist/ipa.tsv —— 先跑  python scripts/build_ipa.py\n")
         return {}
     out = {}
     with io.open(path, encoding="utf-8") as fh:

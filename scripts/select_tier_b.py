@@ -13,7 +13,7 @@ ecdict_senses_final.json 里每个词的 senses 数组已按优先级降序排�
 import csv, io, json, os, re, sys, collections
 sys.stdout.reconfigure(encoding="utf-8")
 PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-FINAL = os.path.join(PROJ, "assets", "wordlists", "ecdict_senses_final.json")
+FINAL = os.path.join(PROJ, "build", "intermediate", "ecdict_senses_final.json")
 
 # 词级分档 -> 保留义项数
 # 阈值经实测校准：目标是 7000-8500 义项、且高频词不被腰斩。
@@ -57,7 +57,7 @@ def keep_for(w):
 def main():
     final = json.load(io.open(FINAL, encoding="utf-8"))
     core = list(csv.reader(
-        io.open(os.path.join(PROJ, "assets", "wordlists", "kaoyan_dagang_core.tsv"),
+        io.open(os.path.join(PROJ, "data", "wordlist", "kaoyan_dagang_core.tsv"),
                 encoding="utf-8"), delimiter="\t"))[1:]
     words = [r[0] for r in core]
 
@@ -108,7 +108,7 @@ def main():
         if drop:
             print("        (弃: " + " / ".join(drop) + ")")
 
-    p = os.path.join(PROJ, "assets", "wordlists", "ecdict_senses_b.json")
+    p = os.path.join(PROJ, "build", "intermediate", "ecdict_senses_b.json")
     with io.open(p, "w", encoding="utf-8") as fh:
         json.dump(sel, fh, ensure_ascii=False, separators=(",", ":"))
     print("\n-> %s (%.2f MB)" % (p, os.path.getsize(p) / 1024 / 1024))

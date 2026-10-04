@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""生成 assets/wordlists/ipa.tsv —— 每个词的音标。
+"""生成 data/wordlist/ipa.tsv —— 每个词的音标。
 
 来源 CMUdict（CMU 发音词典，免费离线，126052 词条），ARPAbet 转 IPA。
 不花钱、不联网、不调用任何服务。
@@ -14,8 +14,8 @@ import csv, io, json, os, re, sys
 
 sys.stdout.reconfigure(encoding="utf-8")
 PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-B = os.path.join(PROJ, "assets", "wordlists", "ecdict_senses_b.json")
-OUT = os.path.join(PROJ, "assets", "wordlists", "ipa.tsv")
+B = os.path.join(PROJ, "build", "intermediate", "ecdict_senses_b.json")
+OUT = os.path.join(PROJ, "data", "wordlist", "ipa.tsv")
 
 ARPABET = {
     "AA": "ɑ", "AE": "æ", "AH": "ʌ", "AO": "ɔ", "AW": "aʊ", "AY": "aɪ",

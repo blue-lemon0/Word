@@ -10,7 +10,7 @@ import { loadParams, applyReview, decayIfIdle, isMastered, weight } from './srs.
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const PROJ = path.resolve(HERE, '..');
 export const SCHEMA_SQL = path.join(HERE, 'schema.sql');
-export const BUNDLE = path.join(PROJ, 'assets', 'bundle', 'cards.json');
+export const BUNDLE = path.join(PROJ, 'build', 'bundle', 'cards.json');
 export const USER_DB = path.join(PROJ, 'data', 'user.db');
 const SCHEMA_VERSION = '1';
 

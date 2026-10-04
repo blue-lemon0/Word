@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """句子落盘 + 规则质检。
 
-opencode（我）生成的句子写到 assets/sentences/<word>.tsv，
+opencode（我）生成的句子写到 data/sentences/<word>.tsv，
 由本脚本做机械质检（G1/G2/G3/G4/G6/G7）并汇总统计。
 
 分工：
@@ -15,9 +15,9 @@ import csv, io, json, os, re, sys, collections, hashlib
 
 sys.stdout.reconfigure(encoding="utf-8")
 PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SDIR = os.path.join(PROJ, "assets", "sentences")
-SE = os.path.join(PROJ, "assets", "senses")
-WL = os.path.join(PROJ, "assets", "wordlists")
+SDIR = os.path.join(PROJ, "data", "sentences")
+SE = os.path.join(PROJ, "data", "wordlist", "senses")
+WL = os.path.join(PROJ, "data", "wordlist")
 
 HEADER = ["senseId", "text", "clue", "span_start", "span_len",
           "translation", "note", "source"]
@@ -425,6 +425,27 @@ def check(rows, senses, core_known=True):
         if r["senseId"] not in valid_ids:
             v.append(("SID", "senseId %s 不在词库" % r["senseId"]))
 
+        # GLOSS note 里记的释义必须指向词库的同一个义项
+        #
+        # 为什么需要这条：写第 5 批时我按「以为的义项顺序」贴释义，eastern 顺序
+        # 就贴错了一组（字典是 东方人/东正教徒/东方的/向东的，我按
+        # 东方/东正教徒/东方人/向东 写），wood s3 也贴错（字典是动词
+        # 「植林于」，我当成「植林地」）。**释义贴错 = 教错，比没有例句更糟。**
+        # 当时靠生成器内的「按释义反查 senseId」挡住，但那个脚本在仓库外、
+        # 下一批就会忘。这条规则把同样的保护固化进常驻质检：不管句子从哪来，
+        # 手写、模型生成、还是从别处导入，都过这一关。
+        #
+        # 判据是「互相包含」而不是相等：note 末尾形如「<说明> = <释义>」，
+        # 而 <释义> 常带注解（指责（非正式指控）= 指责、归咎于 = 归咎），
+        # 要求全等会误报 542 条。互不包含才是真错贴（东方的 vs 东方人）。
+        _note = r.get("note", "")
+        if " = " in _note and r["senseId"] in zh_by_id:
+            claimed = _note.rsplit(" = ", 1)[1].strip().rstrip("。．.、")
+            real = (zh_by_id[r["senseId"]] or "").strip()
+            if claimed and real and claimed not in real and real not in claimed:
+                v.append(("GLOSS", "note 释义 '%s' 与词库 %s 的 '%s' 互不包含"
+                                   "（义项贴错）" % (claimed, r["senseId"], real)))
+
         # note 应提及目标词（说明是人工/模型自觉写的辨析）
         if not r.get("note", "").strip():
             v.append(("NOTE", "缺少辨析 note"))
@@ -439,7 +460,7 @@ def check(rows, senses, core_known=True):
 def audit(verbose=True, only=None):
     """全库审计。"""
     if not os.path.isdir(SDIR):
-        print("assets/sentences/ 不存在——还没有任何句子。")
+        print("data/sentences/ 不存在——还没有任何句子。")
         return None
 
     allv = []
@@ -537,7 +558,7 @@ def fix_spans(word=None, dry=False):
     而实际 UI 用的是字符偏移）。这个函数把它变成机械操作。
     """
     if not os.path.isdir(SDIR):
-        print("assets/sentences/ 不存在")
+        print("data/sentences/ 不存在")
         return 0
     words = sorted(f[:-4] for f in os.listdir(SDIR) if f.endswith(".tsv"))
     if word:

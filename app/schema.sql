@@ -2,7 +2,7 @@
 -- Node（app/db.mjs，node:sqlite）与将来的 Android（原生 SQLite）跑同一份 SQL。
 --
 -- 设计边界（见 docs/decisions/D17-存储分层.md）：
---   内容（7884 义项 + 句子）**不入库**，它是 assets/bundle/cards.json，
+--   内容（7884 义项 + 句子）**不入库**，它是 build/bundle/cards.json，
 --   一次性读进内存。本库只存「索引投影」+「用户进度」。
 --
 -- 三张表的分工：

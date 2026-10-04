@@ -91,7 +91,7 @@ try:
     ok(os.path.exists(os.path.join(PROJ, "app", "index.html")) is False,
        "app/index.html 已删除（不再有第二份 UI）")
 
-    code, body = req("/assets/bundle/cards.json")
+    code, body = req("/build/bundle/cards.json")
     b = json.loads(body.decode("utf-8"))
     ok(code == 200 and b["stats"]["withSentences"] > 0,
        f'bundle 可访问，有句义项 {b["stats"]["withSentences"]}')
