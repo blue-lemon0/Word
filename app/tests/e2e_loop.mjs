@@ -2,17 +2,17 @@
 //   node scripts/e2e_loop.mjs
 //
 // 覆盖：进度持久化、到期判定、幂等、事务原子性、SRS 数值（与 verify_srs.py 对齐）。
-// 用临时 db，不碰 data/user.db。
+// 用临时 db，不碰 app/state/user.db。
 
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import * as store from '../app/db.mjs';
-import { loadParams, easeFactor, classify, applyReview, fastThresholdMs } from '../app/srs.mjs';
+import * as store from '../db.mjs';
+import { loadParams, easeFactor, classify, applyReview, fastThresholdMs } from '../srs.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
-const PROJ = path.resolve(HERE, '..');
+const REPO = path.resolve(HERE, '..', '..');
 const TMP = path.join(os.tmpdir(), 'word-e2e-' + Date.now());
 
 let pass = 0, fail = 0;
@@ -35,7 +35,7 @@ ok(nCards === bundle.cards.length, `card 投影 ${nCards} = bundle 义项数`);
 ok(db.prepare('SELECT COUNT(*) n FROM card').get().n === bundle.cards.length,
    'card 表行数与 bundle 一致');
 ok(store.syncBundle(db, bundle) === 0, 'bundle 未变时跳过重建');
-const withSent = bundle.cards.filter((c) => c.rows.length).length;
+const withSent = bundle.cards.filter((c) => c.sentences.length).length;
 ok(db.prepare('SELECT COUNT(*) n FROM v_pool').get().n === withSent,
    `v_pool = ${withSent}（只有有句义项可练）`);
 ok(db.prepare('SELECT COUNT(*) n FROM v_due').get().n === withSent,
@@ -43,7 +43,7 @@ ok(db.prepare('SELECT COUNT(*) n FROM v_due').get().n === withSent,
 ok(db.prepare('SELECT COUNT(*) n FROM card_state').get().n === 0,
    '未练过的卡不预插空状态行');
 
-const lay = bundle.cards.find((c) => c.w === 'lay' && c.s === 's1');
+const lay = bundle.cards.find((c) => c.word === 'lay' && c.senseId === 's1');
 ok(lay != null, 'bundle 里有 lay#s1');
 
 // ─────────────────────────────────────────────────────────
@@ -310,7 +310,7 @@ group('长期不练的衰减是惰性的');
     elapsedMs: 3000, ts: t,
   });
   const raw = db2.prepare('SELECT * FROM card_state WHERE word=? AND sense_id=?').get('lay', 's1');
-  const decayed = (await import('../app/srs.mjs')).decayIfIdle(P, raw, t + 200 * DAY);
+  const decayed = (await import('../srs.mjs')).decayIfIdle(P, raw, t + 200 * DAY);
   ok(raw.stability === r.stability, '读取不写库：原值未被改动');
   ok(decayed.stability < raw.stability && decayed.rusty === 1,
      `只读时算出衰减 ${raw.stability.toFixed(2)}→${decayed.stability.toFixed(2)} 并标 rusty`);

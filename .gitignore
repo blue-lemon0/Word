@@ -1,9 +1,9 @@
 # ─────────────────────────────────────────────────────────────
-# 三层单向结构：source/ → data/ → build/
-#   source/  外部快照，不可再生，唯一必须备份的
-#   data/    真相源，人可读可改，全部入库
-#   build/   派生产物，一条命令重建，永不入库
-# 详见仓库根 MANIFEST.md
+# 双子系统 + 交接区：
+#   content-kit/source/  外部快照，不可再生，唯一必须备份的
+#   content-kit/data/    内容真相源，人可读可改，全部入库
+#   build/               交接区（content-kit 导出、app 导入），一条命令重建，永不入库
+# 详见仓库根 README.md 与 CONTRACT.md
 # ─────────────────────────────────────────────────────────────
 
 # Python
@@ -13,15 +13,11 @@ __pycache__/
 # Node（e2e 测试用 jsdom）
 node_modules/
 
-# ── 派生产物 ──────────────────────────────────────────────
+# ── 交接产物（content-kit 产出、app 消费；重建：content-kit/pipeline/build_bundle.py）──
 build/
 
-# ── 中间产物（旧 ECDICT 切分链的可重建结果，不再是任何脚本的输入）──
-# ecdict_senses_final.json / _b.json 曾被 pick_words.py 当输入，
-# 该依赖已解除：词表改读 data/wordlist/senses/ + data/wordlist/kaoyan_dagang_core.tsv
-
-# ── 运行时数据库（学习进度，本地状态，不入库）──────────────
-# 注意：只忽略 db 文件本身。data/ 下其余是真相源，必须入库。
+# ── 运行时数据库（app 的学习进度：app/state/user.db，本地状态，不入库）──────
+# 注意：只忽略 db 文件本身。content-kit/data/ 下是内容真相源，必须入库。
 *.db
 *.db-wal
 *.db-shm

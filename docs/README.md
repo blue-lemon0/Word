@@ -85,19 +85,22 @@ SQLite     ✅ app/schema.sql 4 表 3 视图，Node 与 Android 共用
 
 ## 目录
 
-> 目录结构已在 2026-10 迁移为 source → data → build 三层。
-> **以仓库根目录的 `MANIFEST.md` 为准**，本页只作历史记录。
+> 目录结构在 2026-10 第二次迁移：source/data 三层 → **双子系统
+> `content-kit/` + `app/`**，交接格式见根 `CONTRACT.md`。
+> **现行结构以仓库根 `README.md` / `MANIFEST.md` 为准**，下面的三层布局
+> 是 2026-10 拆分前的历史快照。
 
 ```
-source/      外部快照（ECDICT CSV 唯一快照），不可再生
-data/        真相源：wordlist/senses/ wordlist/*.tsv sentences/ profile/ spec.yaml
-build/       派生产物：bundle/cards.json intermediate/，不入库
-content/     创作过程产物：prompts/
-app/         最小循环：schema.sql / srs.mjs / db.mjs / server.mjs
-scripts/     流水线 + 校验脚本
-tools/       零句最坏路径的回归基线（e2e_d16.js 依赖，功能上已被 app/ 取代）
+source/      → 现 content-kit/source/（ECDICT 唯一快照，不可再生）
+data/        → 现 content-kit/data/（wordlist/senses/ wordlist/*.tsv sentences/）
+               SRS 参数 profile/ → 现 app/config/；spec.yaml → content-kit/spec.yaml
+build/       派生产物：bundle/cards.json（intermediate/ 已删除），不入库
+content/     → 现 content-kit/prompts/
+app/         → 现 app/（schema.sql / srs.mjs / db.mjs / server.mjs / web/）
+scripts/     内容脚本 → content-kit/pipeline/；verify_docs.py 留在根 scripts/
+tools/       旧零句回归基线（已随 app/web/ 唯一 UI 退役）
 archive/     不可再生产物（405 人工句 / 642 TRAP / 旧格式词表 / 不可运行 ETL）
-data/user.db 运行时进度，不入库
+app/state/user.db 运行时进度（原 data/user.db），不入库
 ```
 
 ## 词库重建流水线

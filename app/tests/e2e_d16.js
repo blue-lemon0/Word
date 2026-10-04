@@ -1,4 +1,4 @@
-﻿// D16 新基线验收：词库先行、句子为空。
+// D16 新基线验收：词库先行、句子为空。
 // 断言原型在这个状态下不崩溃，且给出诚实的说明。
 //
 // 关键点：主脚本用 `let state`，属于 eval 作用域，
@@ -10,7 +10,7 @@ const { JSDOM } = require("jsdom");
 
 const PROJ = "D:\\projectX\\android\\Word";
 const BUNDLE = path.join(PROJ, "build", "bundle", "cards.json");
-const HTML = path.join(PROJ, "tools", "index.html");
+const HTML = path.join(PROJ, "app", "web", "index.html");
 
 const bundle = JSON.parse(fs.readFileSync(BUNDLE, "utf8"));
 console.log("bundle mode =", bundle.stats.mode,
@@ -23,7 +23,7 @@ console.log("");
 const dom = new JSDOM(fs.readFileSync(HTML, "utf8"), {
   runScripts: "outside-only",
   pretendToBeVisual: true,
-  url: "http://127.0.0.1:8000/tools/index.html"
+  url: "http://127.0.0.1:8000/"
 });
 const w = dom.window;
 
@@ -70,14 +70,14 @@ new Promise(res => setTimeout(res, 300)).then(() => {
   ok("stats 有句义项 + 无句义项 = 总义项",
      BUNDLE.stats.withSentences + BUNDLE.stats.noSentence === CARDS.length,
      BUNDLE.stats.withSentences + "+" + BUNDLE.stats.noSentence + " vs " + CARDS.length);
-  ok("每张卡都有 rows 数组", CARDS.every(c => Array.isArray(c.rows)));
-  ok("每张卡都有 glossZh", CARDS.every(c => typeof c.zh === "string" && c.zh.length > 0));
+  ok("每张卡都有 sentences 数组", CARDS.every(c => Array.isArray(c.sentences)));
+  ok("每张卡都有 gloss", CARDS.every(c => typeof c.gloss === "string" && c.gloss.length > 0));
   // fix_pos.py：ECDICT 约 0.5% 的释义不带词性标记，已按分块规则补齐
   const noPos = CARDS.filter(c => !c.pos);
   ok("每张卡都有词性（fix_pos.py 已补齐）", noPos.length === 0,
-     noPos.length ? noPos.slice(0,5).map(c=>c.w+"#"+c.s+"/"+c.zh).join(", ") : "");
-  ok("无 pl. 前缀残留", !CARDS.some(c => /^pl\.\s/i.test(c.zh)),
-     CARDS.filter(c => /^pl\.\s/i.test(c.zh)).slice(0,5).map(c=>c.zh).join(", "));
+     noPos.length ? noPos.slice(0,5).map(c=>c.word+"#"+c.senseId+"/"+c.gloss).join(", ") : "");
+  ok("无 pl. 前缀残留", !CARDS.some(c => /^pl\.\s/i.test(c.gloss)),
+     CARDS.filter(c => /^pl\.\s/i.test(c.gloss)).slice(0,5).map(c=>c.gloss).join(", "));
   ok("glossPool 足够做干扰项", GLOSS.length > 1000, GLOSS.length);
   ok("id 唯一", new Set(CARDS.map(c => c.id)).size === CARDS.length);
   ok("boot 后 state 已初始化", !!state);
@@ -107,7 +107,7 @@ new Promise(res => setTimeout(res, 300)).then(() => {
 
   const sentHTML = document.getElementById("sentence").innerHTML;
   ok("显示「还没有例句」", sentHTML.indexOf("还没有例句") >= 0, sentHTML.slice(0, 100));
-  ok("显示该义项释义", sentHTML.indexOf(CARDS[0].zh) >= 0, CARDS[0].zh);
+  ok("显示该义项释义", sentHTML.indexOf(CARDS[0].gloss) >= 0, CARDS[0].gloss);
   ok("不渲染选项", document.getElementById("options").innerHTML === "" &&
                    document.getElementById("options").style.display === "none");
   ok("给出一个「下一题」出口",
@@ -142,9 +142,9 @@ new Promise(res => setTimeout(res, 300)).then(() => {
 
   // 有句义项：出题链路（renderQuestion）要能真正渲染出一题
   if (BUNDLE.stats.withSentences > 0) {
-    const full = CARDS.find(c => hasRows(c) && c.rows.length >= 5);
+    const full = CARDS.find(c => hasRows(c) && c.sentences.length >= 5);
     const row = safe(() => nextRow(full));
-    ok("有句义项 nextRow 返回句子", row.err === null && row.v && row.v.t,
+    ok("有句义项 nextRow 返回句子", row.err === null && row.v && row.v.text,
        row.err || "null");
     const rr = safe(() => { startSolo(full.id); });
     ok("有句义项可正常开练", rr.err === null, rr.err);
@@ -154,11 +154,11 @@ new Promise(res => setTimeout(res, 300)).then(() => {
     const i0 = qh.indexOf("<mark>");
     const i1 = qh.indexOf(">", i0) + 1;
     const marked = i0 >= 0 ? qh.slice(i1, qh.indexOf("</mark>", i1)) : null;
-    ok("渲染句子文本", qh.indexOf(row.v.t.slice(0, 12)) >= 0 || marked,
+    ok("渲染句子文本", qh.indexOf(row.v.text.slice(0, 12)) >= 0 || marked,
        qh.slice(0, 80));
     ok("<mark> 高亮的是目标词",
-       !!marked && full.w.toLowerCase().startsWith(marked.toLowerCase().slice(0, full.w.length)),
-       "marked=" + marked + " 期望以目标词 " + full.w + " 开头");
+       !!marked && full.word.toLowerCase().startsWith(marked.toLowerCase().slice(0, full.word.length)),
+       "marked=" + marked + " 期望以目标词 " + full.word + " 开头");
     // 选项先隐藏，点「我不会 / 显示释义」才 reveal（这是设计，不是 bug）
     const optBox = document.getElementById("options");
     ok("出题时选项默认隐藏（先自己回忆）",
@@ -176,15 +176,15 @@ new Promise(res => setTimeout(res, 300)).then(() => {
   ok("可练义项数与 stats.withSentence 一致",
      playable === BUNDLE.stats.withSentences, playable + " vs " + BUNDLE.stats.withSentences);
   ok("有句义项每项恰好 5 句（试点批次）",
-     CARDS.filter(hasRows).every(c => c.rows.length === 5),
-     CARDS.filter(c => hasRows(c) && c.rows.length !== 5)
-           .slice(0, 5).map(c => c.w + "#" + c.s + ":" + c.rows.length).join(", "));
+     CARDS.filter(hasRows).every(c => c.sentences.length === 5),
+     CARDS.filter(c => hasRows(c) && c.sentences.length !== 5)
+           .slice(0, 5).map(c => c.word + "#" + c.senseId + ":" + c.sentences.length).join(", "));
 // span 指向目标词（UI 用 <mark> 高亮"要猜义项的那个词"）。
-  // 不猜词形规则：bundle 的 k 就是 span 处那段文本，由 --fix-spans 机械算出。
+  // 不猜词形规则：bundle 的 form 就是 span 处那段文本，由 --fix-spans 机械算出。
   const badSpan = [];
-  CARDS.filter(hasRows).forEach(c => c.rows.forEach(r => {
-    const seg = (r.t || "").slice(r.ss, r.ss + (r.sl || 0));
-    if (!r.k || r.k !== seg) badSpan.push(c.w + "#" + c.s + ":span='" + seg + "' k='" + (r.k || "") + "'");
+  CARDS.filter(hasRows).forEach(c => c.sentences.forEach(r => {
+    const seg = (r.text || "").slice(r.spanStart, r.spanStart + (r.spanLen || 0));
+    if (!r.form || r.form !== seg) badSpan.push(c.word + "#" + c.senseId + ":span='" + seg + "' form='" + (r.form || "") + "'");
   }));
   ok("所有 span 精确指向目标词", badSpan.length === 0, badSpan.slice(0, 5).join(" | "));
   ok("无未捕获错误", __ERRORS__.length === 0, __ERRORS__.join(" | "));

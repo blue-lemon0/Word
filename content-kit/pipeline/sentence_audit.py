@@ -16,7 +16,7 @@ import csv, io, json, os, re, sys, collections, hashlib
 import yaml
 
 sys.stdout.reconfigure(encoding="utf-8")
-PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # = content-kit/
 SDIR = os.path.join(PROJ, "data", "sentences")
 SE = os.path.join(PROJ, "data", "wordlist", "senses")
 WL = os.path.join(PROJ, "data", "wordlist")
@@ -28,7 +28,7 @@ HEADER = ["senseId", "text", "clue", "span_start", "span_len",
 # 「一个句子该不该被接受」是内容决策，真相源在数据层不在代码。
 # 2026-10 规格反转前这里是硬编码常量，由 make_spec.py 反向同步；
 # 现已反转：改规格只改 spec.yaml，立即生效，无需动代码。
-with io.open(os.path.join(PROJ, "data", "spec.yaml"), encoding="utf-8") as _fh:
+with io.open(os.path.join(PROJ, "spec.yaml"), encoding="utf-8") as _fh:
     _SPEC = yaml.safe_load(_fh)
 LEN_RANGE = {int(k): tuple(v) for k, v in _SPEC["sentence_length"].items()}
 TARGET_SENTS = int(_SPEC["sentences_per_sense"])

@@ -1,24 +1,28 @@
 # -*- coding: utf-8 -*-
-"""构建原型/Stage4 用的紧凑聚合包。
+"""构建原型/Stage4 用的紧凑聚合包（content-kit 的导出物，app 的导入物）。
+
+契约格式详见仓库根 CONTRACT.md。字段全部自解释（不用缩写）：
 
 产物 build/bundle/cards.json：
 {
+  "format": "word-bundle", "schemaVersion": 1,
   "version": "...",
   "stats": {"words":2998,"senses":7884,"withSentences":0,"cards":7884,"glossPool":N},
   "glossPool": ["释义1","释义2",...],          # 跨词干扰项池
   "cards": [
-    {"id":"lay#s1","w":"lay","s":"s1","pos":"vt.","zh":"放置","en":"","trap":0,
-     "tier":"T1",
-     "rows": [{
-                # k = 目标词在句中的实际词形（laid / cast / running…），
-                #    ss/sl 指向的就是它。下游不必再猜词形规则。
-                "t": "...", "k": "laid", "c": "clue", "ss": 4, "sl": 4,
-                "tr": "...", "n": "...", "src": "GENERATED"}]}
+    {"id":"lay#s1","word":"lay","senseId":"s1","pos":"vt.","gloss":"放置",
+     "glossEn":"","trap":0,"tier":"T1","ipa":"...",
+     "sentences": [{
+        # form = 目标词在句中的实际词形（laid / cast / running…），
+        #   spanStart/spanLen 指向的就是它。下游不必再猜词形规则。
+        "text":"...","form":"laid","clue":"clue",
+        "spanStart":4,"spanLen":4,
+        "translation":"...","note":"...","source":"GENERATED"}]}
   ]
 }
 
 D16 之后的要点：
-  1. 义项表是唯一真相源，**没有句子的义项也要成卡**（rows 为空）。
+  1. 义项表是唯一真相源，**没有句子的义项也要成卡**（sentences 为空）。
      旧版会把无 PASS 句的义项丢掉，导致词库里"消失"一部分义项——
      那是内容缺失，不该由打包逻辑掩盖。
   2. 句子目录不存在时（LLM 通道禁用期）自动降级为纯义项包。
@@ -26,12 +30,14 @@ D16 之后的要点：
 """
 import csv, hashlib, io, json, os, sys, time, collections
 
-PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.stdout.reconfigure(encoding="utf-8")
-S = os.path.join(PROJ, "data", "sentences")
-SE = os.path.join(PROJ, "data", "wordlist", "senses")
-J = os.path.join(PROJ, "build", "judge_results")
-OUT = os.path.join(PROJ, "build", "bundle", "cards.json")
+# KIT = content-kit/（本脚本上两级）；REPO = 仓库根。
+# data/source/spec 归 content-kit；build/ 是根级交接区（app 从这里导入）。
+KIT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+REPO = os.path.dirname(KIT)
+S = os.path.join(KIT, "data", "sentences")
+SE = os.path.join(KIT, "data", "wordlist", "senses")
+J = os.path.join(REPO, "build", "judge_results")
+OUT = os.path.join(REPO, "build", "bundle", "cards.json")
 
 has_sent = os.path.isdir(S)
 has_judge = os.path.isdir(J)
@@ -54,11 +60,11 @@ def load_ipa():
     音标是**词性相关**的：read 名词 /ɹɛd/、动词 /ɹid/，所以按卡片自己的
     pos 取，取不到就退回该词的主读音。查不到音标的词返回空串，界面上不显示。
     """
-    path = os.path.join(PROJ, "data", "wordlist", "ipa.tsv")
+    path = os.path.join(KIT, "data", "wordlist", "ipa.tsv")
     if not os.path.exists(path):
         sys.stderr.write(
-            "缺少 data/wordlist/ipa.tsv —— 该文件平时已入库，真缺失说明 data/ 损坏；\n"
-            "重生成需把 archive/2026-10-retire/scripts/build_ipa.py 移回 scripts/（需 cmudict）\n")
+            "缺少 content-kit/data/wordlist/ipa.tsv —— 该文件平时已入库，真缺失说明数据损坏；\n"
+            "重生成需把 archive/2026-10-retire/scripts/build_ipa.py 取出（需 cmudict）\n")
         return {}
     out = {}
     with io.open(path, encoding="utf-8") as fh:
@@ -115,23 +121,25 @@ for f in sorted(os.listdir(SE)):
         n_sent += len(rs)
         cards.append({
             "id": f"{lemma}#{sid}",
-            "w": lemma, "s": sid,
+            "word": lemma, "senseId": sid,
             "pos": s.get("pos", ""),
             "ipa": ipa_of(ipa_tbl, lemma, s.get("pos", "")),
-            "zh": zh,
-            "en": s.get("glossEn", ""),
+            "gloss": zh,
+            "glossEn": s.get("glossEn", ""),
             "trap": 1 if s.get("trap") == "1" else 0,
             "tier": s.get("tier", ""),
-            "rows": [{
-                "t": r["text"],
-                # k = span 处那段文本，即目标词的实际词形。
+            "sentences": [{
+                "text": r["text"],
+                # form = span 处那段文本，即目标词的实际词形。
                 # 不规则动词（lay->laid）猜不出来，直接把结果带进 bundle。
-                "k": r["text"][int(r.get("span_start") or 0):
+                "form": r["text"][int(r.get("span_start") or 0):
                                int(r.get("span_start") or 0) + int(r.get("span_len") or 0)],
-                "c": r.get("clue", ""),
-                "ss": int(r.get("span_start") or 0), "sl": int(r.get("span_len") or 0),
-                "tr": r.get("translation", ""), "n": r.get("note", ""),
-                "src": r.get("source", ""),
+                "clue": r.get("clue", ""),
+                "spanStart": int(r.get("span_start") or 0),
+                "spanLen": int(r.get("span_len") or 0),
+                "translation": r.get("translation", ""),
+                "note": r.get("note", ""),
+                "source": r.get("source", ""),
             } for r in rs],
         })
 
@@ -141,12 +149,14 @@ for f in sorted(os.listdir(SE)):
 h = hashlib.sha1()
 for c in cards:
     h.update(("%s\x1f%s\x1f%d\x1f%s\x1f%d\x1e" % (
-        c["w"], c["s"], len(c["rows"]), c["zh"], c["trap"])).encode("utf-8"))
-    for r in c["rows"]:
-        h.update(("%s\x1f%s\x1e" % (r["t"], r["c"])).encode("utf-8"))
+        c["word"], c["senseId"], len(c["sentences"]), c["gloss"], c["trap"])).encode("utf-8"))
+    for r in c["sentences"]:
+        h.update(("%s\x1f%s\x1e" % (r["text"], r["clue"])).encode("utf-8"))
 version = "%s-%s" % (time.strftime("%Y%m%d"), h.hexdigest()[:8])
 
 bundle = {
+    "format": "word-bundle",
+    "schemaVersion": 1,
     "version": version,
     "stats": {
         "words": n_words,
@@ -182,5 +192,5 @@ print("  ->", OUT)
 if st["noSentence"]:
     print("\n  [注意] %d 个义项没有例句，原型需能显示「暂无例句」状态" % st["noSentence"])
 
-d = collections.Counter(len(c["rows"]) for c in cards)
+d = collections.Counter(len(c["sentences"]) for c in cards)
 print("  每卡句数分布:", dict(sorted(d.items())))

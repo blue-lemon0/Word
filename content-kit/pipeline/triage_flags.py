@@ -11,9 +11,11 @@
 import argparse, io, json, os, sqlite3, sys, time
 
 sys.stdout.reconfigure(encoding="utf-8")
-PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DB = os.path.join(PROJ, "data", "user.db")
-BUNDLE = os.path.join(PROJ, "build", "bundle", "cards.json")
+# 本工具属 content-kit，但读的是 app 的运行时状态（用户标的问题句写在 user.db）。
+# 这是两侧少数的真实耦合点：方向固定为 内容工具 -> 只读 app 状态。
+REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+DB = os.path.join(REPO, "app", "state", "user.db")
+BUNDLE = os.path.join(REPO, "build", "bundle", "cards.json")
 
 
 def read_flags(limit=500):
@@ -51,7 +53,7 @@ def main():
     zh_of = {}
     if os.path.exists(BUNDLE):
         b = json.load(io.open(BUNDLE, encoding="utf-8"))
-        zh_of = {(c["w"], c["s"]): c["zh"] for c in b["cards"]}
+        zh_of = {(c["word"], c["senseId"]): c["gloss"] for c in b["cards"]}
 
     words = {}
     for f in flags:

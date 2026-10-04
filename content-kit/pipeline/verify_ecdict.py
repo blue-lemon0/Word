@@ -8,9 +8,10 @@ D16 起：
 """
 import collections, csv, io, json, os, re, sys
 sys.stdout.reconfigure(encoding="utf-8")
-PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # = content-kit/
+REPO = os.path.dirname(PROJ)
 NEW = os.path.join(PROJ, "data", "wordlist", "senses")
-OLD = os.path.join(PROJ, "archive", "2026-09-30-pre-ECDICT",
+OLD = os.path.join(REPO, "archive", "2026-09-30-pre-ECDICT",
                    "old-senses", "TRAP_AND_GLOSSEN.tsv")
 OLD_DIR = os.path.dirname(OLD)
 

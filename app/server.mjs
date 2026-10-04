@@ -147,9 +147,10 @@ const MIME = {
 };
 
 function serveStatic(res, pathname) {
-  // 原来的原型在 tools/ 下，保持那个路径可用，同时把 / 指到它
+  // UI 现在归属 app：app/web/index.html。其余静态路径（如 /build/bundle/cards.json）
+  // 仍相对仓库根解析，作为 content-kit 产物的只读交接区。
   const rel = pathname === '/' || pathname === '/index.html'
-    ? 'tools/index.html'
+    ? 'app/web/index.html'
     : decodeURIComponent(pathname.replace(/^\/+/, ''));
   const abs = path.resolve(PROJ, rel);
   if (!abs.startsWith(path.resolve(PROJ)) || !fs.existsSync(abs)
@@ -180,7 +181,7 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, '127.0.0.1', () => {
   const ov = store.overview(db, params);
-  console.log(`页面      : http://127.0.0.1:${PORT}/  (tools/index.html，未改动)`);
+  console.log(`页面      : http://127.0.0.1:${PORT}/  (app/web/index.html)`);
   console.log(`card 投影 : ${n} 张（bundle ${bundle.version}）`);
   console.log(`可练 ${ov.pool} / 到期 ${ov.due} / 已掌握 ${ov.mastered} / 错题 ${ov.wrong}`);
   console.log(`user.db   : ${store.USER_DB}`);

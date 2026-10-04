@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """验证 03-记忆曲线 里的 ease_factor 公式与推演表是否真的算得出来。
 
-参数不再硬编码在这里 —— 唯一真相源是 data/profile/srs_params.tsv，
+参数不再硬编码在这里 —— 唯一真相源是 app/config/srs_params.tsv，
 与 app/srs.mjs 读的是同一份文件。
 scripts/e2e_loop.mjs 会把本脚本输出的连对 4 次向量逐格比对，
 所以将来移植到 Kotlin 时有一份可对照的数值基准。
@@ -9,8 +9,8 @@ scripts/e2e_loop.mjs 会把本脚本输出的连对 4 次向量逐格比对，
 import io, os, sys
 
 sys.stdout.reconfigure(encoding="utf-8")
-PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PARAMS = os.path.join(PROJ, "data", "profile", "srs_params.tsv")
+APP = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # = app/
+PARAMS = os.path.join(APP, "config", "srs_params.tsv")
 
 
 def load_params(path=PARAMS):
@@ -54,7 +54,7 @@ def drift_d(D, grade, p=P):
     return max(1.0, min(10.0, D + p["D_DRIFT"] * (4 - grade)))
 
 
-print("=== 参数来源: data/profile/srs_params.tsv ===")
+print("=== 参数来源: app/config/srs_params.tsv ===")
 print("  S0_TRAP=%.2f S0_MULTI_S1=%.2f S0_SINGLE=%.2f S0_NEW=%.2f S0_RARE=%.2f"
       % (P["S0_TRAP"], P["S0_MULTI_S1"], P["S0_SINGLE"], P["S0_NEW"], P["S0_RARE"]))
 print("  MASTER_S=%.0f MASTER_REPS=%.0f MASTER_STREAK=%.0f"

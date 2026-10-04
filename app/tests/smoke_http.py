@@ -13,9 +13,9 @@
 import json, os, re, shutil, subprocess, sys, time, urllib.request, urllib.error
 
 sys.stdout.reconfigure(encoding="utf-8")
-PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 TMP = os.environ["TEMP"]
-DB = os.path.join(PROJ, "data", "user.db")
+DB = os.path.join(REPO, "app", "state", "user.db")
 PORT = int(os.environ.get("SMOKE_PORT", "8791"))
 BASE = "http://127.0.0.1:%d" % PORT
 
@@ -46,7 +46,7 @@ def jreq(path, payload=None):
 
 
 def start(env):
-    p = subprocess.Popen(["node", "app/server.mjs"], cwd=PROJ, env=env,
+    p = subprocess.Popen(["node", "app/server.mjs"], cwd=REPO, env=env,
                          stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     for _ in range(60):
         try:
@@ -72,7 +72,7 @@ if os.path.exists(DB):
             if os.path.exists(f):
                 os.remove(f)
     except PermissionError:
-        sys.exit("data\\user.db 被占用：多半是 app/server.mjs 还在跑。\n"
+        sys.exit("app\\state\\user.db 被占用：多半是 app/server.mjs 还在跑。\n"
                  "本脚本会清空你的真实进度，先停掉：Get-Process node | Stop-Process")
 
 env = dict(os.environ, PORT=str(PORT))
@@ -88,8 +88,10 @@ try:
     ok("错题板" in html and 'id="viewBoard"' in html, "错题板 tab 还在")
     ok("markMastered" in html, "手动标「我已学会」还在")
     ok("app.js" not in html, "页面不再引用被删掉的 app/app.js")
-    ok(os.path.exists(os.path.join(PROJ, "app", "index.html")) is False,
-       "app/index.html 已删除（不再有第二份 UI）")
+    ok(os.path.exists(os.path.join(REPO, "app", "index.html")) is False,
+       "app/index.html 不存在（UI 唯一入口是 app/web/index.html）")
+    ok(os.path.exists(os.path.join(REPO, "app", "web", "index.html")),
+       "app/web/index.html 存在（UI 已归 app）")
 
     code, body = req("/build/bundle/cards.json")
     b = json.loads(body.decode("utf-8"))

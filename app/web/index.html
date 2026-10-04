@@ -244,11 +244,46 @@
   }
   .tab.active { background: var(--primary-soft); color: var(--primary); }
 
+  /* 主列：窄屏时 tabbar 仍在其下方（原布局）；宽屏（>=900px）时 tabbar
+     移到左侧成竖排导航，内容列居右 —— 桌面浏览器里不用把手指伸到页底。 */
+  .main {
+    display: flex; flex-direction: column; gap: 14px; min-width: 0;
+  }
+  @media (min-width: 900px) {
+    body { padding: 24px 20px 40px; }
+    .app {
+      max-width: 860px;
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 18px;
+    }
+    .main { flex: 1; max-width: 620px; }
+    .tabbar {
+      flex: 0 0 108px;
+      flex-direction: column;
+      position: sticky; top: 18px;
+    }
+    .tab { flex: none; white-space: nowrap; }
+  }
+
   /* 单挑横幅 */
   .solo-banner {
     background: var(--primary-soft); color: var(--primary);
     border-radius: var(--radius); padding: 10px 14px;
     font-size: 13px; font-weight: 600; text-align: center;
+  }
+
+  /* 复学标记：这张卡之前见过（显示上次作答结果与时间） */
+  .card-meta {
+    margin: 4px 0 0; font-size: 12px; color: var(--muted, #888);
+  }
+
+  /* 服务端不可用横幅：降级到本地排序时显式告知，不再静默 */
+  .fallback-banner {
+    background: #fdecea; color: #a93226;
+    border-radius: var(--radius); padding: 10px 14px;
+    font-size: 13px; font-weight: 600; text-align: center;
+    margin-bottom: 10px;
   }
 
   /* 错题板 */
@@ -262,7 +297,12 @@
   }
   .board-head h3 { font-size: 18px; }
   .board-count { font-size: 13px; color: var(--ink-faint); }
-  .board-list { display: flex; flex-direction: column; gap: 10px; }
+  /* 列表限高内滚：条目再多也不把页面无限撑长，页头和侧栏始终可见 */
+  .board-list {
+    display: flex; flex-direction: column; gap: 10px;
+    max-height: calc(100vh - 230px);
+    overflow-y: auto; padding-right: 2px;
+  }
   .worst-item {
     display: flex; align-items: center; gap: 12px;
     padding: 14px; border: 1.5px solid var(--line); border-radius: var(--radius);
@@ -337,12 +377,17 @@
 <body>
 <div id="loading" style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--ink-soft);z-index:99">正在加载词库…</div>
   <div class="app" id="appBody">
+  <div class="main">
   <div class="topbar">
     <div class="progress">
       <span id="progressText">0 / 0</span>
       <div class="bar"><i id="progressFill" style="width:0%"></i></div>
       <span class="stats" id="statsLine"></span>
     </div>
+  </div>
+
+  <div class="fallback-banner" id="fallbackBanner" style="display:none">
+    服务端队列不可用：当前为本地排序兜底，作答不会写入数据库
   </div>
 
   <div id="viewTrain">
@@ -352,6 +397,7 @@
         <span class="tag-line" id="tagLine"></span>
       </div>
       <p class="sentence" id="sentence"></p>
+      <p class="card-meta" id="cardMeta" style="display:none"></p>
       <div class="reveal-area">
         <div class="hint" id="hint">想清楚这个词在这里的意思</div>
         <div class="blank-box" id="blankBox" onclick="revealOptions()">— 点击空白处显示选项 —</div>
@@ -387,6 +433,7 @@
   </div>
 
   <div id="viewSummary" style="display:none"></div>
+  </div><!-- /.main -->
 
   <div class="tabbar">
     <div class="tab" id="tabTrain" onclick="switchTab('train')">训练</div>
@@ -473,6 +520,10 @@ const API = {
 
 let _pushTimer = null;
 let SERVER_LIVE = {};        // D17：服务端给的「每张卡还能用的句子下标」
+let LASTSEEN = {};           // id -> {result, ts}：这张卡最近一次作答（来自服务端流水），复学标记用
+let DUE_TOTAL = null;        // 服务端到期池大小（/api/queue 的 dueTotal），null = 未知
+let ROUND_META = null;       // {fresh, review}：本轮构成（新卡 / 复学卡各几张）
+let WORD_TOTAL = 0;          // 池子里的词数（义项按词去重）
 function pushState(){
   if (!state || _pushTimer) return;
   // 连续点击「下一题」时合并成一次推送，别每题都写一遍
@@ -482,15 +533,16 @@ function pushState(){
 /** 记一次作答。result: CORRECT / WRONG / PENDING。返回里带 SRS 数值。 */
 function commitAnswer(result, elapsedMs){
   if (!card) return Promise.resolve(null);
+  LASTSEEN[card.id] = { result, ts: Math.floor(Date.now() / 1000) };   // 本会话内复现（单挑等）也能显示标记
   return API.post("/api/answer", {
-    word: card.w, senseId: card.s, sentence: row ? row.t : null,
+    word: card.word, senseId: card.senseId, sentence: row ? row.text : null,
     result, elapsedMs: elapsedMs ?? null,
   });
 }
 function commitMastered(id){
   const c = CARDS.find(x => x.id === id);
   if (!c) return Promise.resolve(null);
-  return API.post("/api/mastered", {word: c.w, senseId: c.s, on: true});
+  return API.post("/api/mastered", {word: c.word, senseId: c.senseId, on: true});
 }
 
 /* =========================================================================
@@ -534,8 +586,8 @@ function speak(text, slow){
   try { speechSynthesis.speak(u); } catch(e){ return false; }
   return true;
 }
-function speakWord(){ if (card) speak(card.w, false); }
-function speakSentence(){ if (row) speak(row.t, true); }
+function speakWord(){ if (card) speak(card.word, false); }
+function speakSentence(){ if (row) speak(row.text, true); }
 
 /* 这句有问题：填备注 → 点「提交」。**下一题不会自动提交**，
  * 没提交就点下一题等于放弃这条备注（换题后这一行会重画）。
@@ -546,7 +598,7 @@ function flagSentence(){
   const input = document.getElementById("flagNote");
   const note = input ? input.value.trim() : "";
   if (btn){ btn.disabled = true; btn.textContent = "提交中"; }
-  API.post("/api/flag", {word: card.w, senseId: card.s, sentence: row.t, note})
+  API.post("/api/flag", {word: card.word, senseId: card.senseId, sentence: row.text, note})
     .then(r => {
       const line = document.querySelector(".flag-line");
       const hint = document.querySelector(".flag-hint");
@@ -601,11 +653,37 @@ function fetchQueue(size){
   return API.post("/api/queue", {n: size}).then(q => {
     if (!q || !Array.isArray(q.ids)) return null;
     SERVER_LIVE = q.live || {};
+    DUE_TOTAL = (typeof q.dueTotal === "number") ? q.dueTotal : null;
     return q;
   }).catch(() => null);
 }
+
+/** 服务端不可用时的显式降级提示（以前是静默退回本地排序，用户无从得知）。 */
+function setFallbackBanner(on){
+  const el = document.getElementById("fallbackBanner");
+  if (el) el.style.display = on ? "block" : "none";
+}
+
+/** 拉最近 200 条作答流水，建「这张卡上次是什么时候、什么结果」的索引。 */
+function fetchLastSeen(){
+  return API.get("/api/history?n=200").then(r => {
+    const m = {};
+    for (const h of (r && r.history) || []){
+      const id = h.word + "#" + h.senseId;
+      if (!m[id]) m[id] = { result: h.result, ts: h.ts };   // 流水按新→旧，首见即最近
+    }
+    LASTSEEN = m;
+  }).catch(() => {});
+}
+
+/** 本轮构成：几张没见过（新）、几张见过（复学）。 */
+function roundMeta(queue){
+  let review = 0;
+  for (const id of queue) if (LASTSEEN[id]) review++;
+  return { fresh: queue.length - review, review };
+}
 function hasRows(c){
-  return Array.isArray(c.rows) && c.rows.length > 0;
+  return Array.isArray(c.sentences) && c.sentences.length > 0;
 }
 function shuffle(a){
   const r = a.slice();
@@ -616,12 +694,12 @@ function shuffle(a){
 function buildOptions(c){
   // 干扰项：同词他义（TRAP 优先） -> 跨词同义池
   const same = CARDS
-    .filter(x => x.w === c.w && x.s !== c.s)
+    .filter(x => x.word === c.word && x.senseId !== c.senseId)
     .sort((a,b) => b.trap - a.trap);
-  const opts = [{zh: c.zh, kind: "correct", id: c.id}];
+  const opts = [{zh: c.gloss, kind: "correct", id: c.id}];
   for (const s of same){
     if (opts.length >= 4) break;
-    if (!opts.some(o => o.zh === s.zh)) opts.push({zh: s.zh, kind: "same"});
+    if (!opts.some(o => o.zh === s.gloss)) opts.push({zh: s.gloss, kind: "same"});
   }
   // 跨词补足
   const need = 4 - opts.length;
@@ -636,10 +714,10 @@ function nextRow(c){
   if (!hasRows(c)) return null;   // D16：无句义项
   // 服务端给的可���下标里挑（已剔除被标记的问题句）；没有就退回全量
   const live = SERVER_LIVE[c.id];
-  const pool = (live && live.length) ? live : c.rows.map((_, i) => i);
+  const pool = (live && live.length) ? live : c.sentences.map((_, i) => i);
   const i = pool[(state.rowIdx[c.id] || 0) % pool.length];
   state.rowIdx[c.id] = ((state.rowIdx[c.id] || 0) + 1) % pool.length;
-  return c.rows[i];
+  return c.sentences[i];
 }
 
 function loadCard(id){
@@ -661,12 +739,12 @@ function renderNoSentence(){
   const g = c => document.getElementById(c);
   g("sentence").innerHTML =
     `<div class="nosent">
-       <div class="nosent-title">${esc(card.w)} <span class="nosent-pos">${esc(card.pos)}</span></div>
-       <div class="nosent-gloss">${esc(card.zh)}</div>
+       <div class="nosent-title">${esc(card.word)} <span class="nosent-pos">${esc(card.pos)}</span></div>
+       <div class="nosent-gloss">${esc(card.gloss)}</div>
        <div class="nosent-note">这个义项还没有例句。</div>
        <div class="nosent-sub">例句由句子生成流水线产出，需要启用 LLM 通道后批量生成。</div>
      </div>`;
-  g("wordBadge").textContent = card.w;
+  g("wordBadge").textContent = card.word;
   g("wordBadge").className = canSpeak() ? "speakable" : "";
   g("wordBadge").onclick = canSpeak() ? speakWord : null;
   g("tagLine").innerHTML = `<span>${esc(card.pos)}</span>` +
@@ -691,7 +769,7 @@ function renderNoSentence(){
    ========================================================================= */
 function recordWrong(kind){
   const id = card.id;
-  if (!state.wrong[id]) state.wrong[id] = {id, w: card.w, s: card.s, zh: card.zh, wrongCount: 0, lastKind: null};
+  if (!state.wrong[id]) state.wrong[id] = {id, w: card.word, s: card.senseId, zh: card.gloss, wrongCount: 0, lastKind: null};
   state.wrong[id].wrongCount++;
   state.wrong[id].lastKind = kind;
 }
@@ -766,8 +844,10 @@ function newRound(){
   SERVER_LIVE = {};
   // 先向服务端要到期队列（SRS 排期 + 剔除已标记的问题句）；
   // 拿不到就退回前端自己的排法（离线 / 纯静态打开）。
-  fetchQueue(20).then(q => {
+  Promise.all([fetchQueue(20), fetchLastSeen()]).then(([q]) => {
+    setFallbackBanner(!q);                       // 降级要显式，别让用户猜
     state.queue = (q && q.ids && q.ids.length) ? q.ids : pickQueue(20);
+    ROUND_META = roundMeta(state.queue);
     state.pos = 0;
     state.stats = {correct:0, wrong:0, pending:0};
     state.rowIdx = {};
@@ -791,20 +871,20 @@ function renderQuestion(){
   // 顶部徽章虽然也显示目标词，但句子里的第二次指示才告诉眼睛"看这里"。
   // 定位优先用数据里的 span（由 sentence_audit.py --fix-spans 按目标词机械重算），
   // 缺失或对不上时回退到词形正则。
-  const t = row.t;
+  const t = row.text;
   let html;
   // k 是目标词在句中的实际词形（laid / cast / running…），由 build_bundle 机械算出。
   // 优先直接按 span 切；span 缺失或对不上时回退到以 k（或原形）做词形正则。
-  const spanOk = typeof row.ss === "number" && row.ss >= 0 && row.ss + row.sl <= t.length;
+  const spanOk = typeof row.spanStart === "number" && row.spanStart >= 0 && row.spanStart + row.spanLen <= t.length;
   if (spanOk){
-    html = esc(t.slice(0, row.ss)) + "<mark>" + esc(t.slice(row.ss, row.ss + row.sl)) + "</mark>" + esc(t.slice(row.ss + row.sl));
+    html = esc(t.slice(0, row.spanStart)) + "<mark>" + esc(t.slice(row.spanStart, row.spanStart + row.spanLen)) + "</mark>" + esc(t.slice(row.spanStart + row.spanLen));
   } else {
-    const stem = (row.k || card.w).replace(/[-\\^$*+?.()|[\]{}]/g, "\\$&");
+    const stem = (row.form || card.word).replace(/[-\\^$*+?.()|[\]{}]/g, "\\$&");
     html = esc(t).replace(new RegExp(`\\b(${stem}[a-z]*)\\b`, "ig"), m => `<mark>${m}</mark>`);
   }
   document.getElementById("sentence").innerHTML = html;
   const badge = document.getElementById("wordBadge");
-  badge.textContent = card.w;
+  badge.textContent = card.word;
   badge.className = canSpeak() ? "speakable" : "";
   badge.onclick = canSpeak() ? speakWord : null;
   badge.title = canSpeak() ? "点一下朗读" : "";
@@ -813,6 +893,22 @@ function renderQuestion(){
     (card.ipa ? ` <span class="ipa">/${esc(card.ipa)}/</span>` : "") +
     (card.tier ? ` <span class="tier">${esc(card.tier)}</span>` : "") +
     (card.trap ? ' <span class="trap">TRAP · 熟词僻义</span>' : "");
+
+  // 复学标记：见过就明说「上次什么时候、什么结果」，
+  // 消除「怎么又是这个词」的困惑——它确实是复学卡，不是新卡。
+  const meta = document.getElementById("cardMeta");
+  const last = LASTSEEN[card.id];
+  if (last){
+    const agoH = Math.max(0, (Date.now() / 1000 - last.ts) / 3600);
+    const ago = agoH >= 24 ? (agoH / 24).toFixed(1) + " 天前"
+             : agoH >= 1 ? Math.round(agoH) + " 小时前" : "刚刚";
+    const what = last.result === "WRONG" ? "答错"
+               : last.result === "PENDING" ? "标了「我不会」" : "答对过";
+    meta.textContent = `复学卡 · 上次${what} · ${ago}`;
+    meta.style.display = "block";
+  } else {
+    meta.style.display = "none";
+  }
 
   document.getElementById("blankBox").style.display = "flex";
   document.getElementById("giveupStage1").style.display = "block";
@@ -836,8 +932,13 @@ function updateProgress(){
   document.getElementById("progressFill").style.width = `${pct}%`;
   const s = state.stats;
   const masteredCount = Object.keys(state.mastered).length;
+  // 池子真相：一共多少词/义项、当前到期多少、本轮新旧构成。
+  // 以前这些全藏在服务端里，用户只能靠体感猜「怎么老是这几个词」。
+  let extra = ` &nbsp;·&nbsp; 池 ${WORD_TOTAL} 词 / ${CARDS.length} 义`;
+  extra += ` · 到期 ${DUE_TOTAL != null ? DUE_TOTAL : "—"}`;
+  if (ROUND_META) extra += ` · 本轮 新 ${ROUND_META.fresh} / 复 ${ROUND_META.review}`;
   document.getElementById("statsLine").innerHTML =
-    `对 <b>${s.correct}</b> · 错 <b>${s.wrong}</b> · 不会 <b>${s.pending}</b> · 已掌握 <b>${masteredCount}</b> / ${CARDS.length}`;
+    `对 <b>${s.correct}</b> · 错 <b>${s.wrong}</b> · 不会 <b>${s.pending}</b> · 已掌握 <b>${masteredCount}</b> / ${CARDS.length}${extra}`;
 }
 
 function revealOptions(){
@@ -890,8 +991,8 @@ function showExplain(status, node, key){
   exp.innerHTML =
     `<div class="result-row ${meta.cls}"><span class="chip">${meta.icon} ${meta.label}</span>` +
     `<span class="correct-ans">正确答案 <b>${esc(correct.zh)}</b></span></div>` +
-    `<div class="trans"><b>译文：</b>${esc(row.tr)}</div>` +
-    `<div class="note">${esc(row.n)}</div>` + masterBtn +
+    `<div class="trans"><b>译文：</b>${esc(row.translation)}</div>` +
+    `<div class="note">${esc(row.note)}</div>` + masterBtn +
     `<div class="note flag-line"><span>这句有问题？</span>` +
     `<input class="flag-input" id="flagNote" placeholder="备注（可空）" maxlength="60">` +
     `<button class="btn tiny" id="flagGo" onclick="flagSentence()">提交</button></div>` +
@@ -906,7 +1007,7 @@ function showExplain(status, node, key){
     if (solo.chain >= 2){
       delete state.wrong[solo.id];
       saveState();
-      const doneId = solo.id, doneWord = card.w, doneZh = correct.zh;
+      const doneId = solo.id, doneWord = card.word, doneZh = correct.zh;
       solo = null;
       document.getElementById("soloBanner").style.display = "none";
       renderBoard();
@@ -1080,6 +1181,7 @@ function boot(){
       BUNDLE = b;
       CARDS = b.cards;
       GLOSS = b.glossPool;
+      WORD_TOTAL = new Set(CARDS.map(c => c.word)).size;
       if (load) load.remove();
       state = loadState();
       // D17：本地没有存档时，从 SQLite 恢复这一轮（换机器/清缓存后接着练）
@@ -1087,8 +1189,10 @@ function boot(){
         if (restored && load) load.textContent = "";
         // 恢复未完成的一轮。也要先取 live：否则恢复出来的这一轮
         // 会把已标记的问题句再考一遍（SERVER_LIVE 空 -> nextRow 用全量下标）。
-        return fetchQueue(20).then(q => {
+        return Promise.all([fetchQueue(20), fetchLastSeen()]).then(([q]) => {
+          setFallbackBanner(!q);                     // 降级要显式，别让用户猜
           if (state.queue.length && state.pos < state.queue.length){
+            ROUND_META = roundMeta(state.queue);
             switchTab("train");
             loadCard(state.queue[state.pos]);
             renderBoard();
@@ -1096,12 +1200,14 @@ function boot(){
           }
           if (state.queue.length && state.pos >= state.queue.length){
             // 上一轮已做完 -> 回到小结，而不是静默开新一轮
+            ROUND_META = roundMeta(state.queue);
             renderSummary();
             renderBoard();
             return;
           }
           // 全新一轮：用服务端按 SRS 排好的队列
           state.queue = (q && q.ids && q.ids.length) ? q.ids : pickQueue(20);
+          ROUND_META = roundMeta(state.queue);
           state.pos = 0;
           saveState();
           if (state.queue.length){ switchTab("train"); loadCard(state.queue[0]); }

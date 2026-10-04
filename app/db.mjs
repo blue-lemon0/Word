@@ -11,15 +11,28 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const PROJ = path.resolve(HERE, '..');
 export const SCHEMA_SQL = path.join(HERE, 'schema.sql');
 export const BUNDLE = path.join(PROJ, 'build', 'bundle', 'cards.json');
-export const USER_DB = path.join(PROJ, 'data', 'user.db');
+export const USER_DB = path.join(HERE, 'state', 'user.db');
 const SCHEMA_VERSION = '1';
+
+export const BUNDLE_FORMAT = 'word-bundle';
+export const BUNDLE_SCHEMA_VERSION = 1;
 
 export function loadBundle(file = BUNDLE) {
   if (!fs.existsSync(file)) {
     throw new Error(
-      `缺少 bundle: ${file}\n先跑  python scripts/build_bundle.py`);
+      `缺少 bundle: ${file}\n先跑  python content-kit/pipeline/build_bundle.py`);
   }
-  return JSON.parse(fs.readFileSync(file, 'utf8'));
+  const b = JSON.parse(fs.readFileSync(file, 'utf8'));
+  // 契约守门：格式不对直接拒绝，不用猜字段。兼容性规则见根 CONTRACT.md。
+  if (b.format !== BUNDLE_FORMAT) {
+    throw new Error(`bundle 格式标识 "${b.format}" ≠ "${BUNDLE_FORMAT}"，不是本应用的内容包`);
+  }
+  if (b.schemaVersion !== BUNDLE_SCHEMA_VERSION) {
+    throw new Error(
+      `bundle schemaVersion ${b.schemaVersion} ≠ 应用支持的 ${BUNDLE_SCHEMA_VERSION}，` +
+      '请更新应用或用匹配版本的 content-kit 重新导出（见 CONTRACT.md）');
+  }
+  return b;
 }
 
 export function openDb(userPath = USER_DB) {
@@ -32,7 +45,7 @@ export function openDb(userPath = USER_DB) {
   else if (cur !== SCHEMA_VERSION) {
     throw new Error(
       `user.db schema 版本 ${cur} ≠ 代码期望 ${SCHEMA_VERSION}。\n` +
-      `个人工具不做降级迁移：备份 data/user.db 后删掉重建。`);
+      `个人工具不做降级迁移：备份 app/state/user.db 后删掉重建。`);
   }
   return db;
 }
@@ -68,7 +81,7 @@ export function setMeta(db, key, value) {
 export function rebuildCards(db, bundle) {
   const nSensesByWord = new Map();
   for (const c of bundle.cards) {
-    nSensesByWord.set(c.w, (nSensesByWord.get(c.w) || 0) + 1);
+    nSensesByWord.set(c.word, (nSensesByWord.get(c.word) || 0) + 1);
   }
   db.exec('BEGIN');
   try {
@@ -76,7 +89,7 @@ export function rebuildCards(db, bundle) {
     const ins = db.prepare(
       'INSERT INTO card(word,sense_id,tier,is_trap,n_sent) VALUES(?,?,?,?,?)');
     for (const c of bundle.cards) {
-      ins.run(c.w, c.s, c.tier || '', c.trap ? 1 : 0, (c.rows || []).length);
+      ins.run(c.word, c.senseId, c.tier || '', c.trap ? 1 : 0, (c.sentences || []).length);
     }
     setMeta(db, 'bundle_version', bundle.version);
     setMeta(db, 'bundle_senses', bundle.cards.length);
@@ -136,10 +149,10 @@ export function commitAnswer(db, params, bundle, answer) {
   const attemptId = answer.attemptId ?? `${sessionId}#${idx}`;
   const ts = answer.ts ?? now();
 
-  const card = bundle.cards.find((c) => c.w === word && c.s === senseId);
+  const card = bundle.cards.find((c) => c.word === word && c.senseId === senseId);
   if (!card) throw new Error(`bundle 里没有这张卡: ${word}#${senseId}`);
 
-  const nSenses = bundle.cards.filter((c) => c.w === word).length;
+  const nSenses = bundle.cards.filter((c) => c.word === word).length;
   const meta = {
     sense_id: senseId,
     tier: card.tier || '',
@@ -253,9 +266,9 @@ export function clearUiState(db) {
  * 第二道题起就撞主键被 INSERT OR IGNORE 静默吞掉（一次实测漏记 2 次作答）。
  */
 export function recordAnswer(db, params, bundle, a) {
-  const card = bundle.cards.find((c) => c.w === a.word && c.s === a.senseId);
+  const card = bundle.cards.find((c) => c.word === a.word && c.senseId === a.senseId);
   if (!card) throw new Error(`bundle 里没有这张卡: ${a.word}#${a.senseId}`);
-  const nSenses = bundle.cards.filter((c) => c.w === a.word).length;
+  const nSenses = bundle.cards.filter((c) => c.word === a.word).length;
   const meta = {
     sense_id: a.senseId, tier: card.tier || '',
     is_trap: card.trap ? 1 : 0, n_senses: nSenses,
@@ -316,7 +329,7 @@ export function recordAnswer(db, params, bundle, a) {
 
 /** 用户手动标「我已学会」：置 mastered 并按 S>=90 天重排到期。 */
 export function setMastered(db, params, bundle, word, senseId, on) {
-  const card = bundle.cards.find((c) => c.w === word && c.s === senseId);
+  const card = bundle.cards.find((c) => c.word === word && c.senseId === senseId);
   if (!card) throw new Error(`bundle 里没有这张卡: ${word}#${senseId}`);
   const ts = now();
   db.prepare(
@@ -346,9 +359,9 @@ const P_MASTER_REPS = 6;
 
 /** 标一句有问题。幂等：同一句只记一条，重复标只是更新备注。 */
 export function flagSentence(db, bundle, f) {
-  const card = bundle.cards.find((c) => c.w === f.word && c.s === f.senseId);
+  const card = bundle.cards.find((c) => c.word === f.word && c.senseId === f.senseId);
   if (!card) throw new Error(`bundle 里没有这张卡: ${f.word}#${f.senseId}`);
-  if (!card.rows.some((r) => r.t === f.sentence)) {
+  if (!card.sentences.some((r) => r.text === f.sentence)) {
     throw new Error('这句不在该义项的句子里');
   }
   db.prepare(
@@ -388,11 +401,11 @@ export function queue(db, bundle, params, limit = 20) {
   const rows = db.prepare('SELECT word, sense_id, is_trap, wrong_n FROM v_due').all();
   const out = [];
   for (const r of rows) {
-    const card = bundle.cards.find((c) => c.w === r.word && c.s === r.sense_id);
+    const card = bundle.cards.find((c) => c.word === r.word && c.senseId === r.sense_id);
     if (!card) continue;
     const idx = [];
-    card.rows.forEach((row, i) => {
-      if (!flagged.has(r.word + ' ' + r.sense_id + ' ' + row.t)) idx.push(i);
+    card.sentences.forEach((row, i) => {
+      if (!flagged.has(r.word + ' ' + r.sense_id + ' ' + row.text)) idx.push(i);
     });
     if (!idx.length) continue;
     out.push({ id: r.word + '#' + r.sense_id, w: weight(params, r), idx });
@@ -413,7 +426,7 @@ export function history(db, bundle, limit = 60) {
     `SELECT word, sense_id, sentence, result, grade, elapsed_ms, ts
        FROM review_log ORDER BY ts DESC, rowid DESC LIMIT ?`).all(limit);
   const zh = new Map();
-  for (const c of bundle.cards) zh.set(c.w + '#' + c.s, c.zh);
+  for (const c of bundle.cards) zh.set(c.word + '#' + c.senseId, c.gloss);
   return rows.map((r) => ({
     word: r.word,
     senseId: r.sense_id,
@@ -441,17 +454,17 @@ export function overview(db, params, nowSec = now()) {
 
 /** 取题：bundle 里该义项的句子按指纹轮转，避免同场重复。 */
 export function pickSentence(bundle, word, senseId, idx = 0) {
-  const card = bundle.cards.find((c) => c.w === word && c.s === senseId);
-  if (!card || !card.rows.length) return null;
-  const row = card.rows[idx % card.rows.length];
+  const card = bundle.cards.find((c) => c.word === word && c.senseId === senseId);
+  if (!card || !card.sentences.length) return null;
+  const row = card.sentences[idx % card.sentences.length];
   return {
-    text: row.t,
-    clue: row.c,
-    spanStart: row.ss,
-    spanLen: row.sl,
-    translation: row.tr,
-    note: row.n,
-    gloss: card.zh,
+    text: row.text,
+    clue: row.clue,
+    spanStart: row.spanStart,
+    spanLen: row.spanLen,
+    translation: row.translation,
+    note: row.note,
+    gloss: card.gloss,
     pos: card.pos,
   };
 }
@@ -459,10 +472,10 @@ export function pickSentence(bundle, word, senseId, idx = 0) {
 /** 干扰项：同词优先，其余从 glossPool 抽，保证 4 选 1 里只有 1 个对。 */
 export function buildOptions(bundle, card, n = 4) {
   const sameWord = bundle.cards
-    .filter((c) => c.w === card.w && c.zh && c.zh !== card.zh)
-    .map((c) => c.zh);
-  const pool = bundle.glossPool.filter((z) => z !== card.zh);
-  const out = [card.zh];
+    .filter((c) => c.word === card.word && c.gloss && c.gloss !== card.gloss)
+    .map((c) => c.gloss);
+  const pool = bundle.glossPool.filter((z) => z !== card.gloss);
+  const out = [card.gloss];
   const seen = new Set(out);
   for (const z of [...shuffle(sameWord), ...shuffle(pool)]) {
     if (out.length >= n) break;
