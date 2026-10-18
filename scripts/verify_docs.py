@@ -1215,6 +1215,18 @@ interaction = [
      os.path.exists(os.path.join(WEB, "src", "spell.ts"))
      and "spellMatched(" in _src(os.path.join("pages", "TrainPage.vue"))
      and "spellMatched(" in _src(os.path.join("spell.ts"))),
+    # 错题循环：走到头回到最早那个错的，全对才结算（背单词 / 拼写都是）
+    ("背单词有错题循环（答对移出，走到头跳最早那个错的）",
+     "wrongIdx" in _src(os.path.join("pages", "TrainPage.vue"))
+     and "async function jumpTo(" in _src(os.path.join("pages", "TrainPage.vue"))
+     and "loopRound" in _src(os.path.join("pages", "TrainPage.vue"))),
+    ("拼写有错题循环（只重拼写错的，直到全对）",
+     "spellMissed.value = []" in _src(os.path.join("pages", "TrainPage.vue"))
+     and "spellRound" in _src(os.path.join("pages", "TrainPage.vue"))),
+    # 首页两个数字必须和「点进去那一组」同口径：用能练的池子来数
+    ("首页的数字来自能练的池子（与队列同口径）",
+     "practicePool()" in _src(os.path.join("pages", "HomePage.vue"))
+     and "allWords()" not in _src(os.path.join("pages", "HomePage.vue"))),
 ]
 
 fi = 0

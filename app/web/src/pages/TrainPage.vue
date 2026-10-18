@@ -93,6 +93,11 @@ const headerTitle = computed(() => {
 const steps = ref<Record<number, Step>>({})
 /** 光标：当前显示第几张 */
 const cursor = ref(0)
+/** 这一轮里**还没答对**的题（存 index）。走到头就只在这些里循环，直到全对。 */
+const wrongIdx = ref<number[]>([])
+/** 0 = 第一遍；>0 = 第几轮重练 */
+const loopRound = ref(0)
+
 /** 缓存已出过的题，避免来回切换时重新洗牌 */
 const asked = ref<Record<number, Question>>({})
 
@@ -164,6 +169,8 @@ function backToPicker(): void {
   queue.value = []
   steps.value = {}
   asked.value = {}
+  wrongIdx.value = []
+  loopRound.value = 0
   cursor.value = 0
   lastRound.value = []
   q.value = null
@@ -218,6 +225,8 @@ const spellState = ref<'ask' | 'right' | 'wrong'>('ask')
 const spellHits = ref(0)
 const spellMissed = ref<SpellItem[]>([])
 const spellHint = ref(false)
+/** 0 = 第一遍；>0 = 第几轮（只拼上一轮写错的） */
+const spellRound = ref(0)
 const spellInputEl = ref<HTMLInputElement | null>(null)
 
 const spellCur = computed(() => spellQueue.value[spellIdx.value] ?? null)
@@ -242,6 +251,7 @@ async function startSpell(): Promise<void> {
   spellHits.value = 0
   spellMissed.value = []
   spellHint.value = false
+  spellRound.value = 0
   phase.value = 'spell'
   await nextTick()
   spellInputEl.value?.focus()
@@ -263,6 +273,21 @@ function checkSpell(): void {
 
 function spellNext(): void {
   if (spellIdx.value >= spellQueue.value.length - 1) {
+    // ★ 走到头：这一遍写错的**再拼一遍**，只拼它们，直到全对
+    if (spellMissed.value.length) {
+      const seen = new Set<string>()
+      spellQueue.value = spellMissed.value.filter((m) =>
+        seen.has(m.id) ? false : (seen.add(m.id), true),
+      )
+      spellMissed.value = []
+      spellRound.value++
+      spellIdx.value = 0
+      spellInput.value = ''
+      spellState.value = 'ask'
+      spellHint.value = false
+      void nextTick(() => spellInputEl.value?.focus())
+      return
+    }
     phase.value = 'spellDone'
     return
   }
@@ -344,6 +369,8 @@ async function start(which: Mode = mode.value): Promise<void> {
   }
   steps.value = {}
   asked.value = {}
+  wrongIdx.value = []
+  loopRound.value = 0
   cursor.value = 0
   await loadQ()
 }
@@ -497,12 +524,63 @@ async function save(result: 'CORRECT' | 'WRONG' | 'PENDING'): Promise<void> {
     stats: { ...s },
   }
   steps.value = { ...steps.value, [cursor.value]: step }
+
+  // ★ 错题集合：答对就移出，答错/说不会就留下。
+  //   它是「重练循环」唯一的依据 —— 走到头就照着它跳。
+  const at = cursor.value
+  if (result === 'CORRECT') {
+    wrongIdx.value = wrongIdx.value.filter((k) => k !== at)
+  } else if (!wrongIdx.value.includes(at)) {
+    wrongIdx.value = [...wrongIdx.value, at].sort((a, b) => a - b)
+  }
 }
 
-/** 下一题：优先往前走（回看时是往历史后面走），走到头就是继续答新的。 */
+/**
+ * 下一题。三条路，顺序有讲究：
+ *  1. 重练模式（loopRound > 0）：永远跳到「还没答对」里的**第一个**，全对了才收；
+ *  2. 第一遍：顺序往后走；
+ *  3. 第一遍走到头：还有答错的 → 开始重练，跳到最早那个错的；全对 → 结算。
+ */
 async function next(): Promise<void> {
-  cursor.value++
+  // 1) 重练中：只在错题里转
+  if (loopRound.value > 0) {
+    const rest = wrongIdx.value
+    if (!rest.length) {
+      finishRound()
+      return
+    }
+    await jumpTo(rest[0])
+    return
+  }
+  // 2) 第一遍：还没到最后一张
+  if (cursor.value < queue.value.length - 1) {
+    cursor.value++
+    await loadQ()
+    return
+  }
+  // 3) 第一遍走到头
+  if (wrongIdx.value.length) {
+    loopRound.value = 1
+    await jumpTo(wrongIdx.value[0])
+    return
+  }
+  finishRound()
+}
+
+/** 跳到某一张重新作答：清掉它上一次的作答快照，让它重新出题 */
+async function jumpTo(i: number): Promise<void> {
+  cursor.value = i
+  const copy = { ...steps.value }
+  delete copy[i]
+  steps.value = copy
   await loadQ()
+}
+
+/** 收一轮：结算屏 */
+function finishRound(): void {
+  q.value = null
+  phase.value = 'done'
+  lastRound.value = queue.value.slice()
 }
 
 /** 「别练它」：这句话有问题而且懒得改/改不了时，
@@ -859,7 +937,10 @@ watch(
           <span v-if="reviewing" class="rv">· 回看中</span>
           <span v-else-if="jumpedAhead" class="rv">· 跳过题</span>
           <span class="wb-sp" />
-          已答 {{ answeredCount }} · 对 {{ stats.correct }} · 错 {{ stats.wrong }}
+          <span v-if="loopRound > 0" class="rv">
+          · 第 {{ loopRound + 1 }} 轮重练 · 还剩 {{ wrongIdx.length }} 个
+        </span>
+        <span v-else>已答 {{ answeredCount }} · 对 {{ stats.correct }} · 错 {{ stats.wrong }}</span>
         </p>
 
         <div class="qw">{{ q.sense.word }}</div>
@@ -1086,7 +1167,10 @@ watch(
         <section v-else-if="phase === 'spell'" class="spell">
           <header class="sp-h">
             <span class="sp-title">拼写</span>
-            <span class="sp-n">{{ spellIdx + 1 }} / {{ spellQueue.length }}</span>
+            <span class="sp-n">
+              <template v-if="spellRound > 0">第 {{ spellRound + 1 }} 轮 · </template>
+              {{ spellIdx + 1 }} / {{ spellQueue.length }}
+            </span>
             <span class="wb-sp" />
             <button class="sp-x" type="button" @click="phase = 'done'">结束</button>
           </header>

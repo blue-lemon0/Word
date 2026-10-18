@@ -24,22 +24,49 @@ import { aiReady } from '../ai/config'
 import { describeAiError, type AiResult } from '../ai/types'
 import type { Question } from '../quiz'
 import type { Sense, Sentence } from '../types'
-import { allProgress, allWords } from '../db'
-import { buildRandomQueue, type ScanItem } from '../quiz'
+import { allProgress } from '../db'
+import { buildRandomQueue, practicePool, type ScanItem } from '../quiz'
 
 const router = useRouter()
 
 type Mode = 'random' | 'due' | 'new' | 'learning'
 
-/* ── 两个数：今天剩余到期 / 词库词数 ── */
+/**
+ * 两个数：**今天该复习的词数** 与 **待学的词数**。
+ *
+ * ★ 它们必须和「点进去那一组」的口径完全一致 —— 数字来自 A、跳转到 B 时，
+ *   人看到「21」进去却是空的（这个错踩过）。所以统一按**词**数、按「这个词最紧要
+ *   的那个义项的桶」归类，与词库页五个桶同一套口径。
+ */
 const dueN = ref(0)
 const wordsN = ref(0)
 
 async function loadNums(): Promise<void> {
-  const [prows, wrows] = await Promise.all([allProgress(), allWords()])
+  // ★ 用**能练的义项池**（有例句、没被标记）来数，而不是整张 senses 表：
+  //   没例句的词进不了出题池，把它们算进「待学」就会出现「显示 1 个、进去 0 题」。
+  const [senses, prows] = await Promise.all([practicePool(), allProgress()])
+  const pmap = new Map(prows.map((p) => [p.senseId, p]))
   const now = Math.floor(Date.now() / 1000)
-  dueN.value = prows.filter((p) => p.reps > 0 && !p.mastered && p.dueAt <= now).length
-  wordsN.value = wrows.length
+  const rankOf = (senseId: string): number => {
+    const p = pmap.get(senseId)
+    if (!p || p.reps === 0) return 2
+    if (p.mastered && !p.rusty) return 3
+    return p.dueAt <= now ? 0 : 1
+  }
+  const buckets = new Map<string, number>()
+  for (const s of senses) {
+    const r = rankOf(s.id)
+    const cur = buckets.get(s.word)
+    if (cur === undefined || r < cur) buckets.set(s.word, r)
+  }
+  let due = 0
+  let fresh = 0
+  for (const r of buckets.values()) {
+    if (r === 0) due++
+    else if (r === 2) fresh++
+  }
+  dueN.value = due
+  wordsN.value = fresh
 }
 
 /* ── 屏一：一题一屏 ── */
@@ -342,9 +369,15 @@ onMounted(async () => {
             <b>{{ dueN }}</b>
             <span>{{ dueN ? '复习 · 今天剩余' : '今天没有到期的' }}</span>
           </button>
-          <button class="pad study" type="button" @click="openPlan('new')">
+          <button
+            class="pad study"
+            type="button"
+            :disabled="wordsN === 0"
+            :class="{ off: wordsN === 0 }"
+            @click="wordsN && openPlan('new')"
+          >
             <b>{{ wordsN }}</b>
-            <span>学习 · 词库</span>
+            <span>{{ wordsN ? '学习 · 待学' : '没有待学的词了' }}</span>
           </button>
         </div>
 
