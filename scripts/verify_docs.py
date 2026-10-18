@@ -168,8 +168,8 @@ d16 += [
     # 这条曾经真的漏过一次，所以进机械检查。
     ("答题不泄题：对错色只由 submitted 门控（QuestionBox）",
      "right: submitted && isRight(opt)" in _qb
-     and 'v-if="!revealed && !submitted"' in _qb
-     and "wrong: submitted &&" in _qb),
+     and "wrong: submitted &&" in _qb
+     and 'v-else-if="revealed || submitted"' in _qb),
     # tabbar 图标名必须是 Vant 内置图标表里真实存在的。写错不报错、只渲染空白，
     # 而「底栏少一个图标」很难让人联想到是名字拼错了。
     ("tabbar 图标名都在 Vant 图标表里", all(

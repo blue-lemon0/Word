@@ -79,6 +79,37 @@ async function setMode(m: Mode): Promise<void> {
   if (el) el.scrollTop = 0
 }
 
+/** 当前这页题面组件的引用（底栏按钮要指挥它） */
+const boxes = new Map<number, { reveal: () => void; save: (r: 'CORRECT' | 'WRONG' | 'PENDING') => void }>()
+
+function setBox(i: number, el: unknown): void {
+  if (el) boxes.set(i, el as never)
+  else boxes.delete(i)
+}
+
+/** 当前题的呈现状态（决定底栏显示哪两个按钮） */
+const boxState = ref<{ revealed: boolean; submitted: boolean }>({ revealed: false, submitted: false })
+
+function onBoxState(i: number, st: { revealed: boolean; submitted: boolean }): void {
+  if (i === idx.value) boxState.value = st
+}
+
+function askReveal(): void {
+  boxes.get(idx.value)?.reveal()
+}
+
+function askGiveUp(): void {
+  boxes.get(idx.value)?.save('PENDING')
+}
+
+/** 底栏「下一题」：滚到下一页（原生吸附给动画），到底就停 */
+function goNext(): void {
+  const el = qscroll.value
+  if (!el) return
+  if (idx.value >= total.value - 1) return
+  el.scrollBy({ top: el.clientHeight, behavior: 'smooth' })
+}
+
 /** 滚动到第几题（原生吸附负责动画，这里只同步「第 n / m 题」与统计） */
 const qscroll = ref<HTMLElement | null>(null)
 
@@ -86,7 +117,10 @@ function onQScroll(): void {
   const el = qscroll.value
   if (!el) return
   const i = Math.round(el.scrollTop / (el.clientHeight || 1))
-  if (i !== idx.value) idx.value = Math.min(Math.max(i, 0), Math.max(total.value - 1, 0))
+  if (i !== idx.value) {
+    idx.value = Math.min(Math.max(i, 0), Math.max(total.value - 1, 0))
+    boxState.value = { revealed: false, submitted: false }
+  }
 }
 
 /** 每题只记一次结果（上下滑来回不会重复计数） */
@@ -193,9 +227,12 @@ onMounted(async () => {
               <div class="qpage-in">
                 <QuestionBox
                   v-if="Math.abs(i - idx) <= 1"
+                  :ref="(el) => setBox(i, el)"
+                  hide-actions
                   :sense-id="sid"
                   :serial="i"
                   @answered="onAnsweredAt(i, $event)"
+                  @state="(st) => onBoxState(i, st)"
                   @word="goWord"
                 />
               </div>
@@ -210,7 +247,18 @@ onMounted(async () => {
             </div>
           </div>
 
-          <p class="qhint">上滑下一题 · 下滑上一题 · 左右滑换屏</p>
+          <!-- ★ 「我不会 / 显示选项 / 下一题」固定在底部：
+               它们是指头的主行动，不能跟着一屏一屏滚走。 -->
+          <div v-if="total" class="qbar">
+            <template v-if="!boxState.revealed && !boxState.submitted">
+              <button class="qb" type="button" @click="askGiveUp">我不会</button>
+              <button class="qb primary" type="button" @click="askReveal">显示选项</button>
+            </template>
+            <button v-else-if="boxState.submitted" class="qb primary wide" type="button" @click="goNext">
+              {{ idx >= total - 1 ? '练完了' : '下一题' }}
+            </button>
+          </div>
+
         </div>
       </section>
 
@@ -220,6 +268,7 @@ onMounted(async () => {
           <ScanList @pick="scanItem = $event" />
         </div>
 
+        <!-- 屏二底部：复习 / 学习 两颗大按钮（拇指区，一左一右） -->
         <div class="pads">
           <button class="pad" type="button" @click="openPlan('due')">
             <b>{{ dueN }}</b>
@@ -230,6 +279,7 @@ onMounted(async () => {
             <span>学习 · 词库</span>
           </button>
         </div>
+
       </section>
     </div>
 
@@ -261,9 +311,16 @@ onMounted(async () => {
     var(--wb-bg);
 }
 
+/* 页面：两屏占满剩余高度，底部按钮条固定 */
+.home {
+  display: flex;
+  flex-direction: column;
+}
+
 .hroot {
   display: flex;
-  height: 100%;
+  flex: 1;
+  min-height: 0;
   overflow-x: auto;
   overflow-y: hidden;
   scroll-snap-type: x mandatory;
@@ -319,7 +376,7 @@ onMounted(async () => {
   min-height: 0;
   display: flex;
   flex-direction: column;
-  padding: calc(var(--wb-sb-h) + 26px) 18px calc(10px + env(safe-area-inset-bottom, 0px));
+  padding: calc(var(--wb-sb-h) + 26px) 18px 8px;
   overflow: hidden;
 }
 
@@ -398,6 +455,38 @@ onMounted(async () => {
   margin-top: 8px;
 }
 
+/* 固定底栏：我不会 / 显示选项 / 下一题 */
+.qbar {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 10px;
+  padding: 8px 0 4px;
+}
+
+.qb {
+  flex: 0 0 34%;
+  padding: 13px 10px;
+  border: 1px solid var(--wb-line);
+  border-radius: 14px;
+  background: var(--wb-card);
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--wb-ink);
+  cursor: pointer;
+}
+
+.qb.primary {
+  flex: 1;
+  border-color: var(--wb-primary);
+  background: var(--wb-primary);
+  color: #fff;
+  font-weight: 600;
+}
+
+.qb.wide {
+  flex: 1;
+}
+
 .qhint {
   flex: 0 0 auto;
   padding-top: 10px;
@@ -421,14 +510,17 @@ onMounted(async () => {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: calc(var(--wb-sb-h) + 22px) 14px 8px;
+  padding: calc(var(--wb-sb-h) + 18px) 14px 10px;
 }
 
+/* 屏二底部按钮条 */
 .pads {
   flex: 0 0 auto;
   display: flex;
   gap: 10px;
-  padding: 10px 14px calc(12px + env(safe-area-inset-bottom, 0px));
+  padding: 8px 14px calc(8px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(to top, var(--wb-bg) 70%, rgba(255, 255, 255, 0));
+  backdrop-filter: blur(6px);
 }
 
 .pad {
@@ -436,8 +528,8 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  padding: 12px 8px;
+  gap: 1px;
+  padding: 8px 8px;
   border: 1px solid var(--wb-line);
   border-radius: 16px;
   background: var(--wb-card);
@@ -446,7 +538,7 @@ onMounted(async () => {
 }
 
 .pad b {
-  font-size: 26px;
+  font-size: 22px;
   font-weight: 750;
   letter-spacing: -0.6px;
   color: var(--wb-ink);

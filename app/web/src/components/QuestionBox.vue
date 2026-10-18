@@ -15,6 +15,8 @@ import { makeQuestion, newSessionId, recordAnswer, type Question } from '../quiz
 import type { Sentence } from '../types'
 
 const props = defineProps<{
+  /** true = 不自带「我不会 / 显示选项」，由外壳固定底栏渲染（首页屏一用） */
+  hideActions?: boolean
   senseId: string
   /** 钉住哪一句（扫读点的那句）。不给就随机 */
   sentenceId?: number
@@ -26,6 +28,8 @@ const emit = defineEmits<{
   (e: 'word', w: string): void
   (e: 'answered', result: 'CORRECT' | 'WRONG' | 'PENDING'): void
   (e: 'loaded', q: Question): void
+  /** 状态变化：外壳用它在「我不会/显示选项」与「下一题」之间切换 */
+  (e: 'state', s: { revealed: boolean; submitted: boolean }): void
 }>()
 
 const KEYS = ['A', 'B', 'C', 'D']
@@ -81,6 +85,7 @@ watch(() => [props.senseId, props.serial, props.sentenceId], load, { immediate: 
 
 function reveal(): void {
   revealed.value = true
+  emit('state', { revealed: true, submitted: false })
 }
 
 async function save(result: 'CORRECT' | 'WRONG' | 'PENDING'): Promise<void> {
@@ -94,6 +99,7 @@ async function save(result: 'CORRECT' | 'WRONG' | 'PENDING'): Promise<void> {
     (result === 'CORRECT' ? '对了' : result === 'WRONG' ? '错了' : '记成「不会」') +
     (nextText() ? ` · 下次 ${nextText()}` : '')
   emit('answered', result)
+  emit('state', { revealed: true, submitted: true })
 }
 
 function choose(opt: string): void {
@@ -128,14 +134,14 @@ defineExpose({ reveal, save })
         />
       </p>
 
-      <!-- 还没出选项 -->
-      <div v-if="!revealed && !submitted" class="acts">
+      <!-- 还没出选项（hideActions 时交给外壳的固定底栏） -->
+      <div v-if="!revealed && !submitted && !props.hideActions" class="acts">
         <van-button block round @click="save('PENDING')">我不会</van-button>
         <van-button type="primary" block round @click="reveal">显示选项</van-button>
       </div>
 
       <!-- 选项 -->
-      <div v-else class="opts">
+      <div v-else-if="revealed || submitted" class="opts">
         <button
           v-for="(opt, i) in q.options"
           :key="opt + i"
