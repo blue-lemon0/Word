@@ -274,6 +274,8 @@ export async function buildRandomQueue(limit = SESSION_SIZE, only?: string[]): P
 export interface ScanItem {
   sentence: Sentence
   sense: Sense
+  /** 这个义项一共有几条例句 —— 扫读浮层里要说「N 句」，让人知道后面还有没有 */
+  count: number
 }
 
 export async function scanBatch(
@@ -294,11 +296,13 @@ export async function scanBatch(
   // 连续三行同一个词会让人觉得卡住了。
   const out: ScanItem[] = []
   const seen = new Set<string>()
+  const cnt = new Map<string, number>()
+  for (const s of sents) cnt.set(s.senseId, (cnt.get(s.senseId) ?? 0) + 1)
   for (const s of shuffle(rows)) {
     const sense = byId.get(s.senseId)!
     if (seen.has(sense.word) && out.length < limit) continue
     seen.add(sense.word)
-    out.push({ sentence: s, sense })
+    out.push({ sentence: s, sense, count: cnt.get(s.senseId) ?? 1 })
     if (out.length >= limit) break
   }
   return out

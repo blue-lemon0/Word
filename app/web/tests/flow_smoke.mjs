@@ -661,6 +661,15 @@ ok((await db.sentences.get(afterTake[0].sentenceId)).en === flagged.sentence.en,
   await edit.purgeWord(P)
   ok((await db.words.get(P)) == null, '排期探针词已清干净')
 
+  // 12) 扫读条目带「这个义项一共几条例句」—— 浮层里要说「N 句」
+  const scan = await quiz.scanBatch(3)
+  ok(scan.length > 0, `扫读能取到句子（${scan.length} 条）`)
+  const one = scan[0]
+  const realCount = (await db.sentences.where('senseId').equals(one.sense.id).toArray())
+    .filter((s) => !s.flagged).length
+  ok(one.count === realCount, `扫读条目带对了例句条数（${one.count} vs ${realCount}）`)
+  ok(one.sentence.zh !== undefined, '扫读条目带了中文翻译（浮层里要直接给答案）')
+
   // 收尾
   ai.__setTransportForTest(null)
   ai.__setConfigForTest(null)

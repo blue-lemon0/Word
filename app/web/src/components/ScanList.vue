@@ -18,7 +18,8 @@ import { onMounted, ref } from 'vue'
 import MarkedText from './MarkedText.vue'
 import { scanBatch, type ScanItem } from '../quiz'
 
-const emit = defineEmits<{ (e: 'drill', item: ScanItem): void }>()
+/** 点一行 → 交给父组件弹「这一句什么意思」（不再直接进答题，见 ScanPeek） */
+const emit = defineEmits<{ (e: 'pick', item: ScanItem): void }>()
 
 const BATCH = 14
 
@@ -63,7 +64,7 @@ onMounted(load)
     </p>
 
     <div v-else class="paper">
-      <button v-for="(it, i) in items" :key="it.sentence.id" class="line" @click="emit('drill', it)">
+      <button v-for="(it, i) in items" :key="it.sentence.id" class="line" @click="emit('pick', it)">
         <span class="n">{{ i + 1 }}</span>
         <span class="tx">
           <MarkedText

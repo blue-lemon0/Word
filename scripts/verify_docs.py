@@ -836,10 +836,12 @@ interaction = [
      _re.search(r"export async function buildRandomQueue", _code(
          os.path.join(WEB, "src", "quiz.ts"))) is not None
      and _re.search(r"start\('random'\)", train) is not None),
-    ("有「扫读」：报纸式多行例句，点哪句猜哪句（就地显示，不跳页）",
+    ("有「扫读」：报纸式多行例句，点哪句看哪句（先摊开答案再问练不练）",
      _re.search(r"export async function scanBatch", _code(
          os.path.join(WEB, "src", "quiz.ts"))) is not None
-     and _re.search(r'@click="emit\(.drill., it\)"', scanlist) is not None
+     # 点一行 → 先弹「这句什么意思」（ScanPeek），不再直接进答题
+     and _re.search(r'@click="emit\(.pick., it\)"', scanlist) is not None
+     and _re.search(r"<ScanPeek", train) is not None
      and _re.search(r"sent:\s*String\(it\.sentence\.id\)", train) is not None
      # 不许再单独存在一个扫读页面 —— 「藏得深」本身就是要去掉的东西
      and not os.path.exists(os.path.join(WEB, "src", "pages", "ScanPage.vue"))
@@ -984,7 +986,7 @@ interaction = [
     # 之前它用 `mode === 'scan'` 霸占整屏：进扫读就把「今天练什么」顶掉，
     # 看着就是另一个页面，而且想回去得先记住返回在哪。
     ("扫读是训练页下面的一节（不是独立页面）",
-     _re.search(r"<ScanList\s+@drill=\"onScanDrill\"\s*/>", train) is not None
+     _re.search(r"<ScanList\s+@pick=\"onScanPick\"\s*/>", train) is not None
      and "mode === 'scan'" not in _code(os.path.join(WEB, "src", "pages", "TrainPage.vue"))
      and not os.path.exists(os.path.join(WEB, "src", "pages", "ScanPage.vue"))),
     # 封装归 ScanList：自己取句子、自己换一批、自己管空/加载态
@@ -1336,6 +1338,34 @@ interaction = [
     ("查词浮层能排进明天，词库看得见「明天练」",
      "排进明天练" in _src(os.path.join("components", "WordPeek.vue"))
      and _re.search(r'class="pin">明天练', lib) is not None),
+
+    # ── D43：训练页的返回栈 + 扫读「先看再练」──
+    # 扫读列表就在训练页里，点一行不该多占一格历史（否则返回会退到同一页的上一个状态）
+    ("扫读点句用 replace（不往历史里塞同一页）",
+     _re.search(r"void router\.replace\(\{\s*\n\s*path: '/train',\s*\n\s*query: \{ solo:", train) is not None),
+    # 单挑/扫读那一轮里，第一次返回 = 回到「怎么练」，不是直接退出训练
+    ("单挑/扫读那一轮里，返回先回「怎么练」",
+     _re.search(r"function backToPicker", train) is not None
+     and _re.search(r"if \(solo\.value \|\| scopeQuery\.value\)", train) is not None),
+    # query 被清掉时必须复位：否则屏幕还是那道题 —— 表现是「返回没反应」
+    ("query 被清掉时题目复位（返回才会有反应）",
+     _re.search(r"if \(queue\.value\.length\) backToPicker\(\)", train) is not None),
+    # 单句练的结算屏不摆整轮统计（一道题的正确率没有意义）
+    ("单句练完不摆整轮统计（一个结论 + 回扫读）",
+     _re.search(r'<template v-if="solo">[\s\S]{0,600}回到扫读', train) is not None),
+
+    # ── D44：首页 = 随手背一句 ──
+    # 打开就能背：卡片上直接有「点一下看意思」，不是只能看、要背还得跳走
+    ("首页打开就能背（卡上有「点一下看意思」）",
+     'class="reveal"' in home and "点一下看意思" in home),
+    # 首页不放搜索框：词库页已有同一个搜索，两个入口做一件事
+    ("首页不再有搜索框（搜索归词库）", "van-search" not in home),
+    # 通往训练只有一个入口：一屏两个入口做同一件事，点哪个都行反而让人以为不同
+    ("首页只有一个通往训练的入口（去复习）",
+     home.count("router.push('/train')") == 1),
+    # 例句里点词开浮层、不跳页（跳页会把首页这张卡顶掉）
+    ("首页例句点词开浮层（不跳页）",
+     "<WordPeek" in home and "peekOpen" in home),
 ]
 
 fi = 0

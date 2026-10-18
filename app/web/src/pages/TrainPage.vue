@@ -13,6 +13,7 @@ import MarkedText from '../components/MarkedText.vue'
 import { goBack as goBackNav } from '../nav'
 import ModePicker, { type Mode as PickerMode } from '../components/ModePicker.vue'
 import ScanList from '../components/ScanList.vue'
+import ScanPeek from '../components/ScanPeek.vue'
 import {
   buildQueue,
   buildRandomQueue,
@@ -150,8 +151,35 @@ const strip = ref<HTMLElement | null>(null)
 const KEYS = ['A', 'B', 'C', 'D']
 
 /** 顶栏返回 = 系统返回键。训练不再有底栏，这里是唯一明确的退出路径。
- *  走 nav.ts 的 goBack：深链直接进这一屏时没有上一层，会兜底落回首页。 */
-const goBack = (): void => goBackNav(router, '/')
+ *  走 nav.ts 的 goBack：深链直接进这一屏时没有上一层，会兜底落回首页。
+ *
+ *  ★ 但在「单挑 / 扫读点进来」的那一轮里，第一次返回是**回到「怎么练」**，
+ *    而不是直接退出训练：扫读列表就在那一屏上，人还想继续扫。
+ *    这一层收在 backToPicker 里；它用 replace 去掉 query，历史只留一格。
+ */
+const goBack = (): void => {
+  if (solo.value || scopeQuery.value) {
+    backToPicker()
+    return
+  }
+  goBackNav(router, '/')
+}
+
+/** 回到「怎么练」那一屏（含扫读列表），并清掉 query（replace，不新增历史） */
+function backToPicker(): void {
+  queue.value = []
+  steps.value = {}
+  asked.value = {}
+  cursor.value = 0
+  lastRound.value = []
+  q.value = null
+  phase.value = 'playing'
+  solo.value = false
+  if (route.query.solo || route.query.sent || route.query.scope) {
+    void router.replace({ path: '/train' })
+  }
+  void refreshDueCount()
+}
 
 /** 解释区（对错 + 释义 + 标记）只在真正作答之后出现 */
 const isRight = (opt: string): boolean => !!q.value && opt === q.value.sense.gloss
@@ -225,8 +253,16 @@ function onMode(key: string): void {
 }
 
 /** 点哪句猜哪句：把那一行的两个 id 一起带进答题流程 */
+function onScanPick(it: ScanItem): void {
+  // 先摊开「这句什么意思」，再由用户决定要不要练（见 ScanPeek）
+  scanItem.value = it
+}
+
 function onScanDrill(it: ScanItem): void {
-  void router.push({
+  scanItem.value = null
+  // ★ 用 replace，不是 push：扫读列表**就在这一页**，点一行不该多占一格历史。
+  //   否则「点一句 → 练 → 返回」会退到同一页的上一个状态 —— 看起来像返回没反应。
+  void router.replace({
     path: '/train',
     query: { solo: it.sense.id, sent: String(it.sentence.id) },
   })
@@ -253,13 +289,18 @@ async function start(which: Mode = mode.value): Promise<void> {
   sessionId.value = newSessionId()
   stats.value = { correct: 0, wrong: 0, pending: 0, dueCorrect: 0, dueTotal: 0 }
   void refreshDueCount()
-  queue.value = scopeQuery.value
-    ? await buildScopeQueue(scopeQuery.value, SESSION_SIZE, only)
-    : which === 'random'
-      ? await buildRandomQueue(SESSION_SIZE, only)
-      : which === 'redo'
-        ? lastRound.value.filter((id) => poolIds.has(id))
-        : await buildQueue(SESSION_SIZE, only)
+  // ★ 单挑（错题板 / 扫读点句）是「指哪打哪」：只练这一个意思，**不看到期**。
+  //   走 buildQueue 的话，一个还没到期、也不是新卡的义项会被过滤掉 ——
+  //   队列是空的，人看到的直接是结算屏（「这一句练完了」但什么都没练）。
+  queue.value = only
+    ? [...only]
+    : scopeQuery.value
+      ? await buildScopeQueue(scopeQuery.value, SESSION_SIZE)
+      : which === 'random'
+        ? await buildRandomQueue(SESSION_SIZE)
+        : which === 'redo'
+          ? lastRound.value.filter((id) => poolIds.has(id))
+          : await buildQueue(SESSION_SIZE)
   if (!queue.value.length) {
     if (which === 'redo') {
       toast('上一轮已经不在库里了')
@@ -350,6 +391,14 @@ async function loadQ(): Promise<void> {
   asked.value = { ...asked.value, [cursor.value]: question }
   pinUsed = true
   q.value = question
+  // 单句练：顺手把这个意思的**其它例句**取出来，答完之后填进解析区 ——
+  // 一屏只有一句短句时，下半屏全是空白；那些句子本来就在库里，摆出来才叫「解析」。
+  if (solo.value) {
+    const all = await db.sentences.where('senseId').equals(question.sense.id).toArray()
+    soloOthers.value = all
+      .filter((s) => s.id !== question!.sentence.id && !s.flagged && s.zh)
+      .slice(0, 2)
+  }
   picked.value = ''
   shownAt.value = performance.now()
   revealed.value = false
@@ -509,6 +558,10 @@ async function onEdited(): Promise<void> {
  */
 const peekOpen = ref(false)
 const peekToken = ref('')
+/** 单句练时，同一个意思的其它例句（答完填进解析区，不让下半屏空着） */
+const soloOthers = ref<Sentence[]>([])
+/** 扫读里点中的那一行：先给「这句什么意思」的浮层 */
+const scanItem = ref<ScanItem | null>(null)
 
 function onPickToken(tok: string): void {
   if (!submitted.value) return
@@ -644,6 +697,25 @@ const accuracy = computed(() =>
     : Math.round((stats.value.correct / (stats.value.correct + stats.value.wrong)) * 100) + '%',
 )
 
+/** 单句练完的结论：只有三种可能，别把整轮统计搬过来 */
+const soloResult = computed(() => {
+  // 一张都没答成：这个意思没有可用的句子（被标记 / 全删了）
+  if (answeredCount.value === 0) return '这个意思暂时没有可练的句子'
+  if (stats.value.correct > 0) return '对了'
+  if (stats.value.wrong > 0) return '错了'
+  return '记成「不会」'
+})
+
+const soloTone = computed(() =>
+  answeredCount.value === 0
+    ? 'sk'
+    : stats.value.correct > 0
+      ? 'ok'
+      : stats.value.wrong > 0
+        ? 'no'
+        : 'sk',
+)
+
 /** 开一轮。
  *
  *  ★ 监听的是 `route.query.solo`，不是 onMounted。
@@ -666,9 +738,16 @@ const accuracy = computed(() =>
  *    （那种入口是「指哪打哪」，多问一句是多余的一层）。 */
 watch(() => [route.query.solo, route.query.sent], syncPin, { immediate: true })
 watch(
-  () => [route.query.solo, route.query.sent],
+  () => [route.query.solo, route.query.sent, route.query.scope],
   () => {
-    if (route.query.solo || route.query.scope) void start('due')
+    if (route.query.solo || route.query.scope) {
+      void start('due')
+      return
+    }
+    // ★ query 被清掉 = 用户按了返回（或我们 replace 掉了）。
+    //   如果这时还在某一轮里，必须**回到「怎么练」**：
+    //   否则组件状态不变，屏幕还是那道题 —— 看起来就是「返回没反应」。
+    if (queue.value.length) backToPicker()
   },
   { immediate: true },
 )
@@ -690,12 +769,11 @@ watch(
              所以这里必须有一个明确的退出路径 —— 顶栏的箭头等价于系统返回键，
              和单词页/意思页用的是同一个 goBack（见 nav.ts）。
              之前底栏在的时候，这一屏没有返回箭头也能走；现在没了。 -->
-        <van-icon
-          v-if="!solo"
-          name="arrow-left"
-          size="18"
-          @click="goBack"
-        />
+        <!-- 返回箭头**始终在**：单挑也是训练的一种，必须能退出去。
+             上一版把它藏起来（`v-if="!solo"`），于是扫读点进来之后
+             既没有返回箭头、底栏也没有回列表 —— 人被困在一个只有一道题的屏上。
+             单挑时它退到「怎么练」（扫读列表在那一屏），见 goBack。 -->
+        <van-icon name="arrow-left" size="18" @click="goBack" />
         <h1>{{ headerTitle }}</h1>
         <!-- ★ 这里原来有一个「错题板」按钮，拿掉了。
              错题板上就是「词 + 释义」—— 那是**这道题的答案本身**。
@@ -715,10 +793,9 @@ watch(
            不显示中文：中文在点进去答题之后才出现（出题时露 = 泄题）。 -->
 
       <template v-if="q">
-        <!-- 一排可点的进度格：既回答了「我在第几个」，也回答了「怎么跳」。
-             单纯的 "3 / 20" 文字只解决了前者，而且字小、滚下去就看不见；
-             一排格子能一眼看出哪些做对、哪些错、哪些空着，还能直接点回去。 -->
-        <div ref="strip" class="strip">
+        <!-- ★ 单句练（solo）不摆进度格：一个格子、写着「1」，除了占地方没有别的用处。
+             一块进度条只在「一轮多题」时有意义。 -->
+        <div v-if="!solo" ref="strip" class="strip">
           <button
             v-for="(sid, i) in queue"
             :key="sid + i"
@@ -736,7 +813,15 @@ watch(
             {{ i + 1 }}
           </button>
         </div>
-        <p class="where">
+        <!-- ★ 单句练时不报「第 1 / 1 题 · 已答 0 · 对 0 · 错 0」：
+             这四组数字在一道题上全是废话（1/1 是恒等式，0/0/0 是还没开始）。
+             只留一句「只练这一句」，顺便说明退出去在哪。 -->
+        <p v-if="solo" class="where solo-where">
+          只练这一句
+          <span class="wb-sp" />
+          <span class="rv">练完可以回列表继续扫</span>
+        </p>
+        <p v-else class="where">
           第 <b>{{ cursor + 1 }}</b> / {{ queue.length }} 题
           <span v-if="reviewing" class="rv">· 回看中</span>
           <span v-else-if="jumpedAhead" class="rv">· 跳过题</span>
@@ -874,6 +959,27 @@ watch(
           </div>
         </template>
 
+        <!-- ★ 单句练答完之后：这一屏本来只有「不长的题干 + 一行对错」，
+             下半屏全是空白 —— 看着像「这一页没做完」。
+             填进去的人都有的东西：**这句的中文**、**正解**、**这个意思的其它例句**。
+             这些不是拿空白去凑，它们本来就是「这一句」的解析。 -->
+        <section v-if="solo && submitted && q" class="solo-x">
+          <p class="x-h">这一句</p>
+          <p v-if="q.sentence.zh" class="x-zh">{{ q.sentence.zh }}</p>
+          <div class="x-gloss">
+            <span class="x-pos">{{ q.sense.pos || '—' }}</span>
+            <span class="x-g">{{ q.sense.gloss }}</span>
+          </div>
+          <template v-if="soloOthers.length">
+            <p class="x-h2">同一个意思的其它例句</p>
+            <div v-for="o in soloOthers" :key="o.id" class="x-o">
+              <p class="x-en">{{ o.en }}</p>
+              <p v-if="o.zh" class="x-zh2">{{ o.zh }}</p>
+            </div>
+          </template>
+          <p v-else class="x-h2">这个意思只有这一句。</p>
+        </section>
+
         <!-- 「有问题？改」：一个入口，什么都能改，什么时候都能改。
              它挂在「有没有题」这一层，而不是任何一个答题分支里 ——
              内容坏了的那一刻就该能动手；等答完题才给入口，
@@ -891,32 +997,47 @@ watch(
              几行小字。现在竖向居中、主数字放到 64px、对/错/不会三块并排，
              两个按钮都在拇指区。 -->
         <section v-if="phase === 'done'" class="done">
-          <div>
-            <p class="done-k">这一轮练完了</p>
-            <p class="done-big">{{ answeredCount }}<span>题</span></p>
-          </div>
-          <div class="tiles">
-            <div class="t ok"><b>{{ stats.correct }}</b><span>对</span></div>
-            <div class="t no"><b>{{ stats.wrong }}</b><span>错</span></div>
-            <div class="t sk"><b>{{ stats.pending }}</b><span>不会</span></div>
-          </div>
-          <p class="done-note">
-            到期题正确率 {{ stats.dueTotal ? accuracy : '—' }} · 共 {{ stats.dueTotal }} 题到期
-          </p>
-          <div class="done-btns">
-            <!-- ★ 这里原来是 @click="start"，也就是**按到期重新组一轮**。
-                 刚答过的卡 dueAt 挪到了明天、reps 也大于 0，于是 buildQueue
-                 把它们全部排除 —— 点了「再来一轮」结果队列是空的，
-                 表现就是「按了没反应 / 什么都不变」。
-                 「再刷一遍」要的是**重刷刚做完的那批**，所以用 redo。 -->
-            <van-button type="primary" block round @click="start('redo')">再来一遍</van-button>
-            
-            <van-button block round @click="start('random')">随便练</van-button>
-            <!-- 用路由名，不写路径：首页的路径是 '/'，写成 '/home' 会匹配不到
-                 任何路由 —— 表现是点了之后一片空白（既不是首页也不是报错），
-                 而 /home 这种「看起来应该存在」的错字编译器不会拦。 -->
-            <van-button block round @click="router.push({ name: 'home' })">回首页</van-button>
-          </div>
+          <!-- 单句练（扫读点进来 / 错题板单挑）：**不要**端出整轮的统计。
+               一道题的正确率、三块色块、到期题数 —— 全是为一轮二十题准备的，
+               放在这里只会让人觉得「我做了什么大事」。 -->
+          <template v-if="solo">
+            <p class="done-k">这一句练完了</p>
+            <p class="solo-res" :class="soloTone">{{ soloResult }}</p>
+            <p class="done-note">要继续扫就回列表；这个词的进度已经记下了。</p>
+            <div class="done-btns">
+              <van-button type="primary" block round @click="backToPicker">回到扫读</van-button>
+              <van-button block round @click="start('redo')">再来一遍</van-button>
+            </div>
+          </template>
+
+          <template v-else>
+            <div>
+              <p class="done-k">这一轮练完了</p>
+              <p class="done-big">{{ answeredCount }}<span>题</span></p>
+            </div>
+            <div class="tiles">
+              <div class="t ok"><b>{{ stats.correct }}</b><span>对</span></div>
+              <div class="t no"><b>{{ stats.wrong }}</b><span>错</span></div>
+              <div class="t sk"><b>{{ stats.pending }}</b><span>不会</span></div>
+            </div>
+            <p class="done-note">
+              到期题正确率 {{ stats.dueTotal ? accuracy : '—' }} · 共 {{ stats.dueTotal }} 题到期
+            </p>
+            <div class="done-btns">
+              <!-- ★ 这里原来是 @click="start"，也就是**按到期重新组一轮**。
+                   刚答过的卡 dueAt 挪到了明天、reps 也大于 0，于是 buildQueue
+                   把它们全部排除 —— 点了「再来一轮」结果队列是空的，
+                   表现就是「按了没反应 / 什么都不变」。
+                   「再刷一遍」要的是**重刷刚做完的那批**，所以用 redo。 -->
+              <van-button type="primary" block round @click="start('redo')">再来一遍</van-button>
+
+              <van-button block round @click="start('random')">随便练</van-button>
+              <!-- 用路由名，不写路径：首页的路径是 '/'，写成 '/home' 会匹配不到
+                   任何路由 —— 表现是点了之后一片空白（既不是首页也不是报错），
+                   而 /home 这种「看起来应该存在」的错字编译器不会拦。 -->
+              <van-button block round @click="router.push({ name: 'home' })">回首页</van-button>
+            </div>
+          </template>
         </section>
 
         <!-- 开场屏：把「今天没到期」从死胡同变成一个选择。
@@ -931,7 +1052,7 @@ watch(
             :sub="solo ? undefined : '按空格显示选项，A/B/C/D 选，Enter 下一个'"
             @choose="onMode"
           />
-          <ScanList @drill="onScanDrill" />
+          <ScanList @pick="onScanPick" />
         </template>
       </template>
     </div>
@@ -1004,6 +1125,14 @@ watch(
     <!-- 点词查义：答完之后才可能被打开（见 onPickToken 的守卫） -->
     <WordPeek :show="peekOpen" :token="peekToken" @close="peekOpen = false" />
 
+    <!-- 扫读点中一行：先给「这句什么意思」，再问要不要练 -->
+    <ScanPeek
+      :item="scanItem"
+      :total="scanItem?.count ?? 0"
+      @close="scanItem = null"
+      @drill="onScanDrill"
+    />
+
     <!-- AI 提议（换一句）：和词条页/意思页共用同一张浮层 -->
     <AiSheet
       :show="aiOpen"
@@ -1049,6 +1178,12 @@ watch(
         <span class="apick">点上面四个选项作答</span>
       </template>
       <!-- 答完了（无论走的哪条作答路径）：主行动前进，左边给回看 -->
+      <template v-else-if="solo">
+        <!-- 单句练没有「下一题」：答完就是答完，直接回列表继续扫。
+             原来这里还是「下一题 / 看看本轮结果」，而队列只有一张卡 ——
+             点了要么回到同一张，要么进那个一道题的结算屏，都是多余的一步。 -->
+        <van-button class="wide" type="primary" @click="backToPicker">回到扫读</van-button>
+      </template>
       <template v-else>
         <van-button size="small" plain :disabled="cursor === 0" @click="prev">上一题</van-button>
         <van-button class="wide" type="primary" @click="next">
@@ -1459,6 +1594,73 @@ watch(
   flex-wrap: wrap;
 }
 
+/* 单句练的解析区：把「这一句」讲完 —— 中文、正解、这个意思的其它例句。
+   它存在的理由就是补上那半屏空白，所以每一块都必须是**内容**，不是装饰。 */
+.solo-x {
+  margin-top: 14px;
+  background: var(--wb-card);
+  border: 1px solid var(--wb-line);
+  border-radius: 14px;
+  padding: 12px 14px 6px;
+}
+
+.x-h {
+  font-size: 12px;
+  color: var(--wb-ink-3);
+  margin-bottom: 4px;
+}
+
+.x-zh {
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: var(--wb-ink-2);
+}
+
+.x-gloss {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--wb-line);
+}
+
+.x-pos {
+  flex: 0 0 auto;
+  font-size: 11.5px;
+  color: var(--wb-ink-3);
+}
+
+.x-g {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--wb-ink);
+}
+
+.x-h2 {
+  margin: 14px 0 6px;
+  font-size: 12px;
+  color: var(--wb-ink-3);
+}
+
+.x-o {
+  padding: 8px 0;
+  border-top: 1px dashed var(--wb-line);
+}
+
+.x-en {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--wb-ink);
+}
+
+.x-zh2 {
+  margin-top: 3px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--wb-ink-3);
+}
+
 /* 「选项不对？改」：一个入口，放在选项下面。
    不放进选项里 —— 四个选项各挂一个「改」，用户得先在心里挑出
    「是哪一条不对」才找得到它，判断成本原封不动地推回给了用户。 */
@@ -1571,6 +1773,26 @@ watch(
   margin: 0;
   font-size: 14.5px;
   color: var(--wb-ink-3);
+}
+
+/* 单句练的结论：一个词就够，别再摆三块色块 */
+.solo-res {
+  margin: 10px 0 6px;
+  font-size: 26px;
+  font-weight: 750;
+  letter-spacing: -0.5px;
+}
+
+.solo-res.ok {
+  color: #12a05c;
+}
+
+.solo-res.no {
+  color: #c1291f;
+}
+
+.solo-res.sk {
+  color: #b26a00;
 }
 
 .done-big {
