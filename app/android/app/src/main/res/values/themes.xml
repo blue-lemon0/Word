@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 不用 AppCompat：Activity 直接继承 android.app.Activity，
+         主题用系统自带的 Material.NoActionBar，少一层依赖、构建更快 -->
+    <style name="AppTheme" parent="@android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/bg</item>
+        <!-- 状态栏/导航栏：实色，不透明。
+             原来写的是 transparent + windowLayoutInDisplayCutoutMode=shortEdges
+             （为了做全屏沉浸）。半透明状态栏在浅色页面上会「露馅」：
+             时钟和图标直接压在内容上，中间还隔一层不均匀的毛玻璃。
+             而且全屏（LAYOUT_FULLSCREEN）会让 IME insets 被系统吃掉，
+             网页侧连键盘弹没弹都测不出来。
+             改回不透明纯色，WebView 从状态栏下方开始，问题一起消失。 -->
+        <item name="android:statusBarColor">@color/bg</item>
+        <item name="android:navigationBarColor">@color/bg</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <!-- adjustResize 的前提：窗口不能延伸到状态栏底下，否则键盘不会压缩视口 -->
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowTranslucentNavigation">false</item>
+    </style>
+</resources>

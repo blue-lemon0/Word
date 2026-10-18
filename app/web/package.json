@@ -1,0 +1,33 @@
+{
+  "name": "wordbank",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "vue-tsc --noEmit",
+    "params": "python scripts/params2json.py",
+    "icons": "node scripts/make_icons.mjs",
+    "icons:android": "node scripts/make_android_icons.mjs",
+    "test": "node tests/srs_parity.mjs && node tests/flow_smoke.mjs",
+    "test:pwa": "npm run build && node tests/pwa_check.mjs",
+    "apk": "node scripts/build_apk.mjs",
+    "serve:dist": "vite preview --host"
+  },
+  "dependencies": {
+    "dexie": "^4.0.8",
+    "vant": "^4.10.2",
+    "vue": "^3.5.12",
+    "vue-router": "^4.4.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.1.4",
+    "fake-indexeddb": "^6.2.6",
+    "sharp": "^0.35.5",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.10",
+    "vue-tsc": "^2.1.10"
+  }
+}

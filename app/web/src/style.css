@@ -1,0 +1,362 @@
+/* 全局样式与设计 token。
+ *
+ *  组件外观交给 Vant（vant/lib/index.css），这里只做两件事：
+ *   1. 定义本应用自己的设计 token（--wb-*），并把它们**映射到** Vant 的
+ *      主题变量 —— 改一个颜色，Vant 组件和应用样式一起变，不会各改各的。
+ *   2. 补 Vant 没管的部分：底部安全区、页面容器、少量排版工具类。
+ *
+ *  颜色口径：背景暖白 #faf9f7、主色靛蓝 #4f46e5、语义色沿用 Vant 默认
+ *  （成功绿 / 警告橙 / 危险红），避免自己造一套差不多的。
+ */
+:root {
+  /* 本应用的设计 token */
+  --wb-bg: #f7f7f9;
+  --wb-card: #ffffff;
+  --wb-ink: #1f2333;
+  --wb-ink-2: #5b6072;
+  --wb-ink-3: #969baa;
+  --wb-line: #ebedf2;
+  --wb-primary: #4f46e5;
+  --wb-radius: 12px;
+  --wb-tabbar-h: 50px;
+
+  /* 映射到 Vant 主题变量：组件与本应用的样式从此同源 */
+  --van-primary-color: var(--wb-primary);
+  --van-success-color: #12a05c;
+  --van-danger-color: #e5484d;
+  --van-warning-color: #f5a524;
+  --van-text-color: var(--wb-ink);
+  --van-text-color-2: var(--wb-ink-2);
+  --van-text-color-3: var(--wb-ink-3);
+  --van-background: var(--wb-bg);
+  --van-background-2: var(--wb-card);
+  --van-border-color: var(--wb-line);
+  --van-radius-md: 10px;
+  --van-radius-lg: var(--wb-radius);
+  --van-cell-vertical-padding: 12px;
+  --van-cell-horizontal-padding: 16px;
+  --van-font-size-md: 15px;
+
+  /* 安全区用 env() 本身即可：APK 壳不再覆盖状态栏（WebView 从状态栏下方开始），
+   iOS 独立 app 才会返回刘海高度，那时确实需要让出来。
+   --wb-sb-h 是「状态栏实色带」的高度：页面所有顶部留白都按它算，
+   这样一个变量改对，全站的标题就都对齐了。 */
+  --wb-safe-top: env(safe-area-inset-top, 0px);
+  --wb-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --wb-sb-h: max(var(--wb-safe-top), 24px);
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ★ 橡皮筋必须禁在 html 上，而且必须是 none，不能是 contain。
+ *
+ *   1. 默认的滚动容器是 <html>，不是 <body>。把 overscroll-behavior 写在
+ *      body 上等于没写（实测：body 是 none、html 仍是 auto）。
+ *   2. 后写的**长写会覆盖简写**：原来这里先写 `none`、下一行又写
+ *      `overscroll-behavior-y: contain`，y 轴最终生效的值是 **contain**。
+ *      真机 computedStyle 量出来就是 `html_y: "contain"` —— 注释写着 none，
+ *      实际早就不是了。这类「注释与生效值不一致」最难发现，因为没报错。
+ *   3. 后果不只是「能拉出一点空白」：越界拖动一旦成立，被移动的是
+ *      **整个窗口**（不是文档，见 D34），于是 position:fixed 的 tabbar
+ *      和顶部栏会一起被拖出屏幕外 —— 用户看到的是「底栏跑到页面外面去了」
+ *      「标题也飘了」，而 CSS 里两处都是 fixed，看起来不该动，
+ *      很难往 overscroll 上想。
+ *
+ *   ★ 为什么是 none 而不是 contain：两者对「本地橡皮筋」的语义不同。
+ *     contain = 不把越界**传给别人**，但自己照弹；
+ *     none    = 自己也不弹，且不传。
+ *     想要「栏不动如山」就得 none —— contain 只挡了「传」，没挡「自己弹」，
+ *     而在 Android 上「自己弹」的表现恰好就是整个窗口被系统拉伸。 */
+html {
+  overscroll-behavior: none;
+  /* iOS 上橡皮筋的另一种表现：body 被拉长后背景色露出来 */
+  background: var(--wb-bg);
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  /* 注意这里**没有** overflow-x。
+     试过 body/html 上加 overflow-x: hidden 和 clip，都夹不住横向溢出：
+     根元素的 overflow 会传播给视口（自身计算值恒为 visible），
+     而这个 WebView 的视口也不采用 body 的 overflow —— 实测 scrollX 仍能滚到 80。
+     最后是在真正产生溢出的元素（首页 .home）上用 clip 夹住的。
+     留一句注释是为了下一个人别再走一遍这条死路。 */
+  background: var(--wb-bg);
+  color: var(--wb-ink);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  /* 橡皮筋在 html 上禁（见上），body 这里只做兜底 */
+  overscroll-behavior: none;
+}
+
+#app {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* 二级页没有底栏：把「底栏占多高」这个变量归零，让所有按它算的留白一起收。
+ *
+ *  为什么改变量而不是给 .wb-page 写第二条 padding-bottom：
+ *  按 --wb-tabbar-h 算的有一处以上 —— .wb-page 的 padding-bottom、
+ *  首页 .home 的 min-height、.toast 的 bottom。全都靠这一个变量；
+ *  逐处加 if 只会漏掉一处，而漏掉的那处表现是「页面底部忽然多一截空白」。
+ *  见 App.vue 的 showTabs。 */
+html.no-tabs {
+  --wb-tabbar-h: 0px;
+}
+
+/* 页面容器：内容区宽上限 + 左右留白 + 给固定 tabbar 让位。
+   tabbar 是 position:fixed（App.vue 里写死了），所以留白必须由页面自己出，
+   不能指望组件库插占位块 —— 那一套在 WebView 里高度会算错，滚到底时 bar 会抖。
+
+   --kb 是键盘高度（keyboard.ts 实时写进来）。键盘弹出时：
+     · 页面底部留白 + 键盘高度 → 页面下半部分的输入框被顶到键盘上方
+     · tabbar 整体下滑让位（App.vue 里 .kb-open 处理）——
+       它要是留在原位，就会直接压在键盘上，连按钮都点不到。 */
+/* ★ 顶部状态栏的让位只允许算一次。
+   .wb-topbar 已经带了 padding-top: var(--wb-sb-h)，而它又是 .wb-page 的
+   第一个子元素 —— 如果 .wb-page 再补一份，两处叠加就是 2×38=76px，
+   标题被推到屏幕很下面（真机实测标题落在 84px 处，而应该是 46px）。
+   所以页面本身**不再**加顶部留白；没有 topbar 的页面（只有首页）
+   自己加，见 HomePage 的 .home。 */
+.wb-page {
+  /* 顶部留白**不在这里算**：有 topbar 的页面由 .wb-topbar 让位，
+     没有的（只有首页）由页面自己让。两边都算会叠加成两倍 ——
+     真机实测标题被推到 84px（应为 46px）。写死 0 是为了把这条约定
+     显式化，顺带让守卫能判出来。 */
+  padding-top: 0;
+  padding-bottom: calc(var(--wb-tabbar-h) + var(--wb-safe-bottom) + 16px + var(--kb, 0px));
+  min-height: 100dvh;
+}
+
+/* 键盘弹出时，正在聚焦的那个输入框要被顶到可见区域。
+   浏览器不会自动做这件事（adjustResize 只压缩窗口，元素仍可能被切掉）。 */
+.kb-open .van-field__control {
+  scroll-margin-bottom: 24px;
+}
+
+/* 拖动排序进行中：整页不能选字。
+   不禁掉的话，手指按住序号往下滑会把相邻例句的英文一起选中，
+   松手后变成一片蓝底，看起来像「排序把内容弄乱了」。 */
+body.wb-dragging {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ★ 键盘弹出时，底部弹层（Sheet / van-popup）整体上移。
+   弹层是 position:fixed 的，而键盘避让用的是 window.scrollTo ——
+   对 fixed 元素**完全无效**，所以弹层里的输入框照样被键盘盖住。
+   真机实测：输入框底边 671 > 键盘顶边 517，整个泡在键盘后面。
+   弹层贴底、高度由内容决定，给它加 padding-bottom = 键盘高度，
+   总高度变大、顶边随之��移，内容和按钮就都在键盘上方了。
+
+   必须写在全局：van-popup 被 teleport 到 body，拿不到组件 scoped 的
+   data-v 属性，写在 .vue 里会编译成永远匹配不上的选择器。 */
+.kb-open .van-popup {
+  padding-bottom: var(--kb, 0px);
+}
+
+/* 拖动时跟随手指的那一行要盖在别人上面，且不被 transform 的合成层
+   裁掉圆角 */
+body.wb-dragging .sent {
+  will-change: transform;
+}
+
+/* ── 拖动排序把手（全局）──
+   序号本身当把手，但要**看得出来是个把手**，否则用户会当成普通编号，
+   试了一下没反应就认定「没做拖动」。三条视觉线索一起上：
+     · 手柄形状（六点握把）
+     · 一排很淡的竖点 = 「这一块可以抓」
+     · touch-action:none 让这里的手指事件归我们管
+   触摸目标用 padding 撑到 44px 高，视觉大小不变。 */
+.wb-drag-handle {
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.wb-drag-handle:active {
+  cursor: grabbing;
+}
+
+.wb-drag-handle::after {
+  content: '';
+  width: 10px;
+  height: 16px;
+  opacity: 0.4;
+  background-image: radial-gradient(circle, var(--wb-ink-3) 1.1px, transparent 1.2px);
+  background-size: 5px 5px;
+  background-position: 0 0;
+}
+
+/* 抓起来了：把手变主色，整行也抬起来 —— 视觉上确认「现在在拖」 */
+.wb-dragging .wb-drag-handle::after {
+  opacity: 1;
+  background-image: radial-gradient(circle, var(--wb-primary) 1.1px, transparent 1.2px);
+}
+
+.wb-wrap {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 0 12px;
+}
+
+/* 顶部条：粘顶 + 状态栏安全区。
+   ★ 粘顶必须靠 position:sticky + top:0，而**祖先不能有 overflow** ——
+     一旦某个祖先开了 overflow，sticky 就相对那个祖先定位，
+     表现为「滚动时标题跟着跑出屏幕」。这里显式写 overflow:visible 兜住。 */
+.wb-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  padding-top: var(--wb-sb-h);
+  background: var(--wb-bg);
+  border-bottom: 1px solid var(--wb-line);
+  overflow: visible;
+}
+
+.wb-topbar .in {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 680px;
+  margin: 0 auto;
+  /* ★ 高度与首页搜索框一致（42px + 上方 8px 间距），否则两个页面的首个元素
+     不在同一条水平线上：首页没有 topbar、搜索框直接贴着顶部，
+     其他页隔着一个 topbar，于是切页面时标题会「往下跳」一截。
+     这点差值不大，但每次切页都闪一下，很像布局没对齐的毛刺。 */
+  min-height: 42px;
+  padding: 0 12px;
+}
+
+.wb-topbar h1 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wb-sp {
+  flex: 1;
+}
+
+/* 卡片容器 */
+.wb-card {
+  background: var(--wb-card);
+  border-radius: var(--wb-radius);
+  padding: 14px;
+  margin-bottom: 10px;
+}
+
+/* 区块小标题 */
+.wb-sec {
+  font-size: 13px;
+  color: var(--wb-ink-2);
+  margin: 16px 4px 8px;
+}
+
+/* 例句里高亮目标词 —— 训练时告诉眼睛「看这里」 */
+mark {
+  background: #fff0b3;
+  color: inherit;
+  padding: 1px 3px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+/* 就地编辑 */
+.wb-edit {
+  outline: none;
+  min-height: 1.3em;
+  border-radius: 6px;
+  padding: 2px 4px;
+  margin: 0 -4px;
+  transition: background 0.12s;
+}
+
+/* hover：--van-background-2 被映射成卡片白（#fff），在白卡片上等于没有变化，
+   「这里能点」完全看不出来。换成一点灰。 */
+.wb-edit:hover {
+  background: #f2f3f8;
+}
+
+/* ★ 聚焦（正在编辑）用**浅底 + 主色描边**，不要反色成白字。
+ *
+ *   原来是 `background: 主色; color: #fff`，问题是例句里有高亮的
+ *   <mark>（浅黄底，color: inherit）—— 白字压在浅黄上基本读不出来，
+ *   真机实测整句都看不清，而这一句正是用户正在改的那一句。
+ *   浅底 + 描边：既保住了对比度，编辑区又一眼可辨。 */
+.wb-edit:focus {
+  background: #eef2ff;
+  color: var(--wb-ink);
+  box-shadow: inset 0 0 0 1px var(--wb-primary);
+}
+
+.wb-edit:empty::before {
+  content: attr(data-ph);
+  color: var(--wb-ink-3);
+}
+
+/* 骨架屏：读库期间占位。
+ *
+ *  要点是**别让内容说假话**。从单词页点进意思页，读库要几十毫秒，
+ *  原来这段时间渲染的是「找不到这个意思（可能已删）」—— 真机逐帧采样量到
+ *  闪了 37ms，用户会以为自己刚点的义项没了。骨架屏不说任何话，只是占住位置。
+ */
+.skel .l {
+  height: 13px;
+  border-radius: 7px;
+  background: var(--wb-line);
+  margin-bottom: 10px;
+}
+
+.skel .l:last-child {
+  margin-bottom: 0;
+}
+
+.skel .w40 {
+  width: 40%;
+}
+
+.skel .w60 {
+  width: 60%;
+}
+
+.skel .w90 {
+  width: 90%;
+}
+
+/* 轻提示用 Vant 的 showToast，这里不再自己实现一套 */
+.wb-dim {
+  color: var(--wb-ink-3);
+  font-size: 12.5px;
+}
+
+@media (min-width: 900px) {
+  .wb-wrap {
+    max-width: 900px;
+  }
+  .wb-topbar .in {
+    max-width: 900px;
+  }
+}

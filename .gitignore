@@ -10,11 +10,36 @@
 __pycache__/
 *.pyc
 
-# Node（e2e 测试用 jsdom）
+# Node（e2e 测试用 jsdom、web 前端依赖）
 node_modules/
+
+# ── web 前端的构建产物与开发日志（重建：app/web 里 npm run build / npm run dev）──
+app/web/dist/
+app/web/dev.log
+app/web/dev.err
+
+# ── Android 壳（app/android）：源码入库，构建产物不入库 ──
+app/android/.gradle/
+app/android/build/
+app/android/app/build/
+app/android/local.properties
+app/android/.idea/
+app/android/*.iml
+# 打包脚本会把 web/dist 拷进这里，是产物
+app/android/app/src/main/assets/
 
 # ── 交接产物（content-kit 产出、app 消费；重建：content-kit/pipeline/build_bundle.py）──
 build/
+
+# ── 打包脚本路径算错时产出的重复副本 ──
+# 现象：app/app/android/app/src/main/assets/assets/** —— 整份 web 产物被多套了两层目录。
+# 是 build_apk.mjs 用相对路径、在 cwd 不是 app/web 时跑出来的。
+# 它不是源码也不是权威产物，两处真身都已经被上面忽略了。
+app/app/
+
+# ── opencode 的依赖（skill 本身要入库，node_modules 不入库）──
+.opencode/node_modules/
+.opencode/package-lock.json
 
 # ── 运行时数据库（app 的学习进度：app/state/user.db，本地状态，不入库）──────
 # 注意：只忽略 db 文件本身。content-kit/data/ 下是内容真相源，必须入库。

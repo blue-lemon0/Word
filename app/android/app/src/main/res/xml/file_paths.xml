@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 分享出去的临时文件放在 cacheDir/share，FileProvider 负责把这个目录
+     映射成 content:// URI 给微信/QQ 读。没有这段，getUriForFile 会抛异常，
+     导出按钮就会「点了没反应」——但看不出是路径配置漏了。 -->
+<paths>
+    <cache-path
+        name="share"
+        path="share/" />
+</paths>

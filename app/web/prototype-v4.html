@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>词库系统 v2 · 原型</title>
+<style>
+:root{
+  --bg:#f4f6fb; --card:#fff; --ink:#1a1f36; --ink-soft:#5b6472; --ink-faint:#9aa3b2;
+  --line:#e6e9f2; --primary:#4f46e5; --primary-soft:#eef2ff;
+  --good:#10b981; --good-soft:#ecfdf5; --bad:#ef4444; --bad-soft:#fef2f2;
+  --focus:#f59e0b; --warn:#f97316; --warn-soft:#fff7ed;
+  --shadow:0 8px 30px rgba(31,35,51,.08); --shadow-sm:0 2px 10px rgba(31,35,51,.06);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  background:var(--bg);color:var(--ink);padding-bottom:76px}
+.wrap{max-width:720px;margin:0 auto;padding:0 14px}
+.sp{flex:1}
+.rowa{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.btn{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:7px 12px;
+  font:inherit;font-size:13px;color:var(--ink);cursor:pointer;box-shadow:var(--shadow-sm);white-space:nowrap}
+.btn:active{transform:translateY(1px)}
+.btn.pri{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:600}
+.btn.gho{background:none;border-color:transparent;color:var(--ink-soft);box-shadow:none}
+.btn.sm{padding:4px 9px;font-size:12px;border-radius:8px}
+.btn.dan{color:var(--bad);border-color:#fecaca}
+.btn.blk{width:100%;display:block;text-align:center}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+  box-shadow:var(--shadow-sm);padding:14px;margin-bottom:11px}
+.badge{font-size:11px;padding:2px 7px;border-radius:6px;font-weight:600;white-space:nowrap}
+.b-rf{background:var(--warn-soft);color:#c2410c;border:1px solid #fed7aa}
+.b-ok{background:var(--good-soft);color:#047857;border:1px solid #a7f3d0}
+.b-ns{background:#fff;color:var(--ink-faint);border:1px solid var(--line)}
+.bar5{width:50px;height:5px;background:var(--line);border-radius:99px;overflow:hidden;flex:0 0 auto}
+.bar5 i{display:block;height:100%;border-radius:99px}
+.bar5 i.g{background:var(--good)}.bar5 i.l{background:var(--focus)}.bar5 i.n{background:var(--ink-faint)}
+.tag{font-size:11px;padding:1px 6px;border-radius:5px;font-weight:600}
+.t-mas{background:var(--good-soft);color:#047857}
+.t-ing{background:#fef3c7;color:#b45309}
+.t-new{background:var(--line);color:var(--ink-faint)}
+.hint{background:var(--primary-soft);border:1px solid #c7d2fe;border-radius:11px;
+  padding:10px 12px;font-size:12.5px;color:#3730a3;margin-bottom:12px;line-height:1.65}
+.empty{text-align:center;padding:40px 20px;color:var(--ink-faint);font-size:13.5px;line-height:1.85}
+.v{display:none}
+.v.on{display:block}
+
+.home{min-height:100vh;flex-direction:column;position:relative}
+.bg{position:fixed;inset:0;z-index:0;
+  background:linear-gradient(160deg,#dbeafe 0%,#e0e7ff 38%,#fce7f3 72%,#fef3c7 100%)}
+.bg::after{content:"";position:absolute;inset:0;
+  background:radial-gradient(circle at 22% 18%,rgba(255,255,255,.72),transparent 46%),
+             radial-gradient(circle at 82% 74%,rgba(255,255,255,.5),transparent 42%)}
+.home.on{display:flex}
+.home>*{position:relative;z-index:1}
+.hsearch{padding:22px 0 8px}
+.hsearch .box{position:relative}
+.hsearch input{width:100%;background:rgba(255,255,255,.92);border:1px solid rgba(255,255,255,.9);
+  border-radius:15px;padding:14px 15px 14px 42px;font:inherit;font-size:16px;
+  box-shadow:0 6px 22px rgba(31,35,51,.1);backdrop-filter:blur(8px)}
+.sicon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--ink-faint);font-size:17px;pointer-events:none}
+.sug{position:absolute;left:0;right:0;top:calc(100% + 6px);background:rgba(255,255,255,.97);
+  border-radius:14px;box-shadow:0 10px 34px rgba(31,35,51,.16);overflow:hidden;display:none;z-index:10}
+.sug.on{display:block}
+.sug .i{display:flex;align-items:center;gap:9px;padding:11px 14px;cursor:pointer}
+.sug .i:hover,.sug .i.on{background:var(--primary-soft)}
+.sug .i b{font-size:15px;font-weight:650}
+.sug .i .ipa{color:var(--ink-faint);font-size:12px}
+.sug .i .n{font-size:11.5px;color:var(--ink-soft);margin-left:auto}
+.sug .none{padding:14px;font-size:13px;color:var(--ink-faint);text-align:center}
+.stage{flex:1;display:flex;flex-direction:column;justify-content:center;padding:20px 0 26px;text-align:center}
+.stage .w{font-size:clamp(34px,11vw,50px);font-weight:700;letter-spacing:-1px;line-height:1.15}
+.stage .sn{font-size:clamp(16px,4.4vw,20px);line-height:1.8;margin-top:26px;color:#1f2937;
+  max-width:560px;margin-left:auto;margin-right:auto}
+.stage .sn mark{background:rgba(254,243,199,.95);padding:1px 5px;border-radius:5px;font-weight:650}
+.stage .tap{font-size:12.5px;color:var(--ink-soft);margin-top:16px;opacity:.8}
+.hbtns{display:flex;gap:10px;justify-content:center;padding-bottom:14px;flex-wrap:wrap}
+.hbtns .btn{padding:10px 20px;font-size:14px;box-shadow:0 4px 14px rgba(31,35,51,.1)}
+
+.topbar{position:sticky;top:0;z-index:20;background:var(--bg);padding:13px 0 9px;border-bottom:1px solid var(--line)}
+.topbar h1{margin:0;font-size:18px;font-weight:650}
+.proto{font-size:11px;font-weight:600;color:#b45309;background:var(--warn-soft);
+  border:1px solid #fed7aa;border-radius:99px;padding:2px 8px;margin-left:9px}
+
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;
+  background:rgba(255,255,255,.86);backdrop-filter:blur(20px) saturate(180%);
+  -webkit-backdrop-filter:blur(20px) saturate(180%);
+  border-top:1px solid rgba(255,255,255,.6);
+  box-shadow:0 -1px 0 rgba(31,35,51,.05),0 -8px 24px rgba(31,35,51,.06);
+  display:flex;padding:0 6px calc(4px + env(safe-area-inset-bottom))}
+.tabbar button{flex:1;background:none;border:0;padding:8px 2px 7px;font:inherit;font-size:10.5px;
+  color:var(--ink-faint);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;
+  position:relative;transition:color .18s}
+.tabbar button .ic{width:22px;height:22px;display:block;transition:transform .2s cubic-bezier(.34,1.56,.64,1)}
+.tabbar button .ic svg{width:22px;height:22px;display:block;fill:none;
+  stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.tabbar button.on{color:var(--primary);font-weight:600}
+.tabbar button.on .ic{transform:translateY(-1px)}
+.tabbar button.on::after{content:"";position:absolute;top:2px;left:50%;transform:translateX(-50%);
+  width:18px;height:2.5px;border-radius:99px;background:var(--primary);
+  box-shadow:0 0 8px rgba(79,70,229,.5)}
+.tabbar button:active .ic{transform:scale(.9)}
+
+.sl{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid var(--line);
+  border-radius:12px;margin-bottom:9px;background:var(--card);cursor:pointer}
+.sl:hover{border-color:var(--primary)}
+.sl .slot{font:600 11px ui-monospace,monospace;color:var(--ink-faint);background:var(--line);
+  border-radius:5px;padding:2px 6px;flex:0 0 auto}
+.sl .b{flex:1;min-width:0}
+.sl .g{font-size:15px;font-weight:600}
+.sl .m{font-size:11.5px;color:var(--ink-soft);margin-top:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.gloss{font-size:18px;font-weight:620;line-height:1.45}
+.glossEn{font-size:13px;color:var(--ink-soft);margin-top:6px;line-height:1.55}
+.note-t{font-size:12.5px;color:#92400e;background:var(--warn-soft);border-left:3px solid var(--focus);
+  padding:7px 10px;border-radius:0 7px 7px 0;margin-top:10px}
+.sent{display:flex;gap:9px;align-items:flex-start;padding:9px 0;border-bottom:1px solid #f6f7fb}
+.sent:last-child{border:0}
+.sent .n{font:600 11px ui-monospace,monospace;color:var(--ink-faint);flex:0 0 auto;margin-top:3px}
+.sent .b{flex:1;min-width:0}
+.sent .en{font-size:14px}
+.sent .zh{font-size:12.5px;color:var(--ink-soft);margin-top:3px}
+.sent .op{display:flex;gap:2px;opacity:.32}
+.sent:hover .op{opacity:1}
+.ico{background:none;border:0;cursor:pointer;font-size:13px;padding:3px 5px;border-radius:6px;color:var(--ink-faint)}
+.ico:hover{background:var(--line);color:var(--ink)}
+.addb{width:100%;border:1px dashed var(--line);background:none;border-radius:9px;padding:9px;
+  font:inherit;font-size:13px;color:var(--ink-faint);cursor:pointer;margin-top:4px}
+.addb:hover{border-color:var(--primary);color:var(--primary)}
+.divider{height:1px;background:var(--line);margin:16px 0}
+.filters{display:flex;gap:7px;overflow-x:auto;padding-bottom:10px}
+.filters::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;background:var(--card);border:1px solid var(--line);border-radius:99px;
+  padding:5px 12px;font:inherit;font-size:12.5px;color:var(--ink-soft);cursor:pointer;white-space:nowrap}
+.chip.on{background:var(--primary-soft);border-color:var(--primary);color:var(--primary);font-weight:600}
+.searchbox{flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;
+  padding:11px 13px;font:inherit;box-shadow:var(--shadow-sm);min-width:0}
+
+.tbar{display:flex;align-items:center;gap:9px;margin-bottom:14px;font-size:12px;color:var(--ink-soft)}
+.tbar .bar{flex:1;height:5px;background:var(--line);border-radius:99px;overflow:hidden}
+.tbar .bar i{display:block;height:100%;background:var(--primary);border-radius:99px;transition:width .3s}
+.qw{font-size:32px;font-weight:680;text-align:center;letter-spacing:-.5px}
+.qtag{text-align:center;font-size:12.5px;color:var(--ink-faint);margin-top:2px;margin-bottom:18px}
+.qsent{text-align:center;font-size:19px;line-height:1.75;margin:14px 0 22px}
+.qsent mark{background:#fef3c7;padding:1px 4px;border-radius:4px;font-weight:600}
+.qhint{text-align:center;font-size:13px;color:var(--ink-soft);margin-bottom:11px}
+.blank{background:var(--card);border:2px dashed var(--line);border-radius:12px;padding:15px;
+  text-align:center;color:var(--ink-faint);font-size:13.5px;cursor:pointer}
+.blank:hover{border-color:var(--primary);color:var(--primary)}
+.giveup{text-align:center;margin-top:13px}
+.giveup a{color:var(--ink-faint);font-size:13px;cursor:pointer;border-bottom:1px dashed var(--line);padding:5px 11px}
+.opts{display:grid;gap:9px}
+.opt{display:flex;gap:11px;align-items:center;background:var(--card);border:1px solid var(--line);
+  border-radius:12px;padding:13px;cursor:pointer}
+.opt:hover{border-color:var(--primary)}
+.opt .key{font:600 11px ui-monospace,monospace;width:22px;height:22px;border-radius:6px;
+  background:var(--line);color:var(--ink-soft);display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.opt.right{border-color:var(--good);background:var(--good-soft)}
+.opt.right .key{background:var(--good);color:#fff}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt.wrong .key{background:var(--bad);color:#fff}
+.opt.full .key{background:#fff;border:1px solid var(--line)}
+.exp{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px;margin-top:14px}
+.exp .st{font-size:14px;font-weight:650;margin-bottom:9px}
+.exp .st.ok{color:var(--good)}.exp .st.no{color:var(--bad)}.exp .st.sk{color:var(--warn)}
+.exp .ln{font-size:13px;margin:5px 0}
+.flagbox{display:flex;gap:7px;align-items:center;margin-top:11px;padding-top:11px;border-top:1px dashed var(--line)}
+.flagbox input{flex:1;border:1px solid var(--line);border-radius:8px;padding:7px 10px;font:inherit;font-size:12.5px;min-width:0}
+
+.mask{position:fixed;inset:0;background:rgba(15,20,35,.45);z-index:50;display:none;align-items:flex-end;justify-content:center}
+.mask.on{display:flex}
+.sheet{background:var(--bg);width:100%;max-width:720px;border-radius:20px 20px 0 0;max-height:90vh;
+  display:flex;flex-direction:column;animation:up .22s}
+@keyframes up{from{transform:translateY(24px);opacity:.4}to{transform:none;opacity:1}}
+.sh-h{padding:14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line);
+  background:var(--card);border-radius:20px 20px 0 0}
+.sh-h h2{margin:0;font-size:16.5px;font-weight:650}
+.sh-b{overflow-y:auto;padding:14px;flex:1}
+.sh-f{padding:12px 14px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--line);
+  background:var(--card);display:flex;gap:9px;justify-content:flex-end}
+textarea{width:100%;min-height:180px;background:var(--card);border:1px solid var(--line);border-radius:12px;
+  padding:11px;font:12.5px/1.6 ui-monospace,Menlo,monospace;resize:vertical}
+.diff{border:1px solid var(--line);border-radius:12px;background:var(--card);margin-bottom:11px;overflow:hidden}
+.diff h3{margin:0;padding:10px 12px;font-size:13.5px;font-weight:650;background:#fafbff;
+  border-bottom:1px solid var(--line);display:flex;align-items:center;gap:7px}
+.diff h3 .sp{flex:1}
+.loc{background:#f8fafc;border-bottom:1px solid var(--line);padding:10px 12px;font-size:13px}
+.loc b{color:var(--ink-soft);font-weight:600;font-size:11.5px;display:block;margin-bottom:3px}
+.impt{background:var(--good-soft);border-top:1px dashed #a7f3d0;padding:10px 12px;font-size:13px}
+.impt b{color:var(--ink-soft);font-weight:600;font-size:11.5px;display:block;margin-bottom:3px}
+.choices{display:flex;gap:7px;flex-wrap:wrap;padding:10px 12px;background:#fafbff;border-top:1px solid var(--line)}
+.choices .btn{flex:1;min-width:84px;text-align:center}
+.choices .btn.pri{background:var(--primary-soft);border-color:var(--primary);color:var(--primary)}
+.snap{display:flex;align-items:center;gap:9px;padding:10px 0;border-bottom:1px solid var(--line);font-size:13px}
+.stat{display:flex;gap:9px;margin-bottom:12px}
+.stat>div{flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px;text-align:center}
+.stat b{display:block;font-size:21px;line-height:1.2}
+.stat span{font-size:11.5px;color:var(--ink-soft)}
+
+@media (min-width:900px){
+  body{padding-bottom:76px}
+  .tabbar{background:rgba(255,255,255,.9);border-top:1px solid var(--line);
+    box-shadow:0 -8px 24px rgba(31,35,51,.06);
+    display:flex;justify-content:center;gap:6px;padding:8px 0 calc(8px + env(safe-area-inset-bottom))}
+  .tabbar button{flex:0 0 auto;min-width:124px;flex-direction:row;gap:8px;
+    padding:10px 22px;font-size:13.5px;border-radius:12px}
+  .tabbar button.on::after{display:none}
+  .tabbar button.on{background:var(--primary-soft)}
+  .wrap{max-width:1180px}
+  .home{min-height:auto}
+  .home.on{display:flex}
+  .home .stage{padding:70px 0}
+  .home .hsearch{padding:34px 0 0;max-width:560px;margin:0 auto;width:100%}
+  .home .stage,.home .hbtns{max-width:760px;margin-left:auto;margin-right:auto;width:100%}
+  .stats4{display:grid;grid-template-columns:repeat(4,1fr)}
+  .mask{align-items:center}.sheet{border-radius:20px;margin:0}
+}
+</style>
+</head>
+<body>
+
+<section class="v on home" id="v-home">
+  <div class="bg"></div>
+  <div class="wrap">
+    <div class="hsearch">
+      <div class="box">
+        <span class="sicon">&#128269;</span>
+        <input id="q" placeholder="搜索单词" autocomplete="off"
+               oninput="sug(this.value)" onfocus="sug(this.value)" onkeydown="sugKey(event)">
+        <div class="sug" id="sug"></div>
+      </div>
+    </div>
+    <div class="stage" id="stage"></div>
+    <div class="hbtns">
+      <button class="btn" onclick="roll()">换一个</button>
+      <button class="btn pri" onclick="go('train')">去训练</button>
+      <button class="btn" onclick="go('lib')">词库</button>
+    </div>
+  </div>
+</section>
+
+<section class="v" id="v-word">
+  <div class="topbar"><div class="wrap rowa">
+    <button class="btn sm" onclick="go('home')">&#8592;</button>
+    <h1 id="ttl">单词</h1><span class="sp"></span>
+    <button class="btn sm" onclick="copyTpl(curW)">复制模板</button>
+  </div></div>
+  <div class="wrap">
+    <div class="card">
+      <div style="font-size:26px;font-weight:680" id="w-w"></div>
+      <div style="color:var(--ink-faint);font-size:13px;margin-top:2px" id="w-ipa"></div>
+      <div class="rowa" style="margin-top:11px">
+        <span class="badge b-ns" id="w-t"></span><span class="badge b-ns" id="w-n"></span>
+      </div>
+    </div>
+    <div style="font-size:12.5px;color:var(--ink-soft);margin:4px 2px 9px">
+      点任意意思进去 —— <b>每个意思是独立的学习单元和独立的记忆曲线</b></div>
+    <div id="w-list"></div>
+    <div class="rowa" style="margin-top:12px">
+      <button class="btn sm" onclick="toast('新增意思')">+ 新增意思</button>
+      <button class="btn sm" onclick="openImp()">导入 JSON</button>
+      <button class="btn sm dan" onclick="toast('已进回收站，30 天可还原')">删除这个词</button>
+    </div>
+  </div>
+</section>
+
+<section class="v" id="v-sense">
+  <div class="topbar"><div class="wrap rowa">
+    <button class="btn sm" onclick="goWord(curW)">&#8592; <span id="s-back"></span></button>
+    <span class="sp"></span>
+  </div></div>
+  <div class="wrap">
+    <div class="card">
+      <div class="rowa" style="margin-bottom:9px">
+        <span class="badge b-ns" id="s-slot"></span><span id="s-m"></span><span class="sp"></span>
+        <span style="font-size:11.5px;color:var(--ink-faint)">id <span id="s-id"></span></span>
+      </div>
+      <div class="gloss" contenteditable="true" id="s-g"></div>
+      <div class="glossEn" contenteditable="true" id="s-ge"></div>
+      <div id="s-note"></div>
+      <div class="rowa" style="margin-top:12px">
+        <span class="badge b-ns" id="s-pos"></span>
+        <button class="btn sm" onclick="toast('合并到另一条')">合并</button>
+        <button class="btn sm" onclick="toast('拆分为两条')">拆分</button>
+        <button class="btn sm dan" onclick="toast('已进回收站，熟练度一起保留')">删除</button>
+      </div>
+      <p style="font-size:11.5px;color:var(--ink-faint);margin:9px 0 0">
+        <b>id 永不随排序变</b> —— 编号变了但它不变，所以熟练度不会错位。<br>
+        这里没有「练这个意思」按钮：知道要练哪个意思，选题就成了送分。</p>
+    </div>
+    <div class="divider"></div>
+    <div class="rowa" style="margin-bottom:8px">
+      <b style="flex:1;font-size:14px" id="s-cn"></b>
+      <button class="btn sm" onclick="copyTpl(curW,curSlot)">复制给 AI</button>
+      <button class="btn sm" onclick="openImp()">导入 JSON</button>
+    </div>
+    <div id="s-sents"></div>
+  </div>
+</section>
+
+<section class="v" id="v-lib">
+  <div class="topbar"><div class="wrap rowa"><h1>词库</h1><span class="proto">原型</span></div></div>
+  <div class="wrap">
+    <div style="display:flex;gap:8px;margin-bottom:11px">
+      <input id="q2" class="searchbox" placeholder="搜索单词" oninput="renderLib()">
+    </div>
+    <div class="filters">
+      <button class="chip on" onclick="flt(this,'all')">全部</button>
+      <button class="chip" onclick="flt(this,'rf')">需精修</button>
+      <button class="chip" onclick="flt(this,'ns')">缺例句</button>
+      <button class="chip" onclick="flt(this,'T1')">T1</button>
+      <button class="chip" onclick="flt(this,'unm')">未掌握</button>
+    </div>
+    <div id="l-list"></div>
+  </div>
+</section>
+
+<section class="v" id="v-train">
+  <div class="topbar"><div class="wrap rowa"><h1>训练</h1><span class="sp"></span>
+    <button class="btn sm" onclick="go('board')">错题板</button></div></div>
+  <div class="wrap">
+    <div class="tbar"><span id="t-n">0 / 0</span><span class="bar"><i id="t-bar" style="width:0%"></i></span><span id="t-s"></span></div>
+    <div id="t-body"></div>
+  </div>
+</section>
+
+<section class="v" id="v-board">
+  <div class="topbar"><div class="wrap rowa"><h1>错题板</h1><span class="sp"></span>
+    <button class="btn sm" onclick="go('train')">去训练</button></div></div>
+  <div class="wrap">
+    <div class="hint">单挑入口<b>只在这里</b>。<br>
+      理由：错题板上你不知道会抽到哪个意思，练它才有意义。知道答案再练，是送分。</div>
+    <div id="b-list"></div>
+  </div>
+</section>
+
+<section class="v" id="v-more">
+  <div class="topbar"><div class="wrap rowa"><h1>更多</h1></div></div>
+  <div class="wrap">
+    <div class="stat stats4" id="m-st"></div>
+    <div class="card"><b style="font-size:14px">备份</b>
+      <div class="rowa" style="margin-top:10px">
+        <button class="btn pri" onclick="toast('导出 .vwbak')">导出（含进度）</button>
+        <button class="btn" onclick="toast('仅导出词库')">仅词库</button>
+        <button class="btn" onclick="toast('选择 .vwbak')">导入</button>
+      </div></div>
+    <div class="card"><b style="font-size:14px">快照（导入前自动存，保留 10 次）</b>
+      <div class="snap"><span>10:23 · 导入 crime 补例句</span><span class="sp"></span><button class="btn sm" onclick="toast('回滚')">回滚</button></div>
+      <div class="snap"><span>昨天 20:11 · 全库首次注入</span><span class="sp"></span><button class="btn sm" onclick="toast('回滚')">回滚</button></div></div>
+    <div class="card"><b style="font-size:14px">导入历史</b>
+      <div class="snap"><span>10-16 · crime · 补例句 6 句，改释义 1 条</span></div>
+      <div class="snap"><span>10-16 · abandon · 新增义项</span></div></div>
+    <div class="card"><b style="font-size:14px">回收站（30 天，含熟练度）</b>
+      <div class="snap"><span>aspect s2 · 已删 2 天</span><span class="sp"></span><button class="btn sm" onclick="toast('还原')">还原</button></div>
+      <div class="snap"><span>queen s1 · 已删 5 天</span><span class="sp"></span><button class="btn sm" onclick="toast('还原')">还原</button></div></div>
+  </div>
+</section>
+
+<div class="tabbar">
+  <button class="on" data-v="home"><span class="ic"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V20a1 1 0 0 0 1 1H10v-6h4v6h3.5a1 1 0 0 0 1-1V9.5"/></svg></span>首页</button>
+  <button data-v="lib"><span class="ic"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19a1 1 0 0 1 1 1v13.5"/><path d="M6.5 16H20v4.5a.5.5 0 0 1-.5.5H4V8"/><path d="M8 7h8"/><path d="M8 10.5h6"/></svg></span>词库</button>
+  <button data-v="train"><span class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.2"/><circle cx="12" cy="12" r="4.2"/><circle cx="12" cy="12" r=".8" fill="currentColor"/></svg></span>训练</button>
+  <button data-v="more"><span class="ic"><svg viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h10"/><circle cx="18" cy="17" r="2.4"/></svg></span>更多</button>
+</div>
+
+<div class="mask" id="m-copy" onclick="if(event.target===this)close('m-copy')">
+  <div class="sheet"><div class="sh-h"><h2 id="ct">复制模板</h2><span class="sp"></span>
+    <button class="btn gho sm" onclick="close('m-copy')">关闭</button></div>
+    <div class="sh-b">
+      <div class="hint">粘给豆包 / DeepSeek，回你的 JSON 粘到「导入 JSON」。</div>
+      <textarea id="ctxt" readonly></textarea>
+      <button class="btn pri blk" style="margin-top:10px" onclick="cp();toast('已复制，去问 AI')">复制到剪贴板</button>
+    </div></div>
+</div>
+
+<div class="mask" id="m-imp" onclick="if(event.target===this)close('m-imp')">
+  <div class="sheet"><div class="sh-h"><h2>导入 crime</h2><span class="sp"></span><span class="badge b-rf">逐条决策</span></div>
+    <div class="sh-b">
+      <div class="hint">AI 给的和你现有的不一致，<b>每个冲突单独选</b>。<br>不提供「全部用导入的」—— 批量覆盖就是丢数据的开始。</div>
+      <div class="diff"><h3>例句<span class="sp"></span><span class="badge b-ns">本地 3 / 导入 5</span></h3>
+        <div class="loc"><b>本地</b>① He was convicted of a serious crime.<br>② The police are still investigating.<br>③ Jealousy is a sin, not a crime.</div>
+        <div class="impt"><b>导入</b>① 已有<br>② 已有<br>③ 已有<br>④ ... ⑤ ... <span style="color:var(--good)">（新增 2 句）</span></div>
+        <div class="choices"><button class="btn pri" onclick="toast('追加缺的 2 句')">追加缺的 2 句</button>
+          <button class="btn" onclick="toast('只保留本地')">只保留本地</button>
+          <button class="btn" onclick="toast('用导入的')">用导入的</button></div></div>
+      <div class="diff"><h3>中文释义<span class="sp"></span><span class="badge b-rf">冲突</span></h3>
+        <div class="loc"><b>本地</b>犯罪，罪行（违法行为）</div><div class="impt"><b>导入</b>犯罪，罪行</div>
+        <div class="choices"><button class="btn pri" onclick="toast('保留本地')">保留本地</button>
+          <button class="btn" onclick="toast('用导入的')">用导入的</button></div>
+        <p style="font-size:12px;color:var(--ink-faint);margin:0;padding:0 12px 11px">默认<b>保留本地</b>。</p></div>
+      <div class="diff"><h3>导入有、本地没有<span class="sp"></span><span class="badge b-ns">新增</span></h3>
+        <div style="background:var(--good-soft);border-top:1px dashed #a7f3d0;padding:11px">
+          <b style="font-size:14px">窝藏（庇护罪犯）</b><div style="font-size:12.5px;color:var(--ink-soft);margin-top:4px">shelter a criminal</div></div>
+        <div class="choices"><button class="btn pri" onclick="toast('采纳为 s3')">采纳</button>
+          <button class="btn" onclick="toast('丢弃')">丢弃</button></div></div>
+    </div>
+    <div class="sh-f"><button class="btn" onclick="close('m-imp')">取消</button>
+      <button class="btn pri" onclick="close('m-imp');toast('已导入（导入前已自动快照）')">确认导入</button></div>
+  </div>
+</div>
+
+<script src="proto.js"></script>
+</body>
+</html>

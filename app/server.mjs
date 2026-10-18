@@ -19,10 +19,17 @@ import { loadParams } from './srs.mjs';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const PROJ = path.resolve(HERE, '..');
 const PORT = Number(process.env.PORT || 8777);
+// 多内容源（docs/INTEGRATE-V2.md）：默认仍是线上 cards.json，加载路径不变；
+// 验证包用环境变量成对切换（内容包 + 进度库一起换）：
+//   PORT=8778 WORD_BUNDLE=build/bundle/cards_v2.json WORD_DB=app/state/user_v2.db node app/server.mjs
+// 进度锚点是 (word, senseId)。v2 按 WordNet 重切义项，同锚点在两包里指不同义项，
+// 所以进度互不继承 —— 验证实例必须配独立的 WORD_DB，绝不能与主包共用一个库。
+const BUNDLE_FILE = process.env.WORD_BUNDLE || 'build/bundle/cards.json';
+const DB_FILE = process.env.WORD_DB || store.USER_DB;
 
 const params = loadParams();
-const bundle = store.loadBundle();
-const db = store.openDb();
+const bundle = store.loadBundle(path.resolve(PROJ, BUNDLE_FILE));
+const db = store.openDb(path.resolve(DB_FILE));
 const n = store.syncBundle(db, bundle);
 
 function json(res, code, obj) {
@@ -46,6 +53,8 @@ const routes = {
     json(res, 200, {
       bundle: bundle.stats,
       cards: bundle.cards.length,
+      // 前端从这条拉卡片数据：内容源以服务端为准，多包切换只此一处真相
+      bundleUrl: '/' + BUNDLE_FILE.replace(/\\/g, '/'),
       overview: store.overview(db, params),
     });
   },
@@ -182,7 +191,7 @@ const server = http.createServer(async (req, res) => {
 server.listen(PORT, '127.0.0.1', () => {
   const ov = store.overview(db, params);
   console.log(`页面      : http://127.0.0.1:${PORT}/  (app/web/index.html)`);
-  console.log(`card 投影 : ${n} 张（bundle ${bundle.version}）`);
+  console.log(`card 投影 : ${n} 张（bundle ${bundle.version} ← ${BUNDLE_FILE}）`);
   console.log(`可练 ${ov.pool} / 到期 ${ov.due} / 已掌握 ${ov.mastered} / 错题 ${ov.wrong}`);
-  console.log(`user.db   : ${store.USER_DB}`);
+  console.log(`进度库    : ${DB_FILE}`);
 });
