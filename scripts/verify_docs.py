@@ -1263,6 +1263,10 @@ interaction = [
     ("体检/审查的上下文按义项截断例句（省输入 token）",
      _re.search(r"const perSense = 2", _ai_src("actions.ts")) is not None
      and _re.search(r"omitted", _ai_src("types.ts")) is not None),
+    # 音标：AI 只补缺，人得能自己改 —— 不然补错了/被改坏了就没有出口
+    ("音标可以就地改（AI 只补缺，人要有出口）",
+     _re.search(r"async function onIpaBlur", word) is not None
+     and "updateWord(props.word, { ipa: next })" in word),
 ]
 
 fi = 0

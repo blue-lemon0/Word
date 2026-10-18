@@ -18,7 +18,7 @@ import {
   sensesOfWordNow,
   wordNow,
 } from '../db'
-import { addSense, purgeWord } from '../edit'
+import { addSense, purgeWord, updateWord } from '../edit'
 import { useDragReorder } from '../draglist'
 import { aiPrompt } from '../import'
 import { goBack } from '../nav'
@@ -137,6 +137,23 @@ async function fillCounts(ids: string[]): Promise<void> {
 
 /** 还在读库。内存里有就首帧直接给完整界面（没有那一帧的空白）。 */
 const loading = ref(!readyFromMemory(props.word))
+
+/** 音标就地编辑：失焦才落库（与意思页的字段同一套规矩）。
+ *  去空白、去掉用户可能带上的斜杠 —— `Word.ipa` 的约定是不带斜杠。 */
+async function onIpaBlur(ev: Event): Promise<void> {
+  const el = ev.target as HTMLElement
+  const raw = (el.textContent ?? '').trim()
+  const next = raw.replace(/^\/+|\/+$/g, '').trim()
+  if (next === (word.value?.ipa ?? '')) {
+    el.textContent = word.value?.ipa ?? ''
+    return
+  }
+  if (!word.value) return
+  await updateWord(props.word, { ipa: next })
+  word.value = { ...word.value, ipa: next }
+  el.textContent = next
+  toast(next ? '音标已保存' : '音标清空了')
+}
 
 async function load(): Promise<void> {
   if (readyFromMemory(props.word)) {
@@ -317,7 +334,20 @@ function onAsk(): void {
       <template v-else>
       <section class="wb-card head">
         <div class="big">{{ props.word }}</div>
-        <div v-if="word?.ipa" class="ipa">{{ word.ipa }}</div>
+        <!-- 音标可点即改：这是**唯一**能修音标的地方。
+             为什么需要它：AI 之前会自作主张改写已有音标（把 /ˈæspɛkt/ 改成丢了重音的
+             /æspekt/），现在我们只允许它补缺；但「补错了/想自己填」总得有个入口。
+             失焦落库，写法与意思页的字段一致（那边也是点字即改）。 -->
+        <div
+          class="ipa wb-edit"
+          :class="{ empty: !word?.ipa }"
+          :contenteditable="true"
+          spellcheck="false"
+          data-ph="加音标"
+          @blur="onIpaBlur"
+        >
+          {{ word?.ipa || '' }}
+        </div>
         <div class="tags">
           <van-tag v-if="senses.length" plain round type="primary">{{ senses.length }} 个意思</van-tag>
           <van-tag v-if="senses.some((s) => s.needsRefine)" plain round type="warning">需精修</van-tag>
@@ -466,6 +496,22 @@ function onAsk(): void {
   color: var(--wb-ink-3);
   font-size: 13px;
   margin-top: 2px;
+  /* 空着时也要能点到：没有音标时显示一行浅色的「加音标」占位 */
+  min-height: 1.4em;
+  border-radius: 6px;
+  padding: 1px 3px;
+  margin-left: -3px;
+  display: inline-block;
+}
+
+.head .ipa.empty::before {
+  content: attr(data-ph);
+  color: var(--wb-ink-3);
+  opacity: 0.6;
+}
+
+.head .ipa.empty:focus::before {
+  content: '';
 }
 
 .head .tags {

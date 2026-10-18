@@ -19,7 +19,7 @@
 （下次怎么在 30 秒内认出它）。
 
 其中能机械判定的部分，已经写成断言挂在 `scripts/verify_docs.py` 的
-「真机交互守卫」里（当前 141 项），跑一次 `python scripts/verify_docs.py` 就会拦。
+「真机交互守卫」里（当前 142 项），跑一次 `python scripts/verify_docs.py` 就会拦。
 数字由脚本自己核对：文档写错一项，这一轮就直接 FAIL。
 
 ## 为什么其他东西放这里
