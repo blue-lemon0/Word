@@ -20,7 +20,8 @@
 import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { peekWord, type PeekResult } from '../lookup'
-import { addPendingWord } from '../edit'
+import { addPendingWord, pinSense, tomorrowStart, unpinSense } from '../edit'
+import { allProgress } from '../db'
 import { aiReady } from '../ai/config'
 import { toast } from '../toast'
 
@@ -48,9 +49,55 @@ watch(
     if (!show || !props.token) return
     justAdded.value = ''
     peek.value = await peekWord(props.token)
+    pinned.value = await pinnedSense()
   },
   { immediate: true },
 )
+
+/* ── 排进明天练（D41 §6）──
+ *
+ *  ★ 为什么这一格值得做：看到生词的那一瞬间，人心里说的是「明天练这个词」。
+ *    没有这条通道，它只能混在一堆新卡里等随机抽到，或者干脆被忘掉。
+ *  ★ 只排**有例句**的义项：没例句的义项进不了出题池，排了也练不到，
+ *    那等于给一个假承诺。没有就如实说「还没法练」。
+ */
+const pinned = ref<string>('')
+
+async function pinnedSense(): Promise<string> {
+  const p = peek.value
+  if (!p?.senses.length) return ''
+  const rows = await allProgress()
+  const now = Math.floor(Date.now() / 1000)
+  const hit = rows.find(
+    (r) => p.senses.some((s) => s.id === r.senseId) && r.pinAt && r.pinAt > now,
+  )
+  return hit?.senseId ?? ''
+}
+
+/** 能练的那个义项：有例句、且没被标记为「有问题」 */
+const practisable = computed(() => {
+  const p = peek.value
+  if (!p) return ''
+  const hit = p.senses.find((s) => (p.sentenceCounts.get(s.id) ?? 0) > 0)
+  return hit?.id ?? ''
+})
+
+async function togglePin(): Promise<void> {
+  const id = pinned.value || practisable.value
+  if (!id) {
+    toast('这个词还没有例句，暂时没法练 —— 先进词条补一句')
+    return
+  }
+  if (pinned.value) {
+    await unpinSense(id)
+    pinned.value = ''
+    toast('已取消「明天练」')
+    return
+  }
+  await pinSense(id, tomorrowStart())
+  pinned.value = id
+  toast('已排进明天 —— 明天第一组里就有它')
+}
 
 function close(): void {
   emit('close')
@@ -133,6 +180,10 @@ async function add(): Promise<void> {
           <span class="go">›</span>
         </button>
         <button class="btn ghost" type="button" @click="goWord">看这个词的整页</button>
+        <!-- 排进明天：库里已有的词也能「我要练它」。 -->
+        <button class="btn ghost" type="button" :disabled="!practisable && !pinned" @click="togglePin">
+          {{ pinned ? '取消「明天练」' : '排进明天练' }}
+        </button>
       </template>
 
       <!-- 不在库里 -->

@@ -1320,6 +1320,22 @@ interaction = [
     ("updateWord 会建出词条（不靠 update 的静默 no-op）",
      _re.search(r"export async function updateWord[\s\S]{0,600}?db\.words\.put",
                 _code(os.path.join(WEB, "src", "edit.ts"))) is not None),
+    # 「排进明天练」是唯一一条「我说了算」的排期通道：
+    # 只看 pinAt 不改 S/D/reps；排序上必须真的排到队首，否则等于没做。
+    ("排进明天的卡排在队首，且不改学习记录",
+     _re.search(r"pinned\.push\(s\.id\)", _code(os.path.join(WEB, "src", "quiz.ts"))) is not None
+     and "const queue = [...pinned," in _code(os.path.join(WEB, "src", "quiz.ts"))
+     and _re.search(r"db\.progress\.update\(senseId, \{ pinAt: at \}\)",
+                    _code(os.path.join(WEB, "src", "edit.ts"))) is not None),
+    # 「明天」的口径只能有一处（0 点），查词浮层与词库都读它
+    ("「明天」的口径只有一处（tomorrowStart）",
+     _re.search(r"export function tomorrowStart", _code(
+         os.path.join(WEB, "src", "edit.ts"))) is not None
+     and "tomorrowStart()" in _src(os.path.join("components", "WordPeek.vue"))),
+    # 查词浮层要能「排进明天」，词库要能看见这个标记
+    ("查词浮层能排进明天，词库看得见「明天练」",
+     "排进明天练" in _src(os.path.join("components", "WordPeek.vue"))
+     and _re.search(r'class="pin">明天练', lib) is not None),
 ]
 
 fi = 0

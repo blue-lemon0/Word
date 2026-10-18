@@ -347,8 +347,7 @@ export async function reorderSentences(list: Sentence[], from: number, to: numbe
  *  ★ 不需要手动清缓存：progress 表的写入钩子（db.ts 的 Table.hook）会自动失效。
  *   这正是坑 53 的那条判据 —— **失效钩子已经存在，就别再自己造一个**。
  */
-export async function resetProgress(senseId: string): Promise<void> {
-  await db.progress.put({
+export async function resetProgress(senseId: string): Promise<void> {  await db.progress.put({
     senseId,
     stability: 0,
     difficulty: 8,
@@ -363,3 +362,28 @@ export async function resetProgress(senseId: string): Promise<void> {
 }
 
 export { softDeleteSense }
+
+/* ── 「排进明天练」──
+ *
+ *  ★ 这是唯一一条「我说了算」的排期通道：SRS 只看 S/D，而人看到生词时的念头是
+ *    「这个词我明天要练」。没有它，新词混在一堆新卡里、已掌握的词要等很久。
+ *  ★ 只写 pinAt，不碰 S/D/reps —— 排期是意图，不是学习记录。
+ */
+export async function pinSense(senseId: string, at: number): Promise<void> {
+  await ensureProgress(senseId)
+  await db.progress.update(senseId, { pinAt: at })
+}
+
+export async function unpinSense(senseId: string): Promise<void> {
+  const p = await db.progress.get(senseId)
+  if (!p) return
+  await db.progress.update(senseId, { pinAt: 0 })
+}
+
+/** 下一个「明天 0 点」的时间戳（秒）。词库/查词都用它，口径只能有一处。 */
+export function tomorrowStart(): number {
+  const d = new Date()
+  d.setDate(d.getDate() + 1)
+  d.setHours(0, 0, 0, 0)
+  return Math.floor(d.getTime() / 1000)
+}

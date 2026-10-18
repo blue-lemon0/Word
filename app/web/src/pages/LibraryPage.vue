@@ -40,6 +40,8 @@ interface Row {
   learned: number
   due: number
   needsRefine: boolean
+  /** 「排进明天练」的时间戳（0 = 没排） */
+  pinAt: number
 }
 
 /** 五个桶 —— 顺序就是「人心里想事情的顺序」 */
@@ -103,12 +105,14 @@ function buildRows(
     let dueAt = 0
     /** 一个词有多个义项时，这个词的桶 = 它**最紧要**的那个义项的桶 */
     let bucket: Bucket = 'mastered'
+    let pinAt = 0
     const rank: Record<Bucket, number> = { due: 0, learning: 1, new: 2, mastered: 3, idle: 4 }
     for (const s of senses) {
       sentences += sentBy.get(s.id) ?? 0
       const p = pmap.get(s.id)
       if (p && p.reps > 0) learned++
       if (p && p.reps > 0 && !p.mastered && p.dueAt <= now) due++
+      if (p?.pinAt && p.pinAt > now && (pinAt === 0 || p.pinAt < pinAt)) pinAt = p.pinAt
       const b = bucketOf(p, now)
       if (rank[b] < rank[bucket]) bucket = b
       if (b === 'due' && p && (dueAt === 0 || p.dueAt < dueAt)) dueAt = p.dueAt
@@ -123,6 +127,7 @@ function buildRows(
       bucket,
       learned,
       due,
+      pinAt,
       needsRefine: senses.some((s) => s.needsRefine),
     })
   }
@@ -357,6 +362,7 @@ onMounted(load)
                 </div>
                 <div class="m">
                   <span>{{ r.senses.length }} 个意思</span>
+                  <span v-if="r.pinAt" class="pin">明天练</span>
                   <span v-if="r.bucket === 'due' && r.dueAt" class="due">
                     {{ fmtDue(r.dueAt) }}到期
                   </span>
@@ -589,6 +595,11 @@ onMounted(load)
 
 .row-i .due {
   color: #c0392b;
+}
+
+.row-i .pin {
+  color: var(--primary);
+  font-weight: 600;
 }
 
 .row-i .warn {

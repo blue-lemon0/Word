@@ -100,6 +100,7 @@ export async function buildQueue(limit = SESSION_SIZE, only?: string[]): Promise
 
   const due: Array<{ id: string; at: number }> = []
   const fresh: string[] = []
+  const pinned: string[] = []
   cands.forEach((s) => {
     const p = pmap.get(s.id)
     if (!p || p.reps === 0) {
@@ -111,7 +112,14 @@ export async function buildQueue(limit = SESSION_SIZE, only?: string[]): Promise
   })
   due.sort((a, b) => a.at - b.at)
 
-  const queue = [...due.map((d) => d.id), ...fresh]
+  // 「排进明天」的卡**排最前面**，不管它到没到期（D41 §6）。
+  // 已掌握也照样进 —— 那是人自己点的「我要练它」。
+  for (const s of cands) {
+    const p = pmap.get(s.id)
+    if (p?.pinAt && p.pinAt <= now) pinned.push(s.id)
+  }
+
+  const queue = [...pinned, ...due.map((d) => d.id).filter((id) => !pinned.includes(id)), ...fresh.filter((id) => !pinned.includes(id))]
   return queue.slice(0, limit)
 }
 
@@ -148,8 +156,10 @@ export async function buildScopeQueue(
   const due: Array<{ id: string; at: number }> = []
   const fresh: string[] = []
   const learning: string[] = []
+  const pinned: string[] = []
   cands.forEach((s) => {
     const p = pmap.get(s.id)
+    if (p?.pinAt && p.pinAt <= now) pinned.push(s.id)
     if (!p || p.reps === 0) {
       fresh.push(s.id)
       return
@@ -159,8 +169,9 @@ export async function buildScopeQueue(
     else learning.push(s.id)
   })
   due.sort((a, b) => a.at - b.at)
-  // 到期：早到期的先练（有序才有意义）；新词/在学：打散，避免总是同样几个
-  if (scope === 'due') return due.map((d) => d.id).slice(0, limit)
+  // 「排进明天」的卡也进「今天到期」这一组 —— 它本来就该出现在今天该练的清单里
+  const dueIds = [...pinned, ...due.map((d) => d.id).filter((id) => !pinned.includes(id))]
+  if (scope === 'due') return dueIds.slice(0, limit)
   const q = scope === 'new' ? fresh : learning
   return shuffle(q.slice()).slice(0, limit)
 }

@@ -630,6 +630,37 @@ ok((await db.sentences.get(afterTake[0].sentenceId)).en === flagged.sentence.en,
   await edit.purgeWord(S)
   ok((await db.words.get(S)) == null, '队列探针词已清干净')
 
+  // 11) 「排进明天练」：pin 的卡排在队首，且不改学习记录
+  const P = 'zzzpin'
+  const { senseId: pinId } = await edit.addWord(P, '/p/')
+  await edit.updateSense(pinId, { gloss: '排期探针' })
+  await edit.addSentence(pinId, P, `A plain ${P} sentence.`)
+  // 先让它变成「练过、没到期」—— 正常情况下它**不会**进到期队列
+  await db.progress.put({
+    senseId: pinId, stability: 9, difficulty: 5, lastReview: nowS,
+    dueAt: nowS + 30 * 86400, reps: 4, wrongN: 0, pendingN: 0, mastered: 0, rusty: 0,
+  })
+  ok(!(await quiz.buildQueue(50)).includes(pinId), '没到期、没 pin 时它不在队列里')
+
+  await edit.pinSense(pinId, nowS - 1)   // 已到点（模拟「明天 0 点」已过）
+  const q1 = await quiz.buildQueue(50)
+  ok(q1[0] === pinId, `pin 的卡排在队首（实际第 ${q1.indexOf(pinId) + 1} 位）`)
+  ok((await quiz.buildScopeQueue('due', 50))[0] === pinId, '它也出现在「今天到期」那一组的最前面')
+  const pp = await db.progress.get(pinId)
+  ok(pp.stability === 9 && pp.reps === 4, 'pin 不改学习记录（S/reps 原样）')
+
+  await edit.unpinSense(pinId)
+  ok(!(await quiz.buildQueue(50)).includes(pinId), '取消之后它又回到「还没到期就不出现」')
+  ok((await db.progress.get(pinId)).pinAt === 0, '取消是置 0，不是删行')
+
+  const tmr = edit.tomorrowStart()
+  const d = new Date(tmr * 1000)
+  ok(d.getHours() === 0 && d.getMinutes() === 0 && tmr * 1000 > Date.now(),
+     '「明天」的口径是下一个 0 点（且在未来）')
+
+  await edit.purgeWord(P)
+  ok((await db.words.get(P)) == null, '排期探针词已清干净')
+
   // 收尾
   ai.__setTransportForTest(null)
   ai.__setConfigForTest(null)
