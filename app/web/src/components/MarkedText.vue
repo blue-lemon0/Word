@@ -66,22 +66,31 @@ function onPickToken(tok: string): void {
 </script>
 
 <template>
-  <!-- 可点模式：整句逐词切分，每个词能点（顺藤摸瓜进词条）；
-       目标词那一格照样要高亮 —— 不然首页的例句看着和普通的句子没区别，
-       用户不知道该盯哪个词。 -->
-  <span v-if="pickable && tokens" class="pickable">
-    <span
-      v-for="(tok, i) in tokens"
-      :key="i"
+  <!-- ★ 必须有**唯一**根元素。原来是三个分支（span / 文本+mark / 文本），
+       属于「多根节点」：Vue 无法把父组件传下来的 class 挂上去，
+       只会警告 Extraneous non-props attributes，
+       于是调用方写的 class="tx" 静默失效 —— 排版就按「没有这个 class」渲染。
+       扫读页的行号/词性/句子对不齐，根子在这里：
+       句子被拆成「文本节点 + <mark>」两个匿名 flex item 各自排版。
+       包一个根 span 之后 class / style / 事件都能正常落上去。 -->
+  <span class="wb-marked">
+    <!-- 可点模式：整句逐词切分，每个词能点（顺藤摸瓜进词条）；
+         目标词那一格照样要高亮 —— 不然首页的例句看着和普通的句子没区别，
+         用户不知道该盯哪个词。 -->
+    <span v-if="pickable && tokens" class="pickable">
+      <span
+        v-for="(tok, i) in tokens"
+        :key="i"
       :class="{ link: /[A-Za-z]/.test(tok) && tok.trim() !== '', hit: isHit(tok) }"
       @click="onPickToken(tok)"
       >{{ tok }}</span
     >
+    </span>
+    <template v-else-if="parts">
+      {{ parts.before }}<mark>{{ parts.hit }}</mark>{{ parts.after }}
+    </template>
+    <template v-else>{{ text }}</template>
   </span>
-  <template v-else-if="parts">
-    {{ parts.before }}<mark>{{ parts.hit }}</mark>{{ parts.after }}
-  </template>
-  <template v-else>{{ text }}</template>
 </template>
 
 <style scoped>

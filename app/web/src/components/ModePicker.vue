@@ -16,6 +16,9 @@ export interface Mode {
   label: string
   hint: string
   primary?: boolean
+  /** 没有得练时置灰，并把原因写在 hint 里 ——
+   *  比「点进去才发现是空的、再弹一句看不清的提示」好得多。 */
+  disabled?: boolean
 }
 
 defineProps<{ modes: Mode[]; soloTitle?: string; sub?: string }>()
@@ -31,8 +34,9 @@ const emit = defineEmits<{ (e: 'choose', key: string): void }>()
         v-for="m in modes"
         :key="m.key"
         class="mitem"
-        :class="{ pri: m.primary }"
+        :class="{ pri: m.primary, off: m.disabled }"
         type="button"
+        :disabled="m.disabled"
         @click="emit('choose', m.key)"
       >
         <b>{{ m.label }}</b><span>{{ m.hint }}</span>
@@ -100,5 +104,17 @@ const emit = defineEmits<{ (e: 'choose', key: string): void }>()
 
 .mitem:active {
   background: var(--wb-line);
+}
+
+/* 没有得练：置灰、点不动，原因就写在 hint 里。
+   这比「点进去 → 组出空队列 → 跳去另一种练法 → 弹一句看不懂的提示」
+   好在**代价前置**：用户不点就不会被丢到别处。 */
+.mitem.off {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.mitem.off:active {
+  background: var(--wb-bg);
 }
 </style>

@@ -6,7 +6,6 @@ import WordPage from './pages/WordPage.vue'
 import SensePage from './pages/SensePage.vue'
 import LibraryPage from './pages/LibraryPage.vue'
 import BoardPage from './pages/BoardPage.vue'
-import ScanPage from './pages/ScanPage.vue'
 import TrainPage from './pages/TrainPage.vue'
 import MorePage from './pages/MorePage.vue'
 import { VANT_COMPONENTS } from './vant'
@@ -16,18 +15,27 @@ import { initPwa, registerSW } from './pwa'
 import { toast } from './toast'
 
 /* hash 路由：PWA 离线时不需要服务端做 history fallback，
- *  直接 index.html#/word/xxx 也能打开。 */
+ *  直接 index.html#/word/xxx 也能打开。
+ *
+ *  ★ `meta: { tab: true }` = 「我是一个 tab 页，底部要摆导航栏」。
+ *    **只有这三个有**。注意「训练」不在里面：
+ *    训练是**一个动作**，不是一个地方 —— 摆在 tab 栏里是分类错误
+ *    （和 D35 里「详情页不该摆底栏」同一类毛病）。
+ *    它从首页的「去训练」进去，盖满全屏、没有底栏、有返回。
+ *
+ *    为什么默认隐藏、而不是列一张「要隐藏的路径」：
+ *    手维护前缀表的失败是**静默**的（加新页面忘了加，底栏就露出来了），
+ *    默认隐藏的失败只是「新 tab 页少写一行」—— 见 App.vue 的说明。 */
 const router = createRouter({
   history: createWebHashHistory(),
   routes: [
-    { path: '/', name: 'home', component: HomePage },
+    { path: '/', name: 'home', component: HomePage, meta: { tab: true } },
     { path: '/word/:word', name: 'word', component: WordPage, props: true },
     { path: '/sense/:id', name: 'sense', component: SensePage, props: true },
-    { path: '/library', name: 'library', component: LibraryPage },
+    { path: '/library', name: 'library', component: LibraryPage, meta: { tab: true } },
     { path: '/board', name: 'board', component: BoardPage },
-    { path: '/scan', name: 'scan', component: ScanPage },
     { path: '/train', name: 'train', component: TrainPage },
-    { path: '/more', name: 'more', component: MorePage },
+    { path: '/more', name: 'more', component: MorePage, meta: { tab: true } },
   ],
 })
 

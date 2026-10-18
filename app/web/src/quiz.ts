@@ -17,7 +17,7 @@ export interface Question {
   sense: Sense
   ipa: string
   sentence: Sentence
-  options: string[]
+options: string[]
   /** 到期作答 / 提前复习 —— 提前复习不计入正确率 */
   isDue: boolean
   /** 作答后才有：这次作答后的 SRS 状态（解释区显示「下次什么时候」） */
@@ -148,19 +148,42 @@ export async function makeQuestion(senseId: string, pinSentence?: number): Promi
   }
 }
 
+/** 选项：正解 + 三个干扰项。
+ *
+ *  ★ 干扰项**只要求「同一个词性」**，不要求是这个词的正确意思。
+ *    题目问的是「这个词在这句话里是什么意思」—— 干扰项只要词性对得上，
+ *    四个选项看起来就是同一类东西，用户没法靠「这是名词释义还是动词释义」
+ *    蒙对。想按词性排除 = 换了一种作弊方式。
+ *
+ *  ★ 同一个词的别的义项**更常被抽中**（有就优先占掉两个位）。
+ *    理由：跨词的干扰项「明显不是这个词的意思」，四个字看一眼就能划掉，
+ *    练不到东西；而同一个词的其它义项**都像**正确答案，只能靠「这句话
+ *    到底是哪个意思」区分 —— 这才是这道题真正要练的能力。
+ *    句子已经把义项钉死了，所以它们不是「第二个正确答案」，
+ *    而是**贴着答案的干扰**：练的是分辨，不是二选一。
+ *
+ *  ★ 但干扰项**不能改**：跨词借来的，改它等于改另一张卡片；
+ *    同词借来的，改它等于在你不看着的那张卡上动手。
+ *    一道题的凑数选项不该有能力破坏别人的数据。 */
 async function buildOptions(sense: Sense, right: string): Promise<string[]> {
-  const same = (await db.senses.where('word').equals(sense.word).toArray())
-    .filter((s) => s.id !== sense.id && s.deletedAt == null)
-    .map((s) => s.gloss)
-    .filter(Boolean)
-  const all = (await liveSenses()).map((s) => s.gloss).filter(Boolean)
+  const live = await liveSenses()
+  const sameWord = live.filter((s) => s.id !== sense.id && s.word === sense.word)
+  const samePosSameWord = sense.pos ? sameWord.filter((s) => s.pos === sense.pos) : sameWord
+  const others = live.filter(
+    (s) => s.id !== sense.id && s.word !== sense.word && (!sense.pos || s.pos === sense.pos),
+  )
+  // 任何词性都不够时的兜底：宁可词性不齐，也不能凑不满四个选项
+  const loose = live.filter((s) => s.id !== sense.id)
 
   const out: string[] = [right]
-  const push = (g: string): void => {
-    if (g && !out.includes(g) && out.length < 4) out.push(g)
+  const push = (g: string, cap: number): void => {
+    if (g && !out.includes(g) && out.length < cap) out.push(g)
   }
-  shuffle(same).forEach(push)
-  if (out.length < 4) shuffle(all).forEach(push)
+  shuffle(samePosSameWord)
+    .slice(0, 2)
+    .forEach((s) => push(s.gloss, 4))
+  shuffle(others).forEach((s) => push(s.gloss, 4))
+  shuffle(loose).forEach((s) => push(s.gloss, 4))
   return shuffle(out)
 }
 

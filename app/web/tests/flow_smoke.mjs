@@ -219,6 +219,72 @@ ok((await flags.listFlags()).length === 0, '关单后标记清空')
 ok((await db.sentences.get(afterTake[0].sentenceId)).en === flagged.sentence.en,
    '关单只清标记，不动例句内容')
 
+/* ── 6.2 选项规则与「当场改」的写入语义（D36）──
+ * 这两件事守卫（verify_docs）只能判源码形状：它判得了「buildOptions 里写着
+ * 同词性过滤」，判不了「选项真的全是同一个词性」。而这两条规则一旦退化，
+ * 界面上**什么都不报**：点开题目一切正常，只是「又能靠词性蒙对了」、
+ * 或者「同词的干扰项再也不出现了」。所以这里用自己造的数据把它们钉住。
+ *
+ * 数据是自己造的，所以断言必须是确定的（坑 28）：不依赖随机数、也不依赖
+ * 种子词库里恰好有哪个词 —— 造三个同词性义项，就能把「同词性」和
+ * 「同词优先」两条同时判死。 */
+{
+  const W = 'zzzprobe'
+  const { senseId: s1 } = await edit.addWord(W, '/zzz/')
+  const s2 = await edit.addSense(W, '')
+  const s3 = await edit.addSense(W, '')
+  await edit.updateSense(s1, { gloss: '甲义（名词）', pos: 'n.' })
+  await edit.updateSense(s2, { gloss: '乙义（名词）', pos: 'n.' })
+  await edit.updateSense(s3, { gloss: '丙义（名词）', pos: 'n.' })
+  await edit.addSentence(s1, W, `I saw a ${W} on the table.`)
+  await edit.addSentence(s2, W, `The ${W} broke in half.`)
+  await edit.addSentence(s3, W, `Another ${W} stood by the door.`)
+
+  const q = await quiz.makeQuestion(s1)
+  ok(q != null && q.options.length === 4, '自己造的词也能出满 4 个选项')
+  ok(q.options.includes('甲义（名词）'), '正解在选项里')
+  // 同词的两个义项先占掉两个干扰位（D36 第四节）
+  ok(q.options.includes('乙义（名词）') && q.options.includes('丙义（名词）'),
+     '同一个词的其它义项占掉两个干扰位（同词优先）')
+
+  const glossToPos = new Map()
+  for (const s of await db.senses.filter((x) => x.deletedAt == null).toArray()) {
+    glossToPos.set(s.gloss, s.pos)
+  }
+  const wrong = q.options.filter((g) => g !== '甲义（名词）')
+  ok(wrong.length === 3, `三个干扰项 + 一个正解（实际 ${q.options.length} 个）`)
+  ok(wrong.every((g) => glossToPos.get(g) === 'n.'),
+     '干扰项全部与正解同词性（不能靠词性排除蒙对）',
+     wrong.map((g) => `${g}=${glossToPos.get(g)}`).join(' '))
+
+  // 兜底：该词性只有它自己一个来源时，宁可词性不齐也要凑满四个
+  const R = 'zzzrare'
+  const { senseId: r1 } = await edit.addWord(R, '/rrr/')
+  await edit.updateSense(r1, { gloss: '罕见词性义项', pos: 'zzz.' })
+  await edit.addSentence(r1, R, `A ${R} appeared once.`)
+  const qr = await quiz.makeQuestion(r1)
+  ok(qr != null && qr.options.length === 4, '同词性凑不满时仍凑满 4 个（兜底不死锁）')
+  ok(qr.options.includes('罕见词性义项'), '兜底时正解仍在')
+
+  // 「当场改」的写入语义：只提交动过的字段，别的字段不许被顺手清空
+  const rSent = (await db.sentences.where('senseId').equals(r1).toArray())[0]
+  const enBefore = rSent.en
+  await edit.updateSentence(rSent.id, { zh: '只改中文' })
+  const rAfter = await db.sentences.get(rSent.id)
+  ok(rAfter.zh === '只改中文' && rAfter.en === enBefore,
+     '只改中文不会把英文清空（QuickEdit 只提交动过的字段）')
+  await edit.updateSense(r1, { gloss: '改过的释义' })
+  const rSense = await db.senses.get(r1)
+  ok(rSense.gloss === '改过的释义' && rSense.pos === 'zzz.',
+     '只改释义不会丢掉词性（同理）')
+
+  // 清掉探针词，免得污染后面的计数
+  await edit.purgeWord(W)
+  await edit.purgeWord(R)
+  ok((await db.words.get(W)) == null && (await db.words.get(R)) == null,
+     '造出来的探针词已清干净（不留残骸）')
+}
+
 /* ── 7. 备份 + 回滚 ── */
 const wordsBefore = await db.words.count()
 const bk = await backup.buildBackup(true)
@@ -318,7 +384,7 @@ ok((await db.progress.get(q1.sense.id)) != null, '回滚不动学习进度（只
 }
 
 /* ── 7b. 导入历史那一行怎么说话 ──
- * 存下来的 summary 有两种格式（内容包批量 / AI 单��），
+ * 存下来的 summary 有两种格式（内容包批量 / AI 单词），
  * 认错就会不报错地「少说一句」—— 这里把两种都钉住（坑 47）。
  * ★「改」和「冲突」后面**没有加号**（`词+18 义+66 改0 句+33 冲突0`），
  *   按 `key+N` 一刀切就永远漏掉这两项 —— 这条断言就是为它写的。 */
@@ -330,7 +396,7 @@ ok(
 )
 ok(
   backup.importLine({ ts: 1, word: 'army', summary: '新增义项0 例句10' }) === 'army · 新增义项0 例句10',
-  'AI 单���那套本来就是人话，原样用（不重译成空）',
+  'AI 单词那套本来就是人话，原样用（不重译成空）',
   backup.importLine({ ts: 1, word: 'army', summary: '新增义项0 例句10' }),
 )
 ok(

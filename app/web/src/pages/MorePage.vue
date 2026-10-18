@@ -244,7 +244,7 @@ onMounted(load)
       <!-- 备份区：导出两种 + 导入一个（导入会自动认出文件是哪一种，见 applyIncoming）
            原来这里是「导入备份」，而内容包另在词库页有个「导入内容包」——
            两个入口吃两种格式，用户得先知道自己拿到的是哪种文件。
-           合��一个之后：文件里��� `format` 字段替用户回答这个问题。 -->
+           合成一个之后：文件里有 `format` 字段替用户回答这个问题。 -->
       <van-cell-group inset class="grp">
         <template #title><b>备份与导入</b></template>
         <div class="acts">

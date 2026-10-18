@@ -26,7 +26,7 @@
  *   node android.mjs logs   [过滤词]       抓 logcat
  *
  *   包名默认取环境变量 ANDROID_PKG，没有就用 com.wordbank.app.debug。
- *   坐标一律按 **CSS 像素**填，工具负责乘密度 —— 这样在��密度手机之间通用。
+ *   坐标一律按 **CSS 像素**填，工具负责乘密度 —— 这样在不同密度手机之间通用。
  */
 import { execSync } from 'node:child_process'
 import { mkdirSync, readdirSync, writeFileSync, existsSync, rmSync } from 'node:fs'

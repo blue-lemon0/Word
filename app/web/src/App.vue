@@ -1,9 +1,9 @@
 <script setup lang="ts">
 /** 应用外壳：顶部由各页面自己画，这里只管底部导航。
  *
- *  「首页 / 词库 / 训练 / 更多」是四个入口，**只有这四页有底栏**；
- *  单词页、意思页、错题板是从某处钻进去的二级页，底栏收起来。
- *  为什么收，见下面 showTabs 的注释。
+ *  「首页 / 词库 / 更多」是**三个地方**，只有这三页有底栏；
+ *  单词页、意思页、错题板是从某处钻进去的二级页，训练是一个动作（D36）——
+ *  它们都把底栏收起来。为什么收，见下面 showTabs 的注释。
  */
 import { computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -14,12 +14,23 @@ import { toastMsg } from './toast'
 const route = useRoute()
 const router = useRouter()
 
-/** 从入口钻进去的二级页：单词页、意思页、错题板 */
-function isSubPage(path: string): boolean {
-  return (
-    path.startsWith('/word/') || path.startsWith('/sense/') || path.startsWith('/board')
-  )
-}
+/**
+ * 底栏只出现在**声明过** `meta.tab` 的路由上，也就是那三个 tab 页。
+ *
+ *  ★ 为什么是「默认隐藏」而不是「默认显示」：
+ *   原来的写法是**手维护一张要隐藏的前缀表**（`/word/ /sense/ /board`）。
+ *   它的失败模式是**静默**的 —— 我加了 `/scan` 却忘了加进那张表，
+ *   扫读页就顶着底栏出现了，没人报错、没人察觉，而用户说「犯好多次了」。
+ *
+ *   反过来写，新增页面**默认就是子页**（不摆底栏），
+ *   要变成 tab 页必须显式写一行 `meta: { tab: true }` ——
+ *   漏写的后果从「悄悄露出底栏」变成「新 tab 页少一行声明」，两边不对称，
+ *   而不对称的代价都落在用户身上。
+ *
+ *   同类问题不止一处：扫读页有两个「换一批」、以及「我不会」那条路在界面上
+ *   是死的（坑 54），都是**同一种病** —— 规则散在若干处，靠人记。
+ */
+const showTabs = computed(() => route.meta.tab === true)
 
 watchKeyboard()
 
@@ -37,13 +48,12 @@ router.afterEach((to, from) => {
 /** 二级页归属的主 tab */
 function activeTab(path: string): string {
   if (path.startsWith('/library') || path.startsWith('/word') || path.startsWith('/sense')) return 'library'
-  if (path.startsWith('/train') || path.startsWith('/board')) return 'train'
   if (path.startsWith('/more')) return 'more'
   return 'home'
 }
 
 /**
- * 只有四个入口页有底栏；从入口钻进去的二级页一律收起来。
+ * 只有**声明过** `meta.tab` 的路由才有底栏，也就是那三个 tab 页。
  *
  *  为什么不收是混乱的：底栏在手机上天生被读成「**和它同级**的四个地方」。
  *  二级页里也摆着它，就会同时产生两种错误预期 ——
@@ -58,9 +68,10 @@ function activeTab(path: string): string {
  *    .wb-page 的 padding-bottom、首页的 min-height、toast 的落点
  *    全都是按这个变量算的，改一处就一起对。
  *
+ *  ★ 判断式在文件头（route.meta.tab），不在这里 —— 为什么默认隐藏见那里。
+ *
  *  flush:'sync' 是为了赶在渲染之前改掉 —— 晚一帧就是坑 42 说的那种跳变。
  */
-const showTabs = computed(() => !isSubPage(route.path))
 watch(
   () => route.path,
   () => {
@@ -92,7 +103,16 @@ const active = computed(() => activeTab(route.path))
 
 <template>
   <RouterView v-slot="{ Component }">
-    <component :is="Component" />
+    <!-- ★ 只把训练页留在缓存里。
+         「去核验一番」= 从题目跳到意思详情/词条页看一眼再回来。
+         如果这一跳把训练页销毁，回来就回到「怎么练」那一屏，
+         这一轮做了一半的题全没了 —— 那还敢跳过去核验吗？
+         留着它，回来还在原题；内容新不新鲜由训练页自己在 onActivated 里刷新。
+         别的页面一律不留：词库/意思页都是「改了要马上看到」的地方，
+         缓存它们等于制造「明明改了，列表还是旧的」。 -->
+    <KeepAlive :include="['TrainPage']">
+      <component :is="Component" />
+    </KeepAlive>
   </RouterView>
 
   <!-- ★ 不用 placeholder：它会往 body 里塞一个占位块，高度由 JS 算。
@@ -107,9 +127,11 @@ const active = computed(() => activeTab(route.path))
     <!-- 图标名必须是 Vant 内置图标表里真实存在的（vant/lib/index.css 的
          .van-icon-xxx），写错不报错、只是渲染成空白 —— tabbar 尤其容易踩，
          因为一个图标不显示时底栏看起来「就是少个图标」，很难联想到是名字错。 -->
+    <!-- 只有三个 tab。训练**不在这里** —— 它是一个动作，不是一个地方；
+         它从首页的「去训练」进去，盖满全屏、无底栏、有返回。
+         深链 /train 仍然可用（扫读、错题板、意思页都跳过去）。 -->
     <van-tabbar-item name="home" icon="wap-home-o" to="/">首页</van-tabbar-item>
     <van-tabbar-item name="library" icon="apps-o" to="/library">词库</van-tabbar-item>
-    <van-tabbar-item name="train" icon="aim" to="/train">训练</van-tabbar-item>
     <van-tabbar-item name="more" icon="ellipsis" to="/more">更多</van-tabbar-item>
   </van-tabbar>
 

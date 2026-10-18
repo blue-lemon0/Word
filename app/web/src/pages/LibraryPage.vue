@@ -192,6 +192,7 @@ onMounted(load)
              和两种导入里），想加一个词只能导入整个内容包 ——
              那不叫「加词」，那叫「换数据库」。
              一个「+」放在顶栏，是通讯录式的通用预期。 -->
+        <van-button size="mini" plain @click="router.push('/board')">错题</van-button>
         <van-button size="mini" plain type="primary" icon="plus" @click="showAdd = true">
           新词
         </van-button>

@@ -7,10 +7,12 @@
  *  队列来源：?solo=<senseId> 是错题板的单挑入口（页内不提供单挑按钮 ——
  *  知道要练哪个意思，选题就成了送分）。
  */
-import { computed, ref, watch } from 'vue'
+import { computed, onActivated, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import MarkedText from '../components/MarkedText.vue'
+import { goBack as goBackNav } from '../nav'
 import ModePicker, { type Mode as PickerMode } from '../components/ModePicker.vue'
+import ScanList from '../components/ScanList.vue'
 import {
   buildQueue,
   buildRandomQueue,
@@ -22,9 +24,18 @@ import {
   recordAnswer,
   SESSION_SIZE,
   type Question,
+  type ScanItem,
   type SessionStats,
 } from '../quiz'
 import { toast } from '../toast'
+import { db } from '../db'
+import type { Sentence, Sense } from '../types'
+import QuickEdit from '../components/QuickEdit.vue'
+
+/** 名字要显式声明：App.vue 只 keep-alive 这一页（`include` 靠的就是名字）。
+ *  不声明的话 keep-alive 静默不生效 —— 跳去核验再回来，
+ *  这一轮做了一半的题全没了，而界面上没有任何提示说它丢了。 */
+defineOptions({ name: 'TrainPage' })
 
 const route = useRoute()
 const router = useRouter()
@@ -102,7 +113,7 @@ const masteredFlash = ref('')
  *           随手抽一句猜个意思本来就是学习的一部分，只是过去没入口。
  *  `redo`   重刷**刚做完这一轮**的那批卡。
  */
-type Mode = 'due' | 'random' | 'redo'
+type Mode = 'due' | 'random' | 'redo' | 'scan'
 
 const sessionId = ref('')
 const stats = ref<SessionStats>({ correct: 0, wrong: 0, pending: 0, dueCorrect: 0, dueTotal: 0 })
@@ -110,6 +121,10 @@ const root = ref<HTMLElement | null>(null)
 const strip = ref<HTMLElement | null>(null)
 
 const KEYS = ['A', 'B', 'C', 'D']
+
+/** 顶栏返回 = 系统返回键。训练不再有底栏，这里是唯一明确的退出路径。
+ *  走 nav.ts 的 goBack：深链直接进这一屏时没有上一层，会兜底落回首页。 */
+const goBack = (): void => goBackNav(router, '/')
 
 /** 解释区（对错 + 释义 + 标记）只在真正作答之后出现 */
 const isRight = (opt: string): boolean => !!q.value && opt === q.value.sense.gloss
@@ -142,18 +157,52 @@ void practicePool().then((pool) => {
 
 const mode = ref<Mode>('due')
 
-/** 三种练法。**说明文字是这里的关键** —— 「按计划 / 随便 / 扫读」
- *  三个词不足以让人判断选哪个，所以每一项都要有一行「它到底怎么练」。 */
-const MODES = [
-  { key: 'due', label: '按计划', hint: '今天到期的 + 没学过的新卡', primary: true },
-  { key: 'random', label: '随便练', hint: '全库随机抽，不看到期' },
-  { key: 'scan', label: '扫读例句', hint: '像看报纸一样扫，不懂哪句点哪句' },
-] satisfies PickerMode[]
+/** 两种练法。**说明文字是这里的关键** —— 光有「按计划 / 随便练」两个词
+ *  不足以让人判断选哪个，所以每一项都带一行「它到底怎么练」。
+ *
+ *  ★「按计划」会**按有没有得练置灰**：没得练的时候先把这件事说清楚，
+ *    而不是让人点进去 → 组出空队列 → 自动跳去另一种练法 → 弹一句看不清的提示。
+ *    代价前置比事后补救好；顺带也去掉了「点一下被丢到别处」这种莫名其妙。
+ *
+ *  ★ 扫读**不在这里**：它是这一屏下面的一节，不是和它们并列的第三种练法。
+ *    「按计划 / 随便练」是回答「接下来练什么」，扫读是回答「随手看看」——
+ *    后者不需要被选，它一直在那儿。 */
+const dueCount = ref(0)
 
-/** 唯一入口：只有「扫读」不是一种排期口径，它要去另一个页面。 */
+async function refreshDueCount(): Promise<void> {
+  dueCount.value = (await buildQueue(1)).length
+}
+
+const MODES = computed<PickerMode[]>(() => [
+  {
+    key: 'due',
+    label: '按计划',
+    hint: dueCount.value
+      ? `今天到期 ${dueCount.value} 题 + 没学过的新卡`
+      : '今天没有到期的',
+    primary: true,
+    disabled: dueCount.value === 0,
+  },
+  { key: 'random', label: '随便练', hint: '全库随机抽，不看到期' },
+])
+
+void refreshDueCount()
+
+/** 入口就在**这一屏**里完成，不跳去别的页面。
+ *  扫读尤其不该是另一个页面 —— 它就是「随手看一眼，不懂点哪句」，
+ *  和练法是同一件事的两种做法，跳一次反而把它埋深了（而那一屏很空）。
+ *  现在它连「练法」都不算：它是这一屏下面的一节（ScanList），
+ *  点某一句才进单题 —— 从「练什么」到「随手扫」到「练这一句」是一条直线。 */
 function onMode(key: string): void {
-  if (key === 'scan') void router.push('/scan')
-  else void start(key as Mode)
+  void start(key as Mode)
+}
+
+/** 点哪句猜哪句：把那一行的两个 id 一起带进答题流程 */
+function onScanDrill(it: ScanItem): void {
+  void router.push({
+    path: '/train',
+    query: { solo: it.sense.id, sent: String(it.sentence.id) },
+  })
 }
 
 /** 扫读模式钉过来的**具体那一句**（`?sent=<id>`）。
@@ -176,6 +225,7 @@ async function start(which: Mode = mode.value): Promise<void> {
   mode.value = which
   sessionId.value = newSessionId()
   stats.value = { correct: 0, wrong: 0, pending: 0, dueCorrect: 0, dueTotal: 0 }
+  void refreshDueCount()
   queue.value =
     which === 'random'
       ? await buildRandomQueue(SESSION_SIZE, only)
@@ -187,9 +237,10 @@ async function start(which: Mode = mode.value): Promise<void> {
       toast('上一轮已经不在库里了')
       queue.value = await buildRandomQueue(SESSION_SIZE, only)
     } else {
-      toast('今天没有到期的 —— 换个练法试试')
-      queue.value = await buildRandomQueue(SESSION_SIZE, only)
-      mode.value = 'random'
+      // 正常到不了这里：「按计划」已按「有没有得练」置灰（见 MODES）。
+      // 这里**不再自动跳去另一种练法** —— 那正是「点一下被丢到别处、
+      // 再弹一句看不清的提示」的那条路。留着兜底，但只把空队列如实呈现。
+      queue.value = []
     }
   }
   steps.value = {}
@@ -233,9 +284,15 @@ async function loadQ(): Promise<void> {
   }
   phase.value = 'playing'
 
-  // 回看：直接还原那张卡的原样，不重新出题
+  // 回看：还原那张卡的**作答结果**，但题目内容重新从库里取
   const step = steps.value[cursor.value]
   if (step) {
+    // ★ 内容必须重建，不能拿内存里那个旧对象直接用。
+    //   改完一句例句之后库里的值是新的，可界面还握着旧对象 —— 于是
+    //   「明明存上了，回头一看还是错的」。往回翻旧题时同理。
+    //   要缓存的是**作答结果**（选了哪个、对不对、SRS 状态），不是内容。
+    const fresh = await makeQuestion(step.q.sense.id, step.q.sentence.id ?? undefined)
+    if (fresh) step.q = fresh
     q.value = step.q
     picked.value = step.picked
     revealed.value = true
@@ -245,23 +302,25 @@ async function loadQ(): Promise<void> {
     return
   }
 
-  // 新题：出过一次就缓存，回来看还是同一道
+  // 新题：题干每次都从库里重建（用户在别处改过内容，这里要跟上）；
+  // 只有「钉住的那一句」需要沿用第一次出题时的选择。
   const cached = asked.value[cursor.value]
-  let question: Question | null = cached
-  if (!question) {
-    question = await makeQuestion(
+  let question: Question | null = await makeQuestion(
     queue.value[cursor.value],
-    pinUsed ? undefined : pinnedSentence.value,
+    cached
+      ? cached.sentence.id
+      : pinUsed
+        ? undefined
+        : pinnedSentence.value,
   )
-  pinUsed = true
-    if (!question) {
-      // 刚被标记/删掉的句子：跳过这一张，别让用户看着空屏
-      cursor.value++
-      await loadQ()
-      return
-    }
-    asked.value = { ...asked.value, [cursor.value]: question }
+  if (!question) {
+    // 刚被标记/删掉的句子：跳过这一张，别让用户看着空屏
+    cursor.value++
+    await loadQ()
+    return
   }
+  asked.value = { ...asked.value, [cursor.value]: question }
+  pinUsed = true
   q.value = question
   picked.value = ''
   shownAt.value = performance.now()
@@ -339,12 +398,83 @@ async function next(): Promise<void> {
   await loadQ()
 }
 
+/** 「别练它」：这句话有问题而且懒得改/改不了时，
+ *  至少让它别再出现在练习里（flagged 的句子会被队列排除）。
+ *  这仍然只是止血 —— 真正的解是上面那个「改掉这句」。 */
 async function onFlag(): Promise<void> {
   if (!q.value) return
   await flagQuestion(q.value, flagNote.value)
   flagBox.value = false
   await next()
 }
+
+// ── 当场改：发现问题的那一屏就是动手的那一屏 ──
+// 不把人送去「词库 → 意思」页重新把这句话找回来。找不回来，坏内容就一直坏。
+const edSentence = ref<Sentence | null>(null)
+const edSense = ref<Sense | null>(null)
+
+function editSentence(s: Sentence): void {
+  pickBox.value = false
+  edSentence.value = s
+}
+
+async function editSenseNow(id: string): Promise<void> {
+  pickBox.value = false
+  edSense.value = (await db.senses.get(id)) ?? null
+}
+
+/** 「有问题？改」：这道题上**真正属于内容**的东西全列出来 ——
+ *  例句（英/中）+ 本题正确答案的释义。
+ *
+ *  为什么**不包括错项**：错项是同词性的别的词释义，借来凑数的 ——
+ *  它们不是「这个词的某个意思」，改它们等于去改另一张卡片的内容。
+ *  一道题的凑数选项不该有能力破坏别人的数据。
+ *
+ *  为什么列出来让人选，而不是直接改：用户看到的是一句具体的句子或一个
+ *  具体的释义，让他先归类「我发现的这个问题属于哪一类」才能找到入口，
+ *  这个分类步骤就等于把入口藏起来了 —— 而分类本该是我们做的事。 */
+const pickBox = ref(false)
+const fixSents = ref<Sentence[]>([])
+const fixSenses = ref<Sense[]>([])
+
+function openFixOptions(): void {
+  const qq = q.value
+  if (!qq) return
+  fixSenses.value = [qq.sense]
+  fixSents.value = [qq.sentence]
+  pickBox.value = true
+}
+
+/** 去核验，不是去改。
+ *  用户在这里犹豫的往往不是「这内容错没错」，而是「这个词到底有几个意思、
+ *  我是不是记混了」—— 那需要看完整的一页，所以给跳转。
+ *  回来由 keep-alive + onActivated 负责：还在原题，内容是新的。 */
+function goSensePage(): void {
+  const id = q.value?.sense.id
+  pickBox.value = false
+  if (id) void router.push(`/sense/${id}`)
+}
+
+function goWordPage(): void {
+  const w = q.value?.sense.word
+  pickBox.value = false
+  if (w) void router.push(`/word/${encodeURIComponent(w)}`)
+}
+
+/** 改完回到原题，并且让这道题用上刚存进去的新内容 ——
+ *  不刷新的话用户看不到变化，会怀疑到底存没存上。 */
+async function onEdited(): Promise<void> {
+  edSentence.value = null
+  edSense.value = null
+  await loadQ()
+}
+
+/** 从意思详情/词条页核验完回来：题目要跟着变新。
+ *  状态在 keep-alive 里，所以回来还在原题、进度不丢；
+ *  但**内容**不能沿用内存里那份 —— 用户在那边可能刚改过句子。 */
+onActivated(() => {
+  if (q.value) void loadQ()
+})
 
 async function onMastered(): Promise<void> {
   if (!q.value) return
@@ -460,12 +590,34 @@ watch(
   >
     <header class="wb-topbar">
       <div class="in">
-        <h1>{{ solo ? '单挑' : '训练' }}</h1>
-        <van-button size="mini" plain @click="router.push('/board')">错题板</van-button>
+        <!-- ★ 训练不再是 tab 页了（它是一个动作，不是一个地方），
+             所以这里必须有一个明确的退出路径 —— 顶栏的箭头等价于系统返回键，
+             和单词页/意思页用的是同一个 goBack（见 nav.ts）。
+             之前底栏在的时候，这一屏没有返回箭头也能走；现在没了。 -->
+        <van-icon
+          v-if="!solo"
+          name="arrow-left"
+          size="18"
+          @click="goBack"
+        />
+        <h1>{{ solo ? '单挑' : '练习' }}</h1>
+        <!-- ★ 这里原来有一个「错题板」按钮，拿掉了。
+             错题板上就是「词 + 释义」—— 那是**这道题的答案本身**。
+             把答案贴在出题的地方，入口再小也会被当成「先看一眼再答」：
+             于是这一轮测的就不再是记忆，而是「你能不能忍住不看」。
+             复习错题是对的，但要**换个语境**：它属于「词库/复习」，
+             不属于「考试中」。 -->
       </div>
     </header>
 
     <div class="wb-wrap">
+      <!-- ★ 扫读不再是一个「页面」，是训练页下面的一节。
+           封装在 ScanList.vue 里（自己取句子、自己换一批、自己管空/加载态），
+           但显示上和「今天练什么」在同一屏：用户滚一屏就知道自己能练什么、
+           也能随手扫两句，不用在「训练 / 扫读」两个整屏之间来回切。
+           点某一句才会进单题（那一屏只放一道题，答题时不该有别的干扰）。
+           不显示中文：中文在点进去答题之后才出现（出题时露 = 泄题）。 -->
+
       <template v-if="q">
         <!-- 一排可点的进度格：既回答了「我在第几个」，也回答了「怎么跳」。
              单纯的 "3 / 20" 文字只解决了前者，而且字小、滚下去就看不见；
@@ -505,6 +657,11 @@ watch(
           <span v-if="!q.isDue" class="fresh"> · 新卡</span>
         </div>
 
+        <!-- 例句本身不再单独挂「改」：下面一个「有问题？改」把例句、本题意思、
+             选项里那几个意思全都列出来，想改哪个改哪个。
+             一个入口、不挑时机（答题前答题后都能改）、不限制改什么 ——
+             分成「改例句」「改选项」两个入口，等于让人先判断
+             「我发现的这个问题属于哪一类」才找得到入口。 -->
         <div class="qsent">
           <MarkedText
             :text="q.sentence.en"
@@ -514,28 +671,28 @@ watch(
           />
         </div>
 
-        <template v-if="!revealed">
-          <p class="qhint">想清楚这个词在这里的意思</p>
-          <div class="blank" @click="reveal">— 点击空白处显示选项 —</div>
-        </template>
+        <!-- ★ 三态的判断式要分开：作答（submitted）压过呈现（revealed）。
+             原来是 `v-if="!revealed"` / `v-else`，把**解释卡关在 v-else 里面** ——
+             于是「我不会」那条路（submitted 变 true、revealed 一直 false）
+             既看不到结论、也看不到「下一题」，整条路在界面上是死的，
+             而答案其实已经写进 SRS 了（坑 54）。
 
-        <template v-else>
-          <div class="opts">
-            <!-- ★ right / wrong / dim 只在 submitted 之后才允许加。
-                 isRight(opt) 说的是「这个选项是不是正解」，它任何时候都为真；
-                 早一步绑定就等于把答案用绿色标出来 —— 那是泄题，不是提示。 -->
+             正确的顺序：答了就显示结果，没答才问「要不要看选项」。 -->
+        <template v-if="submitted">
+          <!-- 「我不会」作答时选项从没露出来，这里补一次完整回放，
+               否则用户只看到结论、看不到正确答案是什么。 -->
+          <div class="opts" :class="{ replay: !revealed }">
             <button
               v-for="(opt, i) in q.options"
               :key="opt + i"
               class="opt"
               :class="{
-                right: submitted && isRight(opt),
-                wrong: submitted && opt === picked && !isRight(opt),
-                dim: submitted && !isRight(opt) && opt !== picked,
+                right: isRight(opt),
+                wrong: !revealed && opt === picked,
+                dim: !isRight(opt),
               }"
-              @click="choose(opt)"
             >
-              <span class="key">{{ KEYS[i] }}</span>
+<span class="key">{{ KEYS[i] }}</span>
               <span class="tx">{{ opt }}</span>
             </button>
           </div>
@@ -544,11 +701,8 @@ watch(
                以前是把对错 + 释义 + 英文 + 翻译 + 笔记 + 三个按钮一次性全展开，
                四个选项一出现就必然超出屏幕一屏多，用户得翻页才看得到
                「下一题」—— 在手机上等于没法用。
-               现在：结论常驻（这是答题后最需要的信息），其余折叠。
-
-               v-if="submitted" 不能省：没作答时里面是空的，
-               渲染出来就是一张只有「详情」按钮的空白卡片。 -->
-          <div v-if="submitted" class="exp" :class="{ open: expOpen }">
+               现在：结论常驻（这是答题后最需要的信息），其余折叠。 -->
+          <div class="exp" :class="{ open: expOpen }">
             <div
               class="st"
               :class="
@@ -578,20 +732,53 @@ watch(
               <div v-if="q.sense.note" class="note">{{ q.sense.note }}</div>
               <div v-if="masteredFlash" class="mastered">{{ masteredFlash }}</div>
 
-              <!-- 这两个是「标记类」操作，留在解释区里；
-                   主行动（下一题 / 上一题）在底部固定条，不放这里 -->
-              <div v-if="!reviewing" class="line">
+              <!-- 「别练它 / 已掌握」留在详情里：这两个是**答完之后**对结果的处理，
+                   不是「读到一半发现内容坏了」的补救。
+                   那件事归上面的「改」—— 常驻、贴着句子、不用翻任何东西。 -->
+              <div v-if="!reviewing" class="markrow">
                 <van-button size="small" plain @click="onMastered">已掌握</van-button>
-                <van-button size="small" plain @click="flagBox = !flagBox">这句有问题？</van-button>
-              </div>
-
-              <div v-if="flagBox" class="flagbox">
-                <van-field v-model="flagNote" placeholder="问题是什么（可空）" label="" />
-                <van-button size="small" @click="onFlag">提交</van-button>
+                <van-button size="small" plain @click="onFlag">别练它</van-button>
               </div>
             </template>
           </div>
         </template>
+
+        <!-- 没答、也没显示选项：先问「要不要看选项」 -->
+        <template v-else-if="!revealed">
+          <p class="qhint">想清楚这个词在这里的意思</p>
+          <div class="blank" @click="reveal">— 点击空白处显示选项 —</div>
+        </template>
+
+        <!-- 没答、选项已露：等着点选项 -->
+        <template v-else>
+          <div class="opts">
+            <!-- ★ right / wrong / dim 只在 submitted 之后才允许加。
+                 isRight(opt) 说的是「这个选项是不是正解」，它任何时候都为真；
+                 早一步绑定就等于把答案用绿色标出来 —— 那是泄题，不是提示。 -->
+            <button
+              v-for="(opt, i) in q.options"
+              :key="opt + i"
+              class="opt"
+              :class="{
+                right: submitted && isRight(opt),
+                wrong: submitted && opt === picked && !isRight(opt),
+                dim: submitted && !isRight(opt) && opt !== picked,
+              }"
+              @click="choose(opt)"
+            >
+              <span class="key">{{ KEYS[i] }}</span>
+              <span class="tx">{{ opt }}</span>
+            </button>
+          </div>
+        </template>
+
+        <!-- 「有问题？改」：一个入口，什么都能改，什么时候都能改。
+             它挂在「有没有题」这一层，而不是任何一个答题分支里 ——
+             内容坏了的那一刻就该能动手；等答完题才给入口，
+             等于要求先被坏内容考一次，才轮到你修它。
+             而且只给一个入口：分成「改例句 / 改选项」两个，等于让人先
+             归类问题属于哪一类才找得到；分类这件事本该由我们做。 -->
+        <button class="fixrow" type="button" @click="openFixOptions">有问题？改</button>
       </template>
 
       <!-- 开场与结算 -->
@@ -619,9 +806,9 @@ watch(
                  刚答过的卡 dueAt 挪到了明天、reps 也大于 0，于是 buildQueue
                  把它们全部排除 —— 点了「再来一轮」结果队列是空的，
                  表现就是「按了没反应 / 什么都不变」。
-                 「再���一遍」要的是**重刷刚做完的那批**，所以用 redo。 -->
+                 「再刷一遍」要的是**重刷刚做完的那批**，所以用 redo。 -->
             <van-button type="primary" block round @click="start('redo')">再来一遍</van-button>
-            <van-button block round @click="router.push('/scan')">扫读例句</van-button>
+            
             <van-button block round @click="start('random')">随便练</van-button>
             <!-- 用路由名，不写路径：首页的路径是 '/'，写成 '/home' 会匹配不到
                  任何路由 —— 表现是点了之后一片空白（既不是首页也不是报错），
@@ -633,16 +820,70 @@ watch(
         <!-- 开场屏：把「今天没到期」从死胡同变成一个选择。
      过去只有「准备开始」一个按钮，而今天的题答完之后队列是空的 ——
      「今天没有到期的」这句话后面没有任何可做的事，人就闲着了。
-     三种练法在 ModePicker 里（纯展示，动作由这里派发）。 -->
-        <ModePicker
-          v-else
-          :modes="MODES"
-          :solo-title="solo ? '单挑这个意思' : '怎么练'"
-          :sub="solo ? undefined : '按空格显示选项，A/B/C/D 选，Enter 下一个'"
-          @choose="onMode"
-        />
+     两种练法在 ModePicker 里（纯展示，动作由这里派发），
+     下面接一节扫读：同屏既回答「今天练什么」，也让人随手能扫两句。 -->
+        <template v-else>
+          <ModePicker
+            :modes="MODES"
+            :solo-title="solo ? '单挑这个意思' : '怎么练'"
+            :sub="solo ? undefined : '按空格显示选项，A/B/C/D 选，Enter 下一个'"
+            @choose="onMode"
+          />
+          <ScanList @drill="onScanDrill" />
+        </template>
       </template>
     </div>
+
+    <!-- 改东西：先选「是哪一处不对」，再改它 -->
+    <van-popup :show="pickBox" position="bottom" round @close="pickBox = false">
+      <div class="pick">
+        <h3>哪里不对？</h3>
+        <button
+          v-for="s in fixSents"
+          :key="'s' + s.id"
+          class="pickrow"
+          type="button"
+          @click="editSentence(s)"
+        >
+          <span class="gl">例句：{{ s.en }}</span>
+          <span class="go">改</span>
+        </button>
+        <button
+          v-for="s in fixSenses"
+          :key="'m' + s.id"
+          class="pickrow"
+          type="button"
+          @click="editSenseNow(s.id)"
+        >
+          <span class="gl">意思：{{ s.gloss }}</span>
+          <span class="go">改</span>
+        </button>
+        <p v-if="!fixSenses.length && !fixSents.length" class="wb-dim">这道题没有可改的内容。</p>
+
+        <!-- 「改」和「去看看」是两件事，各走各的：
+             改 = 我确定它错了，趁现在改掉；
+             核 = 我不确定，想看看这个词还有什么别的意思/例句。
+             核验需要的是**更多上下文**，那在详情页，所以给一个跳转；
+             而跳转必须能原样回来（keep-alive 留着这一页 + onActivated 刷新内容），
+             否则没人敢跳 —— 跳一次丢一轮，谁还愿意核验。 -->
+        <div class="psep" />
+        <button class="pickrow nav" type="button" @click="goSensePage">
+          <span class="gl">看看这个意思的详情</span>
+          <span class="go">›</span>
+        </button>
+        <button class="pickrow nav" type="button" @click="goWordPage">
+          <span class="gl">看看这个词</span>
+          <span class="go">›</span>
+        </button>
+      </div>
+    </van-popup>
+
+    <!-- 当场改：浮层挂在页面最外层，任何时刻都能打开 -->
+    <QuickEdit
+      :sentence="edSentence"
+      :sense="edSense"
+      @saved="onEdited"
+    />
 
     <!-- ★ 固定在底部的主操作条。
          之前的「再来一个」按钮在解释卡里，只有答完题才出现，而且位置在
@@ -650,15 +891,26 @@ watch(
          的第一症结就是这个按钮根本不在拇指够得到的地方。
          固定条把主行动放在同一个位置、拇指区，不管题多长都在那。 -->
     <div v-if="q" class="abar">
-      <!-- 回看中：左边是回到当前位置，右边继续往后翻 -->
-      <template v-if="reviewing">
+      <!-- ★ 分支的判断顺序与判断式都很要紧（坑 54）。
+           这里问的必须是「这一题**答了**没有」（submitted），
+           不能用「选项**露出来**没有」（revealed）去代替：
+           revealed 是**呈现**状态，submitted 是**作答**状态，两者不等价。
+           「我不会」这条路 submitted 变 true 而 revealed 一直是 false，
+           于是 `v-else-if="!revealed"` 永远命中 —— 主行动永远停在
+           「我不会」上，「下一题」那个分支根本到不了。
+           表现是：点了毫无反应（答案其实记进 SRS 了），再点也没用，
+           用户被卡在这一题上出不去。
+
+           所以顺序是：先问作答状态，再问回看，最后才轮到呈现状态。 -->
+      <!-- 回看中（且还没作答）：左边是回到当前位置，右边继续往后翻 -->
+      <template v-if="reviewing && !submitted">
         <van-button size="small" plain :disabled="cursor === 0" @click="prev">上一题</van-button>
         <van-button size="small" type="primary" @click="resume">
           继续（第 {{ frontier + 1 }} 题）
         </van-button>
       </template>
       <!-- 还没出选项：主动作是「显示选项」，副动作是「我不会」 -->
-      <template v-else-if="!revealed">
+      <template v-else-if="!submitted && !revealed">
         <van-button size="small" plain @click="giveUp">我不会</van-button>
         <van-button class="wide" type="primary" @click="reveal">显示选项</van-button>
       </template>
@@ -667,7 +919,7 @@ watch(
         <van-button size="small" plain :disabled="cursor === 0" @click="prev">上一题</van-button>
         <span class="apick">点上面四个选项作答</span>
       </template>
-      <!-- 答完了：主行动前进，左边给回看 -->
+      <!-- 答完了（无论走的哪条作答路径）：主行动前进，左边给回看 -->
       <template v-else>
         <van-button size="small" plain :disabled="cursor === 0" @click="prev">上一题</van-button>
         <van-button class="wide" type="primary" @click="next">
@@ -821,10 +1073,33 @@ watch(
 }
 
 .qsent {
+  position: relative;
   text-align: center;
   font-size: 17px;
   line-height: 1.6;
   margin: 8px 0 14px;
+}
+
+/* 贴着例句右上角的一个小「改」。它安静到不像一个功能 ——
+   平时没人会点它，但真有坏句子时它就在那儿，不用翻详情、不用换页。 */
+.fixline {
+  position: absolute;
+  top: -2px;
+  right: 0;
+  border: 1px dashed var(--wb-line);
+  background: transparent;
+  border-radius: 6px;
+  padding: 1px 6px;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--wb-ink-3);
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.fixline:active {
+  background: var(--wb-bg);
+  color: var(--wb-ink-2);
 }
 
 .qhint {
@@ -854,6 +1129,13 @@ watch(
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
+}
+
+/* 「我不会」作答后的选项回放：不可点，但要读得出哪个是正解。
+   没有这个 class 时它长得和正常选项一模一样，用户会以为还能点。 */
+.opts.replay .opt {
+  cursor: default;
+  pointer-events: none;
 }
 
 .opt {
@@ -1023,7 +1305,12 @@ watch(
   font-weight: 600;
 }
 
-.line {
+/* 答案区下面那两个「标记类」按钮。★ 原来叫 .line，和扫读的行同名 ——
+   同一个 <style scoped> 里两条同名规则会**合并**，于是扫读的行
+   莫名继承了这里的 flex-wrap: wrap：句子被挤到第二行，行号孤零零留在上面
+   （真机量到偏差正好 = 行高 22.5 + gap 9 = 31.5px，一行都不差）。
+   教训：同名就是同一个东西，想表达「两处长得像」也得起不同的名字。 */
+.markrow {
   display: flex;
   align-items: center;
   gap: 7px;
@@ -1031,6 +1318,87 @@ watch(
   padding-top: 12px;
   border-top: 1px solid var(--wb-line);
   flex-wrap: wrap;
+}
+
+/* 「选项不对？改」：一个入口，放在选项下面。
+   不放进选项里 —— 四个选项各挂一个「改」，用户得先在心里挑出
+   「是哪一条不对」才找得到它，判断成本原封不动地推回给了用户。 */
+.fixrow {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 8px;
+  border: 1px dashed var(--wb-line);
+  background: transparent;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--wb-ink-3);
+  cursor: pointer;
+}
+
+.fixrow:active {
+  background: var(--wb-bg);
+  color: var(--wb-ink-2);
+}
+
+.pick {
+  padding: 18px 16px calc(14px + env(safe-area-inset-bottom, 0px));
+}
+
+.pick h3 {
+  font-size: 16.5px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.pickrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 4px;
+  border: 0;
+  border-bottom: 1px solid var(--wb-line);
+  background: transparent;
+  font-family: inherit;
+  font-size: 15px;
+  text-align: left;
+  color: var(--wb-ink);
+  cursor: pointer;
+}
+
+.pickrow .gl {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.pickrow .go {
+  flex: 0 0 auto;
+  font-size: 13px;
+  color: var(--wb-ink-3);
+  border: 1px solid var(--wb-line);
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+
+/* 「改」和「看看」之间那条线：上面是改内容，下面是去看别的页面。
+   两件事混在一列里不加区分，用户会以为「看看」也是改的入口。 */
+.psep {
+  height: 1px;
+  background: var(--wb-line);
+  margin: 12px 0 2px;
+}
+
+.pickrow.nav .gl {
+  color: var(--wb-ink-2);
+}
+
+.pickrow.nav .go {
+  border: 0;
+  font-size: 17px;
+  padding: 0 4px;
 }
 
 .flagbox {
@@ -1137,4 +1505,5 @@ watch(
   font-size: 16.5px;
   font-weight: 600;
 }
+
 </style>

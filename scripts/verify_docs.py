@@ -160,10 +160,12 @@ _all_src = "\n".join(
 d16 += [
     ("目标词高亮仍是实心药丸",
      "mark {" in _style and "background: #fff0b3" in _style),
-    ("三件套还在（错题板/手动掌握/训练 tab）",
+    ("三件套还在（错题板/手动掌握/随手标记）",
      all(k in _train for k in ["markMastered", "再来一个", "这句有问题"])
      and "错题板" in _board
-     and "label" not in _app and "训练" in _app),
+     # 底栏三个 tab 的文案。训练已从 tab 栏撤掉（它是动作不是地方，见 D36），
+     # 所以这里不能再找「训练」—— 否则守卫会靠注释里的词通过，判的是什么就说不清了。
+     and "label" not in _app and all(k in _app for k in ["首页", "词库", "更多"])),
     # 泄题守卫：选项的对错色必须由 submitted（真作答）门控，不能由
     # revealed（选项已展开）门控 —— 后者会在你还没选时就把答案染绿。
     # 这条曾经真的漏过一次，所以进机械检查。
@@ -175,10 +177,10 @@ d16 += [
     # 而「底栏少一个图标」很难让人联想到是名字拼错了。
     ("tabbar 图标名都在 Vant 图标表里", all(
         _vant_icon_exists(ic)
-        for ic in ["wap-home-o", "apps-o", "aim", "ellipsis"]) and "icon=\"apps-o\"" in _app),
+        for ic in ["wap-home-o", "apps-o", "ellipsis"]) and "icon=\"apps-o\"" in _app),
     # 盯**闭环**而不是某一个函数名。
     # 原来这里断言 `flagSentence` 存在于 edit.ts —— 而那个函数是死代码，
-    # 被清掉之后守卫立刻红了，可实际闭环好好地���：训练页随手标记
+    # 被清掉之后守卫立刻红了，可实际闭环好好地跑：训练页随手标记
     # （quiz.flagQuestion）、错题板标记/关单（flags.ts）、意思页切换标记
     # （SensePage）三处都在写 flagged/flagNote。
     # 一个钉在函数名上的守卫，保的是「别把那个函数删了」，
@@ -379,7 +381,7 @@ def _code(p):
     不去注释的话正则会匹配到注释，守卫永远 FAIL —— 一个永远失败的守卫
     比没有守卫更糟，因为它会被无视。
 
-    ★ 连**模板里的 HTML 注释**也一起去掉：`.vue` 的模板里满���是
+    ★ 连**模板里的 HTML 注释**也一起去掉：`.vue` 的模板里满是
     「<!-- 原来这里写的是 content-kit 的 cards.json -->」这类解释，
     它们不渲染、不出现在用户界面上，但守卫在扫源码文本 ——
     不去掉就会把「界面上不许出现内部说法」判成 FAIL。
@@ -405,6 +407,64 @@ board = _code(BOARD)
 kb = _code(os.path.join(WEB, "src", "keyboard.ts"))
 # 底栏让位写在 App.vue 的 scoped 样式里，不在 style.css —— 别查错文件
 appvue = _code(os.path.join(WEB, "src", "App.vue"))
+scanlist = _src(os.path.join("components", "ScanList.vue"))
+
+# ── 全仓文本扫描（坑 57 与「坑号都得有正文」两条守卫共用）──
+# 只收人会写的地方：依赖（node_modules）、派生产物（build/、dist/）、
+# 编译缓存（__pycache__）不算「我们写的东西」，那里的乱码不是我们的错。
+_TEXT_EXT = (".ts", ".vue", ".mjs", ".js", ".py", ".md", ".json", ".css",
+             ".html", ".tsv", ".yaml", ".yml")
+_SKIP_DIRS = {"node_modules", "__pycache__", "build", "dist", ".git", ".gradle"}
+
+
+def _text_files():
+    for root, dirs, files in os.walk(PROJ):
+        dirs[:] = [d for d in dirs if d not in _SKIP_DIRS]
+        for f in files:
+            if f.endswith(_TEXT_EXT):
+                yield os.path.join(root, f)
+
+
+def _mojibake_files():
+    """含 U+FFFD（也就是乱码方块）的文件 —— 坑 57。
+
+    这**不是**「少了个字」那么容易被发现：它在编辑器里是一个小方块、
+    在编译器眼里完全合法、在 JSON/TSV 里也不破坏结构，
+    只有读的人才知道坏了。所以判据只能是**扫字节**，靠眼睛不算判据。
+    """
+    bad = []
+    for p in _text_files():
+        try:
+            if "\ufffd" in io.open(p, encoding="utf-8").read():
+                bad.append(os.path.relpath(p, PROJ))
+        except (IOError, UnicodeDecodeError):
+            bad.append(os.path.relpath(p, PROJ))    # 连 UTF-8 都读不了也算坏
+    return bad
+
+
+def _cited_pitfalls():
+    """代码/文档里引用到的坑号（`坑 46`、`坑 45 / 46`、`坑 41、42` 都认）。
+
+    archive/ 不参与：那里的历史文字按当时的编号体系写的，不要求对齐。
+    """
+    nums = set()
+    arc = os.path.join(PROJ, "archive") + os.sep
+    for p in _text_files():
+        if os.path.abspath(p).startswith(arc):
+            continue
+        try:
+            t = io.open(p, encoding="utf-8").read()
+        except (IOError, UnicodeDecodeError):
+            continue
+        for grp in re.findall(r"坑\s*((?:\d+\s*[、/,，]\s*)*\d+)", t):
+            nums |= {int(n) for n in re.findall(r"\d+", grp)}
+    return nums
+
+
+def _documented_pitfalls():
+    """踩坑记录里有正文的坑号（`## 46. 标题` 这种标题的编号）。"""
+    t = _read(os.path.join(PROJ, "docs", "notes", "踩坑记录.md"))
+    return {int(n) for n in re.findall(r"^## (\d+)\. ", t, re.M)}
 
 
 def _code_all():
@@ -731,12 +791,14 @@ interaction = [
      _re.search(r"export async function buildRandomQueue", _code(
          os.path.join(WEB, "src", "quiz.ts"))) is not None
      and _re.search(r"start\('random'\)", train) is not None),
-    ("有「扫读」：报纸式多行例句，点哪句猜哪句",
-     os.path.exists(os.path.join(WEB, "src", "pages", "ScanPage.vue"))
-     and _re.search(r"export async function scanBatch", _code(
+    ("有「扫读」：报纸式多行例句，点哪句猜哪句（就地显示，不跳页）",
+     _re.search(r"export async function scanBatch", _code(
          os.path.join(WEB, "src", "quiz.ts"))) is not None
-     and _re.search(r"sent:\s*String\(it\.sentence\.id\)",
-                    _code(os.path.join(WEB, "src", "pages", "ScanPage.vue"))) is not None),
+     and _re.search(r'@click="emit\(.drill., it\)"', scanlist) is not None
+     and _re.search(r"sent:\s*String\(it\.sentence\.id\)", train) is not None
+     # 不许再单独存在一个扫读页面 —— 「藏得深」本身就是要去掉的东西
+     and not os.path.exists(os.path.join(WEB, "src", "pages", "ScanPage.vue"))
+     and not _re.search(r"router\.push\('/scan'\)", _all_src)),
     # 点了哪句就必须出哪句：pin 参数要一路传到 makeQuestion
     ("点哪句就出哪句（pin 一路传到 makeQuestion）",
      _re.search(r"makeQuestion\([\s\S]*pinnedSentence\.value", train) is not None
@@ -838,6 +900,155 @@ interaction = [
     ("读侧仍同时认两种 summary 格式（importLine）",
      _re.search(r"else\s*\{\s*parts\.push\(r\.summary\)",
                 _src("backup.ts"), _re.S) is not None),
+    # ── 训练不再是 tab；底栏只有三个 ──
+    # 「训练」是一个动作不是一个地方，摆在 tab 栏里是分类错误。
+    # 断言**声明处**（路由表）与**渲染处**（模板里的 tab 项）都要改：
+    # 只改一处就会出现「meta 说不是 tab、模板里还画着」——
+    # 而 meta.tab 只控制整条栏显不显示，不会过滤掉里面的项（真机踩过）。
+    ("训练不再是 tab（路由表里没有 meta.tab）",
+     _re.search(r"path:\s*'/train'[^}]*\}\s*,", _src("main.ts")) is not None
+     and _re.search(r"path:\s*'/train'[^}]*meta:\s*\{", _src("main.ts")) is None),
+    ("底栏只画三项（没有训练）",
+     len(_re.findall(r"van-tabbar-item\s+name=", appvue)) == 3
+     and 'name="train"' not in appvue),
+    # 正好三个 tab 页声明了 meta.tab —— 加 tab 时会被这条拦住去补声明
+    ("恰好三个路由声明了 meta.tab",
+     _code(os.path.join(WEB, "src", "main.ts")).count("meta: { tab: true }") == 3),
+    # 训练从首页进、盖满全屏，所以必须有返回（顶栏箭头 = 系统返回键）
+    ("训练页有返回箭头（不再是 tab 就得给自己一条退出路径）",
+     'name="arrow-left"' in train and "goBack" in train
+     and _re.search(r"solo \? .单挑. : .练习.", train) is not None),
+    # 「按计划」没有得练时置灰，而不是点进去才发现是空的
+    ("「按计划」没得练时置灰（不点进去才发现）",
+     _re.search(r"disabled:\s*dueCount\.value\s*===\s*0", train) is not None
+     and _re.search(r"m\.disabled", _code(os.path.join(
+         WEB, "src", "components", "ModePicker.vue"))) is not None
+     and not _re.search(r"换个练法试试", train)),
+
+    # ── 坑 54：用呈现状态去推断作答状态 ──
+    # 「我不会」把 submitted 置 true 而 revealed 一直 false，
+    # 于是 `v-else-if="!revealed"` 永远命中 —— 「下一题」那个分支到不了，
+    # 答案记进了 SRS 而界面上一点反馈都没有，用户被卡在这一题上。
+    ("作答状态压过呈现状态（坑 54）",
+     _re.search(r'v-else-if="!submitted\s*&&\s*!revealed"', train) is not None
+     and _re.search(r'<template v-if="submitted">', train) is not None
+     and _re.search(r'v-if="reviewing\s*&&\s*!submitted"', train) is not None),
+
+    # 扫读是**训练页下面的一节**，不是第三种练法、也不是另一个页面。
+    # 之前它用 `mode === 'scan'` 霸占整屏：进扫读就把「今天练什么」顶掉，
+    # 看着就是另一个页面，而且想回去得先记住返回在哪。
+    ("扫读是训练页下面的一节（不是独立页面）",
+     _re.search(r"<ScanList\s+@drill=\"onScanDrill\"\s*/>", train) is not None
+     and "mode === 'scan'" not in _code(os.path.join(WEB, "src", "pages", "TrainPage.vue"))
+     and not os.path.exists(os.path.join(WEB, "src", "pages", "ScanPage.vue"))),
+    # 封装归 ScanList：自己取句子、自己换一批、自己管空/加载态
+    ("扫读封装在 ScanList 组件里",
+     _re.search(r"await scanBatch\(BATCH, undefined, skip\.value\)", scanlist) is not None
+     and _re.search(r'<section class="scan">', scanlist) is not None),
+    # 行号/句子共用同一个行高（对齐不靠碰运气）
+    ("扫读行两列共用行高（对齐不靠碰运气）",
+     "--scan-lh" in scanlist
+     and len(_re.findall(r"line-height:\s*var\(--scan-lh\)", scanlist)) == 2),
+    # 「换一批」在标题行：放列表末尾时它的位置 = 列表高度，一换行就跳
+    ("扫读「换一批」在标题行（不随列表高度抖）",
+     _re.search(r'<header class="head">.*?换一批', scanlist, _re.S) is not None
+     and not _re.search(r"\.scanbtns", scanlist)),
+    # 真实语料里的句子不长那样：不挂词性标签（n. / v. / adj.）
+    ("扫读列表不挂词性标签（真实句子不长那样）",
+     not _re.search(r'class="pos"', scanlist) and not _re.search(r"\.pos\s*\{", scanlist)),
+
+    # ── 发现问题要能当场改，而不是「记录一下以后再说」 ──
+    # 发现内容有问题的那一瞬间，正是手里有这个具体句子/选项的那一瞬间。
+    # 送到另一个页面去改 = 让人自己把这个句子找回来；找不回来，
+    # 于是只剩「有问题的句子继续出现在练习里」。这两个能力差的就是这段路。
+    #
+    # ★ 而且只能有**一个**入口、不限制改什么、不限制什么时候：
+    #   - 分成「改例句 / 改选项」两个入口 → 用户得先归类问题属于哪一类才找得到；
+    #   - 塞进选项按钮里 → 四个选项各挂一个「改」，用户得先在心里挑出哪条不对；
+    #   - 只在答完后出现 → 坏内容先把你考一次，才轮到你改它。
+    ("训练时能当场改内容",
+     _re.search(r'<button class="fixrow" type="button" @click="openFixOptions">', train) is not None
+     and "QuickEdit" in train),
+    # 干扰项：同词性随机抽，且**同一个词的义项明显更常出现**。
+    #   - 跨词干扰项「一眼就看出不是这个词的意思」，练不到东西；
+    #   - 同词干扰项都像答案，只能靠「这句话是哪个意思」区分 —— 那才是要练的。
+    #   句子已经把义项钉死，所以它们不是第二个正确答案，是贴着答案的干扰。
+    ("干扰项只取同词性",
+     _re.search(r"async function buildOptions[\s\S]{0,900}!sense\.pos \|\| s\.pos === sense\.pos", _code(
+         os.path.join(WEB, "src", "quiz.ts"))) is not None),
+    ("同词的义项明显更常被抽中",
+     _re.search(r"shuffle\(samePosSameWord\)\s*\n?\s*\.slice\(0, 2\)", _code(
+         os.path.join(WEB, "src", "quiz.ts"))) is not None),
+    # 干扰项是借来的内容：跨词的改了会毁别人的卡，同词的改了会在你没看着的卡上动手
+    ("选项没有来源字段（借来的内容不该可改）",
+     "optionSources" not in _all_src),
+    # 「改」只能改真正属于内容的东西：例句 + 本题正确答案的释义
+    ("「有问题？改」只列内容（例句 + 正解释义）",
+     _re.search(r"fixSenses\.value = \[qq\.sense\]", train) is not None
+     and _re.search(r"fixSents\.value = \[qq\.sentence\]", train) is not None),
+    # 不挑时机：入口不能被 `submitted` 之类的状态挡住
+    ("改的入口不挑时机（答题前就能改）",
+     not _re.search(r'v-if="submitted"[^>]*class="fixrow"|class="fixrow"[^>]*v-if="submitted"', train)),
+    # 「改」和「核」是两件事：改 = 我确定错了（原地改）；核 = 我想看看
+    # （跳详情）。两个都要有，但跳转必须**原样回来**：跳一次丢一轮，
+    # 之后就没人敢跳了核验这条路等于不存在。
+    ("训练页能被 keep-alive 留着（跳去核验不丢进度）",
+     'defineOptions({ name: \'TrainPage\' })' in train
+     and _re.search(r'<KeepAlive\s+:include="\[.TrainPage.\]">', appvue) is not None
+     and _re.search(r"onActivated\(\(\)\s*=>\s*\{[\s\S]{0,80}void loadQ\(\)", train) is not None),
+    ("能跳去核验（意思详情 / 词条）",
+     _re.search(r"function goSensePage\(\)", train) is not None
+     and _re.search(r"router\.push\(`/sense/\$\{id\}`\)", train) is not None
+     and _re.search(r"router\.push\(`/word/\$\{encodeURIComponent\(w\)\}`\)", train) is not None),
+    # 题目内容永远从库里重建：内存里那个对象改完就是旧的，
+    # 而「明明存上了，回头一看还是错的」比不能改更劝退人。
+    ("题目内容每次从库里重建（不拿内存旧对象）",
+     _re.search(r"const fresh = await makeQuestion\(step\.q\.sense\.id", train) is not None
+     and _re.search(r"let question: Question \| null = await makeQuestion\(", train) is not None),
+    # 改完立刻回到原题，否则用户不知道到底存没存上
+    ("改完立刻回到原题（看得见才敢信存上了）",
+     _re.search(r"async function onEdited\(\)[\s\S]{0,240}await loadQ\(\)", train) is not None),
+
+    # 错题板就是「词 + 释义」= 这道题的答案本身。
+    # 放在出题的地方，入口再小也会被当成「先看一眼再答」——
+    # 那一轮测的就不再是记忆，而是「你能不能忍住不看」。
+    # 复习错题是对的，但要换个语境：它属于「词库」，不属于「考试中」。
+    ("训练页里没有错题板入口（考试中不看答案）",
+     "/board" not in _code(os.path.join(WEB, "src", "pages", "TrainPage.vue"))),
+    ("错题板挂在词库上（复习语境，不是考试语境）",
+     _re.search(r"router\.push\('/board'\)", _code(os.path.join(
+         WEB, "src", "pages", "LibraryPage.vue"))) is not None),
+
+    # ── 坑 55：多根节点的组件，收不到父组件传下来的 class ──
+    # MarkedText 原来是三个并列分支（span / 文本+mark / 文本），属于多根节点。
+    # Vue 没法把 class 挂上去，只会警告一声，**界面上照旧渲染**——
+    # 于是调用方写的 class="tx" 静默失效，扫读页的行号/句子对不齐，
+    # 根子是句子被拆成「文本 + <mark>」两个匿名 flex item 各自排版。
+    # 静默失效是最贵的一种坏：不报错、有时看着还行、换个父容器就塌。
+    ("MarkedText 有唯一根元素（class 才挂得上）",
+     _re.search(r"<template>.*?<span class=\"wb-marked\">.*?</template>",
+                _src(os.path.join("components", "MarkedText.vue")), _re.S) is not None),
+    # 同名就是同一个东西：答案区那两个按钮原来也叫 .line，
+    # 于是「flex-wrap: wrap」漏到扫读的行上，句子被挤到第二行
+    # （真机量到偏差正好 = 行高 22.5 + gap 9 = 31.5px，一行都不差）。
+    ("同名 CSS 不会合并出想要的结果（坑 56）",
+     _re.search(r'class="markrow"', train) is not None
+     and not _re.search(r"\.line\s*\{[^}]*flex-wrap", _code(os.path.join(
+         WEB, "src", "pages", "TrainPage.vue")), _re.S)),
+
+    # ── 坑 57：写入被截断的汉字，会静默变成一串乱码方块 ──
+    # 这条坑是**工具链**的，不是业务的：一次写入若把某个汉字切在字节边界上，
+    # 它落盘就成了 U+FFFD。此后：TypeScript 编译正常、JSON 解析正常、
+    # 测试全绿、界面只是「有个方块」—— 我审过好几遍都没看见。
+    # 全仓扫一遍是唯一可靠的判据（成本约一秒）。
+    ("源码/文档/词库里没有乱码方块（坑 57）", not _mojibake_files()),
+
+    # 坑 0 的索引是这本文档的导航，也最容易过期：新写一条坑忘了进索引，
+    # 索引就开始骗人。所以判据不是「索引全不全」（比不出来），而是
+    # **代码里引用到的坑号，正文里必须有那一节** —— 引用一处、正文缺一节，
+    # 读者就只能看到「坑 56」这四个字，然后找不到 56 是什么。
+    ("引用到的每个「坑 N」都有正文（坑 0 的索引不骗人）",
+     not (_cited_pitfalls() - _documented_pitfalls())),
 ]
 
 fi = 0
@@ -845,6 +1056,35 @@ for name, ok in interaction:
     print("  [%s] %s" % ("OK " if ok else "FAIL", name))
     if not ok:
         fi += 1
+
+# ── 文档里的计数必须等于实际项数 ──
+# 这些数字以前是手写的，于是必然过期：守卫从 77 项长到 110 项、
+# 踩坑从 53 条长到 56 条，而四份文档还写着旧数字。文档写错的代价不是
+# 「不好看」，而是**下次有人按它判断「一共就这么多坑」**，于是新坑没人找。
+print("\n=== 文档里的计数必须等于实际项数 ===")
+_notes_md = _read(os.path.join(PROJ, "docs", "notes", "踩坑记录.md"))
+_manifest_md = _read(os.path.join(PROJ, "MANIFEST.md"))
+_ai_md = _read(os.path.join(PROJ, "docs", "AI-操作手机闭环.md"))
+_notes_readme = _read(os.path.join(PROJ, "docs", "notes", "README.md"))
+_runbook = _read(os.path.join(PROJ, "app", "web", "DEBUG-RUNBOOK.md"))
+_n_pitfalls = len(_documented_pitfalls())
+counts = [
+    ("MANIFEST 踩坑条数", _manifest_md, r"踩坑记录\.md\)（(\d+) 条）", _n_pitfalls),
+    ("MANIFEST 真机守卫项数", _manifest_md, r"「真机交互守卫」里\s*（(\d+) 项）", len(interaction)),
+    ("AI 闭环文档踩坑条数", _ai_md, r"(\d+) 条「不报错但结果不对」", _n_pitfalls),
+    ("AI 闭环文档守卫项数", _ai_md, r"「真机交互守卫」(\d+) 项", len(interaction)),
+    ("notes/README 守卫项数", _notes_readme, r"（当前 (\d+) 项）", len(interaction)),
+    ("DEBUG-RUNBOOK 守卫项数", _runbook, r"「真机交互守卫」一节（(\d+) 项）", len(interaction)),
+]
+fc = 0
+for _label, _txt, _pat, _actual in counts:
+    _m = re.search(_pat, _txt)
+    _claimed = int(_m.group(1)) if _m else None
+    _ok = _claimed == _actual
+    print("  [%s] %s：文档写 %s，实际 %d"
+          % ("OK " if _ok else "FAIL", _label, _claimed, _actual))
+    if not _ok:
+        fc += 1
 
 # 迁移类措辞残留
 print("\n=== 迁移措辞残留检查（应为 0 处待办）===")
@@ -868,8 +1108,10 @@ print("  2652 x 5  = %d (文档01 写 13260)    -> %s" % (tier["T1"] * 4 * 5, ti
 print("  14237-7884 = %d (文档 01 写 6353 丢失；14237 为归档管线历史口径) -> %s"
       % (14237 - ns, 14237 - ns == 6353))
 
-print("\n总计: D16 检查 %d 项失败 %d；真机交互守卫 %d 项失败 %d"
-      % (len(d16), f16, len(interaction), fi))
+print("\n总计: D16 检查 %d 项失败 %d；真机交互守卫 %d 项失败 %d；文档计数 %d 项失败 %d"
+      % (len(d16), f16, len(interaction), fi, len(counts), fc))
 if fi:
     print("  ↑ 这些坑都不报错，只能靠断言拦住。解释见 docs/notes/踩坑记录.md")
-sys.exit(1 if (f16 or fi or stale) else 0)
+sys.exit(1 if (f16 or fi or stale or fc) else 0)
+
+

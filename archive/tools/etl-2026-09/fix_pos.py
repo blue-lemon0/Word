@@ -10,7 +10,7 @@ ECDICT 的 `translation` 字段里，约 0.5% 的中文释义**不带词性标�
 例：
     skilled   [a] 熟练的
               []  [经] 熟练的
-              []  有技能��          <- 无 pos
+              []  有技能的          <- 无 pos
     airport   [n] 飞机场
               []  航空站
               []  机场              <- 无 pos

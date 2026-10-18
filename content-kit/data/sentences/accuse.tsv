@@ -1,5 +1,5 @@
 senseId	text	clue	span_start	span_len	translation	note	source
-s1	His mother accused him of being late again.	of being late	11	7	他妈妈指责他又迟到了。	accuse sb of sth（为小���）= 指责。	GENERATED
+s1	His mother accused him of being late again.	of being late	11	7	他妈妈指责他又迟到了。	accuse sb of sth（为小事）= 指责。	GENERATED
 s1	She accused me of telling lies to her.	of telling lies	4	7	她指责我对她说谎。	accuse sb of + 行为 = 指责	GENERATED
 s1	They accused him of forgetting the money.	forgetting	5	7	他们指责他忘了那笔钱。	accuse of + 名词/动名词 = 指责	GENERATED
 s1	My friend accused me of caring too much about money.	of caring	10	7	朋友指责我太在意钱。	accuse sb of + 在意什么 = 指责	GENERATED

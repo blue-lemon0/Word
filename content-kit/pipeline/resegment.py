@@ -836,7 +836,7 @@ def cmd_build(cfg, snap, words, dry=False):
                 if "WORDNET" in src:
                     origin = "EN-WORDNET"
             else:
-                # ZH-FALLBACK：英文对���词性零覆盖，从现有中文义项补。
+                # ZH-FALLBACK：英文对某词性零覆盖，从现有中文义项补。
                 pos = s.get("pos") or zh_by_idx[zh_idx[0]][0]
                 gloss_en = ""
                 origin = "ZH-FALLBACK"
