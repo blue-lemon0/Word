@@ -10,6 +10,7 @@
  */
 import { snapshot } from '../backup'
 import { db } from '../db'
+import type { Sense } from '../types'
 import {
   addSentence as addSentenceEdit,
   addSense,
@@ -22,12 +23,16 @@ import type { Proposal } from './types'
 export async function applyOne(p: Proposal): Promise<string> {
   switch (p.kind) {
     case 'sense.update': {
-      const patch: Record<string, string> = {}
+      const patch: Partial<Record<string, string | number>> = {}
       if (p.gloss != null) patch.gloss = p.gloss
       if (p.pos != null) patch.pos = p.pos
       if (p.note != null) patch.note = p.note
       if (p.glossEn != null) patch.glossEn = p.glossEn
-      await updateSense(p.senseId, patch)
+      // ★ 补上释义就等于「不再是空壳」：needsRefine 是「占位义项待补」的标记
+      //   （D37 顺手加入时打的）。改写释义却不摘掉它，词库里会一直挂着「需精修」，
+      //   而人已经补完了 —— 那个筛选结果就变成噪音。
+      if (p.gloss != null && p.gloss.trim()) patch.needsRefine = 0
+      await updateSense(p.senseId, patch as Partial<Sense>)
       return `改了 s${p.slot} 的释义`
     }
     case 'sentence.replace': {

@@ -503,8 +503,8 @@ ok((await db.sentences.get(afterTake[0].sentenceId)).en === flagged.sentence.en,
 
   await ai.applyAll(rf.proposals)
   const s1After = await db.senses.get(pend.senseId)
-  ok(s1After.gloss === '填充出来的释义' && s1After.needsRefine === 1,
-     '占位义项被改写（needsRefine 保持 1，等用户确认后再清）')
+  ok(s1After.gloss === '填充出来的释义' && s1After.needsRefine === 0,
+     '占位义项被改写，且「需精修」标记跟着摘掉（补完就不该再挂在待办里）')
   const filled = (await db.senses.where('word').equals(F).toArray()).find((s) => s.gloss === '第二个意思')
   ok(!!filled, '新义项建出来了')
   const fSents = await db.sentences.where('senseId').equals(filled.id).toArray()

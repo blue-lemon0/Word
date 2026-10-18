@@ -158,6 +158,15 @@ async function applyKept(): Promise<void> {
               </button>
             </div>
             <p class="to">{{ lineOf(p).to }}</p>
+            <!-- 新义项自带的例句：直接把句子摆出来。
+                 这一条是「补全一个空壳词」的主内容 —— 只写「＋2 句例句」
+                 等于让人盲签：句子是最后要背的东西，必须能先看见。 -->
+            <ul v-if="p.kind === 'sense.add' && p.sentences?.length" class="sents">
+              <li v-for="(s, i) in p.sentences" :key="i">
+                <b>{{ s.en }}</b>
+                <span v-if="s.zh">{{ s.zh }}</span>
+              </li>
+            </ul>
             <p v-if="lineOf(p).why" class="why">{{ lineOf(p).why }}</p>
             <button class="applyOne" type="button" @click="applyOneNow(p)">只应用这条</button>
           </li>
@@ -286,6 +295,31 @@ async function applyKept(): Promise<void> {
   font-size: 12px;
   line-height: 1.6;
   color: var(--wb-ink-3);
+}
+
+.sents {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+}
+
+.sents li {
+  border-left: 2px solid var(--wb-line);
+  padding-left: 9px;
+  margin-bottom: 8px;
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+.sents li b {
+  display: block;
+  font-weight: 500;
+  color: var(--wb-ink);
+}
+
+.sents li span {
+  color: var(--wb-ink-3);
+  font-size: 12.5px;
 }
 
 .applyOne {
