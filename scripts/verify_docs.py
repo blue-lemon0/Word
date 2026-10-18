@@ -1160,9 +1160,8 @@ interaction = [
      and "recordAnswer(" in _src(os.path.join("components", "QuestionBox.vue"))
      and "<QuestionBox" in _src(os.path.join("components", "DrillSheet.vue"))),
     # 首页两屏（D48）：屏一竖滑刷句子，屏二句子列表 + 底部两个大按钮
-    ("首页两屏可横滑（x 吸附 + 两个指示点）",
-     re.search(r"scroll-snap-type:\s*x mandatory", home) is not None
-     and home.count('class="dot"') == 2),
+    ("首页两屏可横滑（x 吸附，两个整屏）",
+     "scroll-snap-type: x mandatory" in home and home.count('class="hpage"') == 2),
     ("屏一一屏一道题（题目区占满、不被列表挤）",
      ".qpane" in home and "min-height: 0" in home),
     ("屏一视觉照背单词页（同一个 QuestionBox）",

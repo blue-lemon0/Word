@@ -92,12 +92,18 @@ onMounted(load)
 /* ★ 标题栏吸顶：句子列表会很长，「扫读例句 / 换一批」不该被滚出屏幕。
    注意挂的是真正的类名 .head（不是 .hd）—— 挂错类名时 sticky 完全不生效，
    而且没有任何报错，只是行为没发生。 */
+/* 吸顶标题：顶到 0，并把**状态栏那一条**也盖住（padding-top 承担让位）。
+   只写 top: 0 + 背景是不够的：内容仍会从状态栏那一条里透出来，
+   看起来就是「标题栏是透明的、底色漏在下面的 UI 里」。 */
 .head {
   position: sticky;
   top: 0;
-  z-index: 3;
+  z-index: 4;
   background: var(--wb-bg);
-  padding-bottom: 6px;
+  /* 横向撑满滚动容器：容器有左右 14px 内边距，负外边距 + 等量内边距才能盖住两侧 */
+  margin: 0 -14px;
+  padding: var(--wb-sb-h) 14px 6px;
+  border-bottom: 1px solid var(--wb-line);
   display: flex;
   align-items: center;
   justify-content: space-between;
