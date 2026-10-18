@@ -524,6 +524,33 @@ ok((await db.sentences.get(afterTake[0].sentenceId)).en === flagged.sentence.en,
   ok(fSents.length === 1, '例句跟着新义项一起落库（没有 id/slot 时只能这么提）')
   ok(fSents[0].form === F && fSents[0].spanStart >= 0, '落库时算好了高亮区间')
 
+  // 7b) 「新词 + 补音标」在同一批里：词条还不存在时音标不能被 update 的静默 no-op 吞掉
+  const N = 'zzznew'
+  ai.__setTransportForTest({
+    name: 'fake4',
+    async postJson() {
+      return {
+        status: 200,
+        body: JSON.stringify({
+          choices: [{ message: { content: JSON.stringify({
+            note: 'ok',
+            proposals: [
+              { kind: 'word.update', ipa: 'ˈnjuː', why: '缺音标' },
+              { kind: 'sense.add', gloss: '新的意思', pos: 'adj.', why: '常用义项', sentences: [{ en: `A ${N} idea.`, zh: '一个新想法。' }] },
+            ],
+          }) } }],
+        }),
+      }
+    },
+  })
+  const rn = await ai.fillWord(N, 2)
+  await ai.applyAll(rn.proposals)
+  const newWord = await db.words.get(N)
+  ok(newWord != null && newWord.ipa === 'ˈnjuː',
+     '同批里的音标没有丢（词条不存在时 updateWord 要建出来，不能是空操作）',
+     newWord ? newWord.ipa : 'no word')
+  await edit.purgeWord(N)
+
   // 有释义的词不许再「补全」：那会重写已经有主的内容
   let refused = null
   try {
@@ -578,6 +605,30 @@ ok((await db.sentences.get(afterTake[0].sentenceId)).en === flagged.sentence.en,
      `跑过之后预览说「已缓存」（实际 ${est2.requests}/${est2.cached}）`)
   ai.__setTransportForTest(null)
   await edit.purgeWord(E)
+
+  // 10) 按学习状态组队列（词库页「练这组」走的就是它）
+  const S = 'zzzscope'
+  const { senseId: scopeId } = await edit.addWord(S, '/s/')
+  await edit.updateSense(scopeId, { gloss: '作用域探针' })
+  await edit.addSentence(scopeId, S, `A plain ${S} sentence.`)
+  const nowS = Math.floor(Date.now() / 1000)
+
+  ok((await quiz.buildScopeQueue('new', 50)).includes(scopeId), '没练过的词进「待学」队列')
+  ok(!(await quiz.buildScopeQueue('learning', 50)).includes(scopeId), '没练过的不在「在学」里')
+
+  await db.progress.put({
+    senseId: scopeId, stability: 5, difficulty: 5, lastReview: nowS,
+    dueAt: nowS + 86400, reps: 3, wrongN: 0, pendingN: 0, mastered: 0, rusty: 0,
+  })
+  ok((await quiz.buildScopeQueue('learning', 50)).includes(scopeId), '练过但没到期 → 「在学」')
+  ok(!(await quiz.buildScopeQueue('due', 50)).includes(scopeId), '没到期 → 不在「今天到期」')
+
+  await db.progress.update(scopeId, { dueAt: nowS - 10 })
+  ok((await quiz.buildScopeQueue('due', 50)).includes(scopeId), '到期了 → 进「今天到期」')
+  ok(!(await quiz.buildScopeQueue('new', 50)).includes(scopeId), '练过的词不再算「待学」')
+
+  await edit.purgeWord(S)
+  ok((await db.words.get(S)) == null, '队列探针词已清干净')
 
   // 收尾
   ai.__setTransportForTest(null)

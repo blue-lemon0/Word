@@ -119,6 +119,52 @@ function isDueNow(p: Progress | undefined, now: number): boolean {
   return !!p && p.reps > 0 && !p.mastered && p.dueAt <= now
 }
 
+/**
+ * 按「学习状态」组队列 —— 词库页那几个分组点进来用的就是它。
+ *
+ *  ★ 为什么需要它：词库页原来只是台账（按仓库口径筛选），
+ *    而人真正想做的是「把这一组练掉」。有了 scope，词库就能变成一个
+ *    **入口**：今天到期 / 新词 / 在学，各点各练。
+ *
+ *  三种 scope 的定义（和词库页的分桶一一对应，改一处必须改另一处）：
+ *    due      到期的（reps>0、未掌握、dueAt<=now），早到期的在前
+ *    new      一次都没练过的（没有进度行或 reps=0）
+ *    learning 练过但还没掌握，且**没到期** —— 「再刷一遍」那批
+ */
+export type QueueScope = 'due' | 'new' | 'learning'
+
+export async function buildScopeQueue(
+  scope: QueueScope,
+  limit = SESSION_SIZE,
+  only?: string[],
+): Promise<string[]> {
+  const pool = await practicePool()
+  const cands = only ? pool.filter((s) => only.includes(s.id)) : pool
+  const now = Math.floor(Date.now() / 1000)
+  const rows = await decayIdle(await allProgress(), now)
+  const pmap = new Map<string, Progress>()
+  for (const p of rows) pmap.set(p.senseId, p)
+
+  const due: Array<{ id: string; at: number }> = []
+  const fresh: string[] = []
+  const learning: string[] = []
+  cands.forEach((s) => {
+    const p = pmap.get(s.id)
+    if (!p || p.reps === 0) {
+      fresh.push(s.id)
+      return
+    }
+    if (p.mastered && !p.rusty) return
+    if (p.dueAt <= now) due.push({ id: s.id, at: p.dueAt })
+    else learning.push(s.id)
+  })
+  due.sort((a, b) => a.at - b.at)
+  // 到期：早到期的先练（有序才有意义）；新词/在学：打散，避免总是同样几个
+  if (scope === 'due') return due.map((d) => d.id).slice(0, limit)
+  const q = scope === 'new' ? fresh : learning
+  return shuffle(q.slice()).slice(0, limit)
+}
+
 /** 组一道题：句子随机取，选项 = 正确释义 + 3 个干扰项。
  *  干扰项优先取**同词的其他意思**（这才是真的干扰），不够再从别的词里补。
  *

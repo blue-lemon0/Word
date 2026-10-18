@@ -214,7 +214,9 @@ d16 += [
      os.path.exists(os.path.join(
          PROJ, "app", "web", "tests", "schema_upgrade.mjs"))),
     ("内容包从文件/种子进 IndexedDB",
-     "导入内容包" in _src(os.path.join("pages", "LibraryPage.vue"))
+     # 导入入口 2026-10 已合并到「更多 → 备份与导入」（按 format 分派），
+     # 词库页只留指路，所以判据盯的是 MorePage 里的那个入口 + 种子文件在。
+     "onImport" in _src(os.path.join("pages", "MorePage.vue"))
      and os.path.exists(os.path.join(PROJ, "app", "web", "public", "seed.json"))),
     ("SRS 移植一致性测试在",
      os.path.exists(os.path.join(PROJ, "app", "web", "tests", "srs_parity.mjs"))),
@@ -960,7 +962,8 @@ interaction = [
     # 训练从首页进、盖满全屏，所以必须有返回（顶栏箭头 = 系统返回键）
     ("训练页有返回箭头（不再是 tab 就得给自己一条退出路径）",
      'name="arrow-left"' in train and "goBack" in train
-     and _re.search(r"solo \? .单挑. : .练习.", train) is not None),
+     # 标题现在由 headerTitle 统一给（单挑 / 复习到期 / 学新词 / 在学的 / 练习）
+     and "headerTitle" in train and "{{ headerTitle }}" in train),
     # 「按计划」没有得练时置灰，而不是点进去才发现是空的
     ("「按计划」没得练时置灰（不点进去才发现）",
      _re.search(r"disabled:\s*dueCount\.value\s*===\s*0", train) is not None
@@ -1285,6 +1288,38 @@ interaction = [
      "maybePrefetch" not in _ai_src("audit.ts")
      and "PREFETCH_DAY" not in _ai_src("audit.ts")
      and "autoDaily" not in _src(os.path.join("ai", "config.ts"))),
+
+    # ── D41/D42：词库按学习进度组织、加词要一步到「能背」 ──
+    # 词库页的五个桶就是「人心里想事情的顺序」；桶键必须和 quiz 的 scope 对得上
+    ("词库按学习状态分桶（到期 / 在学 / 待学 / 已掌握 / 搁置）",
+     all(("'%s'" % k) in lib for k in ["due", "learning", "new", "mastered", "idle"])
+     and _re.search(r"function bucketOf\(", lib) is not None
+     and _re.search(r"rank\[b\] < rank\[bucket\]", lib) is not None),
+    # 桶能直接开练：词库从「台账」变「入口」
+    ("每个桶都能直接开练（/train?scope=）",
+     _re.search(r"router\.push\(\{ path: '/train', query: \{ scope \} \}\)", lib) is not None
+     and "buildScopeQueue" in train
+     and "buildScopeQueue" in _code(os.path.join(WEB, "src", "quiz.ts"))),
+    # 仓库口径（需精修/缺例句/T1）降级成可折叠的「维护」视角
+    ("内容维护口径降级为可折叠视角（不再是首屏主分类）",
+     _re.search(r'class="maint"', lib) is not None
+     and "maintain = ref(false)" in lib),
+    # 加词：配了 AI 就一步到「能背的卡」，但仍然是「提议 → 人点应用」
+    ("加词能一步生成义项与例句（AI 只提议、人点应用）",
+     "fillWord(" in _src(os.path.join("components", "AddWordSheet.vue"))
+     and re.search(r"@applied=\"onAiApplied\"",
+                  _src(os.path.join("components", "AddWordSheet.vue"))) is not None
+     and "AI 生成义项和例句" in _src(os.path.join("components", "AddWordSheet.vue"))),
+    # 已有的词不再重复建：给「去这个词」而不是再建一张空壳
+    ("已在库的词不重复建（给「去这个词」）",
+     _re.search(r"const exists = ref\(false\)", _src(
+         os.path.join("components", "AddWordSheet.vue"))) is not None
+     and "去这个词" in _src(os.path.join("components", "AddWordSheet.vue"))),
+    # updateWord 对不存在的词条不能是静默 no-op：AI 一批里「补音标 + 新建义项」时，
+    # 音标那条会先跑（词条还没建），update 静默失败 → 音标丢失。
+    ("updateWord 会建出词条（不靠 update 的静默 no-op）",
+     _re.search(r"export async function updateWord[\s\S]{0,600}?db\.words\.put",
+                _code(os.path.join(WEB, "src", "edit.ts"))) is not None),
 ]
 
 fi = 0

@@ -16,6 +16,7 @@ import ScanList from '../components/ScanList.vue'
 import {
   buildQueue,
   buildRandomQueue,
+  buildScopeQueue,
   flagQuestion,
   makeQuestion,
   markMastered,
@@ -61,6 +62,27 @@ interface Step {
 }
 
 const queue = ref<string[]>([])
+/** 从词库的分组点进来时带的 scope（due / new / learning）——
+ *  词库页那几个「练这组」按钮走的就是它。 */
+const scopeQuery = computed<'due' | 'new' | 'learning' | null>(() => {
+  const s = route.query.scope
+  return s === 'due' || s === 'new' || s === 'learning' ? s : null
+})
+
+/** 顶栏标题：练的是哪一组，一眼看得出来 */
+const headerTitle = computed(() => {
+  if (solo.value) return '单挑'
+  switch (scopeQuery.value) {
+    case 'due':
+      return '复习到期'
+    case 'new':
+      return '学新词'
+    case 'learning':
+      return '在学的'
+    default:
+      return '练习'
+  }
+})
 /** 已作答的卡片，**按题号稀疏存放**（steps[i] 是第 i 题的作答）。
  *
  *  存成数组会出事：用户可以往前跳到一张还没答的题（比如跳过第 2 题去做第 3 题），
@@ -231,8 +253,9 @@ async function start(which: Mode = mode.value): Promise<void> {
   sessionId.value = newSessionId()
   stats.value = { correct: 0, wrong: 0, pending: 0, dueCorrect: 0, dueTotal: 0 }
   void refreshDueCount()
-  queue.value =
-    which === 'random'
+  queue.value = scopeQuery.value
+    ? await buildScopeQueue(scopeQuery.value, SESSION_SIZE, only)
+    : which === 'random'
       ? await buildRandomQueue(SESSION_SIZE, only)
       : which === 'redo'
         ? lastRound.value.filter((id) => poolIds.has(id))
@@ -645,7 +668,7 @@ watch(() => [route.query.solo, route.query.sent], syncPin, { immediate: true })
 watch(
   () => [route.query.solo, route.query.sent],
   () => {
-    if (route.query.solo) void start('due')
+    if (route.query.solo || route.query.scope) void start('due')
   },
   { immediate: true },
 )
@@ -673,7 +696,7 @@ watch(
           size="18"
           @click="goBack"
         />
-        <h1>{{ solo ? '单挑' : '练习' }}</h1>
+        <h1>{{ headerTitle }}</h1>
         <!-- ★ 这里原来有一个「错题板」按钮，拿掉了。
              错题板上就是「词 + 释义」—— 那是**这道题的答案本身**。
              把答案贴在出题的地方，入口再小也会被当成「先看一眼再答」：

@@ -103,9 +103,29 @@ export async function updateSense(id: string, patch: Partial<Sense>): Promise<vo
   await db.senses.update(id, { ...patch, updatedAt: now() })
 }
 
-/** 改词条本身（目前只有音标这条路：AI 补音标、或以后手填） */
+/** 改词条本身（目前只有音标这条路：AI 补音标、或以后手填）。
+ *
+ *  ★ 词条不存在时**要建出来**，不能只 `db.words.update` ——
+ *    Dexie 的 update 对不存在的行是一次**静默 no-op**：
+ *    「AI 补音标」和「新建义项」在同一批提议里时，音标那条先跑、
+ *    词条还不存在，于是音标被悄悄丢掉，最后建出来的词条没有音标。
+ *    （同一个坑 addSense 里已经踩过一次，见那个函数的注释。）
+ */
 export async function updateWord(word: string, patch: Partial<Word>): Promise<void> {
-  await db.words.update(word, { ...patch, updatedAt: now() })
+  const t = now()
+  const cur = await db.words.get(word)
+  if (cur) {
+    await db.words.update(word, { ...patch, updatedAt: t })
+    return
+  }
+  await db.words.put({
+    word,
+    ipa: '',
+    hidden: 0,
+    createdAt: t,
+    updatedAt: t,
+    ...patch,
+  })
 }
 
 /**

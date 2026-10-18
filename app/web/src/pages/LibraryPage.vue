@@ -1,6 +1,19 @@
 <script setup lang="ts">
-/** 词库页 —— 可搜索、可筛选的列表。状态列直接驱动「该去补哪些词」，
- *  所以筛选器按「缺什么」排：需精修 / 缺例句 / T1 / 未掌握。
+/** 词库页 —— 从「仓库台账」改成「学习地图」。
+ *
+ *  ★ 判据：打开这一页的人想问的是「我现在该练什么」，不是
+ *    「库里有多少个 T1 词、有多少条缺例句」。所以：
+ *    · 顶上是**今天**（到期几个、在学几个、待学几个、已掌握几个）+ 一个开练按钮；
+ *    · 列表按**学习状态分桶**（到期 / 在学 / 待学 / 已掌握 / 搁置），
+ *      每桶可折叠、可「练这一桶」；
+ *    · 仓库口径（需精修 / 缺例句 / T1）降级成「维护」筛选 —— 它们仍然有用，
+ *      但那是**内容生产**的视角，不是学习的视角。
+ *
+ *  ★ 排序也换了：以前按字母（找词方便，但打开先看到一堆「用不上」的词），
+ *    现在桶内按「最该复习的在前」：到期早的在前，新词按字母。
+ *
+ *  ★ 性能照旧走两档：四张表已在内存就同步出列表（切 tab 那一帧不闪），
+ *    冷启动才异步等。见 db.ts 的 cachedNow。
  */
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
@@ -9,6 +22,7 @@ import AddWordSheet from '../components/AddWordSheet.vue'
 import type { Progress, Sense, Sentence, Word } from '../types'
 
 const TARGET = 5
+const router = useRouter()
 
 /** 「新增词」弹层 */
 const showAdd = ref(false)
@@ -19,28 +33,45 @@ interface Row {
   senses: Sense[]
   sentences: number
   target: number
-  prog: Map<string, Progress>
-  needsRefine: boolean
+  /** 该词最该被复习的时刻（秒）；没有进度就是 0 */
+  dueAt: number
+  /** 桶 */
+  bucket: Bucket
   learned: number
   due: number
+  needsRefine: boolean
 }
 
-const router = useRouter()
-const q = ref('')
-const filter = ref<'all' | 'rf' | 'ns' | 'T1' | 'unm'>('all')
+/** 五个桶 —— 顺序就是「人心里想事情的顺序」 */
+type Bucket = 'due' | 'learning' | 'new' | 'mastered' | 'idle'
+
+const BUCKETS: Array<{ key: Bucket; title: string; hint: string; tone: string }> = [
+  { key: 'due', title: '今天到期', hint: '该复习了', tone: 'hot' },
+  { key: 'learning', title: '在学', hint: '还没到期', tone: 'warm' },
+  { key: 'new', title: '待学', hint: '一次都没练过', tone: 'cool' },
+  { key: 'mastered', title: '已掌握', hint: '90 天以上', tone: 'ok' },
+  { key: 'idle', title: '搁置', hint: '暂时不学', tone: 'mute' },
+]
+
 const rows = ref<Row[]>([])
 const loading = ref(true)
-/** 分段渲染：全库 3000 词一次性铺 3000 个 DOM 行，首屏会卡住。
- *  先渲染前 120 行，滚到底再加载下一段 —— 数据早就在内存里，只是别一次画完。 */
+const q = ref('')
+/** 学习视角：要不要看某一桶；空 = 全看 */
+const only = ref<Bucket | ''>('')
+/** 维护视角（仓库口径）：默认关掉，展开才看 */
+const maintain = ref(false)
+const mFilter = ref<'rf' | 'ns' | 'T1' | ''>('')
+
 const PAGE = 120
 const limit = ref(PAGE)
 
-/**
- * 组表。四张表都已经在内存里时**同步**算完 —— 词库页是底部 tab 的常驻页面，
- * 从别的 tab 切过来时那一帧「正在读库… · 0 词」正是用户说的那种闪
- * （screencast 抓到过：15 KB vs 稳定 37 KB）。
- * 表没热（冷启动第一眼）才走异步。
- */
+function bucketOf(p: Progress | undefined, now: number): Bucket {
+  if (!p || p.reps === 0) return 'new'
+  if (p.mastered && !p.rusty) return 'mastered'
+  if (p.dueAt <= now) return 'due'
+  return 'learning'
+}
+
 function buildRows(
   all: Sense[],
   wrows: Word[],
@@ -51,8 +82,6 @@ function buildRows(
   const hidden = new Set(wrows.filter((w) => w.hidden).map((w) => w.word))
   const sentBy = new Map<string, number>()
   for (const s of srows) sentBy.set(s.senseId, (sentBy.get(s.senseId) ?? 0) + 1)
-  // 一次 bulkGet 拿全部进度，按 senseId 索引 —— 不要在词循环里 await，
-  // 那是 3000 次串行查询，打开词库要等好几秒。
   const pmap = new Map<string, Progress>()
   for (const p of prows) pmap.set(p.senseId, p)
 
@@ -71,15 +100,18 @@ function buildRows(
     let sentences = 0
     let learned = 0
     let due = 0
-    const prog = new Map<string, Progress>()
+    let dueAt = 0
+    /** 一个词有多个义项时，这个词的桶 = 它**最紧要**的那个义项的桶 */
+    let bucket: Bucket = 'mastered'
+    const rank: Record<Bucket, number> = { due: 0, learning: 1, new: 2, mastered: 3, idle: 4 }
     for (const s of senses) {
       sentences += sentBy.get(s.id) ?? 0
       const p = pmap.get(s.id)
-      if (p) {
-        prog.set(s.id, p)
-        if (p.reps > 0) learned++
-        if (p.reps > 0 && !p.mastered && p.dueAt <= now) due++
-      }
+      if (p && p.reps > 0) learned++
+      if (p && p.reps > 0 && !p.mastered && p.dueAt <= now) due++
+      const b = bucketOf(p, now)
+      if (rank[b] < rank[bucket]) bucket = b
+      if (b === 'due' && p && (dueAt === 0 || p.dueAt < dueAt)) dueAt = p.dueAt
     }
     list.push({
       word,
@@ -87,13 +119,13 @@ function buildRows(
       senses,
       sentences,
       target: senses.length * TARGET,
-      prog,
-      needsRefine: senses.some((s) => s.needsRefine),
+      dueAt,
+      bucket,
       learned,
       due,
+      needsRefine: senses.some((s) => s.needsRefine),
     })
   }
-  list.sort((a, b) => a.word.localeCompare(b.word))
   return list
 }
 
@@ -103,7 +135,6 @@ function applyRows(list: Row[]): void {
   loading.value = false
 }
 
-/** 内存里四张表都齐吗？齐了就同步出列表。 */
 function readyFromMemory(): boolean {
   const all = cachedNow<Sense[]>('liveSenses')
   const wrows = cachedNow<Word[]>('words')
@@ -126,58 +157,80 @@ async function load(): Promise<void> {
   applyRows(buildRows(all, wrows, srows, prows))
 }
 
-const FILTERS = [
-  { text: '全部', value: 'all' },
-  { text: '需精修', value: 'rf' },
-  { text: '缺例句', value: 'ns' },
-  { text: 'T1', value: 'T1' },
-  { text: '未掌握', value: 'unm' },
-] as const
-
-const shown = computed(() => {
-  const s = q.value.trim().toLowerCase()
-  let list = rows.value
-  if (s) list = list.filter((r) => r.word.toLowerCase().includes(s))
-  switch (filter.value) {
-    case 'rf':
-      return list.filter((r) => r.needsRefine)
-    case 'ns':
-      return list.filter((r) => r.sentences < r.target)
-    case 'T1':
-      return list.filter((r) => r.senses.some((x) => x.tier === 'T1'))
-    case 'unm':
-      return list.filter((r) => r.learned < r.senses.length)
-    default:
-      return list
-  }
+/** 顶上的四个数：今天到期 / 在学 / 待学 / 已掌握（都按**词**算） */
+const head = computed(() => {
+  const c: Record<Bucket, number> = { due: 0, learning: 0, new: 0, mastered: 0, idle: 0 }
+  for (const r of rows.value) c[r.bucket]++
+  return c
 })
 
-/** 搜索/筛选条件一变就回到第一段，否则可能停在一个空白的第 900 行 */
-watch([q, filter], () => {
+/** 每个桶里的词（桶内按「最该复习的在前」） */
+const grouped = computed(() => {
+  const s = q.value.trim().toLowerCase()
+  const map = new Map<Bucket, Row[]>()
+  for (const b of BUCKETS) map.set(b.key, [])
+  for (const r of rows.value) {
+    if (s && !r.word.toLowerCase().includes(s)) continue
+    if (only.value && r.bucket !== only.value) continue
+    if (maintain.value) {
+      if (mFilter.value === 'rf' && !r.needsRefine) continue
+      if (mFilter.value === 'ns' && r.sentences >= r.target) continue
+      if (mFilter.value === 'T1' && !r.senses.some((x) => x.tier === 'T1')) continue
+    }
+    map.get(r.bucket)!.push(r)
+  }
+  for (const [k, list] of map) {
+    list.sort((a, b) => {
+      if (k === 'due') return (a.dueAt || Infinity) - (b.dueAt || Infinity)
+      if (k === 'learning') return a.word.localeCompare(b.word)
+      return a.word.localeCompare(b.word)
+    })
+  }
+  return map
+})
+
+/** 折叠状态：默认只展开「到期 / 在学 / 待学」—— 已掌握和搁置不该抢注意力 */
+const collapsed = ref<Set<Bucket>>(new Set(['mastered', 'idle']))
+
+function toggle(b: Bucket): void {
+  const s = new Set(collapsed.value)
+  if (s.has(b)) s.delete(b)
+  else s.add(b)
+  collapsed.value = s
+}
+
+/** 搜索结果、或者选了单一桶时，一律展开（否则「搜了却看不到」） */
+const effectiveCollapsed = computed(() =>
+  q.value.trim() || only.value ? new Set<Bucket>() : collapsed.value,
+)
+
+const totalShown = computed(() => {
+  let n = 0
+  for (const list of grouped.value.values()) n += list.length
+  return n
+})
+
+watch([q, only, maintain, mFilter], () => {
   limit.value = PAGE
 })
 
-const totals = computed(() => {
-  const needRefine = rows.value.filter((r) => r.needsRefine).length
-  const noSent = rows.value.filter((r) => r.sentences < r.target).length
-  return { words: rows.value.length, needRefine, noSent }
-})
-
-function stateOf(r: Row): { text: string; type: 'success' | 'warning' | 'default' } {
-  if (r.learned === r.senses.length) return { text: '全掌握', type: 'success' }
-  if (r.learned > 0) return { text: `${r.learned}/${r.senses.length}`, type: 'warning' }
-  return { text: '未学', type: 'default' }
+/** 从某一桶直接开练：词库从「台账」变成「入口」的关键一步 */
+function drill(scope: Bucket, n: number): void {
+  if (!n) return
+  void router.push({ path: '/train', query: { scope } })
 }
 
-/* 原来这里有个「导入内容包」按钮，自己 createElement('input') 选文件、
-   自己调 importBundle、自己拼提示语。它和「更多」页的「导入备份」是
-   同一件事的两半：用户手上只有一个 .json 文件，他不该需要先判断它是哪种，
-   而文件里的 format 字段本来就能回答这个问题。
+function fmtDue(ts: number): string {
+  if (!ts) return ''
+  const days = Math.round((ts - Date.now() / 1000) / 86400)
+  if (days <= 0) return '今天'
+  if (days === 1) return '明天'
+  return `${days} 天后`
+}
 
-   合并到「更多 → 备份与导入 → 导入」一个入口（见 MorePage.applyIncoming）：
-   一个按钮、按格式分派、并且从微信/QQ 里直接点开文件也能走同一条路。
-
-   词库页留一句指路就够了 —— 首次启动若词库是空的，首页也写着「先去词库导入」。 */
+function bucketN(b: Bucket): number {
+  return grouped.value.get(b)?.length ?? 0
+}
 
 onMounted(load)
 </script>
@@ -186,12 +239,7 @@ onMounted(load)
   <div class="wb-page">
     <header class="wb-topbar">
       <div class="in">
-        <h1>词库</h1>
-        <!-- 「加一个词」是这里最该常驻的动作。
-             之前界面上**根本没有建词路径**（db.words.put 只出现在备份恢复
-             和两种导入里），想加一个词只能导入整个内容包 ——
-             那不叫「加词」，那叫「换数据库」。
-             一个「+」放在顶栏，是通讯录式的通用预期。 -->
+        <h1>我的词库</h1>
         <van-button size="mini" plain @click="router.push('/board')">错题</van-button>
         <van-button size="mini" plain type="primary" icon="plus" @click="showAdd = true">
           新词
@@ -203,90 +251,299 @@ onMounted(load)
       :open="showAdd"
       @close="showAdd = false"
       @added="(id) => { showAdd = false; router.push(`/sense/${id}`) }"
+      @filled="(w) => { showAdd = false; router.push(`/word/${encodeURIComponent(w)}`) }"
     />
 
     <div class="wb-wrap">
-      <van-tabs
-        v-model:active="filter"
-        sticky
-        color="#4f46e5"
-        title-active-color="#4f46e5"
-        title-inactive-color="#969baa"
-        line-width="16"
-        class="tabs"
-      >
-        <van-tab v-for="f in FILTERS" :key="f.value" :name="f.value" :title="f.text" />
-      </van-tabs>
-
-      <van-search v-model="q" placeholder="搜索单词" shape="round" class="sbox" />
-
-      <p class="sum">
-        {{ totals.words }} 词 · 需精修 {{ totals.needRefine }} · 缺例句 {{ totals.noSent }}
-      </p>
-
-      <van-loading v-if="loading" class="ld" color="#4f46e5">正在读库…</van-loading>
-      <van-empty v-else-if="!shown.length" description="没有匹配的词" />
-
-      <div
-        v-for="r in shown.slice(0, limit)"
-        :key="r.word"
-        class="row-i"
-        @click="router.push(`/word/${r.word}`)"
-      >
-        <div class="b">
-          <div class="w">
-            {{ r.word }}
-            <span class="ipa">{{ r.ipa }}</span>
-          </div>
-          <div class="m">
-            <span>{{ r.senses.length }} 个意思</span>
-            <span>{{ r.sentences }}/{{ r.target }} 句</span>
-            <span v-if="r.due" class="due">{{ r.due }} 到期</span>
-          </div>
+      <!-- 今天：一句话回答「我现在该干什么」 -->
+      <section class="today">
+        <p class="t-h">
+          <template v-if="head.due">
+            今天有 <b>{{ head.due }}</b> 个词到期
+          </template>
+          <template v-else-if="head.new">
+            今天没有到期的 —— 有 <b>{{ head.new }}</b> 个新词可以学
+          </template>
+          <template v-else>今天没有要复习的</template>
+        </p>
+        <p class="t-s">
+          在学 {{ head.learning }} · 待学 {{ head.new }} · 已掌握 {{ head.mastered }}
+        </p>
+        <div class="t-acts">
+          <van-button
+            v-if="head.due"
+            type="primary"
+            round
+            block
+            @click="drill('due', head.due)"
+          >
+            复习这 {{ head.due }} 个
+          </van-button>
+          <van-button v-else-if="head.new" type="primary" round block @click="drill('new', head.new)">
+            学几个新词
+          </van-button>
+          <van-button v-else plain round block @click="router.push('/train')">
+            随便练两句
+          </van-button>
         </div>
-        <div class="tags">
-          <van-tag v-if="r.needsRefine" plain round type="warning">需精修</van-tag>
-          <van-tag v-if="r.sentences < r.target" plain round>缺句</van-tag>
-          <van-tag plain round :type="stateOf(r).type">{{ stateOf(r).text }}</van-tag>
-        </div>
+      </section>
+
+      <van-search v-model="q" placeholder="搜索我的词库" shape="round" class="sbox" />
+
+      <!-- 学习视角的过滤：只留四个，而且都是「我现在想练什么」 -->
+      <div class="chips">
+        <button
+          class="chip"
+          :class="{ on: only === '' }"
+          type="button"
+          @click="only = ''"
+        >
+          全部 {{ rows.length }}
+        </button>
+        <button
+          v-for="b in BUCKETS.slice(0, 3)"
+          :key="b.key"
+          class="chip"
+          :class="{ on: only === b.key, hot: b.key === 'due' && bucketN(b.key) > 0 }"
+          type="button"
+          @click="only = only === b.key ? '' : b.key"
+        >
+          {{ b.title }} {{ bucketN(b.key) }}
+        </button>
       </div>
 
-      <van-button
-        v-if="shown.length > limit"
-        class="more"
-        size="small"
-        plain
-        block
-        @click="limit += PAGE"
-      >
-        显示更多（还有 {{ shown.length - limit }} 个词）
-      </van-button>
+      <van-loading v-if="loading" class="ld" color="#4f46e5">正在读库…</van-loading>
+      <van-empty v-else-if="!totalShown" description="没有匹配的词" />
+
+      <!-- 分桶列表 -->
+      <template v-if="!loading">
+        <section v-for="b in BUCKETS" :key="b.key" class="bucket">
+          <header
+            v-if="bucketN(b.key)"
+            class="b-h"
+            :class="b.tone"
+            @click="toggle(b.key)"
+          >
+            <span class="b-t">{{ b.title }}</span>
+            <span class="b-n">{{ bucketN(b.key) }}</span>
+            <span class="b-hint">{{ b.hint }}</span>
+            <span class="wb-sp" />
+            <button
+              v-if="b.key === 'due' || b.key === 'new' || b.key === 'learning'"
+              class="b-go"
+              type="button"
+              @click.stop="drill(b.key, bucketN(b.key))"
+            >
+              练这组
+            </button>
+            <van-icon
+              :name="effectiveCollapsed.has(b.key) ? 'arrow-down' : 'arrow-up'"
+              size="12"
+              class="b-ic"
+            />
+          </header>
+
+          <template v-if="bucketN(b.key) && !effectiveCollapsed.has(b.key)">
+            <div
+              v-for="r in (grouped.get(b.key) ?? []).slice(0, limit)"
+              :key="r.word"
+              class="row-i"
+              @click="router.push(`/word/${encodeURIComponent(r.word)}`)"
+            >
+              <div class="b">
+                <div class="w">
+                  {{ r.word }}
+                  <span v-if="r.ipa" class="ipa">{{ r.ipa }}</span>
+                </div>
+                <div class="m">
+                  <span>{{ r.senses.length }} 个意思</span>
+                  <span v-if="r.bucket === 'due' && r.dueAt" class="due">
+                    {{ fmtDue(r.dueAt) }}到期
+                  </span>
+                  <span v-else-if="r.learned">{{ r.learned }}/{{ r.senses.length }} 练过</span>
+                  <span v-else>没练过</span>
+                  <span v-if="r.needsRefine" class="warn">待补内容</span>
+                </div>
+              </div>
+              <van-icon name="arrow" size="12" class="go" />
+            </div>
+          </template>
+        </section>
+
+        <van-button
+          v-if="totalShown > limit"
+          class="more"
+          size="small"
+          plain
+          block
+          @click="limit += PAGE"
+        >
+          显示更多（还有 {{ totalShown - limit }} 个词）
+        </van-button>
+      </template>
+
+      <!-- 维护视角：内容生产的口径，收在下面，默认关 -->
+      <section class="maint">
+        <button class="m-t" type="button" @click="maintain = !maintain">
+          <van-icon :name="maintain ? 'arrow-up' : 'arrow-down'" size="12" />
+          维护词库（内容视角）
+        </button>
+        <template v-if="maintain">
+          <p class="m-hint">
+            这几个筛选是给**补内容**用的：词库本身还不是成品，需要人（或 AI）把空壳补上。
+          </p>
+          <div class="chips">
+            <button
+              v-for="f in ([
+                { k: 'rf', t: '需精修' },
+                { k: 'ns', t: '缺例句' },
+                { k: 'T1', t: 'T1 高频' },
+              ] as const)"
+              :key="f.k"
+              class="chip"
+              :class="{ on: mFilter === f.k }"
+              type="button"
+              @click="mFilter = mFilter === f.k ? '' : f.k"
+            >
+              {{ f.t }}
+            </button>
+            <button class="chip" type="button" @click="router.push('/audit')">AI 体检</button>
+          </div>
+        </template>
+      </section>
     </div>
   </div>
 </template>
 
 <style scoped>
-.tabs {
-  margin: 0 -12px;
-  --van-tabs-line-height: 40px;
-  --van-tabs-nav-background: var(--wb-bg);
+/* ── 今天 ── */
+.today {
+  background: linear-gradient(135deg, #f5f3ff 0%, #eef2ff 100%);
+  border: 1px solid #e6e6f7;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
 }
 
+.t-h {
+  font-size: 16px;
+  font-weight: 650;
+  color: var(--wb-ink);
+  line-height: 1.5;
+}
+
+.t-h b {
+  color: var(--wb-primary);
+  font-size: 19px;
+}
+
+.t-s {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--wb-ink-3);
+}
+
+.t-acts {
+  margin-top: 12px;
+}
+
+/* ── 搜索与 chips ── */
 .sbox {
-  margin: 4px 0 0;
+  margin: 0 0 6px;
   background: transparent;
   --van-search-background: transparent;
   --van-search-content-background: var(--wb-card);
 }
 
-.sum {
-  font-size: 12px;
-  color: var(--wb-ink-3);
-  margin: 6px 4px 10px;
+.chips {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin: 2px 0 12px;
+}
+
+.chip {
+  border: 1px solid var(--wb-line);
+  background: var(--wb-card);
+  border-radius: 999px;
+  padding: 5px 11px;
+  font-family: inherit;
+  font-size: 12.5px;
+  color: var(--wb-ink-2);
+  cursor: pointer;
+}
+
+.chip.on {
+  background: var(--wb-primary);
+  border-color: var(--wb-primary);
+  color: #fff;
+}
+
+.chip.hot:not(.on) {
+  border-color: #f0b4b4;
+  color: #c0392b;
 }
 
 .ld {
   padding: 30px 0;
+}
+
+/* ── 桶 ── */
+.bucket {
+  margin-bottom: 6px;
+}
+
+.b-h {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 8px 4px;
+  cursor: pointer;
+}
+
+.b-t {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--wb-ink);
+}
+
+.b-n {
+  font-size: 12px;
+  color: var(--wb-ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.b-hint {
+  font-size: 11.5px;
+  color: var(--wb-ink-3);
+}
+
+.b-h.hot .b-t {
+  color: #c0392b;
+}
+
+.b-h.warm .b-t {
+  color: #b26a00;
+}
+
+.b-h.cool .b-t {
+  color: var(--wb-primary);
+}
+
+.b-go {
+  border: 0;
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-family: inherit;
+  font-size: 11.5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.b-ic {
+  color: var(--wb-ink-3);
+  margin-left: 2px;
 }
 
 .row-i {
@@ -331,18 +588,45 @@ onMounted(load)
 }
 
 .row-i .due {
-  color: var(--wb-primary);
+  color: #c0392b;
 }
 
-.tags {
-  display: flex;
-  gap: 4px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  max-width: 46%;
+.row-i .warn {
+  color: #b26a00;
+}
+
+.row-i .go {
+  color: var(--wb-ink-3);
 }
 
 .more {
   margin-top: 10px;
+}
+
+/* ── 维护视角 ── */
+.maint {
+  margin-top: 18px;
+  border-top: 1px solid var(--wb-line);
+  padding-top: 12px;
+}
+
+.m-t {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: 12.5px;
+  color: var(--wb-ink-3);
+  padding: 4px 2px;
+  cursor: pointer;
+}
+
+.m-hint {
+  margin: 6px 2px 10px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--wb-ink-3);
 }
 </style>

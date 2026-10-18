@@ -387,6 +387,7 @@ function onAsk(): void {
         :open="showAdd"
         @close="showAdd = false"
         @added="(id) => { showAdd = false; router.push(`/sense/${id}`) }"
+        @filled="(w) => { showAdd = false; router.push(`/word/${encodeURIComponent(w)}`) }"
       />
 
       <div ref="senseBox" class="slist">
