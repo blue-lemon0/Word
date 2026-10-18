@@ -815,8 +815,25 @@ function onKey(ev: KeyboardEvent): void {
  *   · 只有**已作答**才能往前滑。没答就滑走 = 漏题，用户会以为已经做完了；
  *   · 横向位移要明显大于纵向位移。竖着滑主要是滚页面，不该被当成翻题。
  */
-const SWIPE_MIN = 56
-const touch = { x: 0, y: 0, locked: false, dx: 0, dy: 0 }
+/**
+ * 左右滑动翻题。**判定口径放宽过一次**（原来经常划不动）：
+ *   1. 锁定阈值从 10px 降到 8px，并且**每次 move 都重新判**：
+ *      人手的斜向手势常常先竖后横，只在第一下判会永远锁不上；
+ *   2. 距离门槛 56 → 40（手机上 56px 已经是大半个拇指的行程）；
+ *   3. 结束判定从「纵向不超过横向的 0.8」放宽到「横向大于纵向即可」——
+ *      斜着划本来就是常态；
+ *   4. 弹层开着时一律不翻题（否则在浮层里一划，底下的题就换了）；
+ *   5. 没作答就往左划：给一句提示，而不是「什么都没发生」。
+ */
+const SWIPE_MIN = 40
+const touch = { x: 0, y: 0, locked: false, dx: 0, dy: 0, blocked: false }
+
+/** 有浮层/输入框开着时不做翻题手势 */
+function gestureBlocked(target: EventTarget | null): boolean {
+  if (pickBox.value || peekOpen.value || drillOpen.value || aiOpen.value) return true
+  const el = target as HTMLElement | null
+  return !!el && /^(INPUT|TEXTAREA)$/.test(el.tagName)
+}
 
 function onTouchStart(e: TouchEvent): void {
   const t = e.touches[0]
@@ -826,6 +843,7 @@ function onTouchStart(e: TouchEvent): void {
   touch.locked = false
   touch.dx = 0
   touch.dy = 0
+  touch.blocked = gestureBlocked(e.target)
 }
 
 function onTouchMove(e: TouchEvent): void {
@@ -833,20 +851,21 @@ function onTouchMove(e: TouchEvent): void {
   if (!t) return
   touch.dx = t.clientX - touch.x
   touch.dy = t.clientY - touch.y
-  if (!touch.locked && Math.abs(touch.dx) > 10) {
-    // 一旦判定为横向手势，阻止纵向滚动；否则页面会跟着一起动，手势被吃掉
-    if (Math.abs(touch.dx) > Math.abs(touch.dy)) touch.locked = true
-  }
+  const ax = Math.abs(touch.dx)
+  const ay = Math.abs(touch.dy)
+  // 横着走起来了就算横向手势（不要求第一下就比纵向大）
+  if (!touch.locked && ax > 8 && ax > ay) touch.locked = true
 }
 
 function onTouchEnd(): void {
-  if (!touch.locked) return
+  if (!touch.locked || touch.blocked) return
   const { dx, dy } = touch
   touch.locked = false
-  if (Math.abs(dx) < SWIPE_MIN || Math.abs(dy) > Math.abs(dx) * 0.8) return
+  if (Math.abs(dx) < SWIPE_MIN || Math.abs(dx) <= Math.abs(dy)) return
   // 往左滑 = 下一题，往右滑 = 上一题
   if (dx < 0) {
     if (submitted.value || reviewing.value) void next()
+    else toast('先答一下（或点「我不会」）再翻页')
   } else {
     void prev()
   }
