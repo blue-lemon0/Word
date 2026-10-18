@@ -32,14 +32,6 @@ declare global {
 export const nativeBridge: NativeBridgeApi | undefined =
   typeof window === 'undefined' ? undefined : window.WBNative
 
-/** 往页面里插一段脚本（只用于排查，正常路径不注入） */
-export function createScript(src: string): void {
-  if (typeof document === 'undefined') return
-  const s = document.createElement('script')
-  s.src = src
-  document.head.appendChild(s)
-}
-
 /**
  * 「从微信/QQ/文件管理器里点开一个 JSON 文件」的待处理内容。
  *

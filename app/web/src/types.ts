@@ -139,16 +139,6 @@ export interface SrsState {
   last_review: number | null
 }
 
-export function emptyState(): SrsState {
-  return {
-    stability: 0,
-    difficulty: 8.0,
-    reps: 0,
-    wrong_n: 0,
-    pending_n: 0,
-    last_review: null,
-  }
-}
 
 /** 进度 → 熟练度标签（UI 用；判定依据见 isMastered） */
 export function masteryOf(p: Progress | undefined): Mastery {

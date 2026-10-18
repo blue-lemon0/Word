@@ -6,7 +6,7 @@
  */
 import { db } from './db'
 import { uuid } from './edit'
-import { exportFile, pickJsonFile } from './fileio'
+import { exportFile } from './fileio'
 import { flagIndexByText, reapplyFlags } from './flags'
 import type { Sense, Sentence, Word } from './types'
 
@@ -284,18 +284,6 @@ export async function restoreBackup(json: unknown): Promise<RestoreResult> {
     summary: `词${res.words} 义${res.senses} 句${res.sentences} 进度${res.progress} 流水${res.reviews}`,
   })
   return res
-}
-
-/**
- * 挑一个备份文件（.vwbak）并恢复。
- * 走 fileio.pickJsonFile：它 accept 更宽松、并且会在用户取消时
- * 返回 null 而不是永远 pending（原来 reject(new Error('没有选文件'))
- * 会把「用户按了返回」当成一个错误弹出来）。
- */
-export async function pickBackupFile(): Promise<unknown> {
-  const picked = await pickJsonFile()
-  if (!picked) return null
-  return picked.json
 }
 
 /** 首次打开还没有任何内容时，把种子灌进去之前先存一份空快照也没意义，

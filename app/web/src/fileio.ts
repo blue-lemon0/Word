@@ -15,7 +15,7 @@
  *  导入同理：给一个**显眼的大按钮**（不是顶栏里的小字），并说明可以从
  *  微信/QQ 收到的文件里直接选 —— 用户不需要先存到某个文件夹。
  */
-import { createScript, nativeBridge } from './bridge'
+import { nativeBridge } from './bridge'
 
 export interface ShareOutcome {
   /** 分享面板是否真的弹出来了 */
@@ -169,9 +169,4 @@ export async function shareText(title: string, text: string): Promise<boolean> {
     return false
   }
   return copyToClipboard(text)
-}
-
-/** 注入一个调试用的可见脚本（只在需要排查时用，正常路径不注入） */
-export function injectDebug(src: string): void {
-  createScript(src)
 }

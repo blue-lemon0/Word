@@ -5,7 +5,7 @@
  *  （这正是旧 schema 用 's1' 当主键时的缺陷，见 types.ts 开头。）
  */
 import { db, ensureProgress, softDeleteSense } from './db'
-import type { Progress, Sense, Sentence } from './types'
+import type { Sense, Sentence } from './types'
 
 export function uuid(): string {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
@@ -225,18 +225,6 @@ export async function deleteSentence(id: number): Promise<void> {
   await db.sentences.delete(id)
 }
 
-/** 例句上下移动：swap idx */
-export async function moveSentence(list: Sentence[], id: number, dir: -1 | 1): Promise<void> {
-  const sorted = [...list].sort((a, b) => a.idx - b.idx)
-  const i = sorted.findIndex((s) => s.id === id)
-  const j = i + dir
-  if (i < 0 || j < 0 || j >= sorted.length) return
-  const a = sorted[i]
-  const b = sorted[j]
-  await db.sentences.update(a.id!, { idx: b.idx })
-  await db.sentences.update(b.id!, { idx: a.idx })
-}
-
 /**
  * 把一条例句挪到 from → to（拖动排序落定后一次性写入）。
  *
@@ -262,27 +250,5 @@ export async function reorderSentences(list: Sentence[], from: number, to: numbe
   })
 }
 
-/** 标记「这句有问题」：训练页点一下，之后不再出题。 */
-export async function flagSentence(id: number, flagged: 0 | 1): Promise<void> {
-  await db.sentences.update(id, { flagged })
-}
-
-/* ── 进度的小工具 ── */
-
-export async function resetProgress(senseId: string): Promise<void> {
-  const fresh: Progress = {
-    senseId,
-    stability: 0,
-    difficulty: 8,
-    lastReview: null,
-    dueAt: 0,
-    reps: 0,
-    wrongN: 0,
-    pendingN: 0,
-    mastered: 0,
-    rusty: 0,
-  }
-  await db.progress.put(fresh)
-}
 
 export { softDeleteSense }

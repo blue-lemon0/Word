@@ -238,6 +238,58 @@ ok((await db.words.get('zzz_gone')) == null, '回滚后多余词消失')
 ok((await db.words.count()) === wordsBefore, `回滚后词数复原（${await db.words.count()}）`)
 ok((await db.progress.get(q1.sense.id)) != null, '回滚不动学习进度（只回内容层）')
 
+/* ── 7c. 闲置衰减：掌握的词会回来 ──
+ * 这一条守的是**行为**不是代码形状：守卫（verify_docs）判不了它，
+ * 因为「衰减有没有接上」在源码里只差一个函数名。
+ * 以前 decayIfIdle 写好了却没人调用，mastered 的词就永远消失 ——
+ * 全绿、没报错、只是「学完就忘」这件事从来没发生过。 */
+{
+  const now = Math.floor(Date.now() / 1000)
+  const day = 86400
+  // 用**活着的**义项：前面那个合并用例已经把 a2 并没了，
+  // 拿它来断言会得到一个和衰减无关的失败（测试自己踩坑，坑 40）。
+  const live = await quiz.practicePool()
+  const fresh = live[0].id
+  const stale = live[1].id
+  const before = {
+    fresh: await db.progress.get(fresh),
+    stale: await db.progress.get(stale),
+  }
+
+  // 刚标的：闲置 1 天、S=6（阈值 3×S=18 天，没超）→ 不该回来
+  await db.progress.put({
+    senseId: fresh, stability: 6, difficulty: 5, lastReview: now - 1 * day,
+    dueAt: now + 5 * day, reps: 5, wrongN: 0, pendingN: 0, mastered: 1, rusty: 0,
+  })
+  // 放很久没碰的：闲置 40 天、S=6（超了）→ 该回来
+  await db.progress.put({
+    senseId: stale, stability: 6, difficulty: 5, lastReview: now - 40 * day,
+    dueAt: now - 35 * day, reps: 5, wrongN: 0, pendingN: 0, mastered: 1, rusty: 0,
+  })
+
+  const q2 = await quiz.buildQueue(50)
+  ok(!q2.includes(fresh), '刚练过的已掌握义项不会被排进队列')
+  ok(q2.includes(stale), '闲置超过 3×S 的已掌握义项重新出现（学完就忘被实现了）')
+
+  const decayed = await db.progress.get(stale)
+  ok(decayed.rusty === 1, '衰减后 rusty 置 1（不然下次组队列又会被跳过）')
+  ok(
+    Math.abs(decayed.stability - 6 * 0.7) < 1e-9,
+    `衰减把 S 乘以 0.7（6 → ${decayed.stability}）`,
+  )
+  ok((await db.progress.get(fresh)).rusty === 0, '没超期的那个不动 rusty')
+
+  // 答完一次之后 rusty 要清掉，否则它永远留在队列里
+  const qq = await quiz.makeQuestion(stale)
+  await quiz.recordAnswer(qq, quiz.newSessionId(), 0, 'CORRECT', 500)
+  ok((await db.progress.get(stale)).rusty === 0, '重新练过之后 rusty 清零')
+
+  // 复原：这一段改过两行的进度，不复原会污染后面所有断言
+  await db.progress.put(before.fresh)
+  await db.progress.put(before.stale)
+  ok(true, '复原了被这段用例改动的进度行（不留残骸）')
+}
+
 /* ── 7b. 导入历史那一行怎么说话 ──
  * 存下来的 summary 有两种格式（内容包批量 / AI 单��），
  * 认错就会不报错地「少说一句」—— 这里把两种都钉住（坑 47）。

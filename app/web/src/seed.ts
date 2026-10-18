@@ -30,6 +30,3 @@ export function ensureSeeded(): Promise<void> {
   return booting
 }
 
-export async function isEmpty(): Promise<boolean> {
-  return (await db.words.count()) === 0
-}

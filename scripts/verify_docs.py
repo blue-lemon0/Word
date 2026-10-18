@@ -176,8 +176,19 @@ d16 += [
     ("tabbar 图标名都在 Vant 图标表里", all(
         _vant_icon_exists(ic)
         for ic in ["wap-home-o", "apps-o", "aim", "ellipsis"]) and "icon=\"apps-o\"" in _app),
-    ("例句标记闭环还在（flagged + flagNote）",
-     "flagNote" in _types and "flagSentence" in _src("edit.ts")),
+    # 盯**闭环**而不是某一个函数名。
+    # 原来这里断言 `flagSentence` 存在于 edit.ts —— 而那个函数是死代码，
+    # 被清掉之后守卫立刻红了，可实际闭环好好地���：训练页随手标记
+    # （quiz.flagQuestion）、错题板标记/关单（flags.ts）、意思页切换标记
+    # （SensePage）三处都在写 flagged/flagNote。
+    # 一个钉在函数名上的守卫，保的是「别把那个函数删了」，
+    # 而不是「标记这件事还通不通」—— 这类守卫迟早和现实脱节。
+    ("例句标记闭环还在（三个写入口 + 导出 + 字段）",
+     "flagged: 0 | 1" in _types and "flagNote: string" in _types
+     and "flagged: 1, flagNote" in _src("quiz.ts")          # 训练页随手标记
+     and "flagged: 1, flagNote" in _src("flags.ts")          # 错题板标记
+     and "flagged: 0, flagNote" in _src("flags.ts")          # 关单
+     and "'word-flags'" in _src("flags.ts")),                # 清单交给内容侧
     ("学习进度挂义项 id（不是 s1/s2）",
      "senseId" in _types and "senseId: string" in _types
      and "progress: 'senseId" in _src("db.ts")),
@@ -753,6 +764,36 @@ interaction = [
     ("单词页区分「不在库里」与「没有释义」",
      _re.search(r"inLibrary\s*\?\s*'这个词还没有释义'\s*:\s*'这个词还不在词库里'",
                 word) is not None),
+
+    # ── 坑 52：写好了却没接上，「学完就忘」就从来没发生过 ──
+    # decayIfIdle 存在但没人调用 → rusty 永远是 0 →
+    # `if (p.mastered && !p.rusty) return` 恒成立 → mastered 的词永远消失。
+    # 判据不能是「这个函数被调用了」（那是形状），只能是接在队列上 + 做了字段适配。
+    ("闲置衰减接在组队列上（mastered 的词会回来）",
+     _re.search(r"async function decayIdle[\s\S]*?const rows = await decayIdle\(",
+                _code(os.path.join(WEB, "src", "quiz.ts"))) is not None),
+    ("衰减做了字段适配（库的 lastReview ↔ srs 的 last_review）",
+     _re.search(r"last_review:\s*p\.lastReview", _code(
+         os.path.join(WEB, "src", "quiz.ts"))) is not None),
+    # 衰减写库必须在事务里，否则 IndexedDB 直接 NotFoundError（坑 25）
+    ("衰减的写库在事务内",
+     _re.search(r"db\.transaction\('rw',\s*db\.progress",
+                _code(os.path.join(WEB, "src", "quiz.ts"))) is not None),
+    # 真正守住它的是**行为测试**：守卫判不了「衰减有没有生效」
+    ("衰减有行为测试（flow_smoke 里断言它真的回到队列）",
+     "闲置超过" in _read(os.path.join(WEB, "tests", "flow_smoke.mjs"))),
+
+    # ── 坑 53：别给「已经缓存着的表」再套一层缓存 ──
+    # 义项数以前有个自己的 Map，配一个从没被调用的 clearSenseCache；
+    # 合并/拆分之后数就一直是老的，而它会喂给 SRS 的 n_senses。
+    # 现在直接数常驻内存的 liveSenses —— 随 senses 写入钩子失效，不可能过期。
+    ("义项数不再另建缓存（直接数常驻的 liveSenses）",
+     _re.search(r"export function senseCount[\s\S]*?cachedNow<Sense\[\]>\('liveSenses'\)",
+                _code(os.path.join(WEB, "src", "quiz.ts"))) is not None
+     and "nSenseCache" not in _code(os.path.join(WEB, "src", "quiz.ts"))),
+    # 反过来守：全仓不该再有「导出了但没人调用」的清缓存函数
+    ("全仓没有只导出不调用的 clear*Cache",
+     not _re.search(r"export function clear\w*Cache", _all_src)),
 ]
 
 fi = 0

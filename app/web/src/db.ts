@@ -96,11 +96,6 @@ interface Entry {
 }
 const cache = new Map<CacheKey, Entry>()
 
-/** 缓存失效（一般由写入钩子自动触发；只在测试里手动用） */
-export function invalidateCaches(): void {
-  cache.clear()
-}
-
 function cached<T>(key: CacheKey, load: () => Promise<T>): Promise<T> {
   const hit = cache.get(key)
   if (hit) return hit.p as Promise<T>
@@ -198,22 +193,12 @@ for (const [name, table] of [
   }
 }
 
-/* ── 便捷读取 ── */
 
-export async function listWords(includeHidden = false): Promise<Word[]> {
-  const all = await db.words.toArray()
-  return includeHidden ? all : all.filter((w) => !w.hidden)
-}
 
 /** 取一个词的存活义项，按 slot 排序 */
 export async function sensesOf(word: string): Promise<Sense[]> {
   const rows = await db.senses.where('word').equals(word).toArray()
   return rows.filter((s) => s.deletedAt == null).sort((a, b) => a.slot - b.slot)
-}
-
-export async function sentencesOf(senseId: string): Promise<Sentence[]> {
-  const rows = await db.sentences.where('senseId').equals(senseId).toArray()
-  return rows.sort((a, b) => a.idx - b.idx)
 }
 
 /* ── 同步读（页面首帧用，见 cachedNow 的说明）──
@@ -287,10 +272,6 @@ export async function progressOf(senseIds: string[]): Promise<Map<string, Progre
 }
 
 /* ── 词条增删改 ── */
-
-export async function setHidden(word: string, hidden: 0 | 1): Promise<void> {
-  await db.words.update(word, { hidden, updatedAt: Date.now() })
-}
 
 /** 重排义项：slots 传完整的新顺序（Sense 对象数组），id 不变 */
 export async function reorderSenses(word: string, ordered: Sense[]): Promise<void> {

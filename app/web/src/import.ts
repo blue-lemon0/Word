@@ -331,29 +331,6 @@ export async function importBundle(input: unknown): Promise<ImportReport> {
 
 /* ── 供「复制 AI 模板」用 ── */
 
-export function aiTemplate(word: string, ipa = ''): string {
-  const t = {
-    format: 'word.import',
-    schemaVersion: 2,
-    word,
-    ipa,
-    senses: [
-      {
-        slot: 1,
-        pos: 'n.',
-        gloss: '',
-        glossEn: '',
-        note: '',
-        sentences: [
-          { text: '', form: word, clue: '', translation: '', note: '' },
-          { text: '', form: word, clue: '', translation: '', note: '' },
-        ],
-      },
-    ],
-  }
-  return JSON.stringify(t, null, 2)
-}
-
 /** 给 AI 看的完整提示词：现有内容 + 要求 + 输出格式。
  *  slot 一并给出，是为了让人和 AI 说的是同一条义项 —— 否则 AI 拆出来的
  *  意思对不上号，导入时就得全靠猜。 */

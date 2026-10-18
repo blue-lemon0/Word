@@ -5,8 +5,8 @@
  *   · 英文释义**只在答题后**出现（出题时露 = 泄题）
  *   · 「我不会」给 PENDING 评级，不是错 —— 与 WRONG 分开记
  */
-import { allSentences, allProgress, liveSenses, db } from './db'
-import { applyReview, isMastered, type ReviewOutcome } from './srs'
+import { allSentences, allProgress, cachedNow, liveSenses, db } from './db'
+import { applyReview, decayIfIdle, isMastered, type ReviewOutcome } from './srs'
 import { toast } from './toast'
 import type { Progress, ReviewLog, Sense, Sentence, SrsCard } from './types'
 import { masteryOf } from './types'
@@ -44,15 +44,59 @@ export async function practicePool(): Promise<Sense[]> {
   return senses.filter((s) => ok.has(s.id))
 }
 
+/**
+ * 闲置衰减：**组队列时顺手做一次**，把「学完就忘」这件事落地。
+ *
+ *  ★ 之前这个函数写好了却从没被调用 —— 于是 `rusty` 永远是 0，
+ *   下一行 `if (p.mastered && !p.rusty) return` 恒成立，
+ *   **一个词一旦标成「已掌握」就永远不再出现**。
+ *   `srs.ts` 里的 `decayIfIdle` 与参数表里的 `DECAY_IDLE` 都是死的。
+ *
+ *  为什么放在「组队列」而不是「启动时全表扫」：
+ *  衰减的判据是「闲置多久 vs 当前 S」，判据只在这里被用到；
+ *  启动扫全表会在每次开 app 时对 8000 行做无谓的写。
+ *  只有「真的超期」的行才会被写（decayIfIdle 没变化时返回原对象）。
+ *
+ *  ★ 为什么这里要写一层字段适配：`srs.ts` 是 `app/srs.mjs` 的逐函数移植，
+ *   它内部一律 snake_case（`last_review`）；而库里存的是 camelCase
+ *   （`lastReview`）。直接传 Progress 会因为字段名对不上而**永远衰减不了** ——
+ *   少一次判断而已，不报错。数值口径必须留在 srs.ts 里，适配放这边。
+ *
+ *  事务：写 progress 必须进事务，否则 IndexedDB 直接报 NotFoundError
+ *  （坑 25）；所以哪怕只改几行也要开一次事务。
+ */
+async function decayIdle(rows: Progress[], now: number): Promise<Progress[]> {
+  const changed: Progress[] = []
+  for (const p of rows) {
+    const d = decayIfIdle(
+      { last_review: p.lastReview, stability: p.stability, rusty: p.rusty },
+      now,
+    )
+    if (d === undefined || d.rusty === p.rusty) continue // 没变化
+    changed.push({ ...p, stability: d.stability, rusty: 1 })
+  }
+  if (changed.length) {
+    await db.transaction('rw', db.progress, async () => {
+      await db.progress.bulkPut(changed)
+    })
+    for (const p of changed) {
+      const hit = rows.find((r) => r.senseId === p.senseId)
+      if (hit) Object.assign(hit, p)
+    }
+  }
+  return rows
+}
+
 /** 组一轮队列：到期的先来（按到期时间），再补新卡。
  *  已掌握的义项不再排期，除非它 rusty（长期不练衰减出来的）。 */
 export async function buildQueue(limit = SESSION_SIZE, only?: string[]): Promise<string[]> {
   const pool = await practicePool()
   const ids = only ?? null
   const cands = ids ? pool.filter((s) => ids.includes(s.id)) : pool
-  const pmap = new Map<string, Progress>()
-  for (const p of await allProgress()) pmap.set(p.senseId, p)
   const now = Math.floor(Date.now() / 1000)
+  const rows = await decayIdle(await allProgress(), now)
+  const pmap = new Map<string, Progress>()
+  for (const p of rows) pmap.set(p.senseId, p)
 
   const due: Array<{ id: string; at: number }> = []
   const fresh: string[] = []
@@ -196,7 +240,7 @@ export async function recordAnswer(
   elapsedMs: number | null,
 ): Promise<AnswerResult> {
   const now = Math.floor(Date.now() / 1000)
-  const card = cardViewOf(q.sense, await senseCount(q.sense.word))
+  const card = cardViewOf(q.sense, senseCount(q.sense.word))
   const prev = (await db.progress.get(q.sense.id)) ?? null
   const st = prev
     ? {
@@ -299,21 +343,26 @@ function cardViewOf(s: Sense, nSenses: number): SrsCard {
   }
 }
 
-/** 同词义项数缓存 —— 一轮练习里同一个词会反复用到 */
-const nSenseCache = new Map<string, number>()
-
-export async function senseCount(word: string): Promise<number> {
-  const hit = nSenseCache.get(word)
-  if (hit != null) return hit
-  const n = (await db.senses.where('word').equals(word).toArray()).filter(
-    (s) => s.deletedAt == null,
-  ).length
-  nSenseCache.set(word, n)
+/**
+ * 这个词有几个存活的意思 —— 直接数常驻内存的 `liveSenses`，不另建缓存。
+ *
+ *  ★ 之前这里有一个 `Map<string, number>` 缓存，配一个 `clearSenseCache()`
+ *   —— 而那个清除函数**从来没有被调用过**（只被导出，没人用）。
+ *   后果：意思页点「合并」或「拆分」之后，这个词的义项数在内存里还是老的，
+ *   而它会喂给 SRS 的 `n_senses`，进而判成 SINGLE 还是 MULTI、起始间隔跟着错。
+ *   不报错、不留痕，只是「新卡的起始间隔慢慢不准了」。
+ *
+ *   为什么缓存不是问题：`liveSenses` 本来就常驻内存（搜索、统计、词库都在用），
+ *   而 senses 表的写入钩子会自动把它失效掉（db.ts 的 TABLE_CACHES）。
+ *   在已缓存的数组里数一遍是毫秒级，**换来的是不可能过期**。
+ *   「加一个缓存」和「加一处失效逻辑」是一笔买卖，这里不该做这笔。
+ */
+export function senseCount(word: string): number {
+  const all = cachedNow<Sense[]>('liveSenses')
+  if (!all) return 1 // 内存还没热：给个保守值，等真正作答时表早热了
+  let n = 0
+  for (const s of all) if (s.word === word) n++
   return n
-}
-
-export function clearSenseCache(): void {
-  nSenseCache.clear()
 }
 
 export { masteryOf }
