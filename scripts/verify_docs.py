@@ -640,8 +640,8 @@ interaction = [
     # 刷不出句子时才说没有 —— 仍然不许在数据没到时就下结论。
     ("首页先给加载态，再下结论（不许一上来就说没有）",
      "loading" in home and re.search(r'v-if="loading"', home) is not None),
-    ("首页屏一有两种出题源（随机 / 按计划）",
-     "buildRandomQueue(" in home and "buildScopeQueue(" in home),
+    ("屏一只有一种来源：随机（自成一体，不管复习计划）",
+     "buildRandomQueue(" in home and "buildScopeQueue(" not in home),
     ("抽卡与统计的算法同步/异步共用一份（pickCard/computeStats）",
      _re.search(r"function pickCard", _code(os.path.join(WEB, "src", "composables.ts"))) is not None
      and _re.search(r"function computeStats", _code(os.path.join(WEB, "src", "composables.ts"))) is not None),

@@ -11,17 +11,16 @@
  *  ★ 所以 `/train` 那一页删了：它的两种形态就是这两屏。
  */
 import { computed, nextTick, onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import ScanList from '../components/ScanList.vue'
 import ScanPeek from '../components/ScanPeek.vue'
 import DrillSheet from '../components/DrillSheet.vue'
 import WordPeek from '../components/WordPeek.vue'
 import QuestionBox from '../components/QuestionBox.vue'
 import { allProgress, allWords } from '../db'
-import { buildQueue, buildRandomQueue, buildScopeQueue, type ScanItem } from '../quiz'
+import { buildRandomQueue, type ScanItem } from '../quiz'
 
 const router = useRouter()
-const route = useRoute()
 
 type Mode = 'random' | 'due' | 'new' | 'learning'
 
@@ -37,6 +36,9 @@ async function loadNums(): Promise<void> {
 }
 
 /* ── 屏一：一题一屏 ── */
+/* ★ 屏一就是**随机**，且自成一体：
+   它不管到期、不管复习计划，也不和「复习/学习」那一轮共享队列。
+   两个按钮进的是背单词页（一整轮、有进度格、能回看跳题）。 */
 const mode = ref<Mode>('random')
 const queue = ref<string[]>([])
 const idx = ref(0)
@@ -47,25 +49,13 @@ const right = ref(0)
 
 const cur = computed(() => queue.value[idx.value] ?? '')
 const total = computed(() => queue.value.length)
-const modeText = computed(() =>
-  mode.value === 'random'
-    ? '随便练'
-    : mode.value === 'due'
-      ? '今天到期'
-      : mode.value === 'new'
-        ? '学新词'
-        : '在学',
-)
+const modeText = computed(() => '随机')
 
-async function setMode(m: Mode): Promise<void> {
-  mode.value = m
+async function setMode(_m: Mode = 'random'): Promise<void> {
+  mode.value = 'random'
   loading.value = true
   try {
-    if (m === 'random') queue.value = await buildRandomQueue(50)
-    else if (m === 'due') {
-      queue.value = await buildScopeQueue('due', 20)
-      if (!queue.value.length) queue.value = await buildQueue(20)
-    } else queue.value = await buildScopeQueue(m, 20)
+    queue.value = await buildRandomQueue(50)
   } finally {
     loading.value = false
   }
@@ -170,19 +160,15 @@ function onScrollRoot(): void {
   pane.value = Math.round(el.scrollLeft / (el.clientWidth || 1))
 }
 
-async function openPlan(scope: 'due' | 'new' | 'learning'): Promise<void> {
-  await setMode(scope)
-  toPane(0)
+/** 复习 / 学习：**进背单词页**（一整轮、有进度格、能回看跳题）；
+ *  屏一留给「随便刷」——那里没有进度条，不该承担一轮复习。 */
+function openPlan(scope: 'due' | 'new' | 'learning'): void {
+  void router.push({ path: '/train', query: { scope } })
 }
 
 onMounted(async () => {
   await loadNums()
   await setMode('random')
-  const p = route.query.practice
-  if (p === 'due' || p === 'new' || p === 'learning') {
-    await setMode(p)
-    toPane(0)
-  }
 })
 </script>
 
@@ -242,8 +228,8 @@ onMounted(async () => {
           <div v-if="!loading && !cur" class="qempty">
             <p>这组现在没有可练的</p>
             <div class="qempty-btns">
-              <van-button block round type="primary" @click="setMode('random')">随便练</van-button>
-              <van-button block round @click="openPlan('new')">学新词</van-button>
+              <van-button block round type="primary" @click="setMode('random')">换一批</van-button>
+              <van-button block round @click="openPlan('new')">去学新词</van-button>
             </div>
           </div>
 
