@@ -101,7 +101,15 @@ function openFix(what: 'sentence' | 'sense'): void {
 const boxState = ref<{ revealed: boolean; submitted: boolean }>({ revealed: false, submitted: false })
 
 function onBoxState(i: number, st: { revealed: boolean; submitted: boolean }): void {
-  if (i === idx.value) boxState.value = st
+  if (i !== idx.value) return
+  boxState.value = st
+  // 答完之后内容变长：把这一页滚回顶部，别让人一睁眼只看到 ABCD 和解析
+  if (st.submitted) {
+    void nextTick(() => {
+      const page = qscroll.value?.querySelectorAll('.qpage-in')[i] as HTMLElement | undefined
+      if (page) page.scrollTop = 0
+    })
+  }
 }
 
 function askReveal(): void {
@@ -247,7 +255,8 @@ onMounted(async () => {
           <div v-else ref="qscroll" class="qscroll" @scroll.passive="onQScroll">
             <section v-for="(sid, i) in queue" :key="sid + i" class="qpage">
               <div class="qpage-in">
-                <QuestionBox
+                <div class="qcenter">
+                  <QuestionBox
                   v-if="Math.abs(i - idx) <= 1"
                   :ref="(el) => setBox(i, el)"
                   hide-actions
@@ -257,9 +266,10 @@ onMounted(async () => {
                   @answered="onAnsweredAt(i, $event)"
                   @state="(st) => onBoxState(i, st)"
                   @loaded="(q) => onLoaded(i, q)"
-                  @pick="pick"
-                  @word="goWord"
-                />
+                    @pick="pick"
+                    @word="goWord"
+                  />
+                </div>
               </div>
             </section>
           </div>
@@ -560,9 +570,16 @@ onMounted(async () => {
   min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   padding: 0 18px;
   overflow-y: auto;
+}
+
+/* ★ 用「自动外边距」居中，而不是 justify-content: center。
+   后者在内容比容器高时会把顶部裁掉 —— 答完题解析一长，词和例句就被挤到屏幕外，
+   看到的只有 ABCD。auto 外边距的口径是：放得下就居中，放不下就从头开始排。 */
+.qcenter {
+  width: 100%;
+  margin: auto 0;
 }
 
 /* ── 屏二 ── */
