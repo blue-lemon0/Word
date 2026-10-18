@@ -794,6 +794,50 @@ interaction = [
     # 反过来守：全仓不该再有「导出了但没人调用」的清缓存函数
     ("全仓没有只导出不调用的 clear*Cache",
      not _re.search(r"export function clear\w*Cache", _all_src)),
+
+    # ── 清零学习进度：只能碰 progress，流水是历史 ──
+    ("重新学一个意思只清 progress，不删 reviewLog",
+     _re.search(r"export async function resetProgress[\s\S]*?db\.progress\.put"
+                r"[\s\S]*?\n\}", _code(os.path.join(WEB, "src", "edit.ts"))) is not None
+     and "reviewLog.delete" not in _code(os.path.join(WEB, "src", "edit.ts"))),
+    # 它清掉的是「用户最不该被误触清掉」的数据，必须走确认弹层（D33）
+    ("清零学习进度走确认弹层（不是点了直接清）",
+     _re.search(r"function onResetProgress\(\): void \{[\s\S]*?ask\.value\s*=",
+                sense, _re.S) is not None
+     and _re.search(r'@click="onResetProgress"', sense) is not None),
+    ("重新学有行为测试（flow_smoke 7d）",
+     "resetProgress" in _read(os.path.join(WEB, "tests", "flow_smoke.mjs"))),
+
+    # ── 两条导入路径共用写入原语，策略各留各的 ──
+    # 各自写一遍的后果已经发生过：只有一条会存快照、只有一条把 importLog
+    # 记在事务内（违反坑 25）、Progress 的十字段抄了两份、summary 两种格式
+    # 导致列表里少说话（坑 47）。
+    ("两条导入路径共用 importWrite 的写入原语",
+     all(_re.search(r"from\s+'\./importWrite'", _src(f)) is not None
+         for f in ("import.ts", "importer.ts"))
+     and os.path.exists(os.path.join(WEB, "src", "importWrite.ts"))),
+    # 事务必须经由原语（表集含 importLog，少一张就会 scope 报错）
+    ("两条路径的事务都走 runImportTx（含 importLog）",
+     not _re.search(r"db\.transaction\('rw',\s*db\.words", _src("import.ts"))
+     and not _re.search(r"db\.transaction\('rw',\s*db\.words", _src("importer.ts"))
+     and _re.search(r"db\.transaction\('rw',\s*\.\.\.TABLES",
+                    _src("importWrite.ts")) is not None
+     and "db.importLog" in _src("importWrite.ts")),
+    # importLog 只能在事务里记（坑 25）
+    ("没有在事务外直接写 importLog",
+     not _re.search(r"\}\)\s*\r?\n\s*await db\.importLog\.add",
+                    _src("importer.ts"), _re.S)
+     and not _re.search(r"\}\)\s*\r?\n\s*await db\.importLog\.add",
+                        _src("import.ts"), _re.S)),
+    # Progress 的十字段只许在 importWrite 里出现（别再手写第二份）
+    ("Progress 的十字段只在 importWrite 与 resetProgress 里",
+     (lambda a, b, c, d: (a.count("difficulty: 8") <= 1 and b.count("difficulty: 8") <= 1
+                          and c.count("difficulty: 8") == 0))(
+         _src("importWrite.ts"), _src("edit.ts"), _src("import.ts"), _src("importer.ts"))),
+    # summary 两种格式仍共存 —— 读的那边必须同时认得（坑 47）
+    ("读侧仍同时认两种 summary 格式（importLine）",
+     _re.search(r"else\s*\{\s*parts\.push\(r\.summary\)",
+                _src("backup.ts"), _re.S) is not None),
 ]
 
 fi = 0

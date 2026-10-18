@@ -12,6 +12,7 @@ import { db, ensureProgress } from './db'
 import { normalizeSlots, uuid } from './edit'
 import { flagIndexByText, reapplyFlags } from './flags'
 import { snapshot } from './backup'
+import { logImport, runImportTx } from './importWrite'
 import type { Sense, Sentence } from './types'
 
 /* ── 宽松输入形状：管道包与 AI 产出都吃 ── */
@@ -226,7 +227,7 @@ export async function applyPlan(plan: ImportPlan, d: Decisions): Promise<string>
   let added = 0
   let sents = 0
 
-  await db.transaction('rw', db.words, db.senses, db.sentences, db.progress, async () => {
+  await runImportTx(async () => {
     if (!(await db.words.get(plan.word))) {
       await db.words.put({
         word: plan.word,
@@ -296,13 +297,16 @@ export async function applyPlan(plan: ImportPlan, d: Decisions): Promise<string>
       }
     }
     await normalizeSlots(plan.word)
-  })
 
-  await db.importLog.add({
-    ts: t,
-    word: plan.word,
-    source: 'JSON 导入',
-    summary: `新增义项${added} 例句${sents}`,
+    // ★ 记在事务**内**：IndexedDB 里事务外的写会因对象库不在 scope 直接报
+    // NotFoundError（坑 25）。原来这里是事务外的 —— 两条导入路径就这一个
+    // 不一致，靠 importWrite.runImportTx 抹平。
+    await logImport({
+      ts: t,
+      word: plan.word,
+      source: 'JSON 导入',
+      summary: `新增义项${added} 例句${sents}`,
+    })
   })
   return `已导入 ${plan.word}：新增义项 ${added}，例句 ${sents}`
 }

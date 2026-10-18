@@ -251,4 +251,35 @@ export async function reorderSentences(list: Sentence[], from: number, to: numbe
 }
 
 
+/**
+ * 重新学一个意思：把它的学习记录清零，例句和释义都留着。
+ *
+ *  为什么需要它：回滚快照**只回内容**（这是有意的设计 —— 导入翻车不该把
+ *  背过的也退回去），所以「内容回到某个版本」和「进度回到某个版本」
+ *  之间有个一直没人管的缺口。用户真正想要的是「这个词我已经会了，
+ *  现在想从头再练一遍」—— 没有它就只能导入一份旧备份去覆盖，
+ *  那会把所有别的词也一起退回去。
+ *
+ *  ★ 只写 progress，**不碰 reviewLog**：作答流水是历史（它统计正确率、
+ *   支撑「已掌握」的连对判定），把流水一起删会让掌握判定凭空改变。
+ *   清零之后它重新排期，连对从头数。
+ *
+ *  ★ 不需要手动清缓存：progress 表的写入钩子（db.ts 的 Table.hook）会自动失效。
+ *   这正是坑 53 的那条判据 —— **失效钩子已经存在，就别再自己造一个**。
+ */
+export async function resetProgress(senseId: string): Promise<void> {
+  await db.progress.put({
+    senseId,
+    stability: 0,
+    difficulty: 8,
+    lastReview: null,
+    dueAt: 0,
+    reps: 0,
+    wrongN: 0,
+    pendingN: 0,
+    mastered: 0,
+    rusty: 0,
+  })
+}
+
 export { softDeleteSense }

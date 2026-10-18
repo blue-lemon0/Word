@@ -238,6 +238,33 @@ ok((await db.words.get('zzz_gone')) == null, '回滚后多余词消失')
 ok((await db.words.count()) === wordsBefore, `回滚后词数复原（${await db.words.count()}）`)
 ok((await db.progress.get(q1.sense.id)) != null, '回滚不动学习进度（只回内容层）')
 
+/* ── 7d. 重新学一个意思 ──
+ * 回滚快照只回内容（有意为之），于是「进度回到某个版本」一直没人管。
+ * 这一条守的是：清零只碰 progress，**不碰作答流水** ——
+ * 流水是历史（正确率、掌握判定都靠它），删了会让掌握凭空变。 */
+{
+  const t = await quiz.practicePool()
+  const s = t[0]
+  await quiz.recordAnswer(await quiz.makeQuestion(s.id), quiz.newSessionId(), 0, 'CORRECT', 700)
+  await quiz.recordAnswer(await quiz.makeQuestion(s.id), quiz.newSessionId(), 1, 'CORRECT', 700)
+  const before = await db.progress.get(s.id)
+  const logBefore = await db.reviewLog.where('senseId').equals(s.id).count()
+  ok(before.reps >= 2 && logBefore >= 2, '先练两次，造出 reps 与流水')
+
+  await edit.resetProgress(s.id)
+  const after = await db.progress.get(s.id)
+  ok(after.reps === 0 && after.stability === 0 && after.mastered === 0, '学习记录清零了')
+  ok(after.lastReview === null && after.dueAt === 0, '到期时间也重置（它会重新排期）')
+  ok(
+    (await db.reviewLog.where('senseId').equals(s.id).count()) === logBefore,
+    '作答流水一条不少（那是历史，不是学习状态）',
+  )
+  ok(await quiz.buildQueue(50).then((qq) => qq.includes(s.id)), '清零之后它回到队列，可以重新学')
+  // 复原：后面的用例还依赖这些进度
+  await db.progress.put(before)
+  ok(true, '复原了被这段用例改动的进度行')
+}
+
 /* ── 7c. 闲置衰减：掌握的词会回来 ──
  * 这一条守的是**行为**不是代码形状：守卫（verify_docs）判不了它，
  * 因为「衰减有没有接上」在源码里只差一个函数名。

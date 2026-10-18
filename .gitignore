@@ -33,8 +33,9 @@ build/
 
 # ── 打包脚本路径算错时产出的重复副本 ──
 # 现象：app/app/android/app/src/main/assets/assets/** —— 整份 web 产物被多套了两层目录。
-# 是 build_apk.mjs 用相对路径、在 cwd 不是 app/web 时跑出来的。
-# 它不是源码也不是权威产物，两处真身都已经被上面忽略了。
+# 起因是早期版本的 build_apk.mjs 用 cwd 拼路径；现在改成从 import.meta.url 推，
+# 已验证「从仓库根直接跑 node app/web/scripts/build_apk.mjs」不再产生它。
+# 目录本身已删；这条留着是为了万一又出现时别误当成源码提交进去。
 app/app/
 
 # ── opencode 的依赖（skill 本身要入库，node_modules 不入库）──

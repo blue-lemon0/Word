@@ -29,6 +29,7 @@ import {
   deleteSentence,
   mergeSenses,
   reorderSentences,
+  resetProgress,
   splitSense,
   updateSentence,
   updateSense,
@@ -400,6 +401,31 @@ function onSplit(): void {
   }
 }
 
+/**
+ * 重新学这个意思：清零学习记录，例句和释义留着。
+ *
+ *  走确认弹层而不是直接清 —— 它把「已经记住的东西」推回零，
+ *  而学习进度是用户最不该被误触清掉的数据（D33 的同一条原则）。
+ */
+function onResetProgress(): void {
+  const s = sense.value
+  if (!s) return
+  const wasMastered = prog.value?.mastered === 1
+  ask.value = {
+    title: '从头再学一遍？',
+    text: wasMastered
+      ? '这个词现在算「已掌握」。清零之后它会重新排期，你背过的记录不再生效，但例句和释义都在。'
+      : '清掉这个词的复习次数、熟练度和到期时间。它会重新排期，例句和释义都在。',
+    okText: '清零重学',
+    danger: true,
+    run: async () => {
+      await resetProgress(s.id)
+      toast('已清零，重新排期了')
+      await load()
+    },
+  }
+}
+
 function onDelete(): void {
   if (!sense.value) return
   ask.value = {
@@ -508,6 +534,7 @@ function onDelete(): void {
               合并
             </van-button>
             <van-button size="small" plain @click="showSplit = true">拆分</van-button>
+            <van-button size="small" plain @click="onResetProgress">重新学</van-button>
             <van-button size="small" plain type="danger" @click="onDelete">删除</van-button>
           </van-space>
         </section>

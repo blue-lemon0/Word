@@ -10,6 +10,7 @@
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import MarkedText from '../components/MarkedText.vue'
+import ModePicker, { type Mode as PickerMode } from '../components/ModePicker.vue'
 import {
   buildQueue,
   buildRandomQueue,
@@ -140,6 +141,20 @@ void practicePool().then((pool) => {
 })
 
 const mode = ref<Mode>('due')
+
+/** 三种练法。**说明文字是这里的关键** —— 「按计划 / 随便 / 扫读」
+ *  三个词不足以让人判断选哪个，所以每一项都要有一行「它到底怎么练」。 */
+const MODES = [
+  { key: 'due', label: '按计划', hint: '今天到期的 + 没学过的新卡', primary: true },
+  { key: 'random', label: '随便练', hint: '全库随机抽，不看到期' },
+  { key: 'scan', label: '扫读例句', hint: '像看报纸一样扫，不懂哪句点哪句' },
+] satisfies PickerMode[]
+
+/** 唯一入口：只有「扫读」不是一种排期口径，它要去另一个页面。 */
+function onMode(key: string): void {
+  if (key === 'scan') void router.push('/scan')
+  else void start(key as Mode)
+}
 
 /** 扫读模式钉过来的**具体那一句**（`?sent=<id>`）。
  *  只有第一题用它；后面回到「下一题」时它就该失效 ——
@@ -618,22 +633,14 @@ watch(
         <!-- 开场屏：把「今天没到期」从死胡同变成一个选择。
      过去只有「准备开始」一个按钮，而今天的题答完之后队列是空的 ——
      「今天没有到期的」这句话后面没有任何可做的事，人就闲着了。
-     现在给出三条路：按计划、随便抽、以及像报纸一样扫。 -->
-        <section v-else class="wb-card center modes">
-          <h2>{{ solo ? '单挑这个意思' : '怎么练' }}</h2>
-          <p v-if="!solo" class="sub">按空格显示选项，A/B/C/D 选，Enter 下一个</p>
-          <div class="mlist">
-            <button class="mitem pri" @click="start('due')">
-              <b>按计划</b><span>今天到期的 + 没学过的新卡</span>
-            </button>
-            <button class="mitem" @click="start('random')">
-              <b>随便练</b><span>全库随机抽，不看到期</span>
-            </button>
-            <button class="mitem" @click="router.push('/scan')">
-              <b>扫读例句</b><span>像看报纸一样扫，不懂哪句点哪句</span>
-            </button>
-          </div>
-        </section>
+     三种练法在 ModePicker 里（纯展示，动作由这里派发）。 -->
+        <ModePicker
+          v-else
+          :modes="MODES"
+          :solo-title="solo ? '单挑这个意思' : '怎么练'"
+          :sub="solo ? undefined : '按空格显示选项，A/B/C/D 选，Enter 下一个'"
+          @choose="onMode"
+        />
       </template>
     </div>
 
@@ -1038,66 +1045,6 @@ watch(
   background: var(--wb-bg);
   border-radius: 8px;
   padding: 7px 10px;
-}
-
-.center {
-  text-align: center;
-  padding: 30px 16px;
-  margin-top: 24px;
-}
-
-.center h2 {
-  margin: 6px 0;
-  font-size: 17px;
-}
-
-.sub {
-  color: var(--wb-ink-3);
-  font-size: 13px;
-  margin: 4px 0 16px;
-}
-
-/* 三种练法：竖排整宽的行，每行 = 一个标题 + 一句「它到底怎么练」。
-   不做成三张小卡并排 —— 手机上并排每张只有 100px 宽，那行说明必须缩成两行，
-   而「按计划 / 随便 / 扫读」这三个词本身不足以让人判断选哪个。 */
-.mlist {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  text-align: left;
-}
-
-.mitem {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  width: 100%;
-  border: 1px solid var(--wb-line);
-  background: var(--wb-bg);
-  border-radius: var(--wb-radius);
-  padding: 12px 14px;
-  font-family: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-
-.mitem b {
-  font-size: 15px;
-  color: var(--wb-ink);
-}
-
-.mitem span {
-  font-size: 12px;
-  color: var(--wb-ink-2);
-}
-
-.mitem.pri {
-  border-color: var(--wb-primary);
-  background: rgba(79, 70, 229, 0.06);
-}
-
-.mitem:active {
-  background: var(--wb-line);
 }
 
 /* ── 结算屏 ──

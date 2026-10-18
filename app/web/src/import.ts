@@ -15,7 +15,8 @@
  */
 import { db } from './db'
 import { snapshot } from './backup'
-import type { Sense, Sentence, Word, Progress, ImportLog } from './types'
+import { addSentenceRow, createSenseRow, ensureWordRow, logImport, runImportTx } from './importWrite'
+import type { Sense, Sentence } from './types'
 
 /* ── 两种输入的宽松形状 ── */
 
@@ -203,14 +204,7 @@ export async function importBundle(input: unknown): Promise<ImportReport> {
 
   // importLog 必须在事务范围内：IndexedDB 里事务外的写操作会直接报
   // NotFoundError（对象库不在事务 scope 里），而且导入记录与导入内容应当同生共死。
-  await db.transaction(
-    'rw',
-    db.words,
-    db.senses,
-    db.sentences,
-    db.progress,
-    db.importLog,
-    async () => {
+  await runImportTx(async () => {
     for (const card of cards) {
       const word = (card.word ?? '').trim()
       const gloss = (card.gloss ?? '').trim()
@@ -225,20 +219,9 @@ export async function importBundle(input: unknown): Promise<ImportReport> {
       importWords.add(word)
 
       // ── 词条 ──
-      const existWord = await db.words.get(word)
-      if (!existWord) {
-        const w: Word = {
-          word,
-          ipa: (card.ipa ?? '').trim(),
-          hidden: 0,
-          createdAt: t,
-          updatedAt: t,
-        }
-        await db.words.put(w)
-        rep.wordsAdded++
-      } else if (card.ipa && !existWord.ipa) {
-        await db.words.update(word, { ipa: card.ipa, updatedAt: t })
-      }
+      const hadWord = (await db.words.get(word)) != null
+      await ensureWordRow(word, (card.ipa ?? '').trim(), t)
+      if (!hadWord) rep.wordsAdded++
 
       // ── 义项：按 slot 对齐，不按顺序 ──
       const slot = card.slot ?? (Number(String(card.senseId ?? 's1').replace(/\D/g, '')) || 1)
@@ -278,22 +261,8 @@ export async function importBundle(input: unknown): Promise<ImportReport> {
           createdAt: t,
           updatedAt: t,
         }
-        await db.senses.put(s)
+        await createSenseRow(s)
         rep.sensesAdded++
-
-        const p: Progress = {
-          senseId,
-          stability: 0,
-          difficulty: 8,
-          lastReview: null,
-          dueAt: 0,
-          reps: 0,
-          wrongN: 0,
-          pendingN: 0,
-          mastered: 0,
-          rusty: 0,
-        }
-        await db.progress.put(p)
       }
 
       // ── 例句：按英文文本去重，不按 idx（AI 重排句子不该产生重复）──
@@ -310,21 +279,21 @@ export async function importBundle(input: unknown): Promise<ImportReport> {
           continue
         }
         const count = await db.sentences.where('senseId').equals(senseId).count()
-        await db.sentences.add(normalizeSentence(raw, senseId, count))
+        await addSentenceRow(normalizeSentence(raw, senseId, count))
         rep.sentencesAdded++
       }
     }
 
-    // 记录导入历史
-    const log: ImportLog = {
-      ts: t,
-      word: [...importWords].join(',').slice(0, 200),
-      source: obj.format ?? 'unknown',
-      summary: `词+${rep.wordsAdded} 义+${rep.sensesAdded} 改${rep.sensesUpdated} 句+${rep.sentencesAdded} 冲突${rep.conflicts.length}`,
+    // 记录导入历史。必须在事务里 —— 原语已经保证了这一点（importWrite.ts）
+    if (importWords.size) {
+      await logImport({
+        ts: t,
+        word: [...importWords].join(',').slice(0, 200),
+        source: obj.format ?? 'unknown',
+        summary: `词+${rep.wordsAdded} 义+${rep.sensesAdded} 改${rep.sensesUpdated} 句+${rep.sentencesAdded} 冲突${rep.conflicts.length}`,
+      })
     }
-    if (importWords.size) await db.importLog.add(log)
-    },
-  )
+  })
 
   return rep
 }
