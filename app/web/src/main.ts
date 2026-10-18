@@ -6,7 +6,6 @@ import WordPage from './pages/WordPage.vue'
 import SensePage from './pages/SensePage.vue'
 import LibraryPage from './pages/LibraryPage.vue'
 import BoardPage from './pages/BoardPage.vue'
-import TrainPage from './pages/TrainPage.vue'
 import MorePage from './pages/MorePage.vue'
 import AuditPage from './pages/AuditPage.vue'
 import { VANT_COMPONENTS } from './vant'
@@ -35,7 +34,6 @@ const router = createRouter({
     { path: '/sense/:id', name: 'sense', component: SensePage, props: true },
     { path: '/library', name: 'library', component: LibraryPage, meta: { tab: true } },
     { path: '/board', name: 'board', component: BoardPage },
-    { path: '/train', name: 'train', component: TrainPage },
     // 体检是二级页（从「更多」进，没有底栏）：它是一次维护动作，不是一个地方
     { path: '/audit', name: 'audit', component: AuditPage },
     { path: '/more', name: 'more', component: MorePage, meta: { tab: true } },

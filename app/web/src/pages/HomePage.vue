@@ -1,25 +1,29 @@
 <script setup lang="ts">
-/** 首页 = **两屏**，左右滑切。
+/** 首页 = **两屏**，左右滑。
  *
- *  屏一「刷」：模仿短视频 —— 一屏一句，上下滑换句子；视觉照**背单词页**来：
- *    巨号词 + 音标 + 居中例句（目标词高亮）+ 点一下看意思 + 底部两个动作。
- *  屏二「句子」：新闻 app 那样一列句子（随机），底部左右两个大按钮：
- *    左「复习 N」（今天剩余）/ 右「学习 M」（词库词数），点了进背单词页。
+ *  屏一「刷」= 练习页的一题一屏：词 + 音标 + 例句 + 四个选项 → 判分 + 解析，
+ *          上下滑换下一题。视觉与交互照背单词页（不另造一套）。
+ *          出题源两种：**随机**（原「随便练」）与**按计划**（到期 / 新词 / 在学）。
+ *  屏二「句子」= 练习页的句子列表（随机），点一行看答案、练这一句。
+ *          底部左右两颗按钮：复习（今天剩余）/ 学习（词库），
+ *          它们只是把屏一切到对应来源再滑过去 —— 不再跳任何「练习页」。
  *
- *  ★ 这两个按钮是**唯一的主行动**，放在拇指区，一左一右。
- *  ★ 背单词页本身不改：它才是主场（进度格、回看、跳题、改内容、AI 换句）。
+ *  ★ 所以 `/train` 那一页删了：它的两种形态就是这两屏。
  */
-import { onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import MarkedText from '../components/MarkedText.vue'
+import { computed, onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import ScanList from '../components/ScanList.vue'
 import ScanPeek from '../components/ScanPeek.vue'
 import DrillSheet from '../components/DrillSheet.vue'
 import WordPeek from '../components/WordPeek.vue'
-import { allProgress, allWords, db } from '../db'
-import { feedBatch, type ScanItem } from '../quiz'
+import QuestionBox from '../components/QuestionBox.vue'
+import { allProgress, allWords } from '../db'
+import { buildQueue, buildRandomQueue, buildScopeQueue, type ScanItem } from '../quiz'
 
 const router = useRouter()
+const route = useRoute()
+
+type Mode = 'random' | 'due' | 'new' | 'learning'
 
 /* ── 两个数：今天剩余到期 / 词库词数 ── */
 const dueN = ref(0)
@@ -32,72 +36,84 @@ async function loadNums(): Promise<void> {
   wordsN.value = wrows.length
 }
 
-/* ── 屏一：刷 ── */
-const feed = ref<ScanItem[]>([])
-const feedLoading = ref(false)
-const feedEl = ref<HTMLElement | null>(null)
-const revealed = ref<Set<number>>(new Set())
-const ipaMap = ref<Map<string, string>>(new Map())
+/* ── 屏一：一题一屏 ── */
+const mode = ref<Mode>('random')
+const queue = ref<string[]>([])
+const idx = ref(0)
+const serial = ref(0)
+const loading = ref(false)
+const done = ref(0)
+const right = ref(0)
 
-async function more(n = 8): Promise<void> {
-  if (feedLoading.value) return
-  feedLoading.value = true
+const cur = computed(() => queue.value[idx.value] ?? '')
+const total = computed(() => queue.value.length)
+const modeText = computed(() =>
+  mode.value === 'random'
+    ? '随便练'
+    : mode.value === 'due'
+      ? '今天到期'
+      : mode.value === 'new'
+        ? '学新词'
+        : '在学',
+)
+
+async function setMode(m: Mode): Promise<void> {
+  mode.value = m
+  loading.value = true
   try {
-    const exclude = feed.value.map((it) => it.sense.word)
-    const batch = await feedBatch(n, exclude)
-    if (batch.length) feed.value = [...feed.value, ...batch]
+    if (m === 'random') queue.value = await buildRandomQueue(50)
+    else if (m === 'due') {
+      queue.value = await buildScopeQueue('due', 20)
+      if (!queue.value.length) queue.value = await buildQueue(20)
+    } else queue.value = await buildScopeQueue(m, 20)
   } finally {
-    feedLoading.value = false
+    loading.value = false
+  }
+  idx.value = 0
+  serial.value++
+  done.value = 0
+  right.value = 0
+}
+
+/** 上滑下一题、下滑上一题（短视频那套手势） */
+let sy = 0
+let sx = 0
+function onQStart(e: TouchEvent): void {
+  sy = e.touches[0].clientY
+  sx = e.touches[0].clientX
+}
+function onQEnd(e: TouchEvent): void {
+  const dy = e.changedTouches[0].clientY - sy
+  const dx = e.changedTouches[0].clientX - sx
+  if (Math.abs(dy) < 70 || Math.abs(dy) < Math.abs(dx) * 1.4) return
+  if (dy < 0) nextQ()
+  else prevQ()
+}
+
+function nextQ(): void {
+  if (idx.value < total.value - 1) {
+    idx.value++
+    serial.value++
   }
 }
 
-async function loadIpa(w: string): Promise<void> {
-  if (ipaMap.value.has(w)) return
-  const row = await db.words.get(w)
-  if (row?.ipa) {
-    const m = new Map(ipaMap.value)
-    m.set(w, row.ipa)
-    ipaMap.value = m
+function prevQ(): void {
+  if (idx.value > 0) {
+    idx.value--
+    serial.value++
   }
 }
 
-const ipaOf = (w: string): string => ipaMap.value.get(w) ?? ''
-
-function onFeedScroll(): void {
-  const el = feedEl.value
-  if (!el) return
-  const i = Math.round(el.scrollTop / (el.clientHeight || 1))
-  const it = feed.value[i]
-  if (it) void loadIpa(it.sense.word)
-  if (!feedLoading.value && i >= feed.value.length - 3) void more(8)
-}
-
-function toggleReveal(sid: number): void {
-  const s = new Set(revealed.value)
-  if (s.has(sid)) s.delete(sid)
-  else s.add(sid)
-  revealed.value = s
-}
-
-/* ── 屏一上的动作：练这一句 / 换一个 ── */
-const drillOpen = ref(false)
-const drillSense = ref('')
-const drillSent = ref<number | undefined>(undefined)
-
-function drillAt(it: ScanItem): void {
-  drillSense.value = it.sense.id
-  drillSent.value = it.sentence.id
-  drillOpen.value = true
-}
-
-function nextCard(): void {
-  const el = feedEl.value
-  if (!el) return
-  el.scrollBy({ top: el.clientHeight, behavior: 'smooth' })
+function onAnswered(r: 'CORRECT' | 'WRONG' | 'PENDING'): void {
+  done.value++
+  if (r === 'CORRECT') right.value++
 }
 
 /* ── 屏二：句子列表 ── */
 const scanItem = ref<ScanItem | null>(null)
+const drillOpen = ref(false)
+const drillSense = ref('')
+const drillSent = ref<number | undefined>(undefined)
 
 function onListDrill(it: ScanItem): void {
   scanItem.value = null
@@ -110,16 +126,11 @@ function onListDrill(it: ScanItem): void {
 const peekOpen = ref(false)
 const peekToken = ref('')
 
-function pick(w: string): void {
-  peekToken.value = w
-  peekOpen.value = true
-}
-
 function goWord(w: string): void {
   void router.push(`/word/${encodeURIComponent(w)}`)
 }
 
-/* ── 两屏切换：横滑即可，左上两个小点也能点 ── */
+/* ── 两屏切换 ── */
 const pane = ref(0)
 const rootEl = ref<HTMLElement | null>(null)
 
@@ -135,22 +146,31 @@ function onScrollRoot(): void {
   pane.value = Math.round(el.scrollLeft / (el.clientWidth || 1))
 }
 
+async function openPlan(scope: 'due' | 'new' | 'learning'): Promise<void> {
+  await setMode(scope)
+  toPane(0)
+}
+
 onMounted(async () => {
-  await Promise.all([loadNums(), more(10)])
-  const first = feed.value[0]
-  if (first) void loadIpa(first.sense.word)
+  await loadNums()
+  await setMode('random')
+  const p = route.query.practice
+  if (p === 'due' || p === 'new' || p === 'learning') {
+    await setMode(p)
+    toPane(0)
+  }
 })
 </script>
 
 <template>
   <div class="wb-page home">
-    <!-- 两屏指示：竖着两个小点，点一下也能切 -->
+    <!-- 两屏指示：竖着两个点 -->
     <div class="dots">
       <button
         class="dot"
         :class="{ on: pane === 0 }"
         type="button"
-        aria-label="刷句子"
+        aria-label="刷题"
         @click="toPane(0)"
       />
       <button
@@ -163,72 +183,51 @@ onMounted(async () => {
     </div>
 
     <div ref="rootEl" class="hroot" @scroll.passive="onScrollRoot">
-      <!-- 屏一：刷（视觉照背单词页：巨号词 + 音标 + 居中例句 + 点一下看意思） -->
+      <!-- 屏一：一题一屏（照背单词页） -->
       <section class="hpage">
-        <div ref="feedEl" class="feed" @scroll.passive="onFeedScroll">
-          <article v-for="it in feed" :key="it.sentence.id" class="fc">
-            <div class="fc-main" @click="toggleReveal(it.sentence.id as number)">
-              <div class="fc-word">
-                <button class="w" type="button" @click.stop="goWord(it.sense.word)">
-                  {{ it.sense.word }}
-                </button>
-                <span v-if="ipaOf(it.sense.word)" class="ipa">/{{ ipaOf(it.sense.word) }}/</span>
-              </div>
-
-              <p class="fc-sn">
-                <MarkedText
-                  :text="it.sentence.en"
-                  :form="it.sentence.form"
-                  :span-start="it.sentence.spanStart"
-                  :span-len="it.sentence.spanLen"
-                  pickable
-                  @pick="pick"
-                />
-              </p>
-
-              <p v-if="!revealed.has(it.sentence.id as number)" class="fc-hint">
-                点一下看意思
-              </p>
-              <div v-else class="fc-ans">
-                <p class="fc-g">
-                  <span class="fc-pos">{{ it.sense.pos || '—' }}</span>
-                  {{ it.sense.gloss || '（这个意思还没有释义）' }}
-                </p>
-                <p v-if="it.sentence.zh" class="fc-zh">{{ it.sentence.zh }}</p>
-                <p v-if="it.sense.note" class="fc-note">{{ it.sense.note }}</p>
-              </div>
-            </div>
-
-            <div class="fc-bar">
-              <button class="bar-btn" type="button" @click.stop="drillAt(it)">练这一句</button>
-              <button class="bar-btn ghost" type="button" @click.stop="nextCard">换一个</button>
-            </div>
-          </article>
-
-          <div v-if="!feed.length" class="fc-empty">
-            <van-loading v-if="feedLoading" color="#4f46e5">装卡…</van-loading>
-            <template v-else>
-              <p>词库里还没有能刷的句子</p>
-              <van-button size="small" round type="primary" @click="router.push('/library')">
-                去词库
-              </van-button>
-            </template>
+        <div class="qpane" @touchstart.passive="onQStart" @touchend.passive="onQEnd">
+          <div class="qtop">
+            <span class="qmode">{{ modeText }}</span>
+            <span v-if="total" class="qnum">{{ idx + 1 }} / {{ total }}</span>
+            <span v-if="done" class="qres">对 {{ right }} · 已答 {{ done }}</span>
+            <span class="wb-sp" />
+            <button class="qmore" type="button" @click="setMode('random')">换一批</button>
           </div>
+
+          <div class="qbody">
+            <van-loading v-if="loading" class="qld" color="#4f46e5">组题…</van-loading>
+            <QuestionBox
+            v-else-if="cur"
+            :sense-id="cur"
+            :serial="serial"
+              @answered="onAnswered"
+              @word="goWord"
+            />
+          </div>
+          <div v-if="!loading && !cur" class="qempty">
+            <p>这组现在没有可练的</p>
+            <div class="qempty-btns">
+              <van-button block round type="primary" @click="setMode('random')">随便练</van-button>
+              <van-button block round @click="openPlan('new')">学新词</van-button>
+            </div>
+          </div>
+
+          <p class="qhint">上滑下一题 · 下滑上一题 · 左右滑换屏</p>
         </div>
       </section>
 
-      <!-- 屏二：句子列表（新闻 app 那样一列随机句子）+ 底部两个大按钮 -->
+      <!-- 屏二：句子列表 + 底部两颗大按钮 -->
       <section class="hpage">
         <div class="list-wrap">
           <ScanList @pick="scanItem = $event" />
         </div>
 
         <div class="pads">
-          <button class="pad" type="button" @click="router.push('/train?scope=due')">
+          <button class="pad" type="button" @click="openPlan('due')">
             <b>{{ dueN }}</b>
             <span>复习 · 今天剩余</span>
           </button>
-          <button class="pad study" type="button" @click="router.push('/train?scope=new')">
+          <button class="pad study" type="button" @click="openPlan('new')">
             <b>{{ wordsN }}</b>
             <span>学习 · 词库</span>
           </button>
@@ -264,7 +263,6 @@ onMounted(async () => {
     var(--wb-bg);
 }
 
-/* 两屏：横向吸附 */
 .hroot {
   display: flex;
   height: 100%;
@@ -284,20 +282,20 @@ onMounted(async () => {
   height: 100%;
   scroll-snap-align: start;
   scroll-snap-stop: always;
-  position: relative;
   display: flex;
   flex-direction: column;
 }
 
-/* 顶部指示点（竖排，避开手势区） */
+/* 指示点：**放在顶部居中**。
+   ★ 别放左侧 —— 竖排的点紧挨着内容，会让人以为它和「上下滑」有关系；
+     放在顶上横排，读起来就是「有两屏，左右滑」。 */
 .dots {
   position: absolute;
-  left: 8px;
-  top: 50%;
-  transform: translateY(-50%);
+  top: calc(var(--wb-sb-h) + 4px);
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 6;
   display: flex;
-  flex-direction: column;
   gap: 6px;
 }
 
@@ -317,162 +315,90 @@ onMounted(async () => {
   border-radius: 3px;
 }
 
-/* ── 屏一：刷 ── */
-.feed {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  scroll-snap-type: y mandatory;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-
-.feed::-webkit-scrollbar {
-  display: none;
-}
-
-.fc {
-  height: 100%;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-  padding: calc(var(--wb-sb-h) + 22px) 22px calc(14px + env(safe-area-inset-bottom, 0px));
-}
-
-.fc-main {
+/* ── 屏一 ── */
+.qpane {
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  padding: calc(var(--wb-sb-h) + 26px) 18px calc(10px + env(safe-area-inset-bottom, 0px));
   overflow-y: auto;
 }
 
-/* 和背单词页同一套字阶：词最大、音标小、例句居中 */
-.fc-word {
+.qtop {
+  flex: 0 0 auto;
   display: flex;
   align-items: baseline;
-  justify-content: center;
-  gap: 10px;
-  flex-wrap: wrap;
+  gap: 8px;
+  padding-bottom: 10px;
+  font-size: 12.5px;
+  color: var(--wb-ink-3);
 }
 
-.w {
+.qmode {
+  color: var(--wb-ink);
+  font-weight: 650;
+}
+
+.qnum,
+.qres {
+  font-variant-numeric: tabular-nums;
+}
+
+.qmore {
   border: 0;
   background: transparent;
   font-family: inherit;
-  font-size: 38px;
-  font-weight: 750;
-  letter-spacing: -1px;
-  line-height: 1.15;
-  color: var(--wb-ink);
-  padding: 0;
+  font-size: 12.5px;
+  color: var(--wb-primary);
+  padding: 2px;
   cursor: pointer;
 }
 
-.ipa {
-  font-size: 13px;
-  color: var(--wb-ink-3);
+.qld {
+  padding: 30px 0;
 }
 
-.fc-sn {
-  margin-top: 18px;
-  font-size: 19px;
-  line-height: 1.7;
-  text-align: center;
-  color: var(--wb-ink);
-}
-
-.fc-hint {
-  margin-top: 22px;
-  text-align: center;
-  font-size: 13px;
-  color: var(--wb-ink-3);
-}
-
-.fc-ans {
-  margin-top: 18px;
-  background: var(--wb-card);
-  border: 1px solid var(--wb-line);
-  border-radius: 14px;
-  padding: 12px 14px;
-}
-
-.fc-g {
-  font-size: 16px;
-  line-height: 1.55;
-  color: var(--wb-ink);
-}
-
-.fc-pos {
-  font-size: 11.5px;
-  color: var(--wb-ink-3);
-  margin-right: 6px;
-}
-
-.fc-zh {
-  margin-top: 7px;
-  font-size: 13.5px;
-  line-height: 1.7;
-  color: var(--wb-ink-2);
-}
-
-.fc-note {
-  margin-top: 5px;
-  font-size: 11.5px;
-  line-height: 1.7;
-  color: var(--wb-ink-3);
-}
-
-/* 底部两个动作：和背单词页底条同一位置感 */
-.fc-bar {
-  flex: 0 0 auto;
-  display: flex;
-  gap: 10px;
-  padding-top: 14px;
-}
-
-.bar-btn {
+.qempty {
   flex: 1;
-  padding: 12px 10px;
-  border: 0;
-  border-radius: 14px;
-  background: var(--wb-primary);
-  color: #fff;
-  font-family: inherit;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.bar-btn.ghost {
-  flex: 0 0 34%;
-  background: var(--wb-card);
-  border: 1px solid var(--wb-line);
-  color: var(--wb-ink);
-  font-weight: 500;
-}
-
-.fc-empty {
-  height: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
   gap: 10px;
+  text-align: center;
   font-size: 14px;
   color: var(--wb-ink-2);
 }
 
-/* ── 屏二：句子列表 + 底部两个大按钮 ── */
+.qempty-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.qhint {
+  flex: 0 0 auto;
+  padding-top: 10px;
+  text-align: center;
+  font-size: 11.5px;
+  color: var(--wb-ink-3);
+}
+
+.qbody {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* ── 屏二 ── */
 .list-wrap {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  /* 只留一点让位：这一屏的主体是列表，不要被顶部空白吃掉一屏的 1/6 */
-  padding: calc(var(--wb-sb-h) + 6px) 14px 8px;
+  padding: calc(var(--wb-sb-h) + 22px) 14px 8px;
 }
 
 .pads {

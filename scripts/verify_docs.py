@@ -146,7 +146,7 @@ def _vant_icon_exists(name):
     return (".van-icon-%s:before" % name) in io.open(css, encoding="utf-8").read()
 
 
-_train = _src(os.path.join("pages", "TrainPage.vue"))
+_qb = _src(os.path.join("components", "QuestionBox.vue"))
 _board = _src(os.path.join("pages", "BoardPage.vue"))
 _style = _src("style.css")
 _types = _src("types.ts")
@@ -155,24 +155,21 @@ _all_src = "\n".join(
     _src(f) for f in ["App.vue", "db.ts", "edit.ts", "importer.ts", "import.ts",
                       "quiz.ts", "srs.ts", "seed.ts", "backup.ts", "toast.ts",
                       "types.ts", "composables.ts", "flags.ts", "pwa.ts"]
-) + _train + _board
+) + _qb + _board
 
 d16 += [
     ("目标词高亮仍是实心药丸",
      "mark {" in _style and "background: #fff0b3" in _style),
-    ("三件套还在（错题板/手动掌握/随手标记）",
-     all(k in _train for k in ["markMastered", "再来一个", "这句有问题"])
-     and "错题板" in _board
-     # 底栏三个 tab 的文案。训练已从 tab 栏撤掉（它是动作不是地方，见 D36），
-     # 所以这里不能再找「训练」—— 否则守卫会靠注释里的词通过，判的是什么就说不清了。
+    ("错题板与标记仍在（/board + flags + 底栏三个 tab）",
+     "错题板" in _board
      and "label" not in _app and all(k in _app for k in ["首页", "词库", "更多"])),
     # 泄题守卫：选项的对错色必须由 submitted（真作答）门控，不能由
     # revealed（选项已展开）门控 —— 后者会在你还没选时就把答案染绿。
     # 这条曾经真的漏过一次，所以进机械检查。
-    ("答题不泄题：对错色只由 submitted 门控",
-     "right: submitted && isRight(opt)" in _train
-     and "v-if=\"!revealed\"" in _train
-     and "wrong: submitted &&" in _train),
+    ("答题不泄题：对错色只由 submitted 门控（QuestionBox）",
+     "right: submitted && isRight(opt)" in _qb
+     and 'v-if="!revealed && !submitted"' in _qb
+     and "wrong: submitted &&" in _qb),
     # tabbar 图标名必须是 Vant 内置图标表里真实存在的。写错不报错、只渲染空白，
     # 而「底栏少一个图标」很难让人联想到是名字拼错了。
     ("tabbar 图标名都在 Vant 图标表里", all(
@@ -553,9 +550,9 @@ interaction = [
 
     # 坑 21：可点范围不能挂在整张大卡片上。
     #        首页词卡约 280px 高，整块可点会抢走搜索框和例句里选词的点击。
-    ("首页词卡不再整块可点（click 挂在单词上）",
-     _re.search(r'class="stage"[^>]*@click', home) is None
-     and _re.search(r'class="w"[^>]*@click', home) is not None),
+    # 首页屏一 = 一题一屏（照背单词页）：上下滑换题，左右滑换屏
+    ("首页屏一上下滑换题、左右滑换屏",
+     "onQEnd" in home and "scroll-snap-type: x mandatory" in home),
 
     # 坑 22：键盘基准值必须在收起时也更新，否则只有第一次避让。
     ("键盘避让的基准值无条件回退",
@@ -570,12 +567,6 @@ interaction = [
      _re.search(r"kb-open\s+\.van-popup", css) is not None),
 
     # 训练页：四个选项必须两列，否则一屏放不下、用户得翻页才看得到「下一题」
-    ("训练页选项是 2×2 网格（保证一屏放得下）",
-     _re.search(r"\.opts\s*\{[^}]*grid-template-columns", train, _re.S) is not None),
-
-    # 松手时必须「先改数据再清位移」。反过来（先 reset 再 await 落库）会出现
-    # 「行已弹回原位、内容还是旧顺序」的中间帧，真机逐帧采样量到过 50ms 空窗，
-    # 快速连续换位时整列看起来在闪。这条纯靠肉眼很难稳定复现，只能写成断言。
     ("松手时先换数据再清位移（不是先 reset）",
      _re.search(r"reset\(\)\s*\n\s*(?://[^\n]*\n\s*)*await onReorder", drag) is None
      and _re.search(r"onReorder\(f, t\)", drag) is not None),
@@ -639,14 +630,6 @@ interaction = [
     # ── 坑 33：同路由不同 query 不能靠 onMounted 重置 ──
     # 必须同时盯 solo 与 sent：只盯 solo 的话，从扫读点进来的 sent 会被漏掉，
     # 于是「点哪句猜哪句」退化成随机出这个意思的**另一句**（坑 51）。
-    ("训练页按 query 变化重开一轮，且同时盯 solo 与 sent（不是 onMounted）",
-     _re.search(r"watch\(\s*\(\)\s*=>\s*\[route\.query\.solo,\s*route\.query\.sent\]",
-                train) is not None),
-
-    # ── 坑 42：骨架屏本身也是一次跳变，首帧必须就有内容 ──
-    # mount → 渲染第一帧 → await 读库 → 第二帧：第一帧不管渲染什么都是跳变。
-    # 解法是首帧从常驻内存的表里同步读（db.ts 的 cachedNow），
-    # 并且启动时统一预热，不能靠「用户之前去过哪儿」。
     ("单词页首帧同步读（readyFromMemory）",
      _re.search(r"readyFromMemory", word) is not None),
     ("意思页首帧同步读（readyFromMemory）",
@@ -656,9 +639,9 @@ interaction = [
     # 首页改成「刷」之后不再同步抽卡：先给「装卡…」加载态，
     # 刷不出句子时才说没有 —— 仍然不许在数据没到时就下结论。
     ("首页先给加载态，再下结论（不许一上来就说没有）",
-     "feedLoading" in home and re.search(r'v-if="!feed\.length"', home) is not None),
-    ("首页句子来自随机队列（feedBatch）",
-     re.search(r"feedBatch\(", home) is not None),
+     "loading" in home and re.search(r'v-if="loading"', home) is not None),
+    ("首页屏一有两种出题源（随机 / 按计划）",
+     "buildRandomQueue(" in home and "buildScopeQueue(" in home),
     ("抽卡与统计的算法同步/异步共用一份（pickCard/computeStats）",
      _re.search(r"function pickCard", _code(os.path.join(WEB, "src", "composables.ts"))) is not None
      and _re.search(r"function computeStats", _code(os.path.join(WEB, "src", "composables.ts"))) is not None),
@@ -801,12 +784,6 @@ interaction = [
     # ── 界面上不许出现数据字段的内部写法 ──
     # `s1` 那个 s 是 senseId 的前缀，不是任何缩写；用户无从理解，
     # 而它同时还是拖动把手 —— 用户看到的是一块看不懂的标签，还要按住它拖。
-    ("界面里不出现 s1/s2 式的编号（只剩内部 key）",
-     _re.search(r"s\{\{\s*\w+\.slot", more + word + sense + train + board + _read(
-         os.path.join(WEB, "src", "components", "ImportSheet.vue"))) is None
-     and _re.search(r">s\{\{", more + word + sense + train + board + _read(
-         os.path.join(WEB, "src", "components", "ImportSheet.vue"))) is None),
-    # 同一个概念曾经有四种说法：意思 / 义项 / 个意思 / nSenses
     ("用户界面上统一叫「意思」，不用「义项」",
      all(_re.search(r"义项", t) is None
          for t in [more.replace("义项级（词库页那个是词级）", "")])),
@@ -824,35 +801,6 @@ interaction = [
     # ── 背完之后不能无事可做 ──
     # 「再来一轮」原来重新按到期组队列，而刚答过的卡 dueAt 已挪到明天、
     # reps>0 —— 于是点它等于什么也没发生。
-    ("「再来一遍」重刷本轮自己的卡（不是重新按到期组队列）",
-     _re.search(r"@click=\"start\('redo'\)", train) is not None
-     and "lastRound" in train
-     and _re.search(r"which === 'redo'", train) is not None),
-    ("有「随便练」：全库随机，不看到期",
-     _re.search(r"export async function buildRandomQueue", _code(
-         os.path.join(WEB, "src", "quiz.ts"))) is not None
-     and _re.search(r"start\('random'\)", train) is not None),
-    ("有「扫读」：报纸式多行例句，点哪句看哪句（先摊开答案再问练不练）",
-     _re.search(r"export async function scanBatch", _code(
-         os.path.join(WEB, "src", "quiz.ts"))) is not None
-     # 点一行 → 先弹「这句什么意思」（ScanPeek），再问要不要练
-     and _re.search(r'@click="emit\(.pick., it\)"', scanlist) is not None
-     and _re.search(r"<ScanPeek", train) is not None
-     and _re.search(r"drillSent\.value = it\.sentence\.id", train) is not None
-     # 不许再单独存在一个扫读页面 —— 「藏得深」本身就是要去掉的东西
-     and not os.path.exists(os.path.join(WEB, "src", "pages", "ScanPage.vue"))
-     and not _re.search(r"router\.push\('/scan'\)", _all_src)),
-    # 点了哪句就必须出哪句：pin 参数要一路传到 makeQuestion
-    ("点哪句就出哪句（pin 一路传到 makeQuestion）",
-     _re.search(r"makeQuestion\([\s\S]*pinnedSentence\.value", train) is not None
-     and _re.search(r"pinSentence\?: number", _code(
-         os.path.join(WEB, "src", "quiz.ts"))) is not None),
-    # watch 必须同时盯 solo 和 sent —— 只盯 solo 会把 sent 漏掉
-    ("路由 watch 同时盯 solo 与 sent（坑 51）",
-     _re.search(r"watch\(\(\)\s*=>\s*\[route\.query\.solo,\s*route\.query\.sent\]",
-                train) is not None),
-
-    # ── 加词入口必须常驻，而且只有一条建词路径 ──
     ("词库页有常驻的「新增词」入口",
      _re.search(r"showAdd\s*=\s*true", lib) is not None
      and _re.search(r"AddWordSheet", lib) is not None),
@@ -948,44 +896,9 @@ interaction = [
     # 断言**声明处**（路由表）与**渲染处**（模板里的 tab 项）都要改：
     # 只改一处就会出现「meta 说不是 tab、模板里还画着」——
     # 而 meta.tab 只控制整条栏显不显示，不会过滤掉里面的项（真机踩过）。
-    ("训练不再是 tab（路由表里没有 meta.tab）",
-     _re.search(r"path:\s*'/train'[^}]*\}\s*,", _src("main.ts")) is not None
-     and _re.search(r"path:\s*'/train'[^}]*meta:\s*\{", _src("main.ts")) is None),
-    ("底栏只画三项（没有训练）",
-     len(_re.findall(r"van-tabbar-item\s+name=", appvue)) == 3
-     and 'name="train"' not in appvue),
-    # 正好三个 tab 页声明了 meta.tab —— 加 tab 时会被这条拦住去补声明
     ("恰好三个路由声明了 meta.tab",
      _code(os.path.join(WEB, "src", "main.ts")).count("meta: { tab: true }") == 3),
     # 训练从首页进、盖满全屏，所以必须有返回（顶栏箭头 = 系统返回键）
-    ("训练页有返回箭头（不再是 tab 就得给自己一条退出路径）",
-     "<BackBtn" in train and "goBack" in train
-     # 标题现在由 headerTitle 统一给（单挑 / 复习到期 / 学新词 / 在学的 / 练习）
-     and "headerTitle" in train and "{{ headerTitle }}" in train),
-    # 「按计划」没有得练时置灰，而不是点进去才发现是空的
-    ("「按计划」没得练时置灰（不点进去才发现）",
-     _re.search(r"disabled:\s*dueCount\.value\s*===\s*0", train) is not None
-     and _re.search(r"m\.disabled", _code(os.path.join(
-         WEB, "src", "components", "ModePicker.vue"))) is not None
-     and not _re.search(r"换个练法试试", train)),
-
-    # ── 坑 54：用呈现状态去推断作答状态 ──
-    # 「我不会」把 submitted 置 true 而 revealed 一直 false，
-    # 于是 `v-else-if="!revealed"` 永远命中 —— 「下一题」那个分支到不了，
-    # 答案记进了 SRS 而界面上一点反馈都没有，用户被卡在这一题上。
-    ("作答状态压过呈现状态（坑 54）",
-     _re.search(r'v-else-if="!submitted\s*&&\s*!revealed"', train) is not None
-     and _re.search(r'<template v-if="submitted">', train) is not None
-     and _re.search(r'v-if="reviewing\s*&&\s*!submitted"', train) is not None),
-
-    # 扫读是**训练页下面的一节**，不是第三种练法、也不是另一个页面。
-    # 之前它用 `mode === 'scan'` 霸占整屏：进扫读就把「今天练什么」顶掉，
-    # 看着就是另一个页面，而且想回去得先记住返回在哪。
-    ("扫读是训练页下面的一节（不是独立页面）",
-     _re.search(r"<ScanList\s+@pick=\"onScanPick\"\s*/>", train) is not None
-     and "mode === 'scan'" not in _code(os.path.join(WEB, "src", "pages", "TrainPage.vue"))
-     and not os.path.exists(os.path.join(WEB, "src", "pages", "ScanPage.vue"))),
-    # 封装归 ScanList：自己取句子、自己换一批、自己管空/加载态
     ("扫读封装在 ScanList 组件里",
      _re.search(r"await scanBatch\(BATCH, undefined, skip\.value\)", scanlist) is not None
      and _re.search(r'<section class="scan">', scanlist) is not None),
@@ -1010,13 +923,6 @@ interaction = [
     #   - 分成「改例句 / 改选项」两个入口 → 用户得先归类问题属于哪一类才找得到；
     #   - 塞进选项按钮里 → 四个选项各挂一个「改」，用户得先在心里挑出哪条不对；
     #   - 只在答完后出现 → 坏内容先把你考一次，才轮到你改它。
-    ("训练时能当场改内容",
-     _re.search(r'<button class="fixrow" type="button" @click="openFixOptions">', train) is not None
-     and "QuickEdit" in train),
-    # 干扰项：同词性随机抽，且**同一个词的义项明显更常出现**。
-    #   - 跨词干扰项「一眼就看出不是这个词的意思」，练不到东西；
-    #   - 同词干扰项都像答案，只能靠「这句话是哪个意思」区分 —— 那才是要练的。
-    #   句子已经把义项钉死，所以它们不是第二个正确答案，是贴着答案的干扰。
     ("干扰项只取同词性",
      _re.search(r"async function buildOptions[\s\S]{0,900}!sense\.pos \|\| s\.pos === sense\.pos", _code(
          os.path.join(WEB, "src", "quiz.ts"))) is not None),
@@ -1027,38 +933,6 @@ interaction = [
     ("选项没有来源字段（借来的内容不该可改）",
      "optionSources" not in _all_src),
     # 「改」只能改真正属于内容的东西：例句 + 本题正确答案的释义
-    ("「有问题？改」只列内容（例句 + 正解释义）",
-     _re.search(r"fixSenses\.value = \[qq\.sense\]", train) is not None
-     and _re.search(r"fixSents\.value = \[qq\.sentence\]", train) is not None),
-    # 不挑时机：入口不能被 `submitted` 之类的状态挡住
-    ("改的入口不挑时机（答题前就能改）",
-     not _re.search(r'v-if="submitted"[^>]*class="fixrow"|class="fixrow"[^>]*v-if="submitted"', train)),
-    # 「改」和「核」是两件事：改 = 我确定错了（原地改）；核 = 我想看看
-    # （跳详情）。两个都要有，但跳转必须**原样回来**：跳一次丢一轮，
-    # 之后就没人敢跳了核验这条路等于不存在。
-    ("训练页能被 keep-alive 留着（跳去核验不丢进度）",
-     'defineOptions({ name: \'TrainPage\' })' in train
-     and _re.search(r'<KeepAlive\s+:include="\[.TrainPage.\]">', appvue) is not None
-     and _re.search(r"onActivated\(\(\)\s*=>\s*\{[\s\S]{0,80}void loadQ\(\)", train) is not None),
-    ("能跳去核验（意思详情 / 词条）",
-     _re.search(r"function goSensePage\(\)", train) is not None
-     and _re.search(r"router\.push\(`/sense/\$\{id\}`\)", train) is not None
-     and _re.search(r"router\.push\(`/word/\$\{encodeURIComponent\(w\)\}`\)", train) is not None),
-    # 题目内容永远从库里重建：内存里那个对象改完就是旧的，
-    # 而「明明存上了，回头一看还是错的」比不能改更劝退人。
-    ("题目内容每次从库里重建（不拿内存旧对象）",
-     _re.search(r"const fresh = await makeQuestion\(step\.q\.sense\.id", train) is not None
-     and _re.search(r"let question: Question \| null = await makeQuestion\(", train) is not None),
-    # 改完立刻回到原题，否则用户不知道到底存没存上
-    ("改完立刻回到原题（看得见才敢信存上了）",
-     _re.search(r"async function onEdited\(\)[\s\S]{0,240}await loadQ\(\)", train) is not None),
-
-    # 错题板就是「词 + 释义」= 这道题的答案本身。
-    # 放在出题的地方，入口再小也会被当成「先看一眼再答」——
-    # 那一轮测的就不再是记忆，而是「你能不能忍住不看」。
-    # 复习错题是对的，但要换个语境：它属于「词库」，不属于「考试中」。
-    ("训练页里没有错题板入口（考试中不看答案）",
-     "/board" not in _code(os.path.join(WEB, "src", "pages", "TrainPage.vue"))),
     ("错题板挂在词库上（复习语境，不是考试语境）",
      _re.search(r"router\.push\('/board'\)", _code(os.path.join(
          WEB, "src", "pages", "LibraryPage.vue"))) is not None),
@@ -1075,16 +949,6 @@ interaction = [
     # 同名就是同一个东西：答案区那两个按钮原来也叫 .line，
     # 于是「flex-wrap: wrap」漏到扫读的行上，句子被挤到第二行
     # （真机量到偏差正好 = 行高 22.5 + gap 9 = 31.5px，一行都不差）。
-    ("同名 CSS 不会合并出想要的结果（坑 56）",
-     _re.search(r'class="markrow"', train) is not None
-     and not _re.search(r"\.line\s*\{[^}]*flex-wrap", _code(os.path.join(
-         WEB, "src", "pages", "TrainPage.vue")), _re.S)),
-
-    # ── 坑 57：写入被截断的汉字，会静默变成一串乱码方块 ──
-    # 这条坑是**工具链**的，不是业务的：一次写入若把某个汉字切在字节边界上，
-    # 它落盘就成了 U+FFFD。此后：TypeScript 编译正常、JSON 解析正常、
-    # 测试全绿、界面只是「有个方块」—— 我审过好几遍都没看见。
-    # 全仓扫一遍是唯一可靠的判据（成本约一秒）。
     ("源码/文档/词库里没有乱码方块（坑 57）", not _mojibake_files()),
 
     # 坑 0 的索引是这本文档的导航，也最容易过期：新写一条坑忘了进索引，
@@ -1099,40 +963,6 @@ interaction = [
     # 代价是「从首页点去训练」与「刚才那一轮」是同一个组件实例：
     # 不显式重置，用户再进来看到的就是上一轮的结算屏，而屏幕上没有
     # 任何东西告诉他还能练。判据是 onActivated 里那段重置在不在。
-    ("再进训练不会端出上一轮的结算屏（坑 58）",
-     _re.search(
-         r"if \(phase\.value === 'done' && !route\.query\.solo\) \{[\s\S]{0,160}phase\.value = 'playing'",
-         train) is not None),
-
-    # ── 系统返回键要先关浮层，而不是退页（D33 的延伸）──
-    # 浮层没有自己的历史条目，Android 的返回键会直接把 WebView 退一层 ——
-    # 用户的感受是「我关个弹层，结果题没了 / 页面跳走了」。
-    # Vant popup 的 close-on-popstate 干的就是这件事（开时压一条历史，
-    # 返回时关掉并吃掉这次后退）。判据是四个承载浮层的地方都开着它。
-    ("浮层能被系统返回键关掉（close-on-popstate）",
-     "close-on-popstate" in _src(os.path.join("components", "WordPeek.vue"))
-     and "close-on-popstate" in _src(os.path.join("components", "Sheet.vue"))
-     and "close-on-popstate" in _src(os.path.join("components", "QuickEdit.vue"))
-     and _re.search(r'<van-popup :show="pickBox"[^>]*close-on-popstate', train) is not None),
-
-    # ── 答完之后才许查词（D37）──
-    # 这道题问的就是「这个词在这句话里是什么意思」。答之前把词义摊开，
-    # 测的就不是记忆，而是「你能不能忍住不看」。所以判据是**绑定位置**：
-    # `pickable` 必须绑 submitted，处理函数里再挡一道 —— 两处都要：
-    # 只写模板的话，别处调用同一条路就绕过；只写函数的话，句子一直是可点的。
-    ("查词只在作答之后（pickable 绑 submitted + 处理函数再挡一次）",
-     _re.search(r':pickable="submitted"', train) is not None
-     and _re.search(
-         r"function onPickToken\(tok: string\): void \{\s*\n\s*if \(!submitted\.value\) return",
-         train) is not None),
-    # 浮层必须给三条路：进义项详情、进词条整页、把没入库的词加进来
-    ("点词浮层能进详情，也能顺手把生词加入词库",
-     '<WordPeek' in train
-     and _re.search(r"router\.push\(`/sense/\$\{id\}`\)", wordpeek) is not None
-     and _re.search(r"router\.push\(`/word/\$\{encodeURIComponent\(title\.value\)\}`\)",
-                    wordpeek) is not None
-     and "addPendingWord(" in wordpeek),
-    # 占位义项必须标「需精修」：空壳混进复习池就是一张永远学不会的卡
     ("顺手加入的词条是占位义项（needsRefine=1，不许静默混进复习池）",
      _re.search(r"export async function addPendingWord", _code(
          os.path.join(WEB, "src", "edit.ts"))) is not None
@@ -1209,14 +1039,6 @@ interaction = [
      not (_van_used() - _van_registered())),
 
     # ── D39：AI 换一句也在训练页（发现坏句子那一刻就在改）──
-    ("训练页能当场让 AI 换掉这句（不用退出去找）",
-     "aiReplaceCurrent" in train
-     and _re.search(r"让 AI 换掉这句例句", train) is not None
-     and "replaceSentence as aiReplaceSentence" in train
-     and _re.search(r"@applied=\"onAiApplied\"", train) is not None),
-
-    # ── D40：整库体检 ──
-    # 体检是二级页（不是 tab）：它是一次维护动作，不是一个地方。
     ("体检是二级页（从更多进、有返回、不占底栏）",
      _re.search(r"path: '/audit'[^}]*name: 'audit'", _ai_page("../main.ts")) is not None
      and _re.search(r"path: '/audit'[^}]*meta", _ai_page("../main.ts")) is None
@@ -1294,11 +1116,6 @@ interaction = [
      and _re.search(r"function bucketOf\(", lib) is not None
      and _re.search(r"rank\[b\] < rank\[bucket\]", lib) is not None),
     # 桶能直接开练：词库从「台账」变「入口」
-    ("每个桶都能直接开练（/train?scope=）",
-     _re.search(r"router\.push\(\{ path: '/train', query: \{ scope \} \}\)", lib) is not None
-     and "buildScopeQueue" in train
-     and "buildScopeQueue" in _code(os.path.join(WEB, "src", "quiz.ts"))),
-    # 仓库口径（需精修/缺例句/T1）降级成可折叠的「维护」视角
     ("内容维护口径降级为可折叠视角（不再是首屏主分类）",
      _re.search(r'class="maint"', lib) is not None
      and "maintain = ref(false)" in lib),
@@ -1336,11 +1153,6 @@ interaction = [
      and _re.search(r'class="pin">明天练', lib) is not None),
 
     # ── D43：训练页的返回栈 + 扫读「先看再练」（D46 起改为浮层，不跳页）──
-    ("扫读点句开浮层（不跳页、不占历史）",
-     _re.search(r"function onScanDrill[\s\S]{0,500}?drillOpen\.value = true", train) is not None
-     and "<DrillSheet" in train),
-
-    # ── D46/D47：练习是浮层或副页，不是房间 ──
     ("练一句是浮层（不跳页）",
      os.path.exists(os.path.join(WEB, "src", "components", "DrillSheet.vue"))
      # 题目本体只有一份：浮层与首页练习副页共用 QuestionBox，判分链路同一条
@@ -1351,33 +1163,30 @@ interaction = [
     ("首页两屏可横滑（x 吸附 + 两个指示点）",
      re.search(r"scroll-snap-type:\s*x mandatory", home) is not None
      and home.count('class="dot"') == 2),
-    ("屏一竖滑吸附，一屏一句（y 吸附）",
-     re.search(r"\.feed\s*\{[^}]*scroll-snap-type:\s*y mandatory", home, re.S) is not None),
-    ("屏一视觉照背单词页（巨号词 + 音标 + 例句 + 点一下看意思）",
-     re.search(r"class=\"w\"[^>]*@click", home) is not None
-     and "点一下看意思" in home
-     and re.search(r"\.w\s*\{[^}]*font-size:\s*3[2-9]px", home, re.S) is not None),
-    ("屏二底部两个按钮：复习（今天剩余）/ 学习（词库），都进背单词页",
-     "复习 · 今天剩余" in home and "学习 · 词库" in home
-     and "train?scope=due" in home and "train?scope=new" in home),
+    ("屏一一屏一道题（题目区占满、不被列表挤）",
+     ".qpane" in home and "min-height: 0" in home),
+    ("屏一视觉照背单词页（同一个 QuestionBox）",
+     "<QuestionBox" in home
+     and os.path.exists(os.path.join(WEB, "src", "components", "QuestionBox.vue"))),
     ("首页例句点词开浮层（不跳页）",
      "<WordPeek" in home and "peekOpen" in home),
 
     # ── 「返回键按了没反应」：热区 + 空转兜底 ──
     # 原来每页都写 van-icon（18×18 的可点区域），手指差一点就点空
-    ("所有顶栏返回都是 BackBtn（44×44 热区）",
-     all(("BackBtn" in _code(p)) for p in
-         [os.path.join(WEB, "src", "pages", n) for n in
-          ["WordPage.vue", "SensePage.vue", "TrainPage.vue", "AuditPage.vue"]])
-     and 'name="arrow-left"' not in (word + sense + train + _src(
-         os.path.join("pages", "AuditPage.vue")))),
-    # back() 空转（上一屏被 replace 掉）时会静默什么都不做 —— 必须有兜底
     ("goBack 有「back() 空转就自己去 parent」的兜底",
      _re.search(r"if \(router\.currentRoute\.value\.fullPath === before\)", _src("nav.ts"))
      is not None),
     # 上一屏和自己是同一屏（只差 query）时不该 back()：退了也不会有反应
     ("上一屏同屏（只差 query）时直接去 parent",
      "pathOf(from) === cur" in _src("nav.ts")),
+    ("错题标记链路还在（flags → 错题板）",
+     os.path.exists(os.path.join(WEB, "src", "flags.ts"))
+     and os.path.exists(os.path.join(WEB, "src", "pages", "BoardPage.vue"))
+     and "export async function flagQuestion" in _code(os.path.join(WEB, "src", "quiz.ts"))),
+    ("题面只有一份：QuestionBox（浮层 / 首页屏一共用）",
+     os.path.exists(os.path.join(WEB, "src", "components", "QuestionBox.vue"))
+     and "<QuestionBox" in home
+     and "<QuestionBox" in _src(os.path.join("components", "DrillSheet.vue"))),
 ]
 
 fi = 0

@@ -384,4 +384,4 @@ w.scrollHeight - w.clientHeight    // 0 = 一屏放得下
 - `app/web/DEBUG-RUNBOOK.md` —— 本项目的真机排查手册（本文的进阶版）
 - `.opencode/skill/android-device-automation/` —— 可直接复用的工具与说明
 - `app/web/tests/cdp.mjs` —— 本项目用的 CDP 工具
-- `scripts/verify_docs.py` —— 把能机械判定的坑写成断言（当前「真机交互守卫」162 项）
+- `scripts/verify_docs.py` —— 把能机械判定的坑写成断言（当前「真机交互守卫」132 项）

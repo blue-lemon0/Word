@@ -222,7 +222,7 @@ watch([q, only, maintain, mFilter], () => {
 /** 从某一桶直接开练：词库从「台账」变成「入口」的关键一步 */
 function drill(scope: Bucket, n: number): void {
   if (!n) return
-  void router.push({ path: '/train', query: { scope } })
+  void router.push({ path: '/', query: { practice: scope } })
 }
 
 function fmtDue(ts: number): string {
@@ -287,7 +287,7 @@ onMounted(load)
           <van-button v-else-if="head.new" type="primary" round block @click="drill('new', head.new)">
             学几个新词
           </van-button>
-          <van-button v-else plain round block @click="router.push('/train')">
+          <van-button v-else plain round block @click="router.push('/?practice=due')">
             随便练两句
           </van-button>
         </div>
