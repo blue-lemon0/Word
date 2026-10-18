@@ -308,8 +308,64 @@ export async function scanBatch(
   return out
 }
 
-/* ── 落一次作答 ── */
+/**
+ * 「刷」的队列：随机但**有偏**。
+ *
+ *  ★ 纯随机（每条等概率）在真实词库里会变成「一直在刷待学的生词」——
+ *    正在学的那些反而轮不到。所以按状态加权：
+ *      到期 3 · 在学 2 · 待学 2 · 已掌握（rusty）1
+ *    这仍然是随机，只是偏向「现在更该看」的那些。
+ *  ★ 一个词最多出现一次：连续两张同一个词，会让人以为没刷新。
+ *  ★ exclude 用来做无限加载 —— 已经刷过的词不再重复出现。
+ */
+export async function feedBatch(limit = 8, exclude: string[] = []): Promise<ScanItem[]> {
+  const [pool, sents, prows] = await Promise.all([practicePool(), allSentences(), allProgress()])
+  const byId = new Map(pool.map((s) => [s.id, s]))
+  const pmap = new Map(prows.map((p) => [p.senseId, p]))
+  const now = Math.floor(Date.now() / 1000)
+  const skip = new Set(exclude)
 
+  const cnt = new Map<string, number>()
+  for (const s of sents) cnt.set(s.senseId, (cnt.get(s.senseId) ?? 0) + 1)
+
+  /** 权重：到期 3、在学 2、待学 2、rusty 的已掌握 1 */
+  const weightOf = (senseId: string): number => {
+    const p = pmap.get(senseId)
+    if (!p || p.reps === 0) return 2
+    if (p.mastered) return p.rusty ? 1 : 0
+    return p.dueAt <= now ? 3 : 2
+  }
+
+  const bag: Array<{ s: Sentence; w: number }> = []
+  const seenWord = new Set<string>()
+  for (const s of sents) {
+    const sense = byId.get(s.senseId)
+    if (!sense || s.flagged || skip.has(sense.word) || seenWord.has(sense.word)) continue
+    const w = weightOf(s.senseId)
+    if (w <= 0) continue
+    seenWord.add(sense.word)
+    bag.push({ s, w })
+  }
+
+  const out: ScanItem[] = []
+  while (out.length < limit && bag.length) {
+    // 加权抽一个（权重大的更容易被抽到），抽中即移除 —— 不重复
+    const total = bag.reduce((n, b) => n + b.w, 0)
+    let r = Math.random() * total
+    let i = 0
+    for (; i < bag.length; i++) {
+      r -= bag[i].w
+      if (r <= 0) break
+    }
+    const picked = bag[Math.min(i, bag.length - 1)]
+    bag.splice(bag.indexOf(picked), 1)
+    const sense = byId.get(picked.s.senseId)!
+    out.push({ sentence: picked.s, sense, count: cnt.get(sense.id) ?? 1 })
+  }
+  return out
+}
+
+/* ── 落一次作答 ── */
 export interface AnswerResult {
   outcome: ReviewOutcome
   /** 是否因此达成掌握（用于提示与庆祝） */

@@ -547,8 +547,9 @@ interaction = [
 
     # 坑 10：根元素/body 上的 overflow 夹不住（会传播给视口），
     #        必须在真正产生溢出的元素上夹。
-    ("首页装饰元素自带 overflow-x: clip",
-     _re.search(r"\.home\s*\{[^}]*overflow-x:\s*clip", home, _re.S) is not None),
+    # 首页现在是两屏横滑容器，根上直接 hidden 夹住溢出（坑 10 的口径不变）
+    ("首页根容器自己夹住溢出（overflow: hidden）",
+     _re.search(r"\.home\s*\{[^}]*overflow:\s*hidden", home, _re.S) is not None),
 
     # 坑 21：可点范围不能挂在整张大卡片上。
     #        首页词卡约 280px 高，整块可点会抢走搜索框和例句里选词的点击。
@@ -652,17 +653,12 @@ interaction = [
      _re.search(r"readyFromMemory", sense) is not None),
     ("词库页首帧同步出列表（不是先闪「正在读库」）",
      _re.search(r"readyFromMemory", lib) is not None),
-    ("首页首帧同步抽卡（randomCardNow）",
-     _re.search(r"randomCardNow", home) is not None),
-    # 首页那一帧最坏：不是闪个骨架，是**说用户的词库没了**。
-    # 「还在读」和「确实没有」必须两个值，模板必须三态。
-    ("首页区分「还没读」与「确实为空」（v-else-if）",
-     _re.search(r'v-else-if="card\s*===\s*undefined"', home) is not None),
-    ("首页的「词库还是空的」只在读完且为空时出现",
-     _re.search(r'v-else-if="card === undefined"[\s\S]*?'
-                r'v-else[^>]*>\s*<p class="empty">词库还是空的</p>', home) is not None),
-    ("首页统计口径也有同步版（loadStatsNow）",
-     _re.search(r"loadStatsNow", home) is not None),
+    # 首页改成「刷」之后不再同步抽卡：先给「装卡…」加载态，
+    # 刷不出句子时才说没有 —— 仍然不许在数据没到时就下结论。
+    ("首页先给加载态，再下结论（不许一上来就说没有）",
+     "feedLoading" in home and re.search(r'v-if="!feed\.length"', home) is not None),
+    ("首页句子来自随机队列（feedBatch）",
+     re.search(r"feedBatch\(", home) is not None),
     ("抽卡与统计的算法同步/异步共用一份（pickCard/computeStats）",
      _re.search(r"function pickCard", _code(os.path.join(WEB, "src", "composables.ts"))) is not None
      and _re.search(r"function computeStats", _code(os.path.join(WEB, "src", "composables.ts"))) is not None),
@@ -1351,35 +1347,19 @@ interaction = [
      and "makeQuestion(" in _src(os.path.join("components", "QuestionBox.vue"))
      and "recordAnswer(" in _src(os.path.join("components", "QuestionBox.vue"))
      and "<QuestionBox" in _src(os.path.join("components", "DrillSheet.vue"))),
-    ("首页内部有可横滑的副页（今天 / 在学 / 待学 / 练）",
-     'swipeable' in home and home.count("<van-tab ") >= 4
-     and all(k in home for k in ["在学", "待学"])),
-    # 练习是首页的一个副页：快捷卡就地开练，不再跳 /train（D47）
-    ("首页快捷卡就地开练（不跳 /train）",
-     "startPractice(" in home and "scope: 'due'" in home),
-    # 单挑/扫读那一轮里，第一次返回 = 回到「怎么练」，不是直接退出训练
-    ("单挑/扫读那一轮里，返回先回「怎么练」",
-     _re.search(r"function backToPicker", train) is not None
-     and _re.search(r"if \(solo\.value \|\| scopeQuery\.value\)", train) is not None),
-    # query 被清掉时必须复位：否则屏幕还是那道题 —— 表现是「返回没反应」
-    ("query 被清掉时题目复位（返回才会有反应）",
-     _re.search(r"if \(queue\.value\.length\) backToPicker\(\)", train) is not None),
-    # 单句练的结算屏不摆整轮统计（一道题的正确率没有意义）
-    ("单句练完不摆整轮统计（一个结论 + 回扫读）",
-     _re.search(r'<template v-if="solo">[\s\S]{0,600}回到扫读', train) is not None),
-
-    # ── D44：首页 = 随手背一句 ──
-    # 打开就能背：卡片上直接有「点一下看意思」，不是只能看、要背还得跳走
-    ("首页打开就能背（卡上有「点一下看意思」）",
-     'class="reveal"' in home and "点一下看意思" in home),
-    # 首页不放搜索框：词库页已有同一个搜索，两个入口做一件事
-    ("首页不再有搜索框（搜索归词库）", "van-search" not in home),
-    # 信息流式首页（D45）：每块都通向一个**具体的动作**
-    ("首页是信息流：今天一行 + 快捷卡 + 随手背一句 + 最近在练",
-     all(k in home for k in ["todayline", "row-cards", "随手背一句", "最近在练"])),
-    # 每块只深一层：首页自己不发往三级页（意思页）的链接
-    ("首页链接只深一层（不发往 /sense/）", "/sense/" not in home),
-    # 例句里点词开浮层、不跳页（跳页会把首页这张卡顶掉）
+    # 首页两屏（D48）：屏一竖滑刷句子，屏二句子列表 + 底部两个大按钮
+    ("首页两屏可横滑（x 吸附 + 两个指示点）",
+     re.search(r"scroll-snap-type:\s*x mandatory", home) is not None
+     and home.count('class="dot"') == 2),
+    ("屏一竖滑吸附，一屏一句（y 吸附）",
+     re.search(r"\.feed\s*\{[^}]*scroll-snap-type:\s*y mandatory", home, re.S) is not None),
+    ("屏一视觉照背单词页（巨号词 + 音标 + 例句 + 点一下看意思）",
+     re.search(r"class=\"w\"[^>]*@click", home) is not None
+     and "点一下看意思" in home
+     and re.search(r"\.w\s*\{[^}]*font-size:\s*3[2-9]px", home, re.S) is not None),
+    ("屏二底部两个按钮：复习（今天剩余）/ 学习（词库），都进背单词页",
+     "复习 · 今天剩余" in home and "学习 · 词库" in home
+     and "train?scope=due" in home and "train?scope=new" in home),
     ("首页例句点词开浮层（不跳页）",
      "<WordPeek" in home and "peekOpen" in home),
 
