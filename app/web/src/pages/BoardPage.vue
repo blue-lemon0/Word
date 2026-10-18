@@ -14,6 +14,8 @@ import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { dueText, repsText } from '../composables'
 import { allProgress, allSentences, liveSenses } from '../db'
+import BackBtn from '../components/BackBtn.vue'
+import { goBack } from '../nav'
 import { clearFlags, downloadFlags, listFlags, type FlagRow } from '../flags'
 import { toast } from '../toast'
 import type { Progress, Sense, Sentence } from '../types'
@@ -108,8 +110,8 @@ onMounted(load)
   <div class="wb-page">
     <header class="wb-topbar">
       <div class="in">
+        <BackBtn @click="goBack(router, '/library')" />
         <h1>错题板</h1>
-        <van-button size="mini" plain @click="router.push('/train?scope=due')">去复习</van-button>
       </div>
     </header>
 

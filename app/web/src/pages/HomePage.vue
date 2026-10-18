@@ -209,6 +209,13 @@ function goWord(w: string): void {
 const pane = ref(0)
 const rootEl = ref<HTMLElement | null>(null)
 
+/** 点指示点直接切屏（横滑之外的第二条路） */
+function goPane(i: number): void {
+  const el = rootEl.value
+  if (!el) return
+  el.scrollTo({ left: i * el.clientWidth, behavior: 'smooth' })
+}
+
 function onScrollRoot(): void {
   const el = rootEl.value
   if (!el) return
@@ -241,7 +248,13 @@ onMounted(async () => {
 <template>
   <div class="wb-page home">
     <!-- 两屏指示：竖着两个点 -->
-      <div ref="rootEl" class="hroot" @scroll.passive="onScrollRoot">
+      <!-- 两屏指示：顶部居中，带一个半透明底片（压在吸顶标题上也不会糊） -->
+    <div class="dots">
+      <button class="dot" :class="{ on: pane === 0 }" type="button" aria-label="刷题" @click="goPane(0)" />
+      <button class="dot" :class="{ on: pane === 1 }" type="button" aria-label="句子列表" @click="goPane(1)" />
+    </div>
+
+    <div ref="rootEl" class="hroot" @scroll.passive="onScrollRoot">
       <!-- 屏一：一题一屏（照背单词页） -->
       <section class="hpage">
         <div class="qpane">
@@ -408,6 +421,38 @@ onMounted(async () => {
   scroll-snap-stop: always;
   display: flex;
   flex-direction: column;
+}
+
+/* 指示点：顶部居中 + 背景矩形 */
+.dots {
+  position: absolute;
+  top: calc(var(--wb-sb-h) + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+  display: flex;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid var(--wb-line);
+  backdrop-filter: blur(6px);
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(17, 17, 27, 0.2);
+  cursor: pointer;
+}
+
+.dot.on {
+  background: var(--wb-primary);
+  width: 16px;
+  border-radius: 3px;
 }
 
 /* ── 屏一 ── */

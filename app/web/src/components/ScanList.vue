@@ -83,10 +83,12 @@ onMounted(load)
 </template>
 
 <style scoped>
+/* ★ 不再自带上下留白与分隔线：
+   原来 .scan 上方有 22+18px 的间距，吸顶标题会先跟着内容往上走这一段才吸住 ——
+   看起来就是「第一次上滑时标题没固定」。现在标题贴着滚动容器顶部，一开始就吸住。 */
 .scan {
-  margin-top: 22px;
-  padding-top: 18px;
-  border-top: 1px solid var(--wb-line);
+  margin: 0;
+  padding: 0;
 }
 
 /* ★ 标题栏吸顶：句子列表会很长，「扫读例句 / 换一批」不该被滚出屏幕。
