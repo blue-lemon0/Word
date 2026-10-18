@@ -7,9 +7,10 @@
  *  队列来源：?solo=<senseId> 是错题板的单挑入口（页内不提供单挑按钮 ——
  *  知道要练哪个意思，选题就成了送分）。
  */
-import { computed, onActivated, ref, watch } from 'vue'
+import { computed, nextTick, onActivated, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import BackBtn from '../components/BackBtn.vue'
+import { spellHint as hintOf, spellMatched } from '../spell'
 import MarkedText from '../components/MarkedText.vue'
 import { goBack as goBackNav } from '../nav'
 import ScanPeek from '../components/ScanPeek.vue'
@@ -117,7 +118,7 @@ const q = ref<Question | null>(null)
  *  选项的显隐看 revealed，作答状态看 submitted。
  * ★ 这三个必须分开：曾经用一个 phase 管两件事，结果点「显示选项」的瞬间
  *   submitted 就为真，正确答案在用户还没选之前就绿了 —— 那是泄题不是提示。 */
-const phase = ref<'playing' | 'done'>('playing')
+const phase = ref<'playing' | 'done' | 'spell' | 'spellDone'>('playing')
 /** 选项已展开（点空白处或按空格） */
 const revealed = ref(false)
 /** 真的做了选择或点了「我不会」 */
@@ -195,6 +196,88 @@ const resultText = computed(() => {
  *   `buildQueue` 会把它们全都排除掉，于是「再来一轮」等于什么也没发生。
  *   这正是「背完当天就无所事事」的第一个原因。 */
 const lastRound = ref<string[]>([])
+
+/* ── 拼写练习（背完一轮之后的可选加练）──
+ *
+ *  ★ 它**不写 SRS**：拼写是另一种记忆通路（产出 vs 辨认），把它的对错喂给
+ *    间隔算法会污染「这个意思我到不到期」的判断。所以这一页只做本地练习 +
+ *    一份自己的小结，不碰 progress、不写 reviewLog。
+ *  ★ 只练这一轮出现过的意思 —— 刚背过的词，趁热拼一遍才有意义。
+ */
+interface SpellItem {
+  id: string
+  word: string
+  gloss: string
+  pos: string
+}
+
+const spellQueue = ref<SpellItem[]>([])
+const spellIdx = ref(0)
+const spellInput = ref('')
+const spellState = ref<'ask' | 'right' | 'wrong'>('ask')
+const spellHits = ref(0)
+const spellMissed = ref<SpellItem[]>([])
+const spellHint = ref(false)
+const spellInputEl = ref<HTMLInputElement | null>(null)
+
+const spellCur = computed(() => spellQueue.value[spellIdx.value] ?? null)
+
+/** 提示只给「首字母 + 长度」：再给多一点就等于把答案说出来了 */
+const spellHintText = computed(() => hintOf(spellCur.value?.word ?? ''))
+
+
+async function startSpell(): Promise<void> {
+  const ids = lastRound.value.slice()
+  const rows = await db.senses.bulkGet(ids)
+  spellQueue.value = rows
+    .filter((r): r is NonNullable<typeof r> => !!r)
+    .map((r) => ({ id: r.id, word: r.word, gloss: r.gloss, pos: r.pos }))
+  if (!spellQueue.value.length) {
+    toast('这一轮没有可拼的词')
+    return
+  }
+  spellIdx.value = 0
+  spellInput.value = ''
+  spellState.value = 'ask'
+  spellHits.value = 0
+  spellMissed.value = []
+  spellHint.value = false
+  phase.value = 'spell'
+  await nextTick()
+  spellInputEl.value?.focus()
+}
+
+function checkSpell(): void {
+  const cur = spellCur.value
+  if (!cur || spellState.value !== 'ask') return
+  if (spellMatched(spellInput.value, cur.word)) {
+    spellState.value = 'right'
+    spellHits.value++
+    // 对了自动走下一个：拼写是「快节奏」的练习，多停一下反而打断
+    window.setTimeout(() => spellNext(), 550)
+  } else {
+    spellState.value = 'wrong'
+    spellMissed.value = [...spellMissed.value, cur]
+  }
+}
+
+function spellNext(): void {
+  if (spellIdx.value >= spellQueue.value.length - 1) {
+    phase.value = 'spellDone'
+    return
+  }
+  spellIdx.value++
+  spellInput.value = ''
+  spellState.value = 'ask'
+  spellHint.value = false
+  void nextTick(() => spellInputEl.value?.focus())
+}
+
+function retrySpell(): void {
+  spellState.value = 'ask'
+  spellInput.value = ''
+  void nextTick(() => spellInputEl.value?.focus())
+}
 
 /** 可练池的 id 集合：重刷之前要确认那些卡还在（被标记/删掉的就不该再出现） */
 let poolIds = new Set<string>()
@@ -973,6 +1056,16 @@ watch(
             <p class="done-note">
               到期题正确率 {{ stats.dueTotal ? accuracy : '—' }} · 共 {{ stats.dueTotal }} 题到期
             </p>
+            <!-- ★ 拼写是**可选加练**：认得出 ≠ 写得出。
+                 只在「一轮」结束之后提供（单句练没有这个意义）。 -->
+            <div v-if="lastRound.length" class="spell-offer">
+              <p class="so-h">要不要再拼一遍？</p>
+              <p class="so-s">看中文，把英文写出来。不计入间隔重复，只练手。</p>
+              <van-button type="primary" block round @click="startSpell">
+                拼写这 {{ lastRound.length }} 个
+              </van-button>
+            </div>
+
             <div class="done-btns">
               <!-- ★ 这里原来是 @click="start"，也就是**按到期重新组一轮**。
                    刚答过的卡 dueAt 挪到了明天、reps 也大于 0，于是 buildQueue
@@ -987,6 +1080,72 @@ watch(
               <van-button block round @click="router.push({ name: 'home' })">回首页</van-button>
             </div>
           </template>
+        </section>
+
+        <!-- 拼写练习 -->
+        <section v-else-if="phase === 'spell'" class="spell">
+          <header class="sp-h">
+            <span class="sp-title">拼写</span>
+            <span class="sp-n">{{ spellIdx + 1 }} / {{ spellQueue.length }}</span>
+            <span class="wb-sp" />
+            <button class="sp-x" type="button" @click="phase = 'done'">结束</button>
+          </header>
+
+          <div class="sp-card">
+            <p v-if="spellCur?.pos" class="sp-pos">{{ spellCur.pos }}</p>
+            <p class="sp-gloss">{{ spellCur?.gloss }}</p>
+            <p v-if="spellHint" class="sp-hint">{{ spellHintText }}</p>
+          </div>
+
+          <input
+            ref="spellInputEl"
+            v-model="spellInput"
+            class="sp-input"
+            :class="{ ok: spellState === 'right', no: spellState === 'wrong' }"
+            type="text"
+            inputmode="text"
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+            placeholder="写出英文"
+            :disabled="spellState !== 'ask'"
+            @keyup.enter="spellState === 'ask' ? checkSpell() : spellNext()"
+          />
+
+          <p v-if="spellState === 'right'" class="sp-ok">对了</p>
+          <p v-else-if="spellState === 'wrong'" class="sp-no">
+            正确答案：<b>{{ spellCur?.word }}</b>
+          </p>
+
+          <div class="sp-acts">
+            <template v-if="spellState === 'ask'">
+              <button class="sp-b" type="button" @click="spellHint = true">提示</button>
+              <button class="sp-b primary" type="button" @click="checkSpell">对一下</button>
+            </template>
+            <template v-else>
+              <button v-if="spellState === 'wrong'" class="sp-b" type="button" @click="retrySpell">
+                再试一次
+              </button>
+              <button class="sp-b primary" type="button" @click="spellNext">下一个</button>
+            </template>
+          </div>
+        </section>
+
+        <!-- 拼写结算 -->
+        <section v-else-if="phase === 'spellDone'" class="spell-done">
+          <p class="done-k">拼写完成</p>
+          <p class="done-big">{{ spellHits }}<span>/ {{ spellQueue.length }}</span></p>
+          <div v-if="spellMissed.length" class="miss">
+            <p class="miss-h">写错的 {{ spellMissed.length }} 个</p>
+            <p v-for="m in spellMissed" :key="m.id" class="miss-i">
+              <b>{{ m.word }}</b> · {{ m.gloss }}
+            </p>
+          </div>
+          <div class="done-btns">
+            <van-button type="primary" block round @click="startSpell">再拼一遍</van-button>
+            <van-button block round @click="phase = 'done'">回到结算</van-button>
+            <van-button block round @click="router.push({ name: 'home' })">回首页</van-button>
+          </div>
         </section>
 
         <!-- ★ 这里原来是「怎么练」选择器 + 扫读列表。
@@ -1707,6 +1866,202 @@ watch(
   background: var(--wb-bg);
   border-radius: 8px;
   padding: 7px 10px;
+}
+
+/* ── 拼写练习（可选加练） ── */
+.spell-offer {
+  margin: 14px 0 4px;
+  padding: 14px;
+  border: 1px dashed var(--wb-line);
+  border-radius: 14px;
+  background: var(--wb-card);
+}
+
+.so-h {
+  font-size: 15px;
+  font-weight: 650;
+  color: var(--wb-ink);
+}
+
+.so-s {
+  margin: 5px 0 12px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--wb-ink-3);
+}
+
+.spell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 0 4px;
+}
+
+.sp-h {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding-bottom: 10px;
+  font-size: 12.5px;
+  color: var(--wb-ink-3);
+}
+
+.sp-title {
+  color: var(--wb-ink);
+  font-weight: 650;
+}
+
+.sp-n {
+  font-variant-numeric: tabular-nums;
+}
+
+.sp-x {
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: 12.5px;
+  color: var(--wb-ink-3);
+  cursor: pointer;
+}
+
+.sp-card {
+  flex: 0 0 auto;
+  background: var(--wb-card);
+  border: 1px solid var(--wb-line);
+  border-radius: 16px;
+  padding: 18px 16px;
+}
+
+.sp-pos {
+  font-size: 11.5px;
+  color: var(--wb-ink-3);
+}
+
+.sp-gloss {
+  margin-top: 4px;
+  font-size: 20px;
+  line-height: 1.5;
+  font-weight: 600;
+  color: var(--wb-ink);
+}
+
+.sp-hint {
+  margin-top: 10px;
+  font-size: 12.5px;
+  color: var(--wb-primary);
+}
+
+.sp-input {
+  flex: 0 0 auto;
+  margin-top: 16px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px;
+  border: 1.5px solid var(--wb-line);
+  border-radius: 14px;
+  background: var(--wb-card);
+  font-family: inherit;
+  font-size: 20px;
+  letter-spacing: 0.5px;
+  color: var(--wb-ink);
+  outline: none;
+}
+
+.sp-input:focus {
+  border-color: var(--wb-primary);
+}
+
+.sp-input.ok {
+  border-color: #12a05c;
+  background: #f0fbf5;
+  color: #0a7a45;
+}
+
+.sp-input.no {
+  border-color: #d24b3e;
+  background: #fdf1f0;
+  color: #c1291f;
+}
+
+.sp-ok {
+  margin-top: 10px;
+  font-size: 14px;
+  font-weight: 650;
+  color: #12a05c;
+}
+
+.sp-no {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #c1291f;
+}
+
+.sp-no b {
+  font-size: 17px;
+}
+
+.sp-acts {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 16px;
+}
+
+.sp-b {
+  flex: 1;
+  padding: 13px 10px;
+  border: 1px solid var(--wb-line);
+  border-radius: 14px;
+  background: var(--wb-card);
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--wb-ink);
+  cursor: pointer;
+}
+
+.sp-b.primary {
+  border-color: var(--wb-primary);
+  background: var(--wb-primary);
+  color: #fff;
+  font-weight: 600;
+}
+
+.spell-done {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+.miss {
+  margin-top: 16px;
+  text-align: left;
+  max-height: 34vh;
+  overflow-y: auto;
+  background: var(--wb-card);
+  border: 1px solid var(--wb-line);
+  border-radius: 14px;
+  padding: 10px 14px;
+}
+
+.miss-h {
+  font-size: 11.5px;
+  color: var(--wb-ink-3);
+  padding-bottom: 6px;
+}
+
+.miss-i {
+  padding: 6px 0;
+  border-top: 1px dashed var(--wb-line);
+  font-size: 13.5px;
+  color: var(--wb-ink-2);
+}
+
+.miss-i b {
+  color: var(--wb-ink);
+  font-size: 15px;
 }
 
 /* ── 结算屏 ──

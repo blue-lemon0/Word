@@ -1205,6 +1205,16 @@ interaction = [
     ("背单词页不再自带选练法与扫读列表",
      "ModePicker" not in _src(os.path.join("pages", "TrainPage.vue"))
      and "<ScanList" not in _src(os.path.join("pages", "TrainPage.vue"))),
+    # ── D52：拼写加练（可选）──
+    ("拼写是可选加练：只在一轮结束后提供，且不写 SRS",
+     "spell-offer" in _src(os.path.join("pages", "TrainPage.vue"))
+     and "startSpell" in _src(os.path.join("pages", "TrainPage.vue"))
+     # 拼写整整一段只有一次 recordAnswer（就是答题那条路），说明拼写没写进度
+     and _src(os.path.join("pages", "TrainPage.vue")).count("recordAnswer(") == 1),
+    ("拼写比对口径只有一处（src/spell.ts）",
+     os.path.exists(os.path.join(WEB, "src", "spell.ts"))
+     and "spellMatched(" in _src(os.path.join("pages", "TrainPage.vue"))
+     and "spellMatched(" in _src(os.path.join("spell.ts"))),
 ]
 
 fi = 0

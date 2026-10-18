@@ -28,7 +28,7 @@ const M = await import(pathToFileURL(out).href)
 /* entry.ts 按命名空间导出：dbApi.db 是那个 Dexie 实例，dbApi.<fn> 是 src/db 里的函数 */
 const dbApi = M.db
 const db = dbApi.db
-const { edit, importer, backup, quiz, bundleImport, flags, lookup, ai, nav } = M
+const { edit, importer, backup, quiz, bundleImport, flags, lookup, ai, nav, spell } = M
 
 let bad = 0
 function ok(cond, msg, detail = '') {
@@ -675,6 +675,14 @@ ok((await db.sentences.get(afterTake[0].sentenceId)).en === flagged.sentence.en,
   ok(nav.pathOf('/word/x#top') === '/word/x', 'pathOf 去掉 hash')
   ok(nav.pathOf('/train?scope=due') === nav.pathOf('/train?scope=new'),
      '只差 query 的两条路由算同一屏（否则返回是空操作）')
+
+  // 14) 拼写练习的比对口径（纯函数）
+  ok(spell.spellMatched('Army', 'army'), '拼写比对忽略大小写')
+  ok(spell.spellMatched('  army ', 'army'), '拼写比对忽略首尾空白')
+  ok(spell.spellMatched('in   the  end', 'in the end'), '词内多余空格压成一个')
+  ok(!spell.spellMatched('armi', 'army'), '拼错就是不通过')
+  ok(spell.spellHint('army') === '首字母 a · 共 4 个字母', `提示给首字母与字母数（${spell.spellHint('army')}）`)
+  ok(spell.spellHint('in the end') === '首字母 i · 共 8 个字母', '多词短语的字母数不含空格')
 
   // 收尾
   ai.__setTransportForTest(null)
