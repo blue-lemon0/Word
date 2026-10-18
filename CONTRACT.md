@@ -18,8 +18,14 @@ progress.json               学习进度包：SRS 状态 + 作答流水 + 标记
 边界铁律：
 
 - **content-kit 不读 user.db**（唯一例外：`triage_flags.py` 只读 `sentence_flag` 来汇总待修句子，不写）。
-- **app 不读 content-kit 的中间产物**，只认 `build/bundle/cards.json` 这一个成品。
+- **app 不读 content-kit 的中间产物**，只认 `build/bundle/` 下的 word-bundle 成品
+  （主包 `cards.json`；验证包如 `cards_v2.json` 用环境变量成对切换，见 app/README「多内容源」）。
 - 交接区文件是机器产物，**手改无效**：内容包由 `content-kit/pipeline/build_bundle.py` 重新生成，进度包由 `app/tools/progress_io.mjs` 导出。
+
+> **范围提醒（2026-10-17 起）**：UI 已经搬到浏览器端（`app/web/`，见 D32），
+> 它照样只吃 `build/bundle/` 的内容包，本契约 §1 照旧适用。
+> 但下面 §2 的 `progress.json` 属于**旧服务端**那一线的用户库格式；
+> 当前应用的备份格式是 `word.backup` v2（见 `app/web/README.md`），两者不通用。
 
 ---
 
@@ -93,6 +99,14 @@ progress.json               学习进度包：SRS 状态 + 作答流水 + 标记
   不被识别时直接报错退出，不靠猜字段运行。
 - 同 `schemaVersion` 内，`(word, senseId)` 是跨版本稳定锚点：词表只增不删，
   `senseId` 不重排。这也是学习进度能跨内容版本存活的前提。
+
+### 1.7 多内容包并存
+
+交接区可同时存在多个内容包（如主包 `cards.json` 与 WordNet 重切验证包
+`cards_v2.json`），各自独立 `version`，都必须通过 §1 的守门。**不同包的
+`(word, senseId)` 是不同锚点体系**——义项重切意味着同一锚点指向不同义项，
+进度与标记互不继承。app 侧用 `WORD_BUNDLE` + `WORD_DB` **成对**切换，
+进度库随内容包隔离，绝不共用。
 
 ---
 

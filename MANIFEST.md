@@ -5,18 +5,21 @@
 
 ## 一句话
 
-单仓双子系统的背单词原型：`content-kit/` 生产词表与例句并烘焙成内容包，
-`app/` 是唯一的背单词 UI 与运行时，读写本地 SQLite。词表来自 ECDICT，
-例句为项目自建。双方不共享代码/数据库，只通过 `build/bundle/cards.json`
-与（备份用的）`progress.json` 对话。
+单仓双子系统：`content-kit/` 生产词表与例句并烘焙成内容包，
+`app/` 是背单词应用 —— 界面在 `app/web/`（Vue 3 + IndexedDB，离线可用），
+学习进度与内容编辑都在浏览器本地。双方不共享代码/数据库，
+只通过 `build/bundle/cards.json` 对话。
 
 ## 跑起来
 
 ```bash
-node app/server.mjs                    # -> http://127.0.0.1:8777
+# 应用（当前 UI）
+cd app/web; npm install; npm run dev     # -> http://127.0.0.1:5180/
+
+# 旧服务端骨架（托管交接区 + 跑 tools/ 下的进度与标记工具）
+node app/server.mjs                      # -> http://127.0.0.1:8777
 ```
 
-打开 <http://127.0.0.1:8777/>（Node 22+，内置 node:sqlite）。
 8000 端口上的纯静态服务器**没有** SQLite/SRS 接口，别用那个。
 
 ## 双子系统结构
@@ -31,19 +34,32 @@ content-kit/   内容产线（Python）。真相源是人可读的 TSV/YAML
   data/wordlist/kaoyan_dagang_core.tsv   考研大纲核心词与档位
   data/wordlist/ipa.tsv          音标，按词性
   data/sentences/                例句（52 词 / 930 句） senseId text clue span translation note source
+  data/senses_v2/ sentences_v2/  WordNet 重切的验证包（义项划分与旧包不同，不可混用）
   source/ecdict_snapshot.json    外部快照，不可再生 —— 全仓库唯一必须离线备份的东西
 
 build/         派生产物（交接区），整个 gitignore，随时可重建
   bundle/cards.json              内容包，运行时唯一输入（word-bundle v1，见 CONTRACT.md）
+  bundle/cards_v2.json           WordNet 重切验证包（独立锚点体系）
 
-app/           背单词应用（Node + 原生 JS 单页）
-  server.mjs db.mjs srs.mjs      HTTP / 数据与守门 / SRS 引擎
-  schema.sql                     进度库 schema 唯一真相源
-  config/srs_params.tsv          SRS 参数唯一真相源
-  web/index.html                 唯一 UI
-  tools/progress_io.mjs          学习进度导出/导入（word-progress v1）
-  tests/                         e2e_d16.js / e2e_loop.mjs / smoke_http.py / verify_srs.py
-  state/user.db                  学习进度（运行时生成，不入库，要备份）
+app/           背单词应用
+  web/                          **当前应用**：Vue 3 + Dexie（界面/数据层/备份），见 web/README.md
+    src/types.ts db.ts edit.ts   数据模型与内容编辑（义项 id 是内部 UUID，永不变）
+    src/srs.ts                   app/srs.mjs 的逐函数移植（数值必须一致，有测试）
+    src/quiz.ts importer.ts      出题与导入对比；import.ts 吃两种 JSON
+    src/backup.ts                word.backup v2 导出/恢复 + 自动快照回滚
+    src/pages/                   首页 单词页 意思页 词库 训练 错题板 更多
+    public/seed.json             首次启动的种子（cards_v2.json 副本）
+    tests/                       srs_parity / flow_smoke / schema_upgrade / perf_probe / pwa_check / cdp / screencast_frames / overscroll_probe
+    prototype-v2/3/4.html        设计原型，定稿是 v4（UI 照它做的）
+    DEBUG-RUNBOOK.md             真机排查手册（崩溃/卡死/日志/CDP 的坑）
+  android/                      Android 壳（WebView + assets 映射），`npm run apk` 一条命令打包安装
+  server.mjs db.mjs srs.mjs      旧服务端骨架：HTTP / 内容包守门与投影 / SRS 参照实现
+  schema.sql                     旧进度库 schema 真相源
+  config/srs_params.tsv          SRS 参数唯一真相源（web 侧 JSON 由它生成）
+  tools/progress_io.mjs          旧进度库的学习进度导出/导入（word-progress v1）
+  tools/flags.mjs                问题句标记关单（list/purge-stale/resolve），闭环纠错流程
+  tests/                         e2e_loop.mjs / verify_srs.py / smoke_http.py（e2e_d16.js 已随旧 UI 退场）
+  state/user.db                  旧进度库（运行时生成，不入库，要备份）
 
 scripts/verify_docs.py           跨两侧的结构守卫
 docs/                            设计文档（design/01–05）与决策记录（decisions/）
@@ -69,18 +85,22 @@ archive/                         历史物：不可运行 ETL、已完成词库�
 
 | 位置 | 职责 |
 |---|---|
-| `app/web/index.html` | **唯一 UI**，只做增量改动；读 `/build/bundle/cards.json` |
-| `app/server.mjs` | HTTP 服务 + API；读内容包、读写 `app/state/user.db` |
+| `app/web/src/` | **当前 UI 与数据层**：Vue 页面 + Dexie 数据模型 + 内容编辑 + 出题 + 备份 |
+| `app/web/src/srs.ts` | `app/srs.mjs` 的逐函数移植；`tests/srs_parity.mjs` 逐格比对，不一致就红 |
+| `app/web/src/importer.ts` | 导入差异计算（只读）+ 按逐条决策写库；默认保留本地释义 |
+| `app/web/src/flags.ts` | 问题句标记：清单导出（word-flags v1）、关单、导入替换时保留标记 |
+| `app/server.mjs` | 旧服务端骨架：HTTP + API，读内容包、读写 `app/state/user.db`。**不再提供 UI** |
 | `app/db.mjs` | 内容包守门与投影、队列、幂等落库、历史、标记 |
-| `app/srs.mjs` | SRS 引擎，读 `app/config/srs_params.tsv` |
-| `app/schema.sql` | 进度库表结构（含 `due_at` / `attempt_id` 不变量） |
-| `app/tools/progress_io.mjs` | 学习进度包导出/导入（CONTRACT.md §2） |
+| `app/srs.mjs` | SRS 引擎（参照实现），读 `app/config/srs_params.tsv` |
+| `app/schema.sql` | 旧进度库表结构（含 `due_at` / `attempt_id` 不变量） |
+| `app/tools/progress_io.mjs` | 旧进度库的学习进度包导出/导入（CONTRACT.md §2） |
+| `app/tools/flags.mjs` | 问题句标记关单（list/purge-stale/resolve），闭环纠错流程 |
 | `content-kit/pipeline/build_bundle.py` | TSV → `build/bundle/`，纯烘焙零判断 |
 | `content-kit/pipeline/sentence_audit.py` | 句子质检 G1–G7 + SPAN/SID/NOTE/GLOSS，规格读 spec.yaml |
 | `content-kit/pipeline/pick_words.py` | 排出下一批该做哪些词 |
-| `content-kit/pipeline/triage_flags.py` | 汇总应用里被标记的问题句（只读 app 库） |
+| `content-kit/pipeline/triage_flags.py` | 汇总应用里被标记的问题句（只读 app 库；浏览器端的标记在 IndexedDB 里，此脚本暂只覆盖旧服务端那一线） |
 | `content-kit/pipeline/verify_ecdict.py` | ECDICT 快照完整性检查 |
-| `scripts/verify_docs.py` | 跨侧结构守卫：布局、数字、契约字段自洽 |
+| `scripts/verify_docs.py` | 跨侧结构守卫：布局、数字、契约字段、前端四条设计判断 |
 | `archive/2026-10-retire/scripts/` | 词库/音标管线 5 件**已完成归档**，重跑会覆写入库数据 |
 | `archive/tools/etl-2026-09/` | 4 个**永久不可运行**的 ETL，保留仅为溯源 |
 
@@ -94,14 +114,18 @@ python content-kit/pipeline/sentence_audit.py --fix-spans
 python content-kit/pipeline/build_bundle.py
 python content-kit/pipeline/triage_flags.py
 
-# 应用侧回归
-node app/tests/e2e_loop.mjs
-node app/tests/e2e_d16.js          # 需 jsdom：把 jsdom 目录加入 NODE_PATH
-python app/tests/verify_srs.py
-python scripts/verify_docs.py
-python app/tests/smoke_http.py     # 需先启动 server；会清空它打到的库，勿打日常库
+# 应用侧（浏览器端）
+node app/web/tests/srs_parity.mjs    # SRS 移植一致性
+node app/web/tests/flow_smoke.mjs    # 数据层端到端
 
-# 学习进度备份/换机
+# 应用侧（旧服务端那一线）
+node app/tests/e2e_loop.mjs
+node app/tests/e2e_d16.js            # 旧单页 UI，已退场，仅参考
+python app/tests/verify_srs.py
+python app/tests/smoke_http.py       # 需先启动 server；会清空它打到的库，勿打日常库
+python scripts/verify_docs.py        # 跨侧结构守卫
+
+# 旧学习进度备份/换机
 node app/tools/progress_io.mjs export progress.json
 node app/tools/progress_io.mjs import progress.json
 ```
@@ -137,6 +161,17 @@ node app/tools/progress_io.mjs import progress.json
    `prompts/` 归入 `content-kit/`；应用件归入 `app/`；内容包字段从单字母
    缩写（w/s/zh/rows/t/k/…）改为全称，并加 `format`/`schemaVersion` 守门，
    格式见 CONTRACT.md。
+8. **2026-10 应用搬到浏览器端**：`app/web/` 从单文件原型重写成 Vue 3 + Dexie
+   （数据落 IndexedDB，离线可用，不再需要 Node 服务）。随之三处变了：
+   学习进度锚点从 `word#senseId` 换成**义项内部 UUID**（插删改序义项不再让
+   进度错位）；备份格式换成 `word.backup` v2（旧的 `word-progress` v1 不通用）；
+   `app/server.mjs` 退成骨架，只剩交接区托管与工具。设计见
+   [docs/DESIGN-词库系统v2.md](docs/DESIGN-词库系统v2.md)，台账见
+   [app/web/README.md](app/web/README.md)。
+9. **句标记闭环已打通（2026-10-17）**：浏览器端把问题句导出成 `word-flags` v1
+   （错题板 → 导出清单），`triage_flags.py --from` 接这份清单，
+   修好后回错题板点「已修好」关单。内容侧只读那个文件，不碰浏览器数据。
+   导入替换例句时按原文保留标记，避免「只改译文」的修复让标记悄悄消失。
 
 ## 移植清单（→ Kotlin/Android）
 
@@ -146,8 +181,11 @@ node app/tools/progress_io.mjs import progress.json
 
 | 件 | 说明 | 对照基准 |
 |---|---|---|
-| `app/srs.mjs` | SRS 引擎公式 | `app/tests/verify_srs.py` + `e2e_loop.mjs` 黄金向量 |
-| `app/schema.sql` | 数据模型（含 `due_at` / `attempt_id` 不变量） | `docs/design/05`、CONTRACT.md §2 |
+| `app/web/src/srs.ts` | SRS 引擎公式（浏览器版，与 `app/srs.mjs` 逐格等价） | `app/web/tests/srs_parity.mjs` |
+| `app/srs.mjs` | SRS 引擎公式（参照实现） | `app/tests/verify_srs.py` + `e2e_loop.mjs` 黄金向量 |
+| `app/web/src/types.ts` `db.ts` | 内容/状态/历史三层 + **义项 UUID 锚点** | [app/web/README.md](app/web/README.md) |
+| `app/web/src/importer.ts` | 导入差异与逐条决策 | docs/DESIGN-词库系统v2 §3.2 |
+| `app/schema.sql` | 旧数据模型（含 `due_at` / `attempt_id` 不变量） | `docs/design/05`、CONTRACT.md §2 |
 | `app/db.mjs` | 投影、队列、幂等落库、历史、标记（逻辑移植，SQLite 可换 Room） | `docs/design/05` |
 | `content-kit/data/` | 词表 / 例句 / 规格，原样带走（或经内容包 cards.json 消费） | CONTRACT.md §1 |
 | `app/config/srs_params.tsv` | SRS 参数 | — |
@@ -158,8 +196,19 @@ node app/tools/progress_io.mjs import progress.json
 - `content-kit/pipeline/` —— Python 内容生产脚手架
 - `content-kit/source/` —— ECDICT 一次性快照
 - `build/` —— 派生产物；Android 侧直接消费内容包或等价打包资源
+- `app/server.mjs` `app/db.mjs` `app/tools/` —— 浏览器端的旧服务端那一线，
+  只有要保留服务端架构时才需要（内容包托管、句标记关单、进度包）
 
 ## 决策记录
 
-`docs/decisions/` D15（词库来源）、D16（断舍离）、D17（存储分层）。
-`docs/design/` 01–05 原始设计。历史说明文档在 `archive/`。
+`docs/decisions/` D15（词库来源）、D16（断舍离）、D17（存储分层）、
+D32（应用搬到浏览器端：技术栈与义项 UUID 锚点）、
+D33（交互保护：例句显式编辑态、确认走自己的弹层、返回语义）、
+D34（固定栏与橡皮筋：要栏不动就得不要橡皮筋，窗口层位移网页管不了）、
+D35（信息架构：二级页不摆底栏 + 三个记录列表合成可滑动的三面板）。
+
+真机踩坑与判据在 [`docs/notes/踩坑记录.md`](docs/notes/踩坑记录.md)（50 条），
+其中可机械判定的一部分挂在 `scripts/verify_docs.py` 的「真机交互守卫」里
+（58 项）：这些坑都不报错，只能靠断言拦住。断言只判「代码写没写对」，
+「屏幕上有没有闪」要用 CDP `Page.startScreencast` 逐帧抓（见坑 42），
+「栏到底动不动」用 `tests/overscroll_probe.mjs`（见坑 45 / D34）。
