@@ -1,13 +1,15 @@
 /** 生成 PWA 图标（可重跑）。
  *
- *  为什么要有这个脚本：图标是机器产物，不该手工画。改设计就改这里的
- *   DRAW 段，然后 `npm run icons` 重出全套。
+ *  ★ 图标是**位图母版**，不在这里画：母版放在
+ *    `public/icon-master.png`（1024，满幅方形、四周留白已裁掉、圆角外涂满深蓝）
+ *    与 `public/icon-glyph.png`（1024，透明底，只有白色纸片与蓝/灰色块）。
+ *    换设计就换这两个母版，然后 `npm run icons` 重出全套。
  *
  *  产出（public/ 下）：
- *   icon-192.png / icon-512.png      普通图标（圆角方块底 + 字母标记）
- *   icon-maskable-512.png           Android 自适应图标（安全区内收，边缘满幅）
- *   apple-touch-icon.png            iOS 主屏图标（180×180，不透明、无圆角，iOS 自己切）
- *   favicon.svg                      矢量 favicon
+ *   icon-64.png / icon-192.png / icon-512.png   普通图标（深蓝底 + 图形）
+ *   icon-maskable-512.png                      Android 自适应（图形收进安全区）
+ *   apple-touch-icon.png                       iOS 主屏（180，不透明、无圆角，iOS 自己切）
+ *   favicon.svg                                内嵌 64px PNG 的矢量 favicon
  */
 import sharp from 'sharp'
 import { writeFileSync, mkdirSync } from 'node:fs'
@@ -18,50 +20,44 @@ const HERE = path.dirname(fileURLToPath(import.meta.url))
 const OUT = path.resolve(HERE, '..', 'public')
 mkdirSync(OUT, { recursive: true })
 
-/** 画一个图标：底色渐变 + 一个大字母 + 下面一行细横条（表示「词条」）。
- *  安全区参数 safe=1 表示满幅铺（maskable 用），safe<1 时内容缩进安全区。 */
-function svg({ size, text, sub = true, safe = 1, radius = 0.22 }) {
-  const r = size * radius
-  const bg = `<defs>
-      <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stop-color="#4f46e5"/><stop offset="55%" stop-color="#5b7cfa"/>
-        <stop offset="100%" stop-color="#7c5cff"/></linearGradient>
-      <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
-        <stop offset="0" stop-color="rgba(255,255,255,0.30)"/>
-        <stop offset="1" stop-color="rgba(255,255,255,0)"/></radialGradient>
-    </defs>`
-  // maskable：内容缩到 60% 安全区内（Android 可能裁成任何形状）
-  const scale = safe
-  const fs = size * 0.42 * scale
-  const subW = size * 0.5 * scale
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-  ${bg}
-  <rect width="${size}" height="${size}" rx="${r}" fill="url(#g)"/>
-  <circle cx="${size * 0.26}" cy="${size * 0.22}" r="${size * 0.46}" fill="url(#glow)"/>
-  <text x="50%" y="${size / 2 + fs * 0.36}" text-anchor="middle"
-        font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="${fs}"
-        font-weight="700" fill="#fff" letter-spacing="${-fs * 0.04}">${text}</text>
-  ${sub ? `<rect x="50%" y="${size / 2 + fs * 0.72}" width="${subW}" height="${size * 0.045 * scale}" rx="${size * 0.02}" fill="rgba(255,255,255,0.7)"/>` : ''}
-</svg>`
+/** 母版的深蓝底色，与 Android 自适应图标的 background 同一个值 */
+const NAVY = '#1f2a44'
+
+/** 普通图标：深蓝满幅 + 图形（ratio 控制图形占多大） */
+async function flat(size, ratio, file) {
+  const inner = Math.max(1, Math.round(size * ratio))
+  const glyph = await sharp(path.join(OUT, 'icon-master.png')).resize(inner, inner).toBuffer()
+  await sharp({ create: { width: size, height: size, channels: 4, background: NAVY } })
+    .composite([
+      { input: glyph, top: Math.round((size - inner) / 2), left: Math.round((size - inner) / 2) },
+    ])
+    .png()
+    .toFile(path.join(OUT, file))
 }
 
-const jobs = [
-  ['icon-192.png', 192, { text: 'A', safe: 0.86 }],
-  ['icon-512.png', 512, { text: 'A', safe: 0.86 }],
-  // maskable：满幅底 + 内容缩到中间 60%
-  ['icon-maskable-512.png', 512, { text: 'A', safe: 0.6 }],
-  // iOS 自己切圆角，所以画成方的满幅
-  ['apple-touch-icon.png', 180, { text: 'A', safe: 0.86, radius: 0 }],
-  ['icon-64.png', 64, { text: 'A', safe: 0.86 }],
-]
-
-for (const [name, size, opt] of jobs) {
-  const buf = Buffer.from(svg({ size, ...opt }))
-  await sharp(buf).png({ compressionLevel: 9 }).toFile(path.join(OUT, name))
-  console.log('写出', name, `${size}×${size}`)
+/** 只有图形（透明底）叠在深蓝上：maskable 要把图形收进安全区 */
+async function maskable(size, ratio, file) {
+  const inner = Math.max(1, Math.round(size * ratio))
+  const glyph = await sharp(path.join(OUT, 'icon-glyph.png')).resize(inner, inner).toBuffer()
+  await sharp({ create: { width: size, height: size, channels: 4, background: NAVY } })
+    .composite([
+      { input: glyph, top: Math.round((size - inner) / 2), left: Math.round((size - inner) / 2) },
+    ])
+    .png()
+    .toFile(path.join(OUT, file))
 }
 
-// 矢量 favicon
-const favicon = svg({ size: 64, text: 'A', safe: 0.86 })
-writeFileSync(path.join(OUT, 'favicon.svg'), favicon, 'utf8')
-console.log('写出 favicon.svg')
+await flat(64, 0.86, 'icon-64.png')
+await flat(180, 0.8, 'apple-touch-icon.png')
+await flat(192, 0.8, 'icon-192.png')
+await flat(512, 0.8, 'icon-512.png')
+await maskable(512, 0.62, 'icon-maskable-512.png')
+
+// favicon：内嵌一张 64px PNG（比手画 SVG 更接近真实图标）
+const fav = await sharp(path.join(OUT, 'icon-64.png')).png().toBuffer()
+writeFileSync(
+  path.join(OUT, 'favicon.svg'),
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64"><image width="64" height="64" href="data:image/png;base64,${fav.toString('base64')}"/></svg>\n`,
+)
+
+console.log('图标已生成：icon-64/192/512、maskable、apple-touch、favicon.svg')

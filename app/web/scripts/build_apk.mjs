@@ -208,5 +208,5 @@ for (const r of ready) {
   log(`安装到 ${serial}`)
   execFileSync(ADB, ['-s', serial, 'install', '-r', '-d', apk], { stdio: 'inherit' })
 }
-log('装好了：桌面上的图标叫「词库」，包名 com.wordbank.app.debug')
+log('装好了：桌面上的图标叫「极简单词」，包名 com.wordbank.app.debug')
 log('★ 换手机/重装前记得在「更多 → 导出」备份 —— 学习进度存在手机本地，重装会没')

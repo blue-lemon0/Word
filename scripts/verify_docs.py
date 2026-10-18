@@ -1238,6 +1238,17 @@ interaction = [
     ("词库顶部按钮只承诺练得到的词（数字来自出题池）",
      "practicePool()" in _src(os.path.join("pages", "LibraryPage.vue"))
      and "practisable" in _src(os.path.join("pages", "LibraryPage.vue"))),
+    # ── D53：更名与图标 ──
+    ("应用名已是「极简单词」",
+     "极简单词" in _src(os.path.join(WEB, "..", "android", "app", "src", "main", "res", "values", "strings.xml"))
+     and "极简单词" in _src(os.path.join(WEB, "index.html"))),
+    ("自适应图标齐全（anydpi xml + 前景层 + 背景色）",
+     os.path.exists(os.path.join(WEB, "..", "android", "app", "src", "main", "res", "mipmap-anydpi-v26", "ic_launcher.xml"))
+     and os.path.exists(os.path.join(WEB, "..", "android", "app", "src", "main", "res", "mipmap-xxxhdpi", "ic_launcher_foreground.png"))
+     and "ic_launcher_background" in _src(os.path.join(WEB, "..", "android", "app", "src", "main", "res", "values", "colors.xml"))),
+    ("图标母版在库里（脚本可重跑，不是一次性手工作品）",
+     os.path.exists(os.path.join(WEB, "public", "icon-master.png"))
+     and os.path.exists(os.path.join(WEB, "public", "icon-glyph.png"))),
 ]
 
 fi = 0

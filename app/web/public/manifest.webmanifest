@@ -1,6 +1,6 @@
 {
-  "name": "词库 · 背单词",
-  "short_name": "词库",
+  "name": "极简单词 · 背单词",
+  "short_name": "极简单词",
   "description": "按意思背单词：每个义项是独立的学习单元，配例句与 SRS 排期。离线可用。",
   "lang": "zh-CN",
   "dir": "ltr",
@@ -27,7 +27,7 @@
     },
     {
       "name": "查词库",
-      "short_name": "词库",
+      "short_name": "极简单词",
       "url": "./#/library",
       "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
     }
