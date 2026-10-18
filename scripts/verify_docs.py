@@ -1253,6 +1253,9 @@ interaction = [
      'class="brand"' in _src(os.path.join("pages", "MorePage.vue"))
      and "APP_VERSION" in _src(os.path.join("pages", "MorePage.vue"))
      and 'class="stat"' not in _src(os.path.join("pages", "MorePage.vue"))),
+    ("词库「练不到的词」是一行提示 + 精确清单弹窗（不是含糊的筛选）",
+     "stuckList" in _src(os.path.join("pages", "LibraryPage.vue"))
+     and "这些词暂时练不到" in _src(os.path.join("pages", "LibraryPage.vue"))),
 ]
 
 fi = 0

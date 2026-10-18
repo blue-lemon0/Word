@@ -152,8 +152,11 @@ function readyFromMemory(): boolean {
 }
 
 async function load(): Promise<void> {
-  void refreshPractisable()
-  if (readyFromMemory()) return
+  // ★ 两个数依赖 rows（每个词有哪些义项），必须在 rows 就位之后再算
+  if (readyFromMemory()) {
+    void refreshPractisable()
+    return
+  }
   loading.value = true
   const [all, wrows, srows, prows] = await Promise.all([
     liveSenses(),
@@ -162,6 +165,7 @@ async function load(): Promise<void> {
     allProgress(),
   ])
   applyRows(buildRows(all, wrows, srows, prows))
+  await refreshPractisable()
 }
 
 /** 出题池里的词各有多少（到期 / 待学）—— 顶部按钮的数字用它 */
@@ -188,6 +192,14 @@ async function refreshPractisable(): Promise<void> {
     else if (r === 2) fresh++
   }
   practisable.value = { due, new: fresh }
+
+  // 库里存在、但没有任何可练义项的**词**（全都缺例句 / 被标记）——
+  // 这些词点哪儿都练不到，是"卡住"的信号，值得在页面上出现一次
+  const inPool = new Set(pool.map((s) => s.word))
+  stuckList.value = rows.value
+    .filter((r) => !inPool.has(r.word))
+    .map((r) => ({ word: r.word, senses: r.senses.length }))
+    .sort((a, b) => a.word.localeCompare(b.word))
 }
 
 /**
@@ -198,6 +210,20 @@ async function refreshPractisable(): Promise<void> {
  *   否则就会出现「说有新词可以学，点进去 0 题」。
  */
 const practisable = ref<{ due: number; new: number }>({ due: 0, new: 0 })
+/**
+ * 库里有、但**一个可练义项都没有**的词（缺例句 / 全被标记）。
+ *
+ * ★ 为什么不复用「维护 → 缺例句」那个筛选：那个的口径是「句子数不足目标」，
+ *   会把"有 5 句、目标 8 句"的词也算进来 —— 和这行提示说的「练不到」不是同一批。
+ *   这里要的是精确集合，所以自己算；弹窗里也就能直接给「去补」。
+ */
+const stuckList = ref<{ word: string; senses: number }[]>([])
+const stuckWords = computed(() => stuckList.value.length)
+const stuckOpen = ref(false)
+
+function showStuck(): void {
+  stuckOpen.value = true
+}
 
 /** 顶上的四个数：今天到期 / 在学 / 待学 / 已掌握（都按**词**算） */
 const head = computed(() => {
@@ -216,7 +242,9 @@ const grouped = computed(() => {
     if (only.value && r.bucket !== only.value) continue
     if (maintain.value) {
       if (mFilter.value === 'rf' && !r.needsRefine) continue
-      if (mFilter.value === 'ns' && r.sentences >= r.target) continue
+      // ★ 口径：**一句都没有**也算缺（占位词的 target 可能是 0，
+      //   写成 r.sentences >= r.target 会把最该补的那批筛掉）
+      if (mFilter.value === 'ns' && r.sentences > 0 && r.sentences >= r.target) continue
       if (mFilter.value === 'T1' && !r.senses.some((x) => x.tier === 'T1')) continue
     }
     map.get(r.bucket)!.push(r)
@@ -289,6 +317,33 @@ onMounted(load)
       </div>
     </header>
 
+    <van-popup
+      :show="stuckOpen"
+      position="bottom"
+      round
+      close-on-popstate
+      @close="stuckOpen = false"
+    >
+      <div class="stuck-sheet">
+        <h3>这些词暂时练不到</h3>
+        <p class="sub">没有例句（或例句都被标记了），所以出不了题。补上就能进练习。</p>
+        <div class="list">
+          <button
+            v-for="it in stuckList"
+            :key="it.word"
+            class="row"
+            type="button"
+            @click="stuckOpen = false; router.push(`/word/${encodeURIComponent(it.word)}`)"
+          >
+            <b>{{ it.word }}</b>
+            <span class="n">{{ it.senses }} 个意思</span>
+            <span class="go">去补 ›</span>
+          </button>
+        </div>
+        <van-button block round @click="stuckOpen = false">知道了</van-button>
+      </div>
+    </van-popup>
+
     <AddWordSheet
       :open="showAdd"
       @close="showAdd = false"
@@ -338,6 +393,14 @@ onMounted(load)
           </van-button>
         </div>
       </section>
+
+      <button v-if="stuckWords > 0" class="stuck" type="button" @click="showStuck">
+        <span class="ico">!</span>
+        <span class="tx">
+          有 <b>{{ stuckWords }}</b> 个词缺例句，练不到
+        </span>
+        <span class="go">去补 ›</span>
+      </button>
 
       <van-search v-model="q" placeholder="搜索我的词库" shape="round" class="sbox" />
 
@@ -499,6 +562,100 @@ onMounted(load)
 }
 
 /* ── 搜索与 chips ── */
+.stuck-sheet {
+  padding: 18px 16px calc(18px + env(safe-area-inset-bottom, 0px));
+}
+
+.stuck-sheet h3 {
+  font-size: 16px;
+  font-weight: 650;
+  color: var(--wb-ink);
+}
+
+.stuck-sheet .sub {
+  margin: 6px 0 12px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--wb-ink-3);
+}
+
+.stuck-sheet .list {
+  max-height: 46vh;
+  overflow-y: auto;
+  margin-bottom: 14px;
+}
+
+.stuck-sheet .row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  padding: 11px 4px;
+  border: 0;
+  border-bottom: 1px solid var(--wb-line);
+  background: transparent;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.stuck-sheet .row b {
+  font-size: 15px;
+  color: var(--wb-ink);
+}
+
+.stuck-sheet .row .n {
+  font-size: 12px;
+  color: var(--wb-ink-3);
+}
+
+.stuck-sheet .row .go {
+  margin-left: auto;
+  font-size: 12.5px;
+  color: var(--wb-primary);
+}
+
+.stuck {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin: 0 0 8px;
+  padding: 10px 12px;
+  border: 1px solid #f0d9a8;
+  border-radius: 12px;
+  background: #fff8e8;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.stuck .ico {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #d99a2b;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+}
+
+.stuck .tx {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  color: #7a5a12;
+}
+
+.stuck .go {
+  flex: 0 0 auto;
+  font-size: 12.5px;
+  color: #a1721a;
+}
+
 .sbox {
   /* 吸在顶栏下面：滚到下面找词时，搜索框还在。 */
   position: sticky;
