@@ -83,6 +83,21 @@ function contextOf(r: Rows): WordContext {
   }
 }
 
+/** 一次「取缓存 → 调用 → 解析 → 写缓存」。
+ *
+ *  ★ 键的组成单独抽成 `cacheKeyOf`：体检的**预算预览**要提前算同一种键
+ *    来判断「这个词是不是已经有缓存了」。如果两处各拼一遍，预览说「全免费」
+ *    而实际照样花钱 —— 这种不一致比没有预览更糟。
+ */
+export function cacheKeyOf(
+  action: AiActionKind,
+  model: string,
+  ctx: WordContext,
+  extra = '',
+): string {
+  return hashOf([PROMPT_VERSION, action, model, extra, JSON.stringify(ctx)].join('|'))
+}
+
 /** 一次「取缓存 → 调用 → 解析 → 写缓存」。 */
 async function run(
   action: AiActionKind,
@@ -94,8 +109,7 @@ async function run(
   if (!isConfigured(cfg)) throw new AiError('no-config', 'AI 还没配置')
 
   const ctx = contextOf(rows)
-  // 键里必须有**内容指纹**：内容一改，旧建议立刻作废（见 cache.ts）
-  const key = hashOf([PROMPT_VERSION, action, cfg.model, extra, JSON.stringify(ctx)].join('|'))
+  const key = cacheKeyOf(action, cfg.model, ctx, extra)
   const bind = { word: rows.word, ipa: rows.ipa, senses: rows.senses, sentences: rows.sentences }
 
   const hit = await cacheGet(key)
@@ -119,6 +133,16 @@ async function run(
     usage: reply.usage,
     cached: false,
   }
+}
+
+/** 体检预算预览用：算出「审这个词」的缓存键**和**大概要多少 token。 */
+export async function reviewSnapshot(
+  word: string,
+): Promise<{ key: string; chars: number } | null> {
+  const rows = await rowsOf(word)
+  if (!rows.senses.length) return null
+  const ctx = contextOf(rows)
+  return { key: cacheKeyOf('reviewWord', loadConfig().model, ctx), chars: JSON.stringify(ctx).length }
 }
 
 /** 审查一个词：义项与例句的问题，附补充建议。 */

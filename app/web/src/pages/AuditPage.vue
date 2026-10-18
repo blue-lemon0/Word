@@ -15,7 +15,15 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import AiSheet from '../components/AiSheet.vue'
-import { auditOne, auditTargets, lastAuditAt, markAudited, type AuditTarget } from '../ai/audit'
+import {
+  auditEstimate,
+  auditOne,
+  auditTargets,
+  lastAuditAt,
+  markAudited,
+  type AuditEstimate,
+  type AuditTarget,
+} from '../ai/audit'
 import { aiReady } from '../ai/config'
 import { describeAiError, AiError, type AiResult } from '../ai/types'
 import { goBack } from '../nav'
@@ -49,8 +57,20 @@ const progress = computed(() =>
   targets.value.length ? Math.round((idx.value / targets.value.length) * 100) : 0,
 )
 
+/* ── 预算预览：跑之前先说清「这次要花多少」 ──
+ *  「19 个词」在界面上看不出价格；而体检是会花钱的动作。
+ *  预览给三件事：多少词、其中多少已有缓存（免费）、预计还要多少 token。
+ *  数字是粗的，所以写「约」。 */
+const est = ref<AuditEstimate | null>(null)
+
+async function refreshEstimate(): Promise<void> {
+  if (!targets.value.length) return
+  est.value = await auditEstimate(targets.value)
+}
+
 onMounted(async () => {
   targets.value = await auditTargets()
+  await refreshEstimate()
 })
 
 const KIND_TEXT: Record<LogKind, string> = {
@@ -65,6 +85,13 @@ function fmt(ts: number): string {
   const d = new Date(ts)
   const p = (n: number): string => String(n).padStart(2, '0')
   return `${d.getMonth() + 1}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`
+}
+
+/** token 数只报量级：几百 / 1.2k / 18k —— 精确个位数没有意义，反而像承诺 */
+function fmtTokens(n: number): string {
+  if (n < 1000) return String(n)
+  if (n < 10000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k'
+  return Math.round(n / 1000) + 'k'
 }
 
 function start(): void {
@@ -148,6 +175,7 @@ function finish(): void {
   running.value = false
   markAudited()
   lastAt.value = lastAuditAt()
+  void refreshEstimate()   // 跑完内容变了：预览要重算（多数词这时变成已缓存）
   toast(`体检完了：${appliedTotal.value} 条已应用`)
 }
 </script>
@@ -176,6 +204,13 @@ function finish(): void {
         </div>
         <p class="dim">
           上次体检：{{ fmt(lastAt) }} · 跑过的词结果会缓存，内容没变再跑不花钱
+        </p>
+
+        <!-- 预算预览：先把「要花多少」说清楚，再让人决定按不按 -->
+        <p v-if="est && aiOn" class="budget">
+          共 {{ est.total }} 个词
+          <template v-if="est.cached">· 其中 {{ est.cached }} 个已缓存（免费）</template>
+          · 预计还要 <b>{{ est.requests }}</b> 次请求、约 <b>{{ fmtTokens(est.tokens) }}</b> tokens
         </p>
 
         <p v-if="!aiOn" class="warn">先去「更多 → AI 助手」填 Key 才能体检。</p>
@@ -263,7 +298,21 @@ function finish(): void {
   font-size: 12px;
   line-height: 1.7;
   color: var(--wb-ink-3);
-  margin: 6px 0 12px;
+  margin: 6px 0 8px;
+}
+
+.budget {
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--wb-ink-2);
+  background: var(--wb-bg);
+  border-radius: 10px;
+  padding: 8px 10px;
+  margin: 0 0 10px;
+}
+
+.budget b {
+  font-weight: 600;
 }
 
 .warn {

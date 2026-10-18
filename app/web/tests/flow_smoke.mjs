@@ -543,6 +543,42 @@ ok((await db.sentences.get(afterTake[0].sentenceId)).en === flagged.sentence.en,
   ok(tg.every((t) => t.senses >= 1), '只把**有义项**的词列进体检（没义项的词没什么可审的）')
   await edit.purgeWord(Z)
 
+  // 9) 体检预算预览：先算缓存命中，再说「还要几次请求」
+  ai.__setConfigForTest({
+    enabled: true,
+    baseUrl: 'https://example.test',
+    apiKey: 'sk-test',
+    model: 'test-model',
+    maxTokens: 800,
+    temperature: 0.2,
+  })
+  const E = 'zzzest'
+  const { senseId: eId } = await edit.addWord(E, '/e/')
+  await edit.updateSense(eId, { gloss: '预算探针' })
+  await edit.addSentence(eId, E, `A plain ${E} sentence here.`)
+  const target = { word: E, senses: 1, sentences: 1, refine: 0, hasIpa: true }
+  const est1 = await ai.auditEstimate([target])
+  ok(est1.requests === 1 && est1.cached === 0,
+     `没缓存时预览说「还要 1 次请求」（实际 ${est1.requests}/${est1.cached}）`)
+  ok(est1.tokens > 0, `预览给出 token 量级（约 ${est1.tokens}）`)
+
+  // 跑一次（假传输）→ 缓存命中 → 预览变「免费」
+  ai.__setTransportForTest({
+    name: 'fake-est',
+    async postJson() {
+      return {
+        status: 200,
+        body: JSON.stringify({ choices: [{ message: { content: JSON.stringify({ note: 'ok', proposals: [] }) } }] }),
+      }
+    },
+  })
+  await ai.reviewWord(E)
+  const est2 = await ai.auditEstimate([target])
+  ok(est2.requests === 0 && est2.cached === 1,
+     `跑过之后预览说「已缓存」（实际 ${est2.requests}/${est2.cached}）`)
+  ai.__setTransportForTest(null)
+  await edit.purgeWord(E)
+
   // 收尾
   ai.__setTransportForTest(null)
   ai.__setConfigForTest(null)

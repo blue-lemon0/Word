@@ -47,3 +47,9 @@ app/app/
 *.db
 *.db-wal
 *.db-shm
+
+# ── IDE（JetBrains / Android Studio 自动生成，不是源码）──
+# 起因：Android Studio 打开工程时生成了根目录的 .idea/，而 .gitignore 里
+# 当时只挡了 app/android/.idea/ —— 于是 `git add -A` 把本机配置扫进了提交。
+.idea/
+*.iml

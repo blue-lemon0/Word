@@ -12,7 +12,8 @@
  *    互相拖慢。一次一个词、失败等 800ms 再试一次，够用了。
  */
 import { allSentences, allWords, liveSenses } from '../db'
-import { reviewWord } from './actions'
+import { reviewSnapshot, reviewWord } from './actions'
+import { cacheGet } from './cache'
 import { AiError, type AiResult } from './types'
 
 export interface AuditTarget {
@@ -103,3 +104,51 @@ export async function auditOne(word: string): Promise<AiResult> {
     return reviewWord(word)
   }
 }
+
+/**
+ * 预算预览：跑之前先说清楚「这次要花多少」。
+ *
+ *  ★ 体检是**花钱**的动作，而「19 个词」在界面上看不出价格。
+ *    预览给出三件事：多少个词、其中多少个已经有缓存（免费）、预计还要多少 token。
+ *
+ *  ★ 缓存判断必须用**和真正调用同一套键**（`cacheKeyOf`）。两处各拼一遍的话，
+ *    预览说「都缓存过了」而实际照样花钱 —— 那种不一致比没有预览更糟。
+ *
+ *  ★ token 估算是粗的：按上下文 JSON 的字符数 ×0.45（中英混排大致这个量级）
+ *    再加上固定的提示词开销与输出预算。界面上写「约」，不写「等于」。
+ */
+export interface AuditEstimate {
+  total: number
+  cached: number
+  /** 还要发几次请求 */
+  requests: number
+  /** 预计 token（粗略） */
+  tokens: number
+}
+
+export async function auditEstimate(targets: AuditTarget[]): Promise<AuditEstimate> {
+  let cached = 0
+  let chars = 0
+  let missing = 0
+  for (const t of targets) {
+    const snap = await reviewSnapshot(t.word)
+    if (!snap) continue
+    chars += snap.chars
+    const hit = await cacheGet(snap.key)
+    if (hit) cached++
+    else missing++
+  }
+  // 每个词：提示词固定开销约 260 token + 上下文 + 输出预算 250
+  const tokens = Math.round(missing * (260 + 250) + chars * 0.45)
+  return { total: targets.length, cached, requests: missing, tokens }
+}
+
+/* 自动预跑（每天跑一小批）**暂时不做**。
+ *
+ *  ★ 原因是判断变了：自动跑是**背着用户花钱**，而且它填的缓存只有在人真的
+ *    打开体检页时才有价值 —— 一个「没人看也在花钱」的功能，不该默认开着。
+ *    先让人把「打开体检 → 看预算 → 决定跑多少」这条路走顺（D40 §5 的预算预览），
+ *    自动那一步等有真实使用数据再说。
+ *  ★ 需要时可以这样加回来（代码骨架留在 git 历史里）：
+ *    localStorage 记日期 + 一天一次 + 只跑 autoDaily 个 + 只填缓存不应用。
+ */

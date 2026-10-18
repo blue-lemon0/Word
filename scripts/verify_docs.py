@@ -1267,6 +1267,24 @@ interaction = [
     ("音标可以就地改（AI 只补缺，人要有出口）",
      _re.search(r"async function onIpaBlur", word) is not None
      and "updateWord(props.word, { ipa: next })" in word),
+
+    # ── 体检的预算预览（以及「不做后台自动跑」的反向守卫）──
+    # 「19 个词」在界面上看不出价格，而体检是花钱的动作。
+    ("体检跑之前给预算预览（词数 / 已缓存 / 预计 token）",
+     "auditEstimate(" in _ai_src("audit.ts")
+     and "auditEstimate(" in _ai_page("AuditPage.vue")
+     and _re.search(r"fmtTokens\(", _ai_page("AuditPage.vue")) is not None),
+    # 预览说「全缓存过」而实际照样花钱，比没有预览更糟 —— 键必须是同一个函数算的
+    ("预算预览与真正调用共用同一套缓存键",
+     "export function cacheKeyOf" in _ai_src("actions.ts")
+     and "cacheKeyOf('reviewWord'" in _ai_src("actions.ts")
+     and "reviewSnapshot(" in _ai_src("audit.ts")),
+    # 自动跑**刻意不做**：它背着用户花钱，而填的缓存只有人真的打开体检页才有价值。
+    # 守卫反着写：一旦有人把「后台自动跑」加回来，这里就该红，逼一次显式决定。
+    ("AI 不在后台偷偷跑（自动预跑已刻意移除）",
+     "maybePrefetch" not in _ai_src("audit.ts")
+     and "PREFETCH_DAY" not in _ai_src("audit.ts")
+     and "autoDaily" not in _src(os.path.join("ai", "config.ts"))),
 ]
 
 fi = 0
