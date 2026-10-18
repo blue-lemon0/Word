@@ -9,8 +9,13 @@
  *  ★ 为什么用一张浮层承载所有 AI 动作：
  *    「审查 / 补一句 / 换一句」产出的东西是同一种（提案列表），
  *    界面就没必要分三套。动作只在标题和空态话术上有区别。
+ *
+ *  ★ 事件只有两个，而且**互斥**：`applied(n)` 与 `close`。
+ *    早先的写法是「应用之后再发一次 close」，结果调用方收到两次「这次结束了」：
+ *    体检那边因此把队列推进两格（跳过一个词），日志里还多出一条没有词名的记录。
+ *    现在应用只发 `applied` —— 关不关浮层、要不要继续，是调用方的事。
  */
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { applyAll, applyOne } from '../ai/apply'
 import type { Proposal, AiResult } from '../ai/types'
 import { toast } from '../toast'
@@ -20,8 +25,10 @@ const props = defineProps<{
   result: AiResult | null
   busy: boolean
   error: string
+  /** 附在标题后面的说明（体检时用来指出「现在审的是哪个词」） */
+  label?: string
 }>()
-const emit = defineEmits<{ (e: 'close'): void; (e: 'applied'): void }>()
+const emit = defineEmits<{ (e: 'close'): void; (e: 'applied', count: number): void }>()
 
 /** 被忽略的提案（按 id）；「全部应用」只应用剩下的 */
 const skipped = ref<Set<string>>(new Set())
@@ -45,6 +52,7 @@ const title = computed(() => {
 
 const kindLabel: Record<Proposal['kind'], string> = {
   'sense.update': '改释义',
+  'word.update': '补音标',
   'sentence.replace': '换例句',
   'sentence.add': '加例句',
   'sense.add': '加义项',
@@ -71,9 +79,13 @@ function lineOf(p: Proposal): { label: string; to: string; why: string } {
     case 'sense.update':
       return {
         label: `s${p.slot} 释义`,
-        to: [p.pos, p.gloss].filter(Boolean).join(' ') || '（只改备注/英文）',
+        to:
+          [p.pos, p.gloss].filter(Boolean).join(' ') ||
+          (p.trap != null ? (p.trap ? '标成「熟词僻义」' : '取消「熟词僻义」') : '（只改备注/英文）'),
         why: p.why ?? '',
       }
+    case 'word.update':
+      return { label: '音标', to: `/${p.ipa}/`, why: p.why ?? '' }
     case 'sentence.replace':
       return { label: p.label, to: p.en, why: p.why ?? '' }
     case 'sentence.add':
@@ -89,14 +101,38 @@ function lineOf(p: Proposal): { label: string; to: string; why: string } {
   }
 }
 
+/** 防止「应用」之后再补一个 close。
+ *
+ *  ★ 真实的机制：应用之后父组件把 `show` 置 false → van-popup 自己也走一遍关闭流程
+ *    并 emit close → 调用方又收到一次「这次结束了」。体检那边因此把队列推两格
+ *    （跳过一整词），日志里还多一条没有词名的记录。
+ *    所以「应用」一旦发生，就把这一次关闭事件吃掉。
+ */
+let appliedFired = false
+
+watch(
+  () => props.show,
+  (v) => {
+    if (v) appliedFired = false
+  },
+)
+
+function onPopupClose(): void {
+  if (appliedFired) {
+    appliedFired = false
+    return
+  }
+  emit('close')
+}
+
 async function applyOneNow(p: Proposal): Promise<void> {
   if (applying.value) return
   applying.value = true
   try {
     const msg = await applyOne(p)
     toast(msg)
-    emit('applied')
-    emit('close')
+    appliedFired = true
+    emit('applied', 1)
   } catch (e) {
     toast(`应用失败：${e instanceof Error ? e.message : String(e)}`)
   } finally {
@@ -108,10 +144,11 @@ async function applyKept(): Promise<void> {
   if (applying.value || !kept.value.length) return
   applying.value = true
   try {
+    const n = kept.value.length
     const r = await applyAll(kept.value)
     toast(`已应用 ${r.applied} 条（应用前自动存了快照）`)
-    emit('applied')
-    emit('close')
+    appliedFired = true
+    emit('applied', r.applied || n)
   } catch (e) {
     toast(`应用失败：${e instanceof Error ? e.message : String(e)}`)
   } finally {
@@ -127,11 +164,12 @@ async function applyKept(): Promise<void> {
     round
     close-on-popstate
     :style="{ maxHeight: '88vh' }"
-    @close="$emit('close')"
+    @close="onPopupClose"
   >
     <div class="ai">
       <header class="hd">
         <h3>{{ title }}</h3>
+        <span v-if="label" class="who">{{ label }}</span>
         <span v-if="result?.cached" class="badge">缓存（这次没花钱）</span>
       </header>
 
@@ -216,6 +254,11 @@ async function applyKept(): Promise<void> {
   padding: 2px 7px;
   border-radius: 999px;
   background: var(--wb-line);
+  color: var(--wb-ink-3);
+}
+
+.hd .who {
+  font-size: 12.5px;
   color: var(--wb-ink-3);
 }
 

@@ -4,6 +4,7 @@
  *  回滚只回内容，学习记录不动 —— 导入翻车不该把人背过的也退回去。
  */
 import { onMounted, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import ConfirmSheet from '../components/ConfirmSheet.vue'
 import InstallPrompt from '../components/InstallPrompt.vue'
 import SwipePanels from '../components/SwipePanels.vue'
@@ -17,6 +18,7 @@ import { db, emptyTrash, restoreSense, trashedSenses } from '../db'
 import { toast } from '../toast'
 import type { ImportLog, Sense, Snapshot } from '../types'
 
+const router = useRouter()
 const stats = ref<Stats | null>(null)
 const snaps = ref<Snapshot[]>([])
 const imports = ref<ImportLog[]>([])
@@ -267,6 +269,23 @@ onMounted(load)
            放在「备份与导入」下面、记录区上面 —— 它属于「设置这台设备怎么工作」，
            不属于「已经发生过的记录」。 -->
       <AiSettings />
+
+      <!-- AI 体检：整库过一遍的入口。它是一次**维护动作**，
+           所以是个二级页（从这儿进去、有返回、没有底栏），不在底栏里占一格。 -->
+      <van-cell-group inset class="grp">
+        <template #title>
+          <b>AI 体检</b><span class="sub">逐个词过一遍，结果由你定</span>
+        </template>
+        <div class="acts">
+          <van-button size="small" plain type="primary" @click="router.push('/audit')">
+            打开体检
+          </van-button>
+        </div>
+        <van-cell
+          class="note"
+          title="跑一个词、看一个词：AI 只提建议，点「应用」才改。跑过的词结果会缓存，内容没变再跑不花钱。"
+        />
+      </van-cell-group>
 
       <!-- 快照 / 导入历史 / 回收站：三个平级的列表，同一个盒子，左右滑动切换。
            它们本来就是一类东西 —— 都是「已经发生过的、会留痕的记录」，

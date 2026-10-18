@@ -291,6 +291,12 @@ function onAiReplace(sen: Sentence): void {
   void runAi(() => aiReplaceSentence(sen.id as number, ''))
 }
 
+/** 应用之后：收起浮层并刷新这一页 */
+function onAiDone(): void {
+  aiOpen.value = false
+  void load()
+}
+
 /** 进编辑态。
  *
  *  两件事都要做，缺一个就会「点了没反应」：
@@ -785,7 +791,7 @@ function onDelete(): void {
         :busy="aiBusy"
         :error="aiError"
         @close="aiOpen = false"
-        @applied="load"
+        @applied="onAiDone"
       />
     </div>
   </div>

@@ -348,7 +348,7 @@ ok((await db.sentences.get(afterTake[0].sentenceId)).en === flagged.sentence.en,
  */
 {
   const W = 'zzzai'
-  const { senseId } = await edit.addWord(W, '/zzz/')
+  const { senseId } = await edit.addWord(W)
   await edit.updateSense(senseId, { gloss: '原释义', pos: 'n.' })
   await edit.addSentence(senseId, W, `A ${W} stood here.`)
   const sid1 = (await db.sentences.where('senseId').equals(senseId).toArray())[0].id
@@ -377,13 +377,16 @@ ok((await db.sentences.get(afterTake[0].sentenceId)).en === flagged.sentence.en,
       const canned = {
         note: '看了一下，有 3 处',
         proposals: [
-          { kind: 'sense.update', slot: 1, gloss: 'AI 修的释义', pos: 'n.', why: '更准确' },
+          { kind: 'sense.update', slot: 1, gloss: 'AI 修的释义', pos: 'n.', trap: 1, why: '更准确，且这是熟词僻义' },
+          { kind: 'word.update', ipa: 'ˈziːzi', why: '原来那个不像音标' },
           { kind: 'sentence.add', slot: 1, en: `The ${W} stood on the hill.`, zh: '它站在山上。', why: '补一句' },
           { kind: 'sentence.replace', sentenceId: sid1, en: `A ${W} appeared near the river.`, zh: '它出现在河边。', why: '换一句' },
           // 幻觉一号：句子里根本没有目标词
           { kind: 'sentence.add', slot: 1, en: 'Nothing to see here.', zh: '这里什么都没有。', why: '不含目标词' },
           // 幻觉二号：不存在的槽位
           { kind: 'sense.update', slot: 9, gloss: '不存在的意思' },
+          // 噪音：与上一条音标完全重复（重复的提案不该占两行）
+          { kind: 'word.update', ipa: '/ˈziːzi/' },
         ],
       }
       return {
@@ -411,7 +414,9 @@ ok((await db.sentences.get(afterTake[0].sentenceId)).en === flagged.sentence.en,
   ok(lastAuth === 'Bearer sk-test', 'Authorization 头带上了 key')
   ok(lastBody?.model === 'test-model' && lastBody?.max_tokens === 800, '模型与输出上限来自配置')
   ok(lastBody?.response_format?.type === 'json_object', '要求 JSON 输出（省掉一半解析麻烦）')
-  ok(r.proposals.length === 3, `幻觉被挡掉，只剩 3 条可用（实际 ${r.proposals.length}）`)
+  ok(r.proposals.length === 4, `幻觉与噪音被挡掉，只剩 4 条可用（实际 ${r.proposals.length}）`)
+  ok(r.proposals.some((p) => p.kind === 'word.update' && p.ipa === 'ˈziːzi'),
+     '音标提议（去掉两边的斜杠，跟 Word.ipa 同格式）')
   ok(r.usage?.total === 150, '带回了 token 用量（界面要显示这次花了多少）')
   ok(r.note.includes('不可用'), '被丢掉的建议有交代，不是静默消失', r.note)
   ok(r.cached === false, '首次是真调用')
@@ -419,13 +424,21 @@ ok((await db.sentences.get(afterTake[0].sentenceId)).en === flagged.sentence.en,
   // 3) 内容没变 → 第二次必须命中缓存（省钱这条要能被证明）
   const r2 = await ai.reviewWord(W)
   ok(r2.cached === true && calls === 1, '同样内容第二次调用走缓存，没有再花钱')
-  ok(r2.proposals.length === 3, '缓存回来的提案一样可用')
+  ok(r2.proposals.length === 4, '缓存回来的提案一样可用')
 
-  // 4) 应用：改释义 + 补一句 + 换一句（换句要重算高亮区间）
+  // 4) 应用：改释义 + 补音标 + 补一句 + 换一句（换句要重算高亮区间）
   const { applied } = await ai.applyAll(r.proposals)
-  ok(applied === 3, `三条都应用了（${applied}）`)
+  ok(applied === 4, `四条都应用了（${applied}）`)
   const senseNow = await db.senses.get(senseId)
   ok(senseNow.gloss === 'AI 修的释义' && senseNow.pos === 'n.', '释义改对了，词性没被顺手清掉')
+  ok(senseNow.trap === 1, '熟词僻义标记落库了（它会改新卡的起始间隔，所以必须能看见、能应用）')
+  ok((await db.words.get(W)).ipa === 'ˈziːzi', '音标落到了词条上（不是义项）')
+
+  // 4b) 已有音标时**不许再改**：模型判断“音标对不对”不可靠，
+  //     真机上它把一个对的 /ˈæspɛkt/ 改成了丢掉重音的 /æspekt/。
+  const r3 = await ai.reviewWord(W)   // 内容变了 → 新的一次调用
+  ok(r3.cached === false && r3.proposals.every((p) => p.kind !== 'word.update'),
+     '已有音标的词不再接受音标改写（只补缺）', r3.note)
   const sentsNow = await db.sentences.where('senseId').equals(senseId).toArray()
   ok(sentsNow.length === 2, `两句（原来 1 句 + 补 1 句，替换不新增）实际 ${sentsNow.length}`)
   const replaced = sentsNow.find((s) => s.id === sid1)
@@ -452,9 +465,9 @@ ok((await db.sentences.get(afterTake[0].sentenceId)).en === flagged.sentence.en,
       }
     },
   })
-  const r3 = await ai.replaceSentence(sid1, '原句不自然')
-  ok(r3.proposals.length === 1 && r3.proposals[0].kind === 'sentence.replace', '换一句只产出一条替换提议')
-  await ai.applyAll(r3.proposals)
+  const rRep = await ai.replaceSentence(sid1, '原句不自然')
+  ok(rRep.proposals.length === 1 && rRep.proposals[0].kind === 'sentence.replace', '换一句只产出一条替换提议')
+  await ai.applyAll(rRep.proposals)
   ok((await db.sentences.get(sid1)).en === `Every ${W} has a name.`, '换一句落库了')
 
   // 6) 内容一改，缓存必须失效（否则会拿旧建议改新内容）
@@ -519,6 +532,16 @@ ok((await db.sentences.get(afterTake[0].sentenceId)).en === flagged.sentence.en,
     refused = e
   }
   ok(refused && refused.kind === 'refused', '已经有释义的词走「审查」，不走「补全」')
+
+  // 8) 体检对象：先跑「最像有问题」的词（需精修 > 缺音标 > 例句少）
+  const Z = 'zzzaudit'
+  const pend2 = await edit.addPendingWord(Z)   // 需精修 + 无音标 + 占位义项
+  ok(pend2.existed === false, '造一个需精修的空壳词')
+  const tg = await ai.auditTargets()
+  ok(tg.length > 0 && tg[0].word === Z, `需精修的词排在体检第一位（实际 ${tg[0]?.word}）`)
+  ok(tg[0].refine === 1 && tg[0].hasIpa === false, '体检对象带上了「需精修 / 缺音标」这两个判据')
+  ok(tg.every((t) => t.senses >= 1), '只把**有义项**的词列进体检（没义项的词没什么可审的）')
+  await edit.purgeWord(Z)
 
   // 收尾
   ai.__setTransportForTest(null)

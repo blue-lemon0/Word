@@ -32,6 +32,10 @@ import { db } from '../db'
 import type { Sentence, Sense } from '../types'
 import QuickEdit from '../components/QuickEdit.vue'
 import WordPeek from '../components/WordPeek.vue'
+import AiSheet from '../components/AiSheet.vue'
+import { replaceSentence as aiReplaceSentence } from '../ai/actions'
+import { aiReady } from '../ai/config'
+import { describeAiError, type AiResult } from '../ai/types'
 
 /** 名字要显式声明：App.vue 只 keep-alive 这一页（`include` 靠的就是名字）。
  *  不声明的话 keep-alive 静默不生效 —— 跳去核验再回来，
@@ -489,6 +493,41 @@ function onPickToken(tok: string): void {
   peekOpen.value = true
 }
 
+/* ── AI：当场换掉这句例句（D39）──
+ *  ★ 为什么在这里而不是只放在意思页：发现「这句读着别扭 / 不像那个意思」
+ *    的时刻，就是手里握着这道题的时刻。送去意思页 = 让人自己把这句找回来。
+ *  ★ 换完要重新 loadQ()：题目内容每次从库里重建（D36 的同一条规矩），
+ *    否则界面还挂着旧句子，用户会怀疑到底换没换。
+ */
+const aiOn = aiReady
+const aiOpen = ref(false)
+const aiBusy = ref(false)
+const aiResult = ref<AiResult | null>(null)
+const aiError = ref('')
+
+async function aiReplaceCurrent(): Promise<void> {
+  const sen = q.value?.sentence
+  if (!sen?.id) return
+  pickBox.value = false
+  aiError.value = ''
+  aiResult.value = null
+  aiOpen.value = true
+  aiBusy.value = true
+  try {
+    aiResult.value = await aiReplaceSentence(sen.id, '')
+  } catch (e) {
+    aiError.value = describeAiError(e)
+  } finally {
+    aiBusy.value = false
+  }
+}
+
+/** 应用之后：这一题要用上新句子 */
+async function onAiApplied(): Promise<void> {
+  aiOpen.value = false
+  await loadQ()
+}
+
 /** 从意思详情/词条页核验完回来：题目要跟着变新。
  *  状态在 keep-alive 里，所以回来还在原题、进度不丢；
  *  但**内容**不能沿用内存里那份 —— 用户在那边可能刚改过句子。 */
@@ -906,6 +945,20 @@ watch(
              核验需要的是**更多上下文**，那在详情页，所以给一个跳转；
              而跳转必须能原样回来（keep-alive 留着这一页 + onActivated 刷新内容），
              否则没人敢跳 —— 跳一次丢一轮，谁还愿意核验。 -->
+        <!-- ★ AI 换一句放在**这里**，不是放在意思页（D39）：
+             发现「这句读着别扭」的那一刻就是现在、就是这一屏。
+             原来要退出训练 → 词库 → 这个词 → 这个意思 → 找到那一句 → 点 AI 换一句，
+             六步之后你已经不想换了。 -->
+        <button
+          v-if="aiOn && q"
+          class="pickrow nav airow"
+          type="button"
+          @click="aiReplaceCurrent"
+        >
+          <span class="gl">让 AI 换掉这句例句</span>
+          <span class="go">AI</span>
+        </button>
+
         <div class="psep" />
         <button class="pickrow nav" type="button" @click="goSensePage">
           <span class="gl">看看这个意思的详情</span>
@@ -927,6 +980,16 @@ watch(
 
     <!-- 点词查义：答完之后才可能被打开（见 onPickToken 的守卫） -->
     <WordPeek :show="peekOpen" :token="peekToken" @close="peekOpen = false" />
+
+    <!-- AI 提议（换一句）：和词条页/意思页共用同一张浮层 -->
+    <AiSheet
+      :show="aiOpen"
+      :result="aiResult"
+      :busy="aiBusy"
+      :error="aiError"
+      @close="aiOpen = false"
+      @applied="onAiApplied"
+    />
 
     <!-- ★ 固定在底部的主操作条。
          之前的「再来一个」按钮在解释卡里，只有答完题才出现，而且位置在

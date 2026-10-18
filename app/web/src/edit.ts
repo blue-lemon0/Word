@@ -5,7 +5,7 @@
  *  （这正是旧 schema 用 's1' 当主键时的缺陷，见 types.ts 开头。）
  */
 import { db, ensureProgress, softDeleteSense } from './db'
-import type { Sense, Sentence } from './types'
+import type { Sense, Sentence, Word } from './types'
 
 export function uuid(): string {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
@@ -101,6 +101,11 @@ export async function addSense(word: string, gloss = '', slot?: number): Promise
 
 export async function updateSense(id: string, patch: Partial<Sense>): Promise<void> {
   await db.senses.update(id, { ...patch, updatedAt: now() })
+}
+
+/** 改词条本身（目前只有音标这条路：AI 补音标、或以后手填） */
+export async function updateWord(word: string, patch: Partial<Word>): Promise<void> {
+  await db.words.update(word, { ...patch, updatedAt: now() })
 }
 
 /**

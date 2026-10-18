@@ -26,26 +26,30 @@ const SYSTEM = `你是英语学习词库的内容审校助手。你只输出严�
 
 const SHAPE = `输出 JSON：
 {"note":"整体判断一句话；全部没问题就写 ok","proposals":[
- {"kind":"sense.update","slot":1,"gloss":"……","pos":"v.","note":"……","glossEn":"……","why":"为什么要改"},
+ {"kind":"sense.update","slot":1,"gloss":"……","pos":"v.","note":"……","glossEn":"……","trap":0,"why":"为什么要改"},
+ {"kind":"word.update","ipa":"ˈaːmi","why":"为什么要补/改音标"},
  {"kind":"sentence.replace","sentenceId":12,"en":"新英文（含目标词或具屈折形式）","zh":"中文","why":"为什么要换"},
  {"kind":"sentence.add","slot":2,"en":"……","zh":"……","why":"为什么要补"},
- {"kind":"sense.add","gloss":"……","pos":"n.","why":"为什么要加这个义项"}
+ {"kind":"sense.add","gloss":"……","pos":"n.","why":"为什么要加这个义项","sentences":[{"en":"……","zh":"……"}]}
 ]}
-字段都可以省略（只写你要改的那个）；slot / sentenceId 必须来自下面给出的编号，不要编。`
+字段都可以省略（只写你要改的那个）；slot / sentenceId 必须来自下面给出的编号，不要编。
+"trap" 是熟词僻义标记：0/1。只在「这个词日常最熟的意思是别的、而这个义项生僻」时才给 1，
+它是新卡起始间隔的依据，宁可漏标也不要乱标。`
 
 function ctxBody(c: WordContext): string {
   const senses = c.senses
-    .map((s) => `  ${s.slot}. (${s.pos || '?'}) ${s.gloss}${s.glossEn ? ` | en: ${s.glossEn}` : ''}${s.note ? ` | note: ${s.note}` : ''}`)
+    .map((s) => `  ${s.slot}. (${s.pos || '?'}) ${s.gloss}${s.glossEn ? ` | en: ${s.glossEn}` : ''}${s.note ? ` | note: ${s.note}` : ''}${s.trap ? ' | [已标熟词僻义]' : ''}`)
     .join('\n')
   const sents = c.sentences.length
     ? c.sentences
         .map((s) => `  - sentenceId=${s.id} slot=${c.senses.find((x) => x.id === s.senseId)?.slot ?? '?'}: "${s.en}"${s.zh ? ` / "${s.zh}"` : ''}`)
         .join('\n')
     : '  （这个词还没有例句）'
-  return `词条：${c.word}${c.ipa ? ` /${c.ipa}/` : ''}
+  const sentNote = c.omitted ? `  （另外还有 ${c.omitted} 句没列出来，只列了每个义项的头两句）` : ''
+  return `词条：${c.word}${c.ipa ? ` /${c.ipa}/` : '（音标缺失）'}
 义项（slot 是编号）：
 ${senses || '  （还没有义项）'}
-例句（sentenceId 是编号）：
+例句（sentenceId 是编号）：${sentNote}
 ${sents}`
 }
 
@@ -58,7 +62,8 @@ export function reviewWordPrompt(c: WordContext): ChatMessage[] {
       content: `${ctxBody(c)}
 
 请审查：哪些释义与词性/英文不一致、哪些中文近义到分不开、哪些例句没有真正用到它该教的义项、
-有没有明显缺的常用义项（最多补 1 条）。最多 6 条 proposal。
+有没有明显缺的常用义项（最多补 1 条）、**音标缺失或明显错**、**哪个义项是熟词僻义**（trap=1，谨慎）。
+最多 6 条 proposal。
 ${SHAPE}`,
     },
   ]
@@ -118,7 +123,8 @@ export function fillWordPrompt(c: WordContext, howManySenses = 3): ChatMessage[]
    用 kind="sense.update" + 那个 slot 直接改写它，不要重复新建；
 2. 其余义项用 kind="sense.add"，并且在**同一条提案里**带上 1-2 条例句：
    "sentences":[{"en":"……","zh":"……"}] —— 新义项还没有编号，例句必须跟它一起提；
-3. 每条例句都必须真的用上这个词（可以屈折变化），12-20 个词，自然书面英语。
+3. 每条例句都必须真的用上这个词（可以屈折变化），12-20 个词，自然书面英语；
+4. 词条没有音标时，用 kind="word.update" 给一个（英式或美式都可，只写音标本身）。
 
 ${SHAPE}
 对 kind="sense.add"，例句写在提案的 "sentences" 数组里。`,

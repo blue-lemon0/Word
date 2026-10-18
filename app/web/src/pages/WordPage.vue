@@ -79,6 +79,12 @@ function runReview(): void {
 function runFill(): void {
   void runAi(() => fillWord(props.word, 3))
 }
+
+/** 应用之后：收起浮层并刷新这一页（AI 只提议，落库后要立刻看到） */
+function onAiDone(): void {
+  aiOpen.value = false
+  void load()
+}
 /** 词条在不在库里。它和「有没有释义」是两件事，空态要分开说 */
 const inLibrary = computed(() => word.value != null)
 
@@ -429,7 +435,7 @@ function onAsk(): void {
       :busy="aiBusy"
       :error="aiError"
       @close="aiOpen = false"
-      @applied="load"
+      @applied="onAiDone"
     />
     <ConfirmSheet
       :open="!!ask"

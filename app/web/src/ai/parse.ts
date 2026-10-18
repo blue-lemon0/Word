@@ -14,6 +14,8 @@ import { AiError, type Proposal } from './types'
 
 export interface Bind {
   word: string
+  /** 当前音标 —— 用来判断 AI 给的音标是不是「没变」（没变就不该冒出一条提案） */
+  ipa: string
   senses: Sense[]
   sentences: Sentence[]
 }
@@ -31,6 +33,10 @@ interface RawProposal {
   why?: string
   /** sense.add 自带的例句（新义项没有编号，例句只能跟义项一起提） */
   sentences?: { en?: string; zh?: string }[]
+  /** sense.update：熟词僻义 */
+  trap?: number | boolean
+  /** word.update：音标 */
+  ipa?: string
 }
 
 export function extractJson(text: string): { note?: string; proposals?: RawProposal[] } {
@@ -88,8 +94,19 @@ export function parseProposals(
       const patch: Partial<Sense> = {}
       if (s(p.gloss) && s(p.gloss) !== sense.gloss) patch.gloss = s(p.gloss)
       if (s(p.pos) && s(p.pos) !== sense.pos) patch.pos = s(p.pos)
-      if (s(p.note) && s(p.note) !== sense.note) patch.note = s(p.note)
+      // note 是**给学习者的辨析线索**，不是给我们的操作建议。
+      // 真机输出里见过「保留语法义，但例句要换；另补“外观、样子”义」这种句子 ——
+      // 它进了 note 就变成用户看到的那行提示，既不像释义也不像提示。
+      const note = s(p.note)
+      const isInternalTalk = /例句|义项|建议|补一|换掉|删掉|合并|拆分/.test(note)
+      if (note && note !== sense.note && !isInternalTalk) patch.note = note
       if (s(p.glossEn) && s(p.glossEn) !== sense.glossEn) patch.glossEn = s(p.glossEn)
+      // TRAP：只在**变**的时候出提案（已经是 1 的再提一次没有任何意义，
+      // 却会让提案列表里全是噪音）
+      if (p.trap != null) {
+        const want = p.trap === true || p.trap === 1 ? 1 : 0
+        if (want !== sense.trap) patch.trap = want
+      }
       if (!Object.keys(patch).length) {
         dropped.push(`sense.update slot=${sense.slot} 没有实际改动`)
         continue
@@ -193,6 +210,36 @@ export function parseProposals(
         pos: s(p.pos),
         why: s(p.why),
         sentences: sentences.length ? sentences : undefined,
+      })
+    } else if (kind === 'word.update') {
+      // 音标：只接受「看起来像音标」的一小段（去掉可能带的斜杠）。
+      // 模型偶尔会在这里塞一整句解释 —— 那种东西进了 Word.ipa 就永远显示成怪东西。
+      const ipa = s(p.ipa).replace(/^\/+|\/+$/g, '')
+      if (!ipa) {
+        dropped.push('word.update 没有给音标')
+        continue
+      }
+      if (ipa.length > 40) {
+        dropped.push('word.update 的音标太长，不像音标')
+        continue
+      }
+      // ★ **只补不改**：已经有音标时一律不动。
+      //   真机上出现过 AI 把一个对的 /ˈæspɛkt/ 改成 /æspekt/（音素对、重音丢了）——
+      //   模型判断“音标对不对”并不可靠，而重音符号对学习是有用的信息。
+      //   缺音标时补上是纯收益；已有音标时改写是纯风险。
+      if (bind.ipa) {
+        dropped.push('已有音标，不做改写（只补缺）')
+        continue
+      }
+      const key = `w:${bind.word}:${ipa}`
+      if (dup.has(key)) continue
+      dup.add(key)
+      out.push({
+        id: `p${out.length + 1}`,
+        kind: 'word.update',
+        word: bind.word,
+        ipa,
+        why: s(p.why),
       })
     } else {
       dropped.push(`不认识的 kind=${kind || '（空）'}`)

@@ -23,6 +23,18 @@ export type Proposal =
       pos?: string
       note?: string
       glossEn?: string
+      /** 熟词僻义：这个词日常最熟的意思是别的，而这个义项生僻。
+       *  ★ 它不只是显示标记 —— TRAP 会改 SRS 的起始间隔（最短 S0），
+       *    所以这一条必须由人看过再应用（见 docs/design/03）。 */
+      trap?: 0 | 1
+      why?: string
+    }
+  | {
+      id: string
+      kind: 'word.update'
+      word: string
+      /** 音标（不带斜杠，与 Word.ipa 同格式） */
+      ipa?: string
       why?: string
     }
   | {
@@ -81,8 +93,9 @@ export interface WordContext {
   ipa: string
   senses: Pick<Sense, 'id' | 'slot' | 'pos' | 'gloss' | 'glossEn' | 'note' | 'tier' | 'trap'>[]
   sentences: Pick<Sentence, 'id' | 'senseId' | 'en' | 'zh' | 'form'>[]
+  /** 因为太长而没放进提示词的例句数 —— 必须说出来，否则模型会以为「就这几句」 */
+  omitted?: number
 }
-
 export class AiError extends Error {
   readonly kind: 'no-config' | 'network' | 'http' | 'parse' | 'refused'
   readonly status?: number

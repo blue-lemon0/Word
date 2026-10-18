@@ -16,6 +16,7 @@ import {
   addSense,
   replaceSentence as replaceSentenceEdit,
   updateSense,
+  updateWord,
 } from '../edit'
 import type { Proposal } from './types'
 
@@ -28,6 +29,7 @@ export async function applyOne(p: Proposal): Promise<string> {
       if (p.pos != null) patch.pos = p.pos
       if (p.note != null) patch.note = p.note
       if (p.glossEn != null) patch.glossEn = p.glossEn
+      if (p.trap != null) patch.trap = p.trap
       // ★ 补上释义就等于「不再是空壳」：needsRefine 是「占位义项待补」的标记
       //   （D37 顺手加入时打的）。改写释义却不摘掉它，词库里会一直挂着「需精修」，
       //   而人已经补完了 —— 那个筛选结果就变成噪音。
@@ -38,6 +40,10 @@ export async function applyOne(p: Proposal): Promise<string> {
     case 'sentence.replace': {
       await replaceSentenceEdit(p.sentenceId, p.en, p.zh)
       return '换了一条例句'
+    }
+    case 'word.update': {
+      if (p.ipa) await updateWord(p.word, { ipa: p.ipa })
+      return `补了音标：/${p.ipa}/`
     }
     case 'sentence.add': {
       const sense = await db.senses.get(p.senseId)

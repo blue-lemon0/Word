@@ -1206,6 +1206,63 @@ interaction = [
     # 设置页上「开关」根本不存在 —— 人只会觉得「没地方开」。
     ("用到的 van-* 组件都注册过（漏了就是一个空白的格子）",
      not (_van_used() - _van_registered())),
+
+    # ── D39：AI 换一句也在训练页（发现坏句子那一刻就在改）──
+    ("训练页能当场让 AI 换掉这句（不用退出去找）",
+     "aiReplaceCurrent" in train
+     and _re.search(r"让 AI 换掉这句例句", train) is not None
+     and "replaceSentence as aiReplaceSentence" in train
+     and _re.search(r"@applied=\"onAiApplied\"", train) is not None),
+
+    # ── D40：整库体检 ──
+    # 体检是二级页（不是 tab）：它是一次维护动作，不是一个地方。
+    ("体检是二级页（从更多进、有返回、不占底栏）",
+     _re.search(r"path: '/audit'[^}]*name: 'audit'", _ai_page("../main.ts")) is not None
+     and _re.search(r"path: '/audit'[^}]*meta", _ai_page("../main.ts")) is None
+     and "router.push('/audit')" in more),
+    # 串行 + 逐词：并发会把「第几个词」变得没法交代，也更容易撞限流
+    ("体检串行跑词、且只提议不自动应用",
+     "await auditOne(" in _ai_page("AuditPage.vue")
+     and "applyAll" not in _ai_src("audit.ts")
+     and "applyOne" not in _ai_src("audit.ts")
+     and "applyAll" not in _ai_page("AuditPage.vue")
+     and _re.search(r"queueMicrotask\(", _ai_page("AuditPage.vue")) is not None),
+    # 能停：这是花钱的动作，必须随时能叫停
+    ("体检随时能停（停下不丢已跑的结果）",
+     _re.search(r"function stop\(\)", _ai_page("AuditPage.vue")) is not None
+     and "stopRequested" in _ai_page("AuditPage.vue")
+     and "markAudited" in _ai_page("AuditPage.vue")),
+    # 体检先跑「最像有问题」的：需精修 > 缺音标 > 例句少
+    ("体检按「最可能需要修」排序（需精修 > 缺音标 > 例句少）",
+     _re.search(r"if \(a\.refine !== b\.refine\) return b\.refine - a\.refine",
+                _ai_src("audit.ts")) is not None
+     and _re.search(r"a\.hasIpa \? 1 : -1", _ai_src("audit.ts")) is not None),
+
+    # ── 提议类型：音标与熟词僻义 ──
+    ("AI 能提出音标与熟词僻义，并且落库到正确的地方",
+     _re.search(r"kind: 'word\.update'", _ai_src("parse.ts")) is not None
+     and _re.search(r"patch\.trap = want", _ai_src("parse.ts")) is not None
+     and _re.search(r"updateWord\(p\.word", _ai_src("apply.ts")) is not None
+     and "patch.trap = p.trap" in _ai_src("apply.ts")),
+    # 每种提议类型界面上都得有文案 —— 漏一种就是一条「看不太懂的空行」
+    ("每种 AI 提议界面都有文案（漏一种就是一行看不懂的东西）",
+     all(("'%s'" % k) in _src(os.path.join("components", "AiSheet.vue"))
+         for k in ["sense.update", "word.update", "sentence.replace", "sentence.add", "sense.add"])),
+    # 应用只发 applied，**不再补发 close**：调用方收到两次「这次结束了」，
+    # 体检就会把队列推进两格（跳过一个词），日志里还多一条没有词名的记录。
+    ("AI 浮层应用之后不再补发一次 close（否则体检会跳过一整词）",
+     _re.search(r"appliedFired = true\s*\n\s*emit\('applied'",
+                _src(os.path.join("components", "AiSheet.vue"))) is not None
+     and "if (appliedFired)" in _src(os.path.join("components", "AiSheet.vue"))),
+    # 一个词的回复坏了不该让整轮体检白跑；限流/余额/网络才停
+    ("体检遇到坏回包只跳过这个词，不中断整轮",
+     _re.search(r"kind === 'parse' \|\| e\.kind === 'refused'",
+                _ai_page("AuditPage.vue")) is not None
+     and _re.search(r"kind === 'parse'", _ai_src("audit.ts")) is not None),
+    # 例句不全带：一个词四个义项二十句，光输入就两三千 token（D40 第五节）
+    ("体检/审查的上下文按义项截断例句（省输入 token）",
+     _re.search(r"const perSense = 2", _ai_src("actions.ts")) is not None
+     and _re.search(r"omitted", _ai_src("types.ts")) is not None),
 ]
 
 fi = 0

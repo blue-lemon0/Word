@@ -34,7 +34,37 @@ async function rowsOf(word: string): Promise<Rows> {
   return { word, ipa: w?.ipa ?? '', senses, sentences }
 }
 
+/** 提示词版本 —— 改 prompt 的**形状**（不是措辞微调）时手动 +1。
+ *
+ *  ★ 为什么要有它：缓存键里已经含内容指纹，但它不知道「提示词变了」。
+ *    换了个更强的模型、或者改了输出约束，旧缓存里的结果就不再代表现在的质量 ——
+ *    这时候必须能把旧缓存整体作废，而不是靠「内容刚好变了」去碰运气。
+ */
+const PROMPT_VERSION = 'v1'
+
 function contextOf(r: Rows): WordContext {
+  // ★ 例句不能全带上：一个词 4 个义项 × 5 句就是 20 句，光输入就要两三千 token，
+  //   而判断「释义准不准、例句教没教对这个意思」每个义项看 2 句就够。
+  //   省下来的输入 token 是全库体检的主要开销（见 D40 第五节）。
+  const perSense = 2
+  const picked: WordContext['sentences'] = []
+  let omitted = 0
+  const seen = new Map<string, number>()
+  for (const s of r.sentences) {
+    const n = seen.get(s.senseId) ?? 0
+    if (n >= perSense) {
+      omitted++
+      continue
+    }
+    seen.set(s.senseId, n + 1)
+    picked.push({
+      id: s.id as number,
+      senseId: s.senseId,
+      en: s.en,
+      zh: s.zh,
+      form: s.form,
+    })
+  }
   return {
     word: r.word,
     ipa: r.ipa,
@@ -48,13 +78,8 @@ function contextOf(r: Rows): WordContext {
       tier: s.tier,
       trap: s.trap,
     })),
-    sentences: r.sentences.map((s) => ({
-      id: s.id as number,
-      senseId: s.senseId,
-      en: s.en,
-      zh: s.zh,
-      form: s.form,
-    })),
+    sentences: picked,
+    omitted,
   }
 }
 
@@ -70,8 +95,8 @@ async function run(
 
   const ctx = contextOf(rows)
   // 键里必须有**内容指纹**：内容一改，旧建议立刻作废（见 cache.ts）
-  const key = hashOf([action, cfg.model, extra, JSON.stringify(ctx)].join('|'))
-  const bind = { word: rows.word, senses: rows.senses, sentences: rows.sentences }
+  const key = hashOf([PROMPT_VERSION, action, cfg.model, extra, JSON.stringify(ctx)].join('|'))
+  const bind = { word: rows.word, ipa: rows.ipa, senses: rows.senses, sentences: rows.sentences }
 
   const hit = await cacheGet(key)
   if (hit) {
