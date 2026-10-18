@@ -1,0 +1,25 @@
+{
+  "word": "artist",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "艺术家（画家等）"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "艺术家",
+      "action": "merged",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "画家",
+      "action": "merged",
+      "reason": "raw=0"
+    }
+  ]
+}

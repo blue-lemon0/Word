@@ -1,0 +1,4 @@
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	一桩事，事件	a vaguely specified social event	0	T1	a vaguely specified social event。语境不特定的一桩事，常见于 diplomatic affair / family affairs。
+s2	n.	事务，公务		0	T1	[glossEn 空：ECDICT 与 WordNet 均无对应义位] [ZH-FALLBACK 英文零覆盖] 英文首词无覆盖（WordNet 归 matter.n.01）。真实用法：foreign affairs 外交事务 / the affairs of the company 公司事务。
+s3	n.	风流韵事，私情	a usually secretive or illicit sexual relationship	0	T1	a usually secretive or illicit sexual relationship。线索明确：have an affair with somebody。对考研不考但确有此义，保留。

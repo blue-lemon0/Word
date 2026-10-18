@@ -1,0 +1,44 @@
+{
+  "_comment": "audience —— 2 英文边界 / 3 现有中文义项。听众/观众/读者 三个中文词合并为一条：英文只有一个概念 a gathering of spectators or listeners，spectators 与 listeners 就是听众与观众，WordNet 没拆。这是合法的「同一概念的中文细分」。",
+  "_mergeNote": "唯一合并处：听众/观众/读者三者英文共用 spectators/listeners，属同一概念的中文细分，合并为 s1。raw=1 interested public（读者/受众）独立保留。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "听众",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "英文 raw=0 a gathering of spectators or listeners —— listeners 与 spectators 都在这一条里，不构成独立概念。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "观众",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与「听众」同指 raw=0 里的 spectators，中文可互换：他的观众/听众席都成立。合并合法。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "读者",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "对应英文 raw=1 the part of the general public interested in a source of information or entertainment —— 读/看某内容的公众，不是「在场听看的人」。概念不同，保留独立义项。"
+    }
+  ],
+  "word": "audience",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "听众，观众",
+      "note": "a gathering of spectators or listeners at a (usually public) performance。在场听看演出的这群人。线索：at a performance / in the hall。合并现有 听众/观众 两义。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "读者，观众（某内容的受众）",
+      "note": "the part of the general public interested in a source of information or entertainment。某份内容的目标受众，不一定到场。线索：target audience / a wide audience。与 s1 的差别是「是否在场」。"
+    }
+  ]
+}

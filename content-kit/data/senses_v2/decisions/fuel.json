@@ -1,0 +1,50 @@
+{
+  "word": "fuel",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "燃料"
+    },
+    {
+      "fromLines": [
+        1,
+        2
+      ],
+      "glossZh": "加燃料，供燃料"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "glossZh": "（船等）加燃料，取燃料"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "燃料",
+      "action": "m",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "木炭",
+      "action": "m",
+      "reason": "drop：英文 charcoal/coal，非 fuel"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "加燃料",
+      "action": "m",
+      "reason": "raw=1+2 同指"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "供燃料",
+      "action": "m",
+      "reason": "与加燃料同指"
+    }
+  ]
+}

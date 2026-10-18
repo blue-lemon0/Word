@@ -1,0 +1,60 @@
+{
+  "_comment": "budget —— 3 英文边界 / 4 现有中文义项。raw=0（这笔钱）与 raw=1（书面方案）英文确实区分，但中文都译「预算」，且实际用法几乎不区分，合并。「编入预算」「安排」都是动词用法，合并为一条。",
+  "_mergeNote": "4 -> 2。① 预算 ← raw=0 + raw=1 + fromZh 0。② 编预算+编入预算+安排 ← raw=2 + fromZh 1,2,3。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "预算",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 a sum of money allocated for a particular purpose 与 raw=1 a summary of intended expenditures（同指「预算」，一指金额一指方案，中文统一译作「预算」）。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "编预算",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "对应英文 raw=2 make a budget。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "编入预算",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "与「编预算」同指 raw=2，是它的及物用法。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "安排",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "与「编预算」同指 raw=2 —— budget three hours for the trip 就是「安排」，宾语可以是时间/精力而非钱。"
+    }
+  ],
+  "word": "budget",
+  "senses": [
+    {
+      "fromLines": [
+        0,
+        1
+      ],
+      "fromZh": [
+        0
+      ],
+      "glossZh": "预算（金额与方案）",
+      "note": "a sum of money allocated for a particular purpose / a summary of intended expenditures。线索：the annual budget / on a tight budget。两条边界只差「钱」与「方案」，中文统一译「预算」，合并。"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "fromZh": [
+        1,
+        2,
+        3
+      ],
+      "glossZh": "编预算；（vt.）把…编入预算，安排",
+      "note": "make a budget。动词义。线索：budget for sth / budget $500 / budget two hours。宾语可以是钱、时间、精力。"
+    }
+  ]
+}

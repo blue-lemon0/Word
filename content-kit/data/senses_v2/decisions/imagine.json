@@ -1,0 +1,31 @@
+{
+  "word": "imagine",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "想象，设想"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "设想",
+      "action": "merged",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "猜测",
+      "action": "merged",
+      "reason": "与设想同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "想像起来",
+      "action": "merged",
+      "reason": "与设想同指"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "word": "council",
+  "senses": [
+    {
+      "fromLines": [
+        0,
+        2
+      ],
+      "glossZh": "会议；委员会"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "（基督教）宗教会议"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "会议",
+      "action": "m",
+      "reason": "raw=2 a meeting of people for consultation"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "委员会",
+      "action": "m",
+      "reason": "raw=0 a body serving in an administrative capacity"
+    }
+  ]
+}

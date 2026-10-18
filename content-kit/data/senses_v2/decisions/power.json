@@ -1,0 +1,55 @@
+{
+  "word": "power",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "权力；势力"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "力；功率"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "掌权的人；有影响力的人"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "glossZh": "供以动力；使有力量"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "力",
+      "action": "m",
+      "reason": "raw=1 physics the rate of doing work"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "体力",
+      "action": "m",
+      "reason": "drop：英文 physical strength，非 power"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "力量",
+      "action": "m",
+      "reason": "raw=0 同指"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "势力",
+      "action": "m",
+      "reason": "raw=0+2 同指"
+    }
+  ]
+}

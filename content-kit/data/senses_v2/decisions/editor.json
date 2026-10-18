@@ -1,0 +1,37 @@
+{
+  "word": "editor",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "编者，编辑；主编（也指编辑职位）"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "编者",
+      "action": "m",
+      "reason": "raw=0 a person responsible for the editorial aspects"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "主笔",
+      "action": "m",
+      "reason": "与编者同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "编辑器",
+      "action": "m",
+      "reason": "drop：英文 editor 程序/装置需专名，本词无该义项"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "编辑装置",
+      "action": "m",
+      "reason": "drop：同前"
+    }
+  ]
+}

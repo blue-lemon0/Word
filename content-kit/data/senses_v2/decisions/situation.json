@@ -1,0 +1,43 @@
+{
+  "word": "situation",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "情形，形势"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "处境"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "（复杂的/严重的）困境"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "情形",
+      "action": "merged",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "境遇",
+      "action": "merged",
+      "reason": "raw=1"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "位置",
+      "action": "dropped",
+      "reason": "英文 position/location，非 situation"
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	败北，失败	an unsuccessful ending to a struggle or contest	0	T1	an unsuccessful ending to a struggle or contest。线索：in/defeat in + 场次。Their team suffered a crushing defeat.
+s2	vt.	击败；使落空		0	T1	[glossEn 空：ECDICT 与 WordNet 均无对应义位] [ZH-FALLBACK 英文零覆盖] 对应英文 defeat.v.01（以武力战胜）与 defeat.v.02（使无法达成）。ECDICT definition 侧漏导动词义，走 fromZh 补洞。线索：宾语是人/军队（defeat the enemy）或期望/计划（defeat all expectations）。

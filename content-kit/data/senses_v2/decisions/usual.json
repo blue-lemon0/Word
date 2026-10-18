@@ -1,0 +1,25 @@
+{
+  "word": "usual",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "平常的，通常的"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "平常的",
+      "action": "merged",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "通常的",
+      "action": "merged",
+      "reason": "与平常同指"
+    }
+  ]
+}

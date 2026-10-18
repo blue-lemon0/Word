@@ -1,0 +1,25 @@
+{
+  "word": "nation",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "国家，民族；国民"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "国家",
+      "action": "m",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "民族",
+      "action": "m",
+      "reason": "raw=0 释义即 the people who live in a nation"
+    }
+  ]
+}

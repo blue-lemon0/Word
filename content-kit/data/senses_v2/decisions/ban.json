@@ -1,0 +1,46 @@
+{
+  "word": "ban",
+  "senses": [
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "禁令，取缔（名词）"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "glossZh": "禁止；不准分销（电影/报纸）"
+    },
+    {
+      "fromLines": [
+        [
+          "wn",
+          "ban.v.02"
+        ]
+      ],
+      "glossZh": "（以法律或社会压力）禁止"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "禁令",
+      "action": "m",
+      "reason": "raw=2 an official prohibition"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "禁止",
+      "action": "m",
+      "reason": "raw=3+4 同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "取缔",
+      "action": "m",
+      "reason": "与禁止同指"
+    }
+  ]
+}

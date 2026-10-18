@@ -1,0 +1,77 @@
+{
+  "_comment": "choice —— 4 英文边界 / 4 现有中文义项，**现有中文里没有「选择」这个第一义**（只有精选品/选择权/精选的/挑三拣四的），全部要从英文侧新增。这是「中文词典按形容词义切入、漏掉名词本义」的样本。",
+  "_mergeNote": "4 -> 4。① 精选品 归入 s1（是被选中的那个东西）。② 选择权 归入 s2（是选择这个行为/余地）。③ 精选的 ← raw=2。④ 挑三拣四的 ← raw=3。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "精选品",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "英文 choice 作名词指「被选中的那个人/物」（a choice of wines = 精选酒），对应 raw=0。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "选择权",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "英文 choice 作名词也指「选择这一行为/余地」（have no choice = 没有选择余地），对应 raw=1。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "精选的",
+      "action": "merged",
+      "into": "v2 s3",
+      "reason": "对应英文 raw=2 of superior grade。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "挑三拣四的",
+      "action": "merged",
+      "into": "v2 s4",
+      "reason": "对应英文 raw=3 appealing to refined taste —— 精品的、有品位的；中文「挑三拣四」是它的口语说法。"
+    }
+  ],
+  "word": "choice",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "fromZh": [
+        0
+      ],
+      "glossZh": "被选中的人或物；精选品",
+      "note": "the person or thing chosen or selected。指**结果**。线索：a choice of wines / the judge's choice。现有中文无此义项，属新增。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "fromZh": [
+        1
+      ],
+      "glossZh": "选择；选择权，选择余地",
+      "note": "the act of choosing or selecting。**本词第一义，但现有中文里没有**。线索：make a choice / have no choice / a wide choice of。"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "fromZh": [
+        2
+      ],
+      "glossZh": "精选的，上等的",
+      "note": "of superior grade。线索：a choice cut of meat / choice wine。"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "fromZh": [
+        3
+      ],
+      "glossZh": "有品位的；挑三拣四的",
+      "note": "appealing to refined taste。线索：a choice item / choice reading material。与 s3 分界：s3 说「品质上等」，s4 说「合乎品位」。"
+    }
+  ]
+}

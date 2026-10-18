@@ -1,0 +1,19 @@
+{
+  "word": "professor",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "教授"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "教授",
+      "action": "merged",
+      "reason": "raw=0"
+    }
+  ]
+}

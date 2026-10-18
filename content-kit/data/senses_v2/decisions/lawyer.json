@@ -1,0 +1,19 @@
+{
+  "word": "lawyer",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "律师"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "律师",
+      "action": "merged",
+      "reason": "raw=0"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "word": "criterion",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "标准，准则，规范"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "标准",
+      "action": "merged",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "准则",
+      "action": "merged",
+      "reason": "与标准同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "规范",
+      "action": "merged",
+      "reason": "与标准同指"
+    }
+  ]
+}

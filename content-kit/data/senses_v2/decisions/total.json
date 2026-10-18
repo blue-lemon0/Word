@@ -1,0 +1,49 @@
+{
+  "word": "total",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "总的，总计的"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "总数，合计"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "总计，合计（动词）；彻底毁坏"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "全体的",
+      "action": "m",
+      "reason": "raw=2 damage beyond the point of repair 实为「彻底毁坏」，误标"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "总的",
+      "action": "m",
+      "reason": "raw=0 add up in number or quantity"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "全然的",
+      "action": "m",
+      "reason": "与总同指"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "计算...的总和",
+      "action": "m",
+      "reason": "raw=1 determine the sum of"
+    }
+  ]
+}

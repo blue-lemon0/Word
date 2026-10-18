@@ -1,0 +1,56 @@
+{
+  "_comment": "least —— 3 英文边界 / 3 现有中文义项。raw=0 是**名词义**（微不足道的人/物），现有三个中文义项里没有；「最小限度」对应的是固定搭配 at least，ECDICT 侧漏了，走 fromZh。",
+  "_mergeNote": "3 -> 3。① 最小限度 ← fromZh（at least）。② 最少的+最小的+副词面 合并为 s2。③ 微不足道的 新增（raw=0）。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "最小限度",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应固定搭配 at least（至少）。**ECDICT definition 侧只有形容词与副词两条，没有 at least**，走 fromZh 补洞 —— 而 at least 才是本词最高频的用法。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "最少的",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "对应英文 raw=1 the superlative of `little` 与 raw=2 used to form the superlative（同指 little 的最高级）。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "最小的",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "与「最少的」同指，中文可互换。"
+    }
+  ],
+  "word": "least",
+  "senses": [
+    {
+      "fromZh": [
+        0
+      ],
+      "glossZh": "最小限度（at least）",
+      "note": "对应固定搭配 at least。ECDICT definition 侧无边界，走 fromZh 补洞，glossEn 留空。**本词最高频的用法。**"
+    },
+    {
+      "fromLines": [
+        1,
+        2
+      ],
+      "fromZh": [
+        1,
+        2
+      ],
+      "glossZh": "最少的，最小的；（副词）最少地",
+      "note": "the superlative of `little / used to form the superlative。little 的最高级。线索：the least / at least / the least possible effort。**注意 least 是 little 的最高级，不是 less（比较级）。**"
+    },
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "微不足道的人（或物）",
+      "note": "something that is of no importance。名词义（the least 指「最不重要的人」）。罕见，现有中文无对应，属新增。"
+    }
+  ]
+}

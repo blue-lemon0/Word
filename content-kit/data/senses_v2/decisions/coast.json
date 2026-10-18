@@ -1,0 +1,39 @@
+{
+  "word": "coast",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "（雪橇可滑下的）斜坡"
+    },
+    {
+      "fromLines": 1,
+      "glossZh": "海岸；视野范围内的区域"
+    },
+    {
+      "fromLines": 2,
+      "glossZh": "滑行；沿海岸航行"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "海岸",
+      "action": "m",
+      "reason": "raw=1 the area within view"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "滑坡",
+      "action": "m",
+      "reason": "raw=0 释义是 sleds may coast 的坡"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "沿海岸而行",
+      "action": "m",
+      "reason": "raw=2 move effortlessly by gravity"
+    }
+  ]
+}

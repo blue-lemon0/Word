@@ -1,0 +1,49 @@
+{
+  "word": "festival",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "节日，节庆（a day set aside for feasting）"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "（一系列的）演出节，节庆活动"
+    },
+    {
+      "glossZh": "节日的，喜庆的（adj.，fromZh）",
+      "fromZh": [
+        0
+      ]
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "节日的",
+      "action": "m",
+      "reason": "drop：raw=0/1 都是名词义，adj. 需 fromZh"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "喜庆的",
+      "action": "m",
+      "reason": "drop：同前"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "快乐的",
+      "action": "m",
+      "reason": "drop：同前"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "庆祝",
+      "action": "m",
+      "reason": "raw=0 a day set aside for feasting"
+    }
+  ]
+}

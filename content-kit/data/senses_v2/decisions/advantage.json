@@ -1,0 +1,65 @@
+{
+  "_comment": "advantage。【D24 返工】原先把 好处/优势 并进 优点，理由是「中文 overlap 1.00、英文只一条边界」。按 D24 的标准重判：英文其实有两条边界（raw=0 固有优势、raw=2 事件带来的好处），中文四个义项里 便利 对应 raw=2，而 好处 也应归 raw=2 而非 raw=0。",
+  "_mergeNote": "4 中文义项 -> 4 英文边界。raw=0「固有的优势」收 优点+优势（中文可互换：这本书的优点/优势）；raw=2「事件带来的好处」收 好处+便利（都是「由某事带来的好处」）；raw=1 是网球专用得分点，英文独有；raw=3 是动词 give an advantage to，英文独有。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "优点",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 the quality of having a superior or more favorable position —— 自身条件上的优势。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "便利",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "对应 raw=2 benefit resulting from some event or action —— 由某事件带来的好处。「便利」指的就是这种外来的好处。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "好处",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "【D24 返工，原先误并入 s1】应归 raw=2「事件/行为带来的好处」而非 raw=0「固有优势」：one advantage of studying abroad 是这件事带来的好处，不是什么东西本来就好。中文「好处/便利」可互换，同一概念。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "优势",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与 优点 同指 raw=0（中文可互换：这台机器的优点/优势），合并合法。"
+    }
+  ],
+  "word": "advantage",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "优点，优势",
+      "note": "the quality of having a superior or more favorable position。指自身条件上就比别的好。线索：优势通常与「本身/相较他人」搭配。the advantages of a bilingual education 是这事物本身的条件。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "占先分，优势分（网球）",
+      "note": "(tennis) first point scored after deuce。平分后的先得一分。对考研无价值，但确实是英语义位，保留。"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "好处，裨益",
+      "note": "benefit resulting from some event or action。强调「由某事件/行动带来的好处」，与 s1 的「固有优势」相对。线索：benefit / advantage 后接 of + 某事。one advantage of moving abroad is warmer weather."
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "glossZh": "使占优势（动词）",
+      "note": "give an advantage to。动词义，线索：宾语是人。The funding advantages small labs."
+    }
+  ]
+}

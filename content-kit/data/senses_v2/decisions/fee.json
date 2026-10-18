@@ -1,0 +1,43 @@
+{
+  "word": "fee",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "费用；酬金"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "封地（可继承的土地权益）"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "费用",
+      "action": "m",
+      "reason": "raw=0 a fixed charge"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "小费",
+      "action": "m",
+      "reason": "drop：英文 tip/gratuity，非 fee"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "封地",
+      "action": "m",
+      "reason": "raw=1 an interest in land capable of being inherited"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "所有权",
+      "action": "m",
+      "reason": "与封地同指"
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "_comment": "adopt。【D24 返工】原先把「正式通过」并进「采纳为做法」，理由含糊。按标准重判：会议正式通过决议（adopted by the council）与把某做法变成自己的常规（adopted the practice）是两个概念 —— 前者主体是会议、宾语是决议；后者主体是个人、宾语是做法。搭配集合不同，不该合并。",
+  "_mergeNote": "4 中文义项全部保留，无合并。raw=0「选择并遵循（方针理论）」、raw=1「采纳为自己的做法」、raw=2「收养」、fromZh「接受」——四者宾语与主体搭配各不相同，是四个概念。原先把 raw=1 与 raw=0 分开是对的，但把「正式通过」塞进 raw=1 属于凑数，已改为独立处理进 s2。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "采用",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 choose and follow; as of theories, ideas, policies —— 采纳某个方针/理论。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "正式通过",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "【D24 返工】与「采纳为做法」是两个概念：the resolution was adopted by the council（会议主体、决议宾语）vs the practice was widely adopted（个人主体、做法宾语）。搭配集合不同，保留为独立义项。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "收养",
+      "action": "merged",
+      "into": "v2 s3",
+      "reason": "英文 raw=2 take into one's family 精确对应。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "接受",
+      "action": "dropped",
+      "reason": "「接受」与「采纳」在中文可互换（adopt = take up = 接受），且英文归 accept.v.04 无独立 adopt.v 义位。已有 s1「采纳」覆盖此概念，故不单列。",
+      "_note": "标记 dropped 而非 merged，因为它是「与 s1 中文可互换」而非「并入某个英文边界」；实际效果相同。"
+    }
+  ],
+  "word": "adopt",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "采纳（方针、理论、政策）",
+      "note": "choose and follow; as of theories, ideas, policies, strategies or plans。主体是采纳者，宾语是理论/政策。The government adopted a new tax policy."
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "采纳为做法；正式通过",
+      "note": "take up and practice as one's own。把某做法变成自己的常规。会议正式通过决议也走这条（adopted by the council）。线索：宾语是 practice / resolution。"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "收养",
+      "note": "take into one's family。线索极强：宾语是孩子。They adopted a baby from the orphanage."
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "word": "fat",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "脂肪，肥肉"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "肥的，胖的"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "（直径）粗的"
+    },
+    {
+      "fromLines": [
+        [
+          "wn",
+          "fat.s.03"
+        ]
+      ],
+      "glossZh": "（果实）肥沃的，多产的"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "脂肪",
+      "action": "merged",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "脂油",
+      "action": "merged",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "肥肉",
+      "action": "merged",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "肥的",
+      "action": "merged",
+      "reason": "raw=1"
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	底部，底下；最下层	the lower side of anything / the lowest part of anything	0	T1	the lower side of anything / the lowest part of anything。线索：at / to the bottom。
+s2	v.	底部的，最低的；最低级的	provide with a bottom or a seat / strike the ground, as with a ship's bottom	0	T1	[WORDNET 补缺 ECDICT 未收录] situated at the bottom or lowest position / the lowest rank。ECDICT definition 侧漏导，显式指定。
+s3	v.	给…装底；给…装座	provide with a bottom or a seat	0	T1	[WORDNET 补缺 ECDICT 未收录] provide with a bottom or a seat。ECDICT definition 侧漏导，显式指定。
+s4	vt.	查明真相，弄清底细		0	T1	[glossEn 空：ECDICT 与 WordNet 均无对应义位] [ZH-FALLBACK 英文零覆盖] 对应 get to the bottom of。ECDICT 与补缺层都没收，走 fromZh 补洞。线索：to the bottom of。Very hard to get to the bottom of the mystery.
+s5	vi.	到达底部；到底，触底		0	T1	[glossEn 空：ECDICT 与 WordNet 均无对应义位] [ZH-FALLBACK 英文零覆盖] 对应 bottom out / reach the bottom。ECDICT 与补缺层都没收，走 fromZh 补洞。线索：the market bottomed out.

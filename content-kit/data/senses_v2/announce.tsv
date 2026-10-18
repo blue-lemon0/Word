@@ -1,0 +1,4 @@
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	v.	宣布，公布；公开通告	make known; make an announcement / announce publicly or officially	0	T1	make known; make an announcement / announce publicly or officially。**本词第一义，但现有中文里没有**。线索：announce a decision / officially announce。两条边界只差「公开/正式」的程度，中文不区分，合并。
+s2	v.	宣布（名单、结果等）；通报	give the names of	0	T1	give the names of。宾语是人名或名单。线索：announce the winners / the results / a list。现有中文无此义项，属新增。
+s3	v.	预告，预示	foreshadow or presage	0	T1	foreshadow or presage。线索：The clouds announced a storm. 现有中文无对应英文边界之外的差别，走 fromZh 接住。

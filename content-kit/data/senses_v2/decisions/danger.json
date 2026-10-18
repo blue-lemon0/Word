@@ -1,0 +1,32 @@
+{
+  "word": "danger",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "危险；危险状态"
+    },
+    {
+      "fromLines": [
+        1,
+        2
+      ],
+      "glossZh": "威胁；危险物，危险之地"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "危险",
+      "action": "m",
+      "reason": "raw=0 the condition of being susceptible to harm"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "威胁",
+      "action": "m",
+      "reason": "raw=1 a cause of pain or injury or loss"
+    }
+  ]
+}

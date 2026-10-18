@@ -1,0 +1,65 @@
+{
+  "_comment": "benefit —— 4 英文边界 / 3 现有中文义项。两个新增义项：raw=0（救济金/补助金，社会保障语境）与 raw=2（义演募捐）。现有「有益于」与「受益」同指 raw=3，合并。",
+  "_mergeNote": "3 -> 4。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "利益",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "对应英文 raw=1 something that aids or promotes well-being。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "有益于",
+      "action": "merged",
+      "into": "v2 s4",
+      "reason": "对应英文 raw=3 be beneficial for —— 及物/系动词用法。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "受益",
+      "action": "merged",
+      "into": "v2 s4",
+      "reason": "与「有益于」同指 raw=3，中文可互换。"
+    }
+  ],
+  "word": "benefit",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "救济金，补助金（社保）",
+      "note": "financial assistance in time of need。现有中文无此义项，属新增 —— 这是社会保障语境：unemployment benefit / welfare benefit。与 s2 分界：s2 是泛指「好处」，本条专指「发给人的钱」。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "fromZh": [
+        0
+      ],
+      "glossZh": "利益，好处；益处",
+      "note": "something that aids or promotes well-being。线索：for the benefit of / to one's benefit。最常用的名词义。"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "（为慈善事业筹款的）义演",
+      "note": "a performance to raise money for a charitable cause。现有中文无此义项，属新增。线索：a benefit concert / benefit show/gala。唯一必须带表演语境才成立的义项。"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "fromZh": [
+        1,
+        2
+      ],
+      "glossZh": "有益于；受益",
+      "note": "be beneficial for。线索：benefit from / sth benefits sb。可及物（benefit sb）也可不及物（benefit from sth），两种中文译法指同一条释义。"
+    }
+  ]
+}

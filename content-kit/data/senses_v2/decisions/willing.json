@@ -1,0 +1,31 @@
+{
+  "word": "willing",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "乐意的，自愿的"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "乐意的",
+      "action": "m",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "自愿的",
+      "action": "m",
+      "reason": "与乐意同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "甘愿的",
+      "action": "m",
+      "reason": "与乐意同指"
+    }
+  ]
+}

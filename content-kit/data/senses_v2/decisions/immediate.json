@@ -1,0 +1,57 @@
+{
+  "_comment": "immediate —— 4 英文边界 / 3 现有中文义项。「接近的」是误收：英文对应 close / near。raw=0（此刻此地）与 raw=3（毫不拖延）中文统一译「立即的」，合并；raw=2「紧接着的」是真实且容易被忽略的因果链义项。",
+  "_mergeNote": "3 -> 3。舍弃 1 个，新增 1 个。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "立即的",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 of the present time and place + raw=3 performed with little or no delay（同指「立即的」，中文统一译法，合并）。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "直接的",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "对应英文 raw=1 having no intervening medium —— 无中间环节。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "接近的",
+      "action": "dropped",
+      "reason": "英文对应 close / near，是别的词。中文侧疑由 immediate family（近亲）这一搭配串成了「接近的」。immediate family 的确指近亲，但那是固定搭配不是义项。"
+    }
+  ],
+  "word": "immediate",
+  "senses": [
+    {
+      "fromLines": [
+        0,
+        3
+      ],
+      "fromZh": [
+        0
+      ],
+      "glossZh": "立即的；当前的",
+      "note": "of the present time and place / performed with little or no delay。线索：immediate action / immediate effect。注意 immediate family 指「直系亲属」，与「立即」无关（固定搭配）。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "fromZh": [
+        1
+      ],
+      "glossZh": "直接的（无中间环节的）",
+      "note": "having no intervening medium。线索：an immediate reaction / immediate cause。**与 s1 的区分靠时间维度**：s1 谈时间快，s2 谈中间没环节。"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "紧接着的（因果链上的前因/后果）",
+      "note": "immediately before or after as in a chain of cause and effect。现有中文无对应，属新增。**这是最容易被漏掉的一条**：the immediate cause of the fire（直接原因）/ an immediate result（直接结果）。"
+    }
+  ]
+}

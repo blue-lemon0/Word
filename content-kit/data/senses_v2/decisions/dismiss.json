@@ -1,0 +1,49 @@
+{
+  "word": "dismiss",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "不予考虑；驳回（上诉）"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "解散（会议），散会"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "解雇，开除；解除职务"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "glossZh": "不予理会，断绝往来"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "解散",
+      "action": "m",
+      "reason": "raw=1 cease to consider / 解散会议"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "开除",
+      "action": "m",
+      "reason": "raw=1+2 同类"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "解职",
+      "action": "m",
+      "reason": "raw=1 dismiss from a post"
+    }
+  ]
+}

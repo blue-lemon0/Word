@@ -1,0 +1,50 @@
+{
+  "word": "proper",
+  "senses": [
+    {
+      "fromLines": [
+        0,
+        3
+      ],
+      "glossZh": "适当的，恰当的"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "固有的，本质的；高尚的"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "专门的，专属的（proper noun 专有名词）"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "适当的",
+      "action": "m",
+      "reason": "raw=0+3 同指"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "固有的",
+      "action": "m",
+      "reason": "raw=1 having all the qualities typical of the thing"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "高尚的",
+      "action": "m",
+      "reason": "raw=1 同指"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "专属的",
+      "action": "m",
+      "reason": "raw=2 limited to the thing specified"
+    }
+  ]
+}

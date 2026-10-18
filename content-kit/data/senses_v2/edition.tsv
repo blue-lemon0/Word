@@ -1,0 +1,5 @@
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	版本，版次	the form in which a text (especially a printed book) is published	0	T1	the form in which a text (especially a printed book) is published。同一著作的出书形式。
+s2	n.	一版（同一时间发行的全套相同副本）	all of the identical copies of something offered to the public at the same time	0	T1	all of the identical copies offered to the public at the same time。某次印行的整套书；报刊的 a new edition 走这条。
+s3	n.	报纸的一次发行	an issue of a newspaper	0	T1	an issue of a newspaper。报刊的某一次/某版。
+s4	n.	翻版		0	T1	[glossEn 空：ECDICT 与 WordNet 均无对应义位] [ZH-FALLBACK 英文零覆盖] 保留。上一轮我以「英文侧无独立义位」为理由删掉它是错的 —— 词典没收录不等于英文里没这个意思（真实用法 reprint / pirated edition）。ECDICT definition 收不到，glossEn 留空。

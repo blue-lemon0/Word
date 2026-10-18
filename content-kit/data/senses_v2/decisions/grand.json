@@ -1,0 +1,57 @@
+{
+  "_comment": "grand —— 2 英文边界 / 4 现有中文义项。WordNet 的两条边界都是「外表的宏大/隆重」，而现有中文的「显赫的」「重大的」对应英文 grand = important / major（a grand plan、grand scale），ECDICT definition 侧漏了，走 fromZh。",
+  "_mergeNote": "4 -> 2。① 庄重+壮观 合并为 s1（raw=0 + raw=1 同指「隆重/宏伟」）。② 显赫+重大的 走 fromZh。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "庄重的",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=1 the most important and magnificent in adornment（礼仪中的隆重盛装）+ raw=0 large and impressive（同指「隆重宏大」，中文统一译法，合并）。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "壮观的",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与「庄重的」同指，中文可互换。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "显赫的",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "英文 grand = eminent / important（a grand and powerful family）。ECDICT definition 侧漏导，走 fromZh 补洞。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "重大的",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "与「显赫的」同指（grand scale / a grand plan = 重大的、重要的），走 fromZh 补洞。"
+    }
+  ],
+  "word": "grand",
+  "senses": [
+    {
+      "fromLines": [
+        0,
+        1
+      ],
+      "fromZh": [
+        0,
+        1
+      ],
+      "glossZh": "宏大的，壮观的；隆重的",
+      "note": "large and impressive in physical size or extent / the most important and magnificent in adornment。指**规模或排场**。线索：a grand building / a grand ceremony。两条边界中文统一译「隆重/宏大」，合并。"
+    },
+    {
+      "fromZh": [
+        2,
+        3
+      ],
+      "glossZh": "重大的，重要的；显赫的",
+      "note": "英文 grand = important / major。ECDICT definition 侧漏导，走 fromZh 补洞，glossEn 留空。线索：a grand plan / grand scale / a grand total。**实际语料中这一义远比 s1 常用。**"
+    }
+  ]
+}

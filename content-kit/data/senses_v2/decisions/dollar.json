@@ -1,0 +1,55 @@
+{
+  "word": "dollar",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "元（美元等货币单位）"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "一美元（纸币）"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "（美国的）一元硬币"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "glossZh": "（象征）商业主义或贪财"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "美元",
+      "action": "m",
+      "reason": "raw=0+2 同指"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "元(加",
+      "action": "m",
+      "reason": "raw=0 同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "澳等国货币单位",
+      "action": "m",
+      "reason": "raw=0 同指"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "元",
+      "action": "m",
+      "reason": "raw=0 同指"
+    }
+  ]
+}

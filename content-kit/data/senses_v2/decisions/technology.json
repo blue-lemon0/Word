@@ -1,0 +1,31 @@
+{
+  "word": "technology",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "技术；工业技术"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "技术",
+      "action": "merged",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "工业技术",
+      "action": "merged",
+      "reason": "与技术同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "术语",
+      "action": "merged",
+      "reason": "英文 term/terminology，非 technology"
+    }
+  ]
+}

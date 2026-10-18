@@ -1,0 +1,37 @@
+{
+  "_comment": "encourage —— 中文三义 鼓励/支持/激励，全部同义。英文两条边界：raw=0 inspire with confidence; give hope or courage to（给人信心与勇气）与 WordNet 补缺的 spur on（推动、促进）。前者是心理层面的鼓励，后者是行动上的推动。",
+  "_mergeNote": "3 -> 2。中文三义合并为两条：激励/鼓励/支持 中的「支持/激励」属同一概念（中文可互换：鼓励他/支持他/激励他），归 raw=0。英文补缺层本还收有 spur on，但它是 2 词（低于 min_en_words=3）被清洗掉了 —— 与 D25 记录的「动词短语天然短」同一现象。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "鼓励",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应 raw=0 inspire with confidence; give hope or courage to。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "支持",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与「鼓励」同指 raw=0，中文可互换（鼓励他/支持他）。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "激励",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与「鼓励」同指 raw=0，中文可互换。"
+    }
+  ],
+  "word": "encourage",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "鼓励，激励",
+      "note": "inspire with confidence; give hope or courage to。给人信心与勇气。线索：encourage sb to do sth。My parents encouraged me to try again."
+    }
+  ]
+}

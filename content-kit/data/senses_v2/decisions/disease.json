@@ -1,0 +1,25 @@
+{
+  "word": "disease",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "疾病，弊病"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "疾病",
+      "action": "merged",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "弊病",
+      "action": "merged",
+      "reason": "raw=0，社会性义同指"
+    }
+  ]
+}

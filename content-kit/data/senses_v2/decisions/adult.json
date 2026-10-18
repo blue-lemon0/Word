@@ -1,0 +1,62 @@
+{
+  "_comment": "adult —— 3 英文边界 / 4 现有中文义项。名词的「成人/成虫」与形容词的「成年的/成熟的」分属两条边界，词性不同不合并。",
+  "_mergeNote": "4 -> 3。成年+成熟 同指 raw=2，中文可互换。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "成人",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 a fully developed person from maturity onward。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "成虫",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "对应英文 raw=1 any mature animal —— 成年动物（昆虫学里就是「成虫」）。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "成年的",
+      "action": "merged",
+      "into": "v2 s3",
+      "reason": "对应英文 raw=2 (of animals) fully developed —— 形容词面。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "成熟的",
+      "action": "merged",
+      "into": "v2 s3",
+      "reason": "与「成年的」同指 raw=2，中文可互换。"
+    }
+  ],
+  "word": "adult",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "成人，成年人",
+      "note": "a fully developed person from maturity onward。线索：adult + education / adult education。形容词 adult 也常直接指「成年的」（adult behaviour）。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "成年动物；成虫",
+      "note": "any mature animal。线索：adult insects / the adult form。区分 s1 看宾语是人还是动物。"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "fromZh": [
+        2,
+        3
+      ],
+      "glossZh": "成年的，成熟的（指动物）",
+      "note": "(of animals) fully developed。线索：adult stage / fully adult。也可泛指人的「成年的」，但 WordNet 这条标的是 animals。"
+    }
+  ]
+}

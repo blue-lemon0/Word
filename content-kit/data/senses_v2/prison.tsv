@@ -1,0 +1,4 @@
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	监狱，拘留所	a correctional institution where persons are confined while on trial or for punishment	0	T1	a correctional institution where persons are confined while on trial or awaiting trial。线索：go to / in + prison。
+s2	n.	监禁，牢狱；监禁状态		0	T1	[glossEn 空：ECDICT 与 WordNet 均无对应义位] [ZH-FALLBACK 英文零覆盖] 英文对应 imprisonment（作名词时 prison 也可直接作「监禁」讲，如 in prison）。ECDICT definition 侧漏导，走 fromZh 补洞。线索：prison + for sth（因…被关押）。
+s3	n.	（比喻）牢笼般的处境	a prisonlike situation; a place of seeming confinement	0	T1	a prisonlike situation; a place of seeming confinement。线索：prison of / a prison of doubt。真实且实用的引申义。

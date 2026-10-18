@@ -1,0 +1,33 @@
+{
+  "word": "research",
+  "senses": [
+    {
+      "fromLines": [
+        0,
+        1,
+        2
+      ],
+      "glossZh": "研究，调查；考察"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "研究",
+      "action": "m",
+      "reason": "raw=0 systematic investigation"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "调查",
+      "action": "m",
+      "reason": "与研究同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "考察",
+      "action": "m",
+      "reason": "与研究同指"
+    }
+  ]
+}

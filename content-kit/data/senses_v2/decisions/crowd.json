@@ -1,0 +1,55 @@
+{
+  "word": "crowd",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "群众，一群人（大量）"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "一伙人，同伙"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "挤满，塞满"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "glossZh": "聚集"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "群众",
+      "action": "m",
+      "reason": "raw=0 a large number of things or people"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "一伙人",
+      "action": "m",
+      "reason": "raw=1 an informal body of friends"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "拥挤",
+      "action": "m",
+      "reason": "raw=2 fill or occupy to overflowing"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "挤满",
+      "action": "m",
+      "reason": "与拥挤同指"
+    }
+  ]
+}

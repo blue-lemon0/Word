@@ -1,0 +1,4 @@
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	炸弹	an explosive device fused to explode under specific conditions	0	T1	an explosive device fused to explode under specific conditions。线索：with a timer / planted a bomb。
+s2	v.	轰炸，投弹	throw bombs at or attack with bombs	0	T1	[WORDNET 补缺 ECDICT 未收录] throw bombs at or attack with bombs。首词非 bomb，ECDICT 侧漏导，本词显式指定。线索：宾语是城市/阵地。
+s3	n.	（引申）彻底失败	an event that fails badly or is totally ineffectual	0	T1	[WORDNET 补缺 ECDICT 未收录] an event that fails badly or is totally ineffectual。借「像炸弹一样失败」的引申义。首词是 turkey，本词显式指定。对考研零价值但是真实用法：the whole project bombed / went over like a bomb。

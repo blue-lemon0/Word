@@ -1,0 +1,64 @@
+{
+  "word": "correct",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "改正；订正（vt.）"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "改正，纠正（treat a defect）"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "正确的"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "glossZh": "合适的，得体的"
+    },
+    {
+      "fromLines": [
+        [
+          "wn",
+          "correct.s.02"
+        ]
+      ],
+      "glossZh": "符合规范惯例的"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "正确的",
+      "action": "m",
+      "reason": "raw=2+3+4 同指"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "合适的",
+      "action": "m",
+      "reason": "raw=4 in accord with accepted standards"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "改正",
+      "action": "m",
+      "reason": "raw=0 make right"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "订正",
+      "action": "m",
+      "reason": "raw=1 treat a defect"
+    }
+  ]
+}

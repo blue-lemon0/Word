@@ -1,0 +1,31 @@
+{
+  "word": "useful",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "有用的，有益的"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "有用的",
+      "action": "merged",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "有益的",
+      "action": "merged",
+      "reason": "与有用同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "有效的",
+      "action": "merged",
+      "reason": "与有用同指"
+    }
+  ]
+}

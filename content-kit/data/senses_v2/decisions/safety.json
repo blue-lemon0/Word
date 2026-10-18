@@ -1,0 +1,52 @@
+{
+  "word": "safety",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "安全，平安（状态）"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "（美式橄榄球）安全得分"
+    },
+    {
+      "fromLines": [
+        [
+          "wn",
+          "safety.n.06"
+        ]
+      ],
+      "glossZh": "安全的地方，避难处"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "安全",
+      "action": "merged",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "保险",
+      "action": "dropped",
+      "reason": "英文 insurance，非 safety"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "平安",
+      "action": "merged",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "保安设备",
+      "action": "merged",
+      "reason": "raw=1 a safe place"
+    }
+  ]
+}

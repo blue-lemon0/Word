@@ -1,0 +1,72 @@
+{
+  "_comment": "incident —— 3 英文边界 / 4 现有中文义项。三条边界是「一般事件 / 骚乱 / 入射」，与现有中文的前三个义项正好一一对应；「附带的」在英语里只存在于固定搭配 incident to，走 fromZh。",
+  "_mergeNote": "4 -> 4。无合并。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "事件",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 a single distinct event —— 中性的、一件事。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "事变",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "对应英文 raw=1 a public disturbance —— 有社会影响的骚动/事变。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "小事",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与「事件」同指 raw=0，中文可互换 —— 尤其在 not an incident（不算什么事）这个否定式里。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "附带的",
+      "action": "merged",
+      "into": "v2 s4",
+      "reason": "英文 incident to sth（附带的、伴随的）。WordNet 无该边界（只有 n.* 三条 + 入射那条形容词），走 fromZh 补洞。"
+    }
+  ],
+  "word": "incident",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "fromZh": [
+        0,
+        2
+      ],
+      "glossZh": "事件；一件事（中性）",
+      "note": "a single distinct event。线索：a minor / isolated incident / at the scene of the incident。**这个英文词刻意中性** —— 既可指大事也可指小事，中文「事件」听起来偏大，所以 gloss 里注明。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "fromZh": [
+        1
+      ],
+      "glossZh": "事变，骚乱",
+      "note": "a public disturbance。带社会动荡意味。线索：a racial / border incident。"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "（光线）入射的",
+      "note": "falling or striking of light rays on something。物理/光学义。线索：incident light / incident ray。现有中文无对应，属新增。"
+    },
+    {
+      "fromZh": [
+        3
+      ],
+      "glossZh": "附带的，伴随的（incident to）",
+      "note": "英文只存在于固定搭配 incident to sth。走 fromZh 补洞，glossEn 留空。判别句：the risks incident to the job。"
+    }
+  ]
+}

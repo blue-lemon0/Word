@@ -1,0 +1,5 @@
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	老板（负责雇人的）	a person responsible for hiring workers	0	T1	a person responsible for hiring workers。强调「雇人」这一权力。
+s2	n.	上司，头儿（拍板的）	a person who exercises control and makes decisions	0	T1	a person who exercises control and makes decisions。强调「决策」这一权力。与 s1 差别很细，判别靠上下文动作。
+s3	n.	岩瘤，突出的岩体（地质学）		0	T1	[glossEn 空：ECDICT 与 WordNet 均无对应义位] [ZH-FALLBACK 英文零覆盖] 英文 boss 作地质学术语。走 fromZh 补洞，glossEn 留空。罕见，造句须带 geological/mine 语境。
+s4	n.	圆凸的浮雕（美术）		0	T1	[glossEn 空：ECDICT 与 WordNet 均无对应义位] [ZH-FALLBACK 英文零覆盖] 英文 boss 作美术术语（圆形浮雕）。走 fromZh 补洞，glossEn 留空。罕见，造句须带 carved/stone 语境。

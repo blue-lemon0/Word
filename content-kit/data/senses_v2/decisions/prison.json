@@ -1,0 +1,51 @@
+{
+  "_comment": "prison —— 2 英文边界 / 3 现有中文义项。监狱与拘留所同指（两者都是关押场所）合并。监禁（状态/动作）在 ECDICT 与补缺层都没有边界 —— raw=1 是「牢笼般的处境」不是「监禁」，故走 fromZh 补洞。",
+  "_mergeNote": "3 -> 3。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "监狱",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 a correctional institution where persons are confined while on trial or awaiting trial。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "监禁",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "英文对应 imprisonment（名词）/ imprison（动词）。ECDICT definition 侧漏导（raw=1 是「牢笼般的处境」不是「监禁」），走 fromZh 补洞保留。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "拘留所",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与「监狱」同指 raw=0 —— 释义就是「关押 awaiting trial 者的机构」，拘留所是同一类场所，中文可互换。"
+    }
+  ],
+  "word": "prison",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "监狱，拘留所",
+      "note": "a correctional institution where persons are confined while on trial or awaiting trial。线索：go to / in + prison。"
+    },
+    {
+      "fromZh": [
+        1
+      ],
+      "glossZh": "监禁，牢狱；监禁状态",
+      "note": "英文对应 imprisonment（作名词时 prison 也可直接作「监禁」讲，如 in prison）。ECDICT definition 侧漏导，走 fromZh 补洞。线索：prison + for sth（因…被关押）。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "（比喻）牢笼般的处境",
+      "note": "a prisonlike situation; a place of seeming confinement。线索：prison of / a prison of doubt。真实且实用的引申义。"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "word": "conservative",
+  "senses": [
+    {
+      "fromLines": [
+        0,
+        2,
+        3
+      ],
+      "glossZh": "保守的，守旧的；保守党的"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "保守党党员"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "保守的",
+      "action": "m",
+      "reason": "raw=0+2+3 同指"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "守旧的",
+      "action": "m",
+      "reason": "与保守同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "有保存力的",
+      "action": "m",
+      "reason": "drop：英文 preservative，非 conservative"
+    }
+  ]
+}

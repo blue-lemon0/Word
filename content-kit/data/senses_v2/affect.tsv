@@ -1,0 +1,5 @@
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	（名词）情感，情绪	the conscious subjective aspect of feeling or emotion	0	T1	the conscious subjective aspect of feeling or emotion。**本词的动词义远比这个名词义常用**，但既在 ECDICT 里就保留。造句时注意：the affect 是心理学/戏剧术语，日常英语几乎不用。
+s2	v.	影响；作用于	have an effect upon / act physically on; have an effect upon	0	T1	have an effect upon / act physically on。线索：affect + 名词（中性，不含褒贬）。与 s3 分界：宾语是人且有情绪反应 → 感动。
+s3	v.	感动，打动	have an emotional or cognitive impact upon	0	T1	have an emotional or cognitive impact upon。线索：be deeply affected。宾语是人。
+s4	vt.	假装，装作		0	T1	[glossEn 空：ECDICT 与 WordNet 均无对应义位] [ZH-FALLBACK 英文零覆盖] 英文对应 affect（古雅用法）。ECDICT definition 侧无边界，走 fromZh 补洞，glossEn 留空。线索：affect an air of / affect to do。真实但罕见，古英语文学里常见。

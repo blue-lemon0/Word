@@ -1,0 +1,63 @@
+{
+  "_comment": "import —— 4 英文边界 / 4 现有中文义项，两个现有义项是误收：「含义」「重要性」对应的英文是 meaning / importance，**与 import 只是拼写相近**。中文侧疑由 important 串到了 import。这是与 equipment「才能」、tour「任期」同类但更隐蔽的错误 —— 因为拼写像。",
+  "_mergeNote": "4 -> 3。舍弃 2 个（含义、重要性），新增 1 个（raw=1 进口劳工）。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "进口货",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 commodities (goods or services) bought from a foreign country。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "输入",
+      "action": "merged",
+      "into": "v2 s3",
+      "reason": "对应英文 raw=2 bring in from abroad 与 raw=3 transfer electronic data into a database（同指「引入」，中文统一译「输入」，合并）。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "含义",
+      "action": "dropped",
+      "reason": "英文对应 meaning / sense，是别的词。**与 import 只是拼写相近**（import ↔ important），中文侧疑由 important 串入。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "重要性",
+      "action": "dropped",
+      "reason": "英文对应 importance，是别的词。与上一条同源（important/importance 串到了 import）。"
+    }
+  ],
+  "word": "import",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "fromZh": [
+        0
+      ],
+      "glossZh": "进口货，进口商品",
+      "note": "commodities (goods or services) bought from a foreign country。名词义指**货**。线索：import duties / imports and exports。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "进口的劳工；侨民",
+      "note": "an imported person brought from a foreign country。罕见（多指历史上的外籍劳工/移民）。现有中文无对应，属新增。"
+    },
+    {
+      "fromLines": [
+        2,
+        3
+      ],
+      "fromZh": [
+        1
+      ],
+      "glossZh": "进口，输入，导入",
+      "note": "bring in from abroad / transfer electronic data into a database。动词义。线索：import goods / import a module。两条边界只差「境外」与「数据库」，中文统一译「输入」，合并。**注意与 important 区分：import 动词与 important 形容词拼写只差一个字母。**"
+    }
+  ]
+}

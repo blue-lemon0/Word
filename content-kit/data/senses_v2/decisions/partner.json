@@ -1,0 +1,44 @@
+{
+  "word": "partner",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "合伙人，股东；伴侣"
+    },
+    {
+      "fromLines": [
+        1,
+        2
+      ],
+      "glossZh": "（与人）合伙；做伙伴"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "合伙人",
+      "action": "m",
+      "reason": "raw=0 a person who is a member of a partnership"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "股东",
+      "action": "m",
+      "reason": "与合伙人同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "伙伴",
+      "action": "m",
+      "reason": "与合伙人同指"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "伴侣",
+      "action": "m",
+      "reason": "与合伙人同指"
+    }
+  ]
+}

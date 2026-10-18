@@ -1,0 +1,55 @@
+{
+  "word": "provide",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "提供，供应"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "规定，预先确定（某个条件/情形下的做法）"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "（为生计）谋生，供养"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "glossZh": "预备，为…作准备"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "提供",
+      "action": "m",
+      "reason": "raw=0 give what is desired"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "供应",
+      "action": "m",
+      "reason": "与提供同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "规定",
+      "action": "m",
+      "reason": "raw=1 determine what is to happen"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "预备",
+      "action": "m",
+      "reason": "raw=3 take measures in preparation"
+    }
+  ]
+}

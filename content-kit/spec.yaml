@@ -19,6 +19,257 @@ sentence_length:
 # 每个义项至少几句才算覆盖
 sentences_per_sense: 5
 
+# ── 义项重切（v2）────────────────────────────────────────
+#
+# 2026-10 起改按**英文释义**切义项。理由（实测 3000 考研词）：
+#   中文 translation 与英文 definition 来自两本不同词典，粒度不一致，
+#   98.0% 的词「英文行数 != 中文段数」。中文侧把同义词并列切开
+#   （reply: 答复/回答/答辩 回击 反响…共 9 段，英文只有 1 行）。
+#   英文侧逐义项成行，是唯一可靠的**边界**来源。
+#
+# glossZh 不再靠位置配对（只有 1.5% 的词能对上），改为按英文义项
+# 由 AI 重新翻译生成 —— 见 data/senses_v2/decisions/<word>.json。
+#
+# 代价（已知并接受）：ECDICT 英文只写 v.，不区分 vt./vi.，
+# 所以 pos 粒度比中文侧粗。宁可粗，不要错。
+#
+# **本段只影响新目录 data/senses_v2/，现有 data/wordlist/senses/ 一字未动。**
+
+  # ── 补洞规则（重要）─────────────────────────────────────
+senses_v2:
+  # 输入：ECDICT 快照（不可再生，只读）
+  source: source/ecdict_snapshot.json
+  # 输出：新目录，与现有 wordlist/senses 并存，不覆盖
+  out_dir: data/senses_v2
+  # AI 语义判断落盘位置（词 -> 义项决策）。脚本只读它，不含判断逻辑。
+  decisions_dir: data/senses_v2/decisions
+
+  # 英文行 -> pos 映射。ECDICT 用 s.(形容词)/r.(副词)，归一化到 a./adv.
+  pos_map:
+    n: n.        # noun
+    v: v.        # verb（不区分 vt/vi —— 英文侧无此信息）
+    vt: vt.
+    vi: vi.
+    a: a.        # adjective
+    s: a.        # ECDICT 的 s. = adjective
+    adv: adv.
+    r: adv.      # ECDICT 的 r. = adverb
+    prep: prep.
+    pron: pron.
+    conj: conj.
+    num: num.
+    int: int.
+    abbr: abbr.
+
+  # ── 清洗开关。全部显式列出，默认值就是行为，不存在隐藏黑盒。──
+  # 丢弃「见 X 条」型互见行（不含任何义项信息）
+  drop_cross_reference: true
+  # 丢弃百科/专名条目（"43rd President of the United States" 之类）。
+  # 这些是真字典义项，但对考研零学习价值。注意：这是**逐行**丢弃，
+  # 不是过滤单词——词本身照样出卡。
+  drop_encyclopedia: true
+  # 英文行正文短于该词数的行丢弃。
+  #
+  # ⚠️ 2026-10 修正（D25）：原设 4，实测误伤 573 条，且**全是恰好 3 词的**。
+  # WordNet 的释义常是紧凑的名词短语（3 词完全够义）：
+  #   become  come into existence        use     a particular service
+  #   minute  a short note               school  an educational institution
+  #   become  denote or connote          pay     be worth it
+  #   write   communicate by letter      like    be fond of
+  # 更严重的是动词短语被误伤，而它们恰恰是常用义：
+  #   apply   ask (for something)   ← 「申请」，本词最常用义之一
+  #   attend  give heed (to)        ← 「专心」
+  #   apply   apply oneself to
+  # 降到 3：那 573 条全部恢复。min_en_words 只拦 1-2 词的碎片
+  # （真正的碎片如 "See Amidst." 由 drop_cross_reference 拦，更准）。
+  #
+  # 【D31：再降到 2】降到 3 之后仍有一批完整释义被挡在外面，实测：
+  #   仍被丢弃 892 条（1 词 153 + 2 词 739），涉及 ~700 词
+  #   样本几乎全是完整义项：
+  #     alive a. possessing life     ask    v. inquire about
+  #     absorb v. become imbued      address v. speak to
+  #     air   v. be broadcast        anger  v. make angry / become angry
+  #   其中 2 词那批（739 条）界面上是可读的，故恢复；
+  #   1 词那批（153 条：have / remove / define / let have）
+  #   界面上没有信息量（用户看到 glossEn="have" 学不到任何东西），
+  #   故留在外面。代价可接受：边界数 12641 -> 约 13380。
+  #
+  #   再次印证 D25 的结论：**碎片靠结构拦，不靠长度拦**。
+  #   实测 892 条里互见碎片只有 1 条（See Amidst.）—— drop_cross_reference
+  #   已经在干这件事，长度门槛拦掉的绝大多数是真义项。
+  min_en_words: 2
+
+  # 不做「过滤单词」。要排除某个词就写进下面这张表，且必须写理由。
+  # 保持为空 = 不排除任何词。
+  skip_words: {}
+  #   例: {civil: "市民的≈公民的，中文侧近乎同义，判别价值低"}
+
+  # 保留哪些 pos 变体。v. 同时吸收 ECDICT 的 vt./vi.（英文侧无区分）
+  keep_pos: [n., v., a., adv., prep., pron., conj., num., int.]
+
+  # ── 英文释义清洗（第一层：词库质量）─────────────────
+  # WordNet 3.0 的 gloss 里混着三类东西，是 1990 年代数据的历史遗留：
+  #   1. 例句被并入释义（e.g. "keep clean"、Barenboim conducted the Chicago symphony）
+  #   2. 空占位残留（"; ; ; ; ,")
+  #   3. 引号未闭合（行尾多一个 " 或 `）
+  # 实测 12735 条里的分布：尾随引号 38 / 空白异常 13 / 分号>2 的 50
+  #
+  # 这些不影响切分（切分只看有没有这一行），但会直接显示在界面上。
+  # 所以清洗放在**产出层**做，不放在切分层 —— 切分层要保持原文可追溯。
+  clean_gloss:
+    # 剥掉行尾未闭合的引号/反引号
+    strip_trailing_quote: true
+    # 压缩连续分号与多余空白："; ; ; ; ," -> ";"
+    squeeze_semicolons: true
+    # 剥掉 "e.g., "xxx"" / "as in ..." 这类内嵌例句。
+    # 只切分号之后的部分，且只在前半段像完整释义时才切 ——
+    # 宁可不切（多留一段例句文字）也不要切掉半个单词。
+    drop_trailing_examples: true
+  # 实测 351/2921 词(12.0%) 存在「中文有某个词性、英文侧一条都没有」：
+  #   author  T1 英文只有 1 边界 "v. be the author of"，名词义「作家」完全缺失
+  #   follow  T1 英文 4 条全是 v.
+  #   social  T1 英文 4 条全是 a.，名词义「联欢会」完全缺失
+  # 缺失分布: a 111 / n 108 / v 97 / num 20 / adv 12 / prep 5 / conj 3 / pron 3
+  #
+  # 纯按英文切会直接丢掉这些真义项 —— author 当名词是核心考研义项，丢不得。
+  # 所以规则是：
+  #   **英文定义该词性内部的义项边界；英文对某词性零覆盖时，该词性
+  #   从现有中文义项补进来。**
+  # 这不是回头用中文切分（那会回到过度切分的老问题），而是在英文缺位时
+  # 不假装它不存在。补进来的义项 note 标 ZH-FALLBACK，来源可查、可回退。
+  supplement_missing_pos: true
+
+  # ── 每词义项上限 ────────────────────────────────────
+  # 现有 7884 个义项不是「词有多少义项」，是「每词最多留 N 个」的截断结果：
+  #   T1 663词x4 + T2 1218词x3 + T3 1011词x2 + T4 106词x1 = 上限 8434
+  #   实际 7884 -> 利用率 93.5%
+  # 而 WordNet 的义项数远超此限（T1 平均 5.08/词，T2 5.21/词），
+  # 所以重切时必须沿用同一套上限，否则一个 well 会带进 21 个义项。
+  #
+  # 实际需要截断的词: 1479/2859 (51.7%)
+  #   T1 46.7% / T2 55.9% / T3 47.8% / T4 72.3%
+  #
+  # 数值不在这里写死 —— 由 resegment.py 读 tier 后查表得到，
+  # 真相源是 data/wordlist/senses/*.tsv 的 tier 列（不是 core.tsv，那里全是 CORE）。
+  # 上限本身写成配置而不是代码常量，改了立即生效。
+  # D21 查清了来历：这套上限不是内容规格，是防御旧中文切分算法的产物。
+  #   证据：超上限的词 0 个，但 T1 74% / T2 85% / T3 93% / T4 100% 顶满上限，
+  #   而中文侧切分平均 5.90 段/词（最多 13 段）。上限当时的作用是防止
+  #   过度切分产出几百个假义项，不是「这个词只值得学 N 个意思」。
+  #   换成英文切分后这个理由消失了，被挡掉的恰恰都是真义项
+  #   （social 联欢会 / stone 纪念碑 / queen 立为女王 都是补洞救回来的）。
+  #
+  # 2026-10 决定：**取消上限**。用户明确「不怕义项多，要的是稳妥正确、耐用实用」，
+  # 且开发阶段不背进度约束。取消后按 WordNet 边界全留。
+  # 保留一个远高于任何真实值的硬保险（40），只为防「某个词切出几百个义项」
+  # 这类数据事故；正常词远达不到，触发即报错要求人工处理。
+  #
+  # 实测：WordNet 可补缺义项 5501 条（现有 7851 条的 70.1%）
+  #   T1 1409 / T2 2944 / T3 1056 / T4 92
+  keep_per_tier: null          # null = 不限，看 WordNet 边界有多少就留多少
+  safety_cap: 40               # 硬保险，正常词达不到（最极端 well 约 21）
+
+  # ── 高频动词的细分义项：只告警，不要求合并 ──────────
+  # 取消上限后实测暴露的现象：cut 有 47 个义项、break 37 个。
+  #
+  # ⚠️ 2026-10 修正（D24）：这个机制原本要求「合并到可判别的义项」，
+  # 理由写的是「造句也区分不开」——**那是错误的合并理由**。
+  #   cut.v.17「切割」与 cut.v.23「执行」是两个完全不同的概念，
+  #   只是共用 cut 这个词形（类比中文「上夜班」和「上个月」的「上」）。
+  #   「造不出区分句」是造句阶段该花功夫，不是词库阶段该砍义项。
+  #
+  # 现在它只是**数据异常告警**：这些词的义项数反常，值得人看一眼，
+  # 但绝不要求合并。确认都是真义项后在 decisions 写 _mergeNote 说明即可。
+  #
+  # 真正该拦的只有两种情况（都不常见）：
+  #   1. safety_cap  —— 数据事故（某个词切出几百条）
+  #   2. 账目不完整  —— 现有义项没交代去向（会静默丢失，见 D18 的守卫）
+  max_senses_soft: 12          # 仅告警：--plan 提示，--build 不拦
+  # 实测: >12 的词 87 个（cut 47 / break 37 / call 30 / play 30 / carry 29…）
+  # 去掉旧注释里的「>6 的词 462 个(40.7%边界)」—— 那是按「造句成本」算的，
+  # 不是按语义算的，不构成保留在文档里的理由。
+
+  # ── 补缺层的粒度上限：ECDICT 全留，WordNet 只补关键义项 ─────
+  # 补缺层实测暴露的真问题（逐条读 WordNet 原文即可判断）：
+  #   cut  47 边界（ECDICT 仅 4，其余 43 全来自 WordNet）
+  #     E31 perform or carry out          ← 「执行」，与「切」判别不了
+  #     E32 function as a cutting instrument
+  #     E38 dissolve by breaking down the fat of   ← 溶脂
+  #     E40/E41 have grow through the gums / grow through the gums
+  #   break 37 边界
+  #     E19 happen or take place / E45 happen  ← 「发生」，两个重复义位
+  #     E28 become punctured or penetrated / E45 pierce or penetrate
+  #   这些是 WordNet 把一个动词的**全部细微用法**逐条列出（含转喻、习语化、
+  #   可分用法）。它们在语言上是真义项，但**造 5 句也区分不开** ——
+  #   区分「cut = 切」和「cut = 执行」要靠语境猜，不是靠义项本身的差别。
+  #
+  # 所以补缺不能「有就全加」。规则：
+  #   **ECDICT 已收录的义项全部保留（它替我们筛过一轮）；
+  #     WordNet 补缺只补「学习者能判别」的义项，且每词有上限。**
+  # 上限按「每词总义项数」计，不是「补缺条数」—— 因为判别性问题是
+  # 总义项太多造成的，不是补缺本身有问题。
+  #
+  # 阈值 12 的依据：cut/break/call/play 这类超高频动词才超；
+  # T1 常用词绝大多数 < 8。逐词人工处理 87 个词是可控工作量。
+  #
+  # 超限时怎么办：**不静默截断**，--build 报错，要求 decisions 里
+  # 用 _mergeNote 说明哪些细分义项合并进了哪个主义项、依据是什么。
+  supplement_max_per_word: 12
+  # 实测需要人工合并的词 87 个（占 3%），其中 cut 47 / break 37 /
+  # call 30 / play 30 / carry 29 各需裁掉 30+ 条细分义项。
+
+  # ── 义项来源：ECDICT + WordNet 补缺 ────────────────
+  # ECDICT 的 definition 就是 WordNet 3.0 的逐字原文，但它只导入了约 2/3：
+  #   实测 2859 词，ECDICT 8439 条 vs WordNet 12827 条
+  #   两者相等 1797 词(63%) / WordNet 更多 1010 词(35%) / ECDICT 更多 52 词(2%)
+  # 缺的那 35% 里既有要的（author 的 writer.n.01，ECDICT 只留了 author.v.01），
+  # 也有噪声（well 多 21 条、make 多 30 条，多为固定语块与罕见义）。
+  #
+  # 所以：**ECDICT 为主（已筛过一轮），WordNet 补缺**，补缺时按下列规则过滤。
+  supplement:
+    wordnet_dir: source/wordnet
+    enabled: true
+    # 只收以该词为首词的 synset。必须过滤：
+    #   wn.synsets("reply") 会返回 answer.n.01 —— 那是「答案」的义项，
+    #   不是「答复」的义项。不按首词过滤会把同义词的意思算到本词头上。
+    first_word_only: true
+    # lexname 黑名单：这些类别是专名/百科，对背单词零学习价值。
+    # noun.person 是最大的一类（美国首席大法官 Stone 之类）。
+    drop_lexnames:
+      - noun.person
+    # 「用于研究某个具体的人」的专名义项，即使不是 noun.person 也要拦。
+    # 判据是句中出现专名地点状语 —— 与 encyclopedia 正则互补。
+    drop_patterns:
+      - "\\bUnited States\\b"
+      - "\\bBritish (statesman|prime minister)\\b"
+      - "\\bAmerican (statesman|physicist|chemist|jurist|film-maker)\\b"
+    # 带这些语域标记的义项丢弃（口语/俚语/古语/复数专用）
+    drop_usage_domains: [colloquialism, slang, archaism, combining_form]
+    # English gloss 的最小词数。补缺侧与主源同款，见上面 min_en_words 的说明。
+    # 【D31】同步 3 -> 2，理由同上。
+    min_en_words: 2
+    # 跨源去重：ECDICT 与 WordNet 是同一条 WordNet 释义的两份转存，尾部例句
+    # 与引文常不一致（`; ; ; ; ; (\`anyplace' is used…` / `- W.B. …`）。
+    # 用原始串比对会把同一条义项算成两条（实测 144 对），故按
+    # 「词性 + 首分句」去重；首分句够长才用，过短则退回全文比对。
+    # 长度门槛 6 的依据：实测 (pos, 首分句) 8378 组里仅 3 组会误合并，
+    # 且都是首分句过短（`until prep. to` / `when adv. at what time`）。
+    # 修复后重复对 144 -> 60（余下是词性不同的真区分，如 quality n. vs a.）。
+    dedup_clause_min_words: 6
+
+  # 截断时的义项保留优先级（按顺序判断，取到上限为止）。
+  # 只合并不算截断 —— 合并是「同义归一」，截断是「超上限丢弃」，两者要分开。
+  truncate_priority:
+    - freq        # 词频/星级高（collins/oxford/ky标签）—— 考研更可能考
+    - separable   # 与同词其他义项语义可判别 —— 能造出区分句子
+    - pos         # 词性覆盖面广 —— 名词优先于罕见副词
+    - short       # 释义简洁 —— 造句更容易
+
+  # 释义可判别性阈值（WordNet path 相似度）。实测词内义项对 7752 个，
+  # path_sim>0.75 的只有 206 个 (2.7%)，>=0.90 的仅 10 个 (0.1%)。
+  # 超过阈值的视为疑似同义，标注出来要求人工确认，不自动合并。
+  separability_path_sim: 0.75
+
 # 超纲生词黑名单。只拦「真正没有学习价值的生词」，不是所有 CORE 3000 以外的词。
 #
 # 为什么不是「非目标词 ∩ CORE3000 = ∅」：CORE 3000 只收实词，连 the/and/of 都不含，

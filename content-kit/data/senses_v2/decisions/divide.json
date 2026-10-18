@@ -1,0 +1,50 @@
+{
+  "word": "divide",
+  "senses": [
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "分开，分割；除",
+      "pos": "v."
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "分配"
+    },
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "（群体间的）严重分歧，分裂"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "分开",
+      "action": "merged",
+      "reason": "raw=1"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "分配",
+      "action": "merged",
+      "reason": "raw=2"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "分裂",
+      "action": "merged",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "分",
+      "action": "merged",
+      "reason": "raw=1/2"
+    }
+  ]
+}

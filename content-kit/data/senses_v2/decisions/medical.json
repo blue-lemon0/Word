@@ -1,0 +1,55 @@
+{
+  "_comment": "medical —— 2 英文边界 / 4 现有中文义项。**现有两个名词义（医生、体格检查）都是误收** —— WordNet 只有两条形容词义项，English 没有 medical 作名词表示这二者（医生是 doctor；体格检查是 physical examination）。这类错误是把相关词的义项串了进来。",
+  "_mergeNote": "4 -> 2。舍弃 2 个。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "医生",
+      "action": "dropped",
+      "reason": "英文对应 doctor / physician，是别的词。中文侧疑由 medical officer（军医）、medical student（医学生）这些**定语复合**被误收成「医生」这个名词义项。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "体格检查",
+      "action": "dropped",
+      "reason": "英文对应 physical examination / check-up，是别的词。同为定语复合（medical check-up）被误收。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "医学的",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 relating to the study or practice of medicine。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "内科的",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "对应英文 raw=1 requiring or amenable to treatment by medicine especially physician —— 「需要用药物治疗的」，中文译「内科的」。"
+    }
+  ],
+  "word": "medical",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "fromZh": [
+        2
+      ],
+      "glossZh": "医学的，医疗的",
+      "note": "relating to the study or practice of medicine。**只作形容词**。线索：a medical degree / medical school / medical care。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "fromZh": [
+        3
+      ],
+      "glossZh": "（需药物治疗的）内科的；疾病的",
+      "note": "requiring or amenable to treatment by medicine especially physician。线索：a medical condition / medical treatment。**注意这条是「需要看医生的」，不是「医院里的」**（那要 hospital）。"
+    }
+  ]
+}

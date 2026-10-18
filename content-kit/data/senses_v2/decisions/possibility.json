@@ -1,0 +1,27 @@
+{
+  "word": "possibility",
+  "senses": [
+    {
+      "fromLines": [
+        0,
+        1,
+        2
+      ],
+      "glossZh": "可能性；可能的事"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "可能性",
+      "action": "m",
+      "reason": "raw=0+1+2 同指"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "可能的事",
+      "action": "m",
+      "reason": "与可能性同指"
+    }
+  ]
+}

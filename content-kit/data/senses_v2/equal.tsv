@@ -1,0 +1,5 @@
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	对手，匹敌者；（one's equals）同辈		0	T1	[glossEn 空：ECDICT 与 WordNet 均无对应义位] [ZH-FALLBACK 英文零覆盖] 英文 one's equal / one's equals。WordNet 无名词义项，走 fromZh 补洞，glossEn 留空。判别句：He is my equal.（对手）/ They are my equals.（同辈）
+s2	v.	等于；相当于；（能力）相当	be identical or equivalent to / be equal to in quality or ability	0	T1	be identical or equivalent to / be equal to in quality or ability。**高频动词义，但现有中文完全没有**。线索：equal to / three equal parts。两条边界只差「数值」与「能力」，合并。
+s3	v.	使相等，使平等；配平	make equal, uniform, corresponding, or matching	0	T1	make equal, uniform, corresponding, or matching。及物动词。线索：equalize / equal the shares。现有中文无对应，属新增。
+s4	a.	相等的，平等的	having the same quantity, value, or measure as another	0	T1	having the same quantity, value, or measure as another。线索：equal weight / equal treatment。**注意拼写**：equal（相等的）vs equally（同样地）vs equality（平等）。

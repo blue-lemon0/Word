@@ -1,0 +1,44 @@
+{
+  "word": "decision",
+  "senses": [
+    {
+      "fromLines": [
+        0,
+        1
+      ],
+      "glossZh": "决定，决心；决断"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "（拳击）点数胜"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "glossZh": "（比赛）结果"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "决定",
+      "action": "m",
+      "reason": "raw=0+1 同指"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "决心",
+      "action": "m",
+      "reason": "与决定同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "决断",
+      "action": "m",
+      "reason": "与决定同指"
+    }
+  ]
+}

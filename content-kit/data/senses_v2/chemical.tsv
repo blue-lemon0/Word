@@ -1,0 +1,3 @@
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	化学药品，化学物质	material produced by or used in a reaction involving changes in atoms or molecules	0	T1	material produced by or used in a reaction involving changes in the chemical constitution。名词义，指「物」。线索：toxic chemicals / agricultural chemicals。
+s2	a.	化学的；化学制品的	relating to or used in chemistry / of or made from or using substances produced by or used in reactions involving atomic or molecular changes	0	T1	relating to or used in chemistry / of or made from or using substances produced by or used in reactions。形容词义。两条边界英文有别（涉及化学 vs 由化学品制成），中文统一译「化学的」，看不出差别，合并。线索：chemical industry / chemical weapons。

@@ -1,0 +1,59 @@
+{
+  "_comment": "motor —— 2 英文边界 / 4 现有中文义项。「马达的」「发动机的」「汽车的」三个形容词义对应同一条边界 raw=0，中文按中心词拆成了三个（马达/发动机/汽车），这是典型的「中文按译词拆分，英文只有一个义位」。",
+  "_mergeNote": "4 -> 2。① 原动力 ← raw=1。② 马达的+发动机的+汽车的 合并为 s2 ← raw=0。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "原动力",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=1 a nonspecific agent that imparts motion —— 抽象的「原动力」。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "马达的",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "对应英文 raw=0 machine that converts other forms of energy into mechanical power。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "发动机的",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "与「马达的」同指 raw=0 —— 「马达」与「发动机」是同一个东西的中文两个译词，英文只有一个词。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "汽车的",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "与「马达的」同指 raw=0 —— motor 作定语指「机动车的」（motor car / motor industry）。**注意：英语 motor 不是普通「汽车」的意思**，汽车是 car。"
+    }
+  ],
+  "word": "motor",
+  "senses": [
+    {
+      "fromLines": [
+        1
+      ],
+      "fromZh": [
+        0
+      ],
+      "glossZh": "原动力，推动力",
+      "note": "a nonspecific agent that imparts motion。抽象义。线索：the motor of growth。**注意这个词在中文语境里译作「马」，英语里其实完全不用**（horse 才是马）—— 这是典型的中英词义错位。"
+    },
+    {
+      "fromLines": [
+        0
+      ],
+      "fromZh": [
+        1,
+        2,
+        3
+      ],
+      "glossZh": "马达，发动机（动力的）",
+      "note": "machine that converts other forms of energy into mechanical power。线索：a motor engine / motor vehicle / motor industry。**英语 motor 不等于「汽车」**，car 才是。中文三个形容词义对应这一个英文义位。"
+    }
+  ]
+}

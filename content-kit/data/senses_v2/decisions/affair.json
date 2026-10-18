@@ -1,0 +1,44 @@
+{
+  "_comment": "affair。英文只给 2 条名词边界，但现有 3 义：事件/事务/恋爱事件。其中「事务」在英文里归 matter.n.01 而非 affair.n 首词，首词规则排除，走补洞 —— 不能因为英文没收录就丢掉（foreign affairs 是真实用法）。",
+  "_mergeNote": "3 中文义项 -> 2 英文边界 + 1 补洞。现有 s0「事件」对应 raw=1 a vaguely specified social event（一桩社交事件/事务）；s1「事务」走 fromZh；s2「恋爱事件」对应 raw=0。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "事件",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=1 a vaguely specified social event —— 语境不特定的一桩事，线索是 diplomatic affair / family affairs。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "恋爱事件",
+      "action": "merged",
+      "into": "v2 s3",
+      "reason": "英文 raw=0 a usually secretive or illicit sexual relationship 精确对应。"
+    }
+  ],
+  "word": "affair",
+  "senses": [
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "一桩事，事件",
+      "note": "a vaguely specified social event。语境不特定的一桩事，常见于 diplomatic affair / family affairs。"
+    },
+    {
+      "fromZh": [
+        1
+      ],
+      "glossZh": "事务，公务",
+      "note": "英文首词无覆盖（WordNet 归 matter.n.01）。真实用法：foreign affairs 外交事务 / the affairs of the company 公司事务。"
+    },
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "风流韵事，私情",
+      "note": "a usually secretive or illicit sexual relationship。线索明确：have an affair with somebody。对考研不考但确有此义，保留。"
+    }
+  ]
+}

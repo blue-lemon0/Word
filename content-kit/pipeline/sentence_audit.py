@@ -559,7 +559,19 @@ def fix_spans(word=None, dry=False):
 
 if __name__ == "__main__":
     args = sys.argv[1:]
-    if args and args[0] == "--fix-spans":
+    # --v2 审计新切分的例句：读 data/sentences_v2/ + data/senses_v2/
+    # 旧例句全部作废（senseId 按旧义项顺序编号，与新义项错位，见 D26），
+    # 所以两条审计线互不相干，默认走旧目录。
+    if args and args[0] == "--v2":
+        rest = args[1:]
+        globals()["SDIR"] = os.path.join(PROJ, "data", "sentences_v2")
+        globals()["SE"] = os.path.join(PROJ, "data", "senses_v2")
+        if rest and rest[0] == "--fix-spans":
+            fix_spans(rest[1] if len(rest) > 1 else None,
+                      dry="--dry" in rest)
+        else:
+            audit(only=set(rest) if rest else None)
+    elif args and args[0] == "--fix-spans":
         fix_spans(args[1] if len(args) > 1 else None,
                   dry="--dry" in args)
     else:

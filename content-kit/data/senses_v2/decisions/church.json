@@ -1,0 +1,69 @@
+{
+  "_comment": "church —— 4 英文边界 / 4 现有中文义项，三个词性问题要处理。①raw=0「教派」（如 Anglican Church）在现有中文里完全没有，是新增。②raw=1「教堂」这个第一义现有中文也没有（只有形容词「教堂的」）。③现有「礼拜」是误收（英文是 service/worship）。④现有「教堂的[a.]」WordNet 无对应义项 —— 作定语是语法修饰而非独立词性，与 arrange「安排」（名词转动词）性质不同，故舍弃。",
+  "_mergeNote": "4 -> 4。舍弃 2 个：礼拜、教堂的。新增 2 个：教派、教堂。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "礼拜",
+      "action": "dropped",
+      "reason": "英文对应 service / worship / worship service，是别的词。中文侧疑由 church 的「宗教活动场所」义串到了「宗教仪式」。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "教会",
+      "action": "merged",
+      "into": "v2 s3",
+      "reason": "对应英文 raw=2 the body of people who attend or belong to a particular local congregation —— 某地的一群教众/堂会。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "使人接受宗教仪式",
+      "action": "merged",
+      "into": "v2 s4",
+      "reason": "对应英文 raw=3 perform a special church rite or service for。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "教堂的",
+      "action": "dropped",
+      "reason": "**WordNet 无 church 的形容词义项**（查证：church 只有 n.01/n.02/n.04/v.01 四条，无 a.*）。英文里 church 作定语（church doctrine、Church history）是名词的语法修饰，不是独立词性 —— 与 arrange「安排」不同，那个是名词转动词、有对应动词义项。"
+    }
+  ],
+  "word": "church",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "教派；（the Church）教会",
+      "note": "one of the groups of Christians who have their own beliefs and their own form of worship。指**组织/派别**。线索：the Catholic / Anglican Church。现有中文无对应，属新增。注意与 s3 分界：s3 是「某一地的堂会」，本条是「跨地区的教派」。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "教堂，礼拜堂",
+      "note": "a place for public (especially Christian) worship。指**建筑物**。**本词最常用的义，但现有中文只有形容词形式**，故属新增。线索：go to church / the church organ。"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "fromZh": [
+        1
+      ],
+      "glossZh": "教众，堂会（某地的一群信徒）",
+      "note": "the body of people who attend or belong to a particular local congregation。线索：the local church / a small church。规模比教派小。"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "fromZh": [
+        2
+      ],
+      "glossZh": "为…举行（入教）仪式",
+      "note": "perform a special church rite or service for。罕见但真实。线索：church someone."
+    }
+  ]
+}

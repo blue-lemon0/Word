@@ -1,0 +1,25 @@
+{
+  "word": "perhaps",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "也许，大概"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "也许",
+      "action": "merged",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "大概",
+      "action": "merged",
+      "reason": "与也许同指"
+    }
+  ]
+}

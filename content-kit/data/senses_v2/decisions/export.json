@@ -1,0 +1,49 @@
+{
+  "word": "export",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "出口商品，输出品"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "出口（动词）"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "（计算机）导出"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "glossZh": "传播，输出（思想/文化）"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "输出品",
+      "action": "m",
+      "reason": "raw=0 commodities sold to a foreign country"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "出口",
+      "action": "m",
+      "reason": "raw=1 sell or transfer abroad"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "输出物资",
+      "action": "m",
+      "reason": "raw=3 cause to spread"
+    }
+  ]
+}

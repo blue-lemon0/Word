@@ -1,0 +1,68 @@
+{
+  "_comment": "engine —— 3 英文边界 / 4 现有中文义项。两个动作：①「机车」初看像误收（英文是 locomotive），但 engine 确实可指机车动力装置（railway engine），保留并说明；②「安装发动机于」是误收 —— 查证 WordNet 无 engine 的动词义项，英语里 engineer 才是动词（engineer a coup），engine 名词转动词极罕见。",
+  "_mergeNote": "4 -> 4。舍弃 1 个（安装发动机于），新增 2 个（raw=1 推动力/手段，raw=2 军用机械）。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "引擎",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 motor that converts thermal energy to mechanical work。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "发动机",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与「引擎」同指 raw=0，中文可互换。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "机车",
+      "action": "merged",
+      "into": "v2 s3",
+      "reason": "英文 railway / steam engine 指机车动力装置，是 engine 的合法用法。走 fromZh 接住 —— **不能因「英文更常用 locomotive」就删**。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "安装发动机于",
+      "action": "dropped",
+      "reason": "**WordNet 无 engine 的任何动词义项**（查证：只有 n.* 三条）。英语里「策划、设计」是 engineer（engineer a coup），不是 engine。中文侧疑由 engineer 串到了 engine。"
+    }
+  ],
+  "word": "engine",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "fromZh": [
+        0,
+        1
+      ],
+      "glossZh": "引擎，发动机",
+      "note": "motor that converts thermal energy to mechanical work。线索：a car engine / engine failure / search engine。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "（推动）引擎，动力；实现手段",
+      "note": "something used to achieve a purpose。比喻义，实际英语中最常用的一条。线索：the engine of growth / a marketing engine。现有中文无对应，属新增。"
+    },
+    {
+      "fromZh": [
+        2
+      ],
+      "glossZh": "机车（动力装置）",
+      "note": "英文 railway / steam engine。WordNet 无此边界，走 fromZh 补洞，glossEn 留空。指机车本身时英文更常用 locomotive。"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "军用机械；兵器",
+      "note": "an instrument or machine that is used in warfare。罕见。现有中文无对应，属新增。造句须带 war/military 语境。"
+    }
+  ]
+}

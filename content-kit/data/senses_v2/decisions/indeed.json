@@ -1,0 +1,55 @@
+{
+  "_comment": "indeed —— 2 英文边界 / 4 现有中文义项。这是**合并最彻底的一个词**：四条中文义项合并成一条。的确/实在/真正地 都译 raw=0（in truth），而 raw=1 是感叹语用法「真的！」。「甚至」是误收：英文对应 even。",
+  "_mergeNote": "4 -> 2。舍弃 1 个（甚至）。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "的确",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 in truth (often tends to intensify)。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "实在",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与「的确」同指 raw=0，中文可互换（It is indeed true.）。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "真正地",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与「的确」同指 raw=0，中文可互换。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "甚至",
+      "action": "dropped",
+      "reason": "英文对应 even，是另一个词（indeed 有时确实可译「甚至」，但那不是它的义项而是副词位置）。中文侧疑由 indeed 的强调语气引申成了 even。"
+    }
+  ],
+  "word": "indeed",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "fromZh": [
+        0,
+        1,
+        2
+      ],
+      "glossZh": "的确，实在；真正地",
+      "note": "in truth (often tends to intensify)。**注意它是强调词，不只是「确认」**：It is indeed cold. 意为「确实冷」。线索：indeed / and indeed（甚至可以说）。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "（惊讶的感叹）真的！",
+      "note": "(used as an interjection) an expression of surprise or skepticism。独立成句。线索：Indeed? 你可真行！现有中文无此义项，属新增 —— 这是本词唯一的非副词用法。"
+    }
+  ]
+}

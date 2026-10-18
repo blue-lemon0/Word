@@ -1,0 +1,44 @@
+{
+  "_comment": "ability。【D24 返工】原先把「才干」并进「能力」，理由是造不出 5 句区分句 —— 那是错误的合并理由。实际情况：he has the ability to solve it（能不能做）vs he has real talent for music（天赋、本领），主语结构与搭配都不同，是两个概念。英文两条边界恰好对应这个区分。",
+  "_mergeNote": "本词 2 个英文边界全部保留，无合并。中文三个义项 与 英文两条边界 的对应关系：能力→raw=0（做某事的能力）；才干/才能→raw=1（完成某事所需的素质，尤其心智素质）。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "能力",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "英文 raw=0 the quality of being able to perform 精确对应 —— 「能不能做某事」的能力。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "才干",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "【D24 返工，原先误并入 s1】与 能力 是两个概念：他有能力做（neutral）vs 他有才干（强调天赋与本领）。搭配不同（have the ability to do / have talent for），故并入 s2 的「素质/本领」义更准确。中文保留「才干、才能」两词，因为它们都指向 raw=1 那个概念。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "才能",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "与 才干 同指 raw=1 possession of the qualities (especially mental qualities) required to do something。两者中文可互换，同一概念。"
+    }
+  ],
+  "word": "ability",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "能力",
+      "note": "the quality of being able to perform; a quality that permits or facilitates achievement。中性义：「有条件做某事」。线索：ability to do sth，宾语是动作。I have the ability to solve this problem."
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "才干，才能，本领",
+      "note": "possession of the qualities (especially mental qualities) required to do something or get something done。强调「具备的素质/天赋」，尤其心智能力。线索：talent / aptitude for sth，宾语是领域。She has real talent for music."
+    }
+  ]
+}

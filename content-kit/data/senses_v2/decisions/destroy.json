@@ -1,0 +1,38 @@
+{
+  "word": "destroy",
+  "senses": [
+    {
+      "fromLines": [
+        0,
+        1
+      ],
+      "glossZh": "破坏，毁坏，摧毁"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "（兽医）宰杀，消灭（动物）"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "破坏",
+      "action": "m",
+      "reason": "raw=0+1 同指"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "毁坏",
+      "action": "m",
+      "reason": "与破坏同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "消灭",
+      "action": "m",
+      "reason": "raw=2 put (an animal) to death"
+    }
+  ]
+}

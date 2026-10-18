@@ -1,0 +1,44 @@
+{
+  "_comment": "crime —— **本批唯一的多边界词**，也是最能说明「按可验证判据切义」的样本。英文给了两条边界，区别是「是否受法律惩罚」，这是可验证的：war crime / violent crime 受法律惩罚，sin/evil act 不受。",
+  "_mergeNote": "3 -> 2。① 犯罪/罪行 同指 raw=0（criminal law，明确 punishable by law）。② 罪恶 对应 raw=1 an evil act not necessarily punishable by law（不必然受法律惩罚）。两条不是同义：判别句「Murder is a crime, but greed is not.」可成立。注意这与 D24 记录的 cut「切割/执行」是反例 —— 那两个共用词形但含义不同，本词两条含义确有法律/道德的分界，判别句成立。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "犯罪",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 (criminal law) an act punishable by law; usually considered an evil act。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "罪行",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与「犯罪」同指 raw=0，中文可互换（犯罪/罪行）。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "罪恶",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "对应 raw=1 an evil act not necessarily punishable by law —— 道德上的恶，不必然违法。判别句：Murder is a crime, but greed is not."
+    }
+  ],
+  "word": "crime",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "犯罪，罪行（违法行为）",
+      "note": "(criminal law) an act punishable by law; usually considered an evil act。线索：commit a crime / war / violent + crime。关键：受法律惩罚。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "罪恶（道德上的恶，不必然违法）",
+      "note": "an evil act not necessarily punishable by law。与 s1 的分界是「是否受法律惩罚」：greed 在中文可说成罪恶，但英语不叫 crime。判别句：Murder is a crime, but greed is only a sin."
+    }
+  ]
+}

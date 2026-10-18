@@ -1,0 +1,4 @@
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	v.	滥用，误用；（名词）恶习，弊端	use wrongly or improperly or excessively	0	T1	use wrongly or improperly or excessively。线索：abuse power / drug abuse / abuse of。宾语决定是哪种「滥用」。
+s2	n.	虐待，粗暴对待		0	T1	[glossEn 空：ECDICT 与 WordNet 均无对应义位] [ZH-FALLBACK 英文零覆盖] 英文 abuse（粗暴对待）。ECDICT definition 侧无边界，走 fromZh 补洞，glossEn 留空。线索：child / domestic + abuse。名词 abuse 指「虐待行为」时也走这条。
+s3	n.	辱骂（的话）	a rude expression intended to offend or hurt / use foul or abusive language towards	0	T1	a rude expression intended to offend or hurt / use foul or abusive language towards。名词与动词两面合并。线索：a term of abuse / abuse sb verbally。注意与 s1 分界：宾语是「权力/药物」还是「人」。

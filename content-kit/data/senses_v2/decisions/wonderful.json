@@ -1,0 +1,31 @@
+{
+  "word": "wonderful",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "极好的，绝妙的"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "令人惊奇的",
+      "action": "m",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "奇妙的",
+      "action": "m",
+      "reason": "与惊奇同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "极好的",
+      "action": "m",
+      "reason": "与惊奇同指"
+    }
+  ]
+}

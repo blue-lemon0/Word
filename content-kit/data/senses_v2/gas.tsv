@@ -1,0 +1,5 @@
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	气体	the state of matter distinguished from the solid and liquid states by: relatively low density and viscosity; relatively great expansion and contraction with changes in pressure and temperature; the ability to diffuse readily; and the spontaneous tendency to become distributed uniformly throughout any container / a fluid in the gaseous state having neither independent shape nor volume and being able to expand indefinitely	0	T1	the state of matter distinguished from the solid and liquid / a fluid in the gaseous state。线索：a gas / gas mask。抽象物质状态与具体气体，中文统一译「气体」，合并。
+s2	v.	用毒气攻击（用毒气）	attack with gas; subject to gas fumes	0	T1	attack with gas; subject to gas fumes。动词义。线索：gassed in the war / gas the enemy。现有中文无此义项，属新增。
+s3	n.	汽油（美式口语）		0	T1	[glossEn 空：ECDICT 与 WordNet 均无对应义位] [ZH-FALLBACK 英文零覆盖] 英文 gas = gasoline，**美式英语**（英式用 petrol）。走 fromZh 补洞，glossEn 留空。线索：gas station / gas pump。真实高频，词库不能因「英式不用」就丢。
+s4	n.	燃气，瓦斯		0	T1	[glossEn 空：ECDICT 与 WordNet 均无对应义位] [ZH-FALLBACK 英文零覆盖] 英文 town gas / natural gas。走 fromZh 补洞，glossEn 留空。线索：town gas / gas supply。

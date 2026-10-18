@@ -1,0 +1,36 @@
+{
+  "_comment": "exist —— 中文三义 存在/生存/发生。英文唯一边界 have an existence, be extant 覆盖「存在」与「生存」。「发生」英文是 happen/occur/take place（另一个词），但它同时也是 exist 的常见中文译法（「发生了什么」= what exists）。需按搭配判：exist 表「存在」，happen 表「发生」，是不同词。",
+  "_mergeNote": "3 -> 2。① 存在/生存 同指 raw=0（have an existence, be extant 一条同时含两个中文译法）。② 「发生」标 dropped：英文对应 happen，与 exist 是不同动词（There happened to be no one there. / Such a situation exists now.）。ECDICT 侧亦无对应义位。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "存在",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 have an existence, be extant。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "生存",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与「存在」同指 raw=0 —— be extant 就是「仍存在/尚存」，中文译作「生存」。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "发生",
+      "action": "dropped",
+      "reason": "英文对应 happen / occur。exist 与 happen 是不同动词：exist 是「存在」（状态），happen 是「发生」（事件）。造句时宾语与时态都不同，不是同一概念。"
+    }
+  ],
+  "word": "exist",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "存在，生存",
+      "note": "have an existence, be extant。线索：主语是事物/人，也可接 that 从句。Few such places still exist today."
+    }
+  ]
+}

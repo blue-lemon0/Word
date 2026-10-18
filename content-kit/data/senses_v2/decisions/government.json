@@ -1,0 +1,66 @@
+{
+  "_comment": "government —— 3 英文边界 / 4 现有中文义项。三条边界正好是「机构 / 行为 / 体制」三层，中文四义里「政府+内阁」同指机构、「政治+政体」同指体制，中间那层「治理行为」现有中文没有。",
+  "_mergeNote": "4 -> 3。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "政府",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 the organization that is the governing authority of a political unit。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "内阁",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与「政府」同指 raw=0 —— 内阁是政府的一种组织形式，中文可互换。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "政治",
+      "action": "merged",
+      "into": "v2 s3",
+      "reason": "对应英文 raw=2 the system or form by which a community or other group is governed。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "政体",
+      "action": "merged",
+      "into": "v2 s3",
+      "reason": "与「政治」同指 raw=2，中文可互换。"
+    }
+  ],
+  "word": "government",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "fromZh": [
+        0,
+        1
+      ],
+      "glossZh": "政府，内阁",
+      "note": "the organization that is the governing authority of a political unit。指**机构**。线索：the national government / a government agency / in government。不可数与可数两义都在这里。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "治理，管理（行为）",
+      "note": "the act of governing; exercising authority。指**行为/权责**。现有中文无对应，属新增。线索：government has failed / responsible government。"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "fromZh": [
+        2,
+        3
+      ],
+      "glossZh": "政治；政体，政制",
+      "note": "the system or form by which a community or other group is governed。指**制度**。线索：representative / democratic government / forms of government。"
+    }
+  ]
+}

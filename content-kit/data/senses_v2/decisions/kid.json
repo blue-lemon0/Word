@@ -1,0 +1,49 @@
+{
+  "word": "kid",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "小山羊皮，山羊皮"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "小山羊"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "开玩笑，戏弄"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "小山羊肉",
+      "action": "m",
+      "reason": "raw=1 young goat"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "小孩",
+      "action": "m",
+      "reason": "drop：英文 kid 作「小孩」是俚语，WordNet 无该义位"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "欺骗",
+      "action": "m",
+      "reason": "drop：英文 deceive/kid 是俚语，无正式义位"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "小山羊皮制的",
+      "action": "m",
+      "reason": "raw=0 soft smooth leather from young goat"
+    }
+  ]
+}

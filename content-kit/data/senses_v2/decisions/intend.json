@@ -1,0 +1,32 @@
+{
+  "word": "intend",
+  "senses": [
+    {
+      "fromLines": [
+        0,
+        1
+      ],
+      "glossZh": "计划，打算，意图"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "计划",
+      "action": "m",
+      "reason": "raw=0+1 同指"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "打算",
+      "action": "m",
+      "reason": "与计划同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "意思是",
+      "action": "m",
+      "reason": "drop：英文 mean，非 intend"
+    }
+  ]
+}

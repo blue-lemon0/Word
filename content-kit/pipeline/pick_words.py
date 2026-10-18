@@ -66,7 +66,20 @@ UNSEPARABLE = {
     "prisoner": "囚犯 = 犯人",
     "conservative": "保守的 = 守旧的",
     "excellent": "优良的 = 杰出的 = 出色的",
-    "alternative": "三个义项都是「供替代的选择」的变体",
+    # 2026-10 撤：按英文边界重判后，这三词的义项语义其实分得开
+    # （见 docs/decisions/D23）。UNSEPARABLE 累积到 28 条时，
+    # 该表的判断依据全是「中文释义重叠度高」—— 而重叠度高恰恰是
+    # 旧切分算法（按逗号平铺同义词）造出来的假象。改用英文边界判断后：
+    #   alternative  英文 raw=0「必须二选一」vs raw=1「另类的选择」，语义完全不同
+    #   file        英文 file.n.01「一套文件」vs file.n.02「器具/锉刀」vs
+    #               file.v.01「提出控告」，可判别
+    #   soldier     英文 soldier.n.01「士兵」vs soldier.v.01「忍受疼痛/作苦工」，
+    #               动词义线索强（soldier on 继续忍耐）
+    "alternative": None,
+    "file": None,
+    "soldier": None,
+    # frequent 保留：中文「时常发生的 = 频繁的」，英文也只有 frequent.a.01 一条，
+    # 确认分不开。
     "frequent": "时常发生的 = 频繁的",
     "theatre": "戏院 = 电影院 = 剧场",
     "soft": "软的/温和的/柔和的/柔滑的 近义",
@@ -84,7 +97,7 @@ UNSEPARABLE = {
     "shoot": "射击 vs 射伤 分不出",
     "dozen": "义项「打」含义不明",
     "aircraft": "航空器 = 飞机",
-    "file": "档案/公文/文件/卷宗 四个高度重叠",
+    "file": None,      # 2026-10 撤：英文 file.n.01 一套文件 / file.n.02 器具锉刀 / file.v.01 提出控告，可判别
     "package": "ECDICT 义项含残缺条目（『…』）",
     "camp": "露营/扎营/使扎营 分不出",
     "civil": "市民的 ≈ 公民的，中文侧近乎同义（内容已改正确，但判别价值低）",

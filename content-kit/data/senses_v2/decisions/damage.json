@@ -1,0 +1,52 @@
+{
+  "word": "damage",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "损害，变坏（occurrence of a change for the worse）"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "（军事装备的）损失"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "损害（act of damaging）"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "glossZh": "损害，损坏（vt.）"
+    },
+    {
+      "fromLines": [
+        [
+          "wn",
+          "damage.v.02"
+        ]
+      ],
+      "glossZh": "遭受损害（vi.）"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "损害",
+      "action": "m",
+      "reason": "raw=0+2+3 同指"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "伤害",
+      "action": "m",
+      "reason": "与损害同指"
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "_comment": "likely —— 3 英文边界 / 4 现有中文义项。「合适的」是误收：英文对应 suitable / fitting。现有义项全是形容词，但 raw=2 是 within the realm of credibility（可信的/像是真的），与 raw=0「有可能」不同；「或许」是副词用法，ECDICT 侧漏了。",
+  "_mergeNote": "4 -> 3。舍弃 1 个（合适的），新增 1 个（很可能[副词]）。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "有可能的",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 has a good chance of being the case or of coming about。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "合适的",
+      "action": "dropped",
+      "reason": "英文对应 suitable / fitting，是别的词。中文侧疑由 likely「看起来合适」这一引申串入。WordNet 三条边界里没有一条是「合适」。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "前途有望的",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "对应英文 raw=1 expected to become or be; in prospect —— 着眼于将来会有好结果（a likely candidate/winner）。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "或许",
+      "action": "merged",
+      "into": "v2 s3",
+      "reason": "英文 likely 作副词（He will likely arrive late.）—— 相当于 probably。ECDICT definition 侧只有形容词三条，走 fromZh 补洞。"
+    }
+  ],
+  "word": "likely",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "fromZh": [
+        0
+      ],
+      "glossZh": "有可能的， probable的",
+      "note": "has a good chance of being the case。**最常用义**。线索：likely to happen / it is likely that。与 possible 强弱不同：likely 概率更高。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "fromZh": [
+        2
+      ],
+      "glossZh": "前途有望的，很可能的（有指望）",
+      "note": "expected to become or be; in prospect。**着眼于将来会有好结果**。线索：the likely winner / a likely candidate。与 s1 分界：s1 只说可能性，s2 带「有望成为」的预期。"
+    },
+    {
+      "fromZh": [
+        3
+      ],
+      "glossZh": "（副词）很可能，或许",
+      "note": "英文 likely 作副词。走 fromZh 补洞，glossEn 留空。线索：He will likely come / It is likely true.（注意这个用法里 likely 前要加 be）"
+    }
+  ]
+}

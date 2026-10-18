@@ -1,0 +1,44 @@
+{
+  "word": "severe",
+  "senses": [
+    {
+      "fromLines": [
+        0,
+        2
+      ],
+      "glossZh": "严重的（程度深）"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "严厉的，不妥协的"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "严格的",
+      "action": "m",
+      "reason": "raw=1 unsparing and uncompromising in discipline"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "尖锐的",
+      "action": "m",
+      "reason": "drop：severe 无「尖锐」义"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "严肃的",
+      "action": "m",
+      "reason": "drop：同前"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "严重的",
+      "action": "m",
+      "reason": "raw=0+2 同指"
+    }
+  ]
+}

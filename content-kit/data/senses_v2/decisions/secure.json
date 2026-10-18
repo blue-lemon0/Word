@@ -1,0 +1,55 @@
+{
+  "word": "secure",
+  "senses": [
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "安心的，无忧虑的"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "安全的（free from danger）"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "glossZh": "可靠的，牢固的"
+    },
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "保证（付款）；获得；使安全"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "无虑的",
+      "action": "m",
+      "reason": "raw=1 free from fear or doubt"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "安心的",
+      "action": "m",
+      "reason": "与无虑的同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "安全的",
+      "action": "m",
+      "reason": "raw=2 free from danger"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "可靠的",
+      "action": "m",
+      "reason": "raw=3 not likely to fail"
+    }
+  ]
+}

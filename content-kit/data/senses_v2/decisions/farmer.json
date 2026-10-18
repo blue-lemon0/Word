@@ -1,0 +1,25 @@
+{
+  "word": "farmer",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "农夫，农场主"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "农夫",
+      "action": "m",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "农场主",
+      "action": "m",
+      "reason": "与农夫同指"
+    }
+  ]
+}

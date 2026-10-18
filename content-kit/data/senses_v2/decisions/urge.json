@@ -1,0 +1,49 @@
+{
+  "word": "urge",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "冲动，本能冲动"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "强烈的要求，冲动"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "力劝，竭力主张；驱策"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "冲动",
+      "action": "m",
+      "reason": "raw=0 an instinctive motive"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "推动力",
+      "action": "m",
+      "reason": "与冲动同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "迫切的要求",
+      "action": "m",
+      "reason": "raw=1 a strong restless desire"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "驱策",
+      "action": "m",
+      "reason": "raw=2 force or impel"
+    }
+  ]
+}

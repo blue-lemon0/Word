@@ -1,0 +1,55 @@
+{
+  "word": "repeat",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "重复（的事件）"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "重复；重做"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "复述，模仿（again）"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "glossZh": "重复（again）"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "重复",
+      "action": "m",
+      "reason": "raw=0+1+3 同指"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "反复",
+      "action": "m",
+      "reason": "与重复同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "重做",
+      "action": "m",
+      "reason": "raw=3 do over"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "复述",
+      "action": "m",
+      "reason": "raw=2 to say again or imitate"
+    }
+  ]
+}

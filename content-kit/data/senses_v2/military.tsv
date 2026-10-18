@@ -1,0 +1,5 @@
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	军队，陆军	the military forces of a nation	0	T1	the military forces of a nation。名词义。线索：join the military / the military industrial complex。
+s2	a.	军事的，军事学的	of or relating to the study of the principles of warfare	0	T1	of or relating to the study of the principles of warfare。线索：military science / military strategy。
+s3	a.	军人的；军人的气质	characteristic of or associated with soldiers or the military	0	T1	characteristic of or associated with soldiers。**主语是人**。线索：military personnel / a military bearing。
+s4	a.	（军队）执行的；军用的	associated with or performed by members of the armed services as contrasted with civilians	0	T1	associated with or performed by members of the armed services。**主语是行动**。线索：a military operation / military aircraft。**与 s3 分界只看主语是人还是行动。**

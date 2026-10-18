@@ -1,0 +1,37 @@
+{
+  "word": "rather",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "宁愿，宁可"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "稍微，有点，相当"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "宁可",
+      "action": "m",
+      "reason": "raw=0 on the contrary; rather he wrote"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "稍微",
+      "action": "m",
+      "reason": "raw=1 to some extent"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "相当",
+      "action": "m",
+      "reason": "与稍微同指"
+    }
+  ]
+}

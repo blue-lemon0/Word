@@ -1,0 +1,64 @@
+{
+  "word": "female",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "雌性动物"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "女性，女人"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "（生物）雌性的"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "glossZh": "女性的（characteristic of a woman）"
+    },
+    {
+      "fromLines": [
+        [
+          "wn",
+          "female.s.02"
+        ]
+      ],
+      "glossZh": "女性的，由女子组成的"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "女人",
+      "action": "m",
+      "reason": "raw=1 a person who belongs to the sex"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "雌性动物",
+      "action": "m",
+      "reason": "raw=0 an animal that produces ova"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "女性的",
+      "action": "m",
+      "reason": "raw=3+4 同指"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "女子的",
+      "action": "m",
+      "reason": "与女性同指"
+    }
+  ]
+}

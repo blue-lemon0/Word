@@ -1,0 +1,37 @@
+{
+  "word": "victim",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "受害人，牺牲者"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "（受骗的）受害者"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "受害人",
+      "action": "m",
+      "reason": "raw=0+1 同指"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "牺牲者",
+      "action": "m",
+      "reason": "与受害人同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "牺牲品",
+      "action": "m",
+      "reason": "与受害人同指"
+    }
+  ]
+}

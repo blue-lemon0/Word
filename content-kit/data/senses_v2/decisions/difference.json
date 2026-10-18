@@ -1,0 +1,31 @@
+{
+  "word": "difference",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "不同，差异"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "（重大）变化，差异"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "不同",
+      "action": "m",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "差异",
+      "action": "m",
+      "reason": "与不同同指"
+    }
+  ]
+}

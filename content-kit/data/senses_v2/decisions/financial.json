@@ -1,0 +1,37 @@
+{
+  "_comment": "financial —— 1 英文边界 / 3 现有中文义项。财政/金融/财务 三义在英文里是同一个词的不同搭配，不是三个义位。",
+  "_mergeNote": "3 -> 1。按 D24 逐条判：financial crisis（金融危机）/ financial market（金融市场）/ financial report（财务报告）—— 宾语不同但都是「involving financial matters」这一个定义，中文三个词在这个定义下可互换。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "财政的",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 involving financial matters。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "金融的",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与「财政的」同指 raw=0，中文可互换。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "财务的",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与「财政的」同指 raw=0，中文可互换。"
+    }
+  ],
+  "word": "financial",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "财政的，金融的，财务的",
+      "note": "involving financial matters。线索：crisis / market / report / year。只能修饰名词，不能作谓语。"
+    }
+  ]
+}

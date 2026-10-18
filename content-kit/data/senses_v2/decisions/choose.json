@@ -1,0 +1,71 @@
+{
+  "_comment": "choose —— 3 英文边界 / 4 现有中文义项。「作出选择」是「选择」的及物/不及物两面，不是独立义项（D24：同一含义不同及物性不构成拆分理由）。「欲」对应 choose.v.03 see fit or proper to act（愿意/决定要…）。",
+  "_mergeNote": "4 -> 3。① 选择+作出选择 合并为 s1（fromLines 给英文、fromZh 接住中文侧）。② 宁愿 对上 raw=1。③ 欲 对上 choose.v.03。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "选择",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 pick out, select, or choose from a number of alternatives。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "宁愿",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "对应英文 raw=1 select as an alternative over another —— choose A rather than B。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "欲",
+      "action": "merged",
+      "into": "v2 s3",
+      "reason": "对应 choose.v.03 see fit or proper to act in a certain way; decide to act in a certain way —— 愿意/决定要。补缺层收进，ECDICT definition 侧漏导。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "作出选择",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与「选择」同义，只是及物性不同（choose sth / choose to do）。按 D24，同义不同及物性不构成拆分理由，合并。"
+    }
+  ],
+  "word": "choose",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "fromZh": [
+        0,
+        3
+      ],
+      "glossZh": "选择；作出选择",
+      "note": "pick out, select, or choose from a number of alternatives。线索：choose between A and B / choose to do sth。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "fromZh": [
+        1
+      ],
+      "glossZh": "宁愿；选定",
+      "note": "select as an alternative over another。线索：would choose A rather than B / choose to do rather than do。常见结构是 choose + 动词原形 + rather than。"
+    },
+    {
+      "fromLines": [
+        [
+          "wn",
+          "choose.v.03"
+        ]
+      ],
+      "fromZh": [
+        2
+      ],
+      "glossZh": "愿意，欲；决定要（做某事）",
+      "note": "see fit or proper to act in a certain way; decide to act in a certain way。补缺层收进，ECDICT definition 侧漏导。线索：They chose to remain silent."
+    }
+  ]
+}

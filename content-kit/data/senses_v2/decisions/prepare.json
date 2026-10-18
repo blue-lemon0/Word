@@ -1,0 +1,49 @@
+{
+  "word": "prepare",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "准备，筹备"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "（口头上）准备讲稿，为…做准备"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "为未来角色做训练，准备"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "准备",
+      "action": "m",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "筹备",
+      "action": "m",
+      "reason": "与准备同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "使在思想上有准备",
+      "action": "m",
+      "reason": "与准备同指"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "制造",
+      "action": "m",
+      "reason": "drop：英文 manufacture，非 prepare"
+    }
+  ]
+}

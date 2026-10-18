@@ -1,0 +1,59 @@
+{
+  "word": "confirm",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "证实，确认（以新证据）"
+    },
+    {
+      "fromLines": [
+        1,
+        2
+      ],
+      "glossZh": "巩固，加强"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "glossZh": "（正式）批准（任命）；确认任命"
+    },
+    {
+      "fromLines": [
+        [
+          "wn",
+          "confirm.v.05"
+        ]
+      ],
+      "glossZh": "（宗教）施坚振礼"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "证实",
+      "action": "m",
+      "reason": "raw=0 establish or strengthen"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "确定",
+      "action": "m",
+      "reason": "与证实同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "批准",
+      "action": "m",
+      "reason": "raw=3 support a person for a position"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "使巩固",
+      "action": "m",
+      "reason": "raw=1+2 同指"
+    }
+  ]
+}

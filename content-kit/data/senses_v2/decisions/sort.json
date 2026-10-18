@@ -1,0 +1,49 @@
+{
+  "word": "sort",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "种类，类别"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "（某人/物的）性质、品格"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "分类，排序"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "种类",
+      "action": "m",
+      "reason": "raw=0 an approximate definition or example"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "方式",
+      "action": "m",
+      "reason": "drop：英文 manner，非 sort"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "品质",
+      "action": "m",
+      "reason": "raw=1 a person of a particular character"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "态度",
+      "action": "m",
+      "reason": "与品质同指"
+    }
+  ]
+}

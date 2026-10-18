@@ -1,0 +1,88 @@
+{
+  "_comment": "stone 补缺后新增 3 条 WordNet 义项，逐条判断：wn[3] 麻木不仁 / wn[4] 以石击毙 两项保留（真实用法，靠句子能判别）；wn[5] 灰褐色 只在颜色描述里出现，判别价值低但它是英语实际用法，保留并注明。",
+  "_mergeNote": "本词 6 个英文边界全部保留未合并：石头/英石/果核/宝石/纪念碑 语义彼此独立，线索场景无重叠（precious stones in a ring / a memorial stone in the yard / a peach pit）。麻木不仁是固定短语 stone-hearted，线索明确。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "石头",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "英文 raw=0 building material consisting of a piece of rock hewn in a definite shape 精确对应。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "果核",
+      "action": "merged",
+      "into": "v2 s3",
+      "reason": "英文 raw=2 the hard inner layer of the pericarp of some fruits 精确对应。"
+    }
+  ],
+  "word": "stone",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "石头",
+      "note": "building material consisting of a piece of rock hewn in a definite shape for a special purpose。最常见义项。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "英石（重量单位，14 磅）",
+      "note": "英文独有义位 an avoirdupois unit equal to 14 pounds。英国重量单位。"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "果核",
+      "note": "the hard inner layer of the pericarp of some fruits (peaches, plums, olives) that contains the seed。"
+    },
+    {
+      "fromZh": [
+        1
+      ],
+      "glossZh": "宝石",
+      "note": "保留。真实英文用法 precious stone / semiprecious stones。ECDICT 与 WordNet 的 stone 首词 synset 都不收这个义位（归 gem.n.02），glossEn 留空。"
+    },
+    {
+      "fromZh": [
+        3
+      ],
+      "glossZh": "纪念碑",
+      "note": "保留。真实英文用法 memorial stone / boundary stone / gravestone。WordNet 里它体现为 stone.n.02 的 hyponym(gravestone/headstone/tombstone) 而非独立义位，glossEn 留空。"
+    },
+    {
+      "fromLines": [
+        [
+          "wn",
+          "stone.v.01"
+        ]
+      ],
+      "glossZh": "麻木不仁的（stone-hearted）",
+      "note": "WORDNET 补缺 a lack of feeling or expression or movement。固定搭配 a stone-hearted stare / turned to stone，线索是表情与身体僵住。"
+    },
+    {
+      "fromLines": [
+        [
+          "wn",
+          "stone.s.01"
+        ]
+      ],
+      "glossZh": "以石击毙",
+      "note": "WORDNET 补缺 kill by throwing stones at。与 s1 线索不同：s1 是建材/投掷物，此处是杀人方式，常见于历史叙述 crowd pelted him with stones until he died。"
+    },
+    {
+      "fromLines": [
+        [
+          "wn",
+          "stone.n.13"
+        ]
+      ],
+      "glossZh": "灰褐色的",
+      "note": "WORDNET 补缺 of any of various dull tannish or grey colors。颜色义，线索是颜色词搭配 stone grey / stone-coloured。"
+    }
+  ]
+}

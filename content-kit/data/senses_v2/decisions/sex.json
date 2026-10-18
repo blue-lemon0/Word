@@ -1,0 +1,50 @@
+{
+  "word": "sex",
+  "senses": [
+    {
+      "fromLines": [
+        0,
+        2
+      ],
+      "glossZh": "性别；两性之一"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "性欲；性快感"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "glossZh": "（鸡隽）辨别雌雄"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "性别",
+      "action": "merged",
+      "reason": "raw=0+2"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "性欲",
+      "action": "merged",
+      "reason": "raw=1"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "区别...的性别",
+      "action": "merged",
+      "reason": "raw=3 tell the sex"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "引起...的性欲",
+      "action": "merged",
+      "reason": "raw=1"
+    }
+  ]
+}

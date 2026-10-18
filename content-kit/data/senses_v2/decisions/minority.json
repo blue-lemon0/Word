@@ -1,0 +1,68 @@
+{
+  "_comment": "minority —— 3 英文边界 / 4 现有中文义项，**现有两个形容词义（少数的、属于少数派的）对应同一条边界 raw=1**（being or relating to the smaller in number of two parts），英文不区分「少数」与「少数派」。",
+  "_mergeNote": "4 -> 3。少数的+属于少数派的 合并为 s3。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "未成年",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=2 any age prior to the legal age —— **法律义：未成年（时期）**。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "少数民族",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "对应英文 raw=0 a group of people who differ racially or politically from the majority of the community。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "少数的",
+      "action": "merged",
+      "into": "v2 s3",
+      "reason": "对应英文 raw=1 being or relating to the smaller in number of two parts。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "属于少数派的",
+      "action": "merged",
+      "into": "v2 s3",
+      "reason": "与「少数的」同指 raw=1，中文可互换 —— English 不区分「少数」与「少数派」。"
+    }
+  ],
+  "word": "minority",
+  "senses": [
+    {
+      "fromLines": [
+        2
+      ],
+      "fromZh": [
+        0
+      ],
+      "glossZh": "未成年（时期）",
+      "note": "any age prior to the legal age。法律义。线索：in one's minority（未成年时期）。**注意这个义项与「少数」毫无关系**，是借「小」引申的法律术语。极罕见。"
+    },
+    {
+      "fromLines": [
+        0
+      ],
+      "fromZh": [
+        1
+      ],
+      "glossZh": "少数民族；少数群体",
+      "note": "a group of people who differ racially or politically from the majority。线索：an ethnic minority / minority rights。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "fromZh": [
+        2,
+        3
+      ],
+      "glossZh": "少数的；少数派（的）",
+      "note": "being or relating to the smaller in number of two parts。线索：a minority opinion / the minority party。**注意与 majority 相反的对应关系：a minority of = 一小部分（少数），不是「大多数」。**"
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	目标，目的	the state of affairs that a plan is intended to achieve and that (when achieved) terminates behavior intended to achieve it	0	T1	the state of affairs that a plan is intended to achieve。**最常用义**。线索：achieve / set a goal / a long-term goal。
+s2	n.	球门（球门线）	game equipment consisting of the place toward which players of a game try to advance a ball or puck in order to score points	0	T1	game equipment consisting of the place toward which players attempt to move the ball。指**装备/位置**。线索：in the goal / a goal kick。
+s3	n.	进球；得分	a successful attempt at scoring	0	T1	a successful attempt at scoring。指**动作/结果**。线索：score / concede a goal。与 s2 分界：s2 是「球门这个位置」，s3 是「踢进去这一下」。
+s4	n.	终点（赛跑）		0	T1	[glossEn 空：ECDICT 与 WordNet 均无对应义位] [ZH-FALLBACK 英文零覆盖] 英文 goal 指赛跑终点。走 fromZh 补洞，glossEn 留空。线索：the goal line / a photo finish at the goal。

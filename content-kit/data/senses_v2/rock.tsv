@@ -1,0 +1,6 @@
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	岩石，石头	a lump or mass of hard consolidated mineral matter / material consisting of the aggregate of minerals like those making up the Earth's crust	0	T1	a lump or mass of hard consolidated mineral matter / material consisting of the aggregate of minerals。线索：solid / hard。默认可数名词。
+s2	n.	岩石（复数 rocks 指海中礁石）		0	T1	[glossEn 空：ECDICT 与 WordNet 均无对应义位] [ZH-FALLBACK 英文零覆盖] 英文常用复数 the rocks 指海中被水淹没的岩石（hit the rocks），也可用 reef。ECDICT 侧无独立边界，走 fromZh 补洞。
+s3	n.	（比喻）可靠的人，坚实的人	(figurative) someone who is strong and stable and dependable	0	T1	someone who is strong and stable and dependable。很好的比喻义，线索：a rock / he's a rock。
+s4	n.	摇动，晃动	pitching dangerously to one side / move back and forth or sideways	0	T1	[WORDNET 补缺 ECDICT 未收录] move back and forth or sideways / cause to move back and forth。ECDICT definition 侧漏导动词义，显式指定。线索：the boat rocked / rocked the boat。
+s5	n.	基石，根基		0	T1	[glossEn 空：ECDICT 与 WordNet 均无对应义位] [ZH-FALLBACK 英文零覆盖] 英文对应 cornerstone / bedrock（基岩）。ECDICT 侧无边界，走 fromZh 补洞。注：raw=rock.n.07「船身危险倾斜」是航海领域义，对背单词零价值，按域丢弃。

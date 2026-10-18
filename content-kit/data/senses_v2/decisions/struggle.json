@@ -1,0 +1,49 @@
+{
+  "word": "struggle",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "（激烈的）斗争，搏斗"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "努力，奋斗（名词）"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "挣扎，奋斗（动词）"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "斗争",
+      "action": "m",
+      "reason": "raw=0+2 同指"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "努力",
+      "action": "m",
+      "reason": "raw=1 strenuous effort"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "奋斗",
+      "action": "m",
+      "reason": "与斗争同指"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "挣扎",
+      "action": "m",
+      "reason": "与斗争同指"
+    }
+  ]
+}

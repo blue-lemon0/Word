@@ -1,0 +1,52 @@
+{
+  "_comment": "chemical —— 3 英文边界 / 3 现有中文义项。raw=1 与 raw=2 都是形容词且都是「化学的」，中文「化学的/化学上用的」不可区分，合并。这是「英文切得比中文细、但中文看不出差别」的典型 —— 按 D24，判「是不是同一概念」而不是「英文给了几条」。",
+  "_mergeNote": "3 -> 2。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "化学药品",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 material produced by or used in a reaction involving changes in the chemical constitution。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "化学的",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "对应英文 raw=1 relating to or used in chemistry 与 raw=2 of or made from or using substances produced by or used in reactions（同指「化学的」，中文看不出差别，合并）。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "化学上用的",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "与「化学的」同指，中文可互换。"
+    }
+  ],
+  "word": "chemical",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "fromZh": [
+        0
+      ],
+      "glossZh": "化学药品，化学物质",
+      "note": "material produced by or used in a reaction involving changes in the chemical constitution。名词义，指「物」。线索：toxic chemicals / agricultural chemicals。"
+    },
+    {
+      "fromLines": [
+        1,
+        2
+      ],
+      "fromZh": [
+        1,
+        2
+      ],
+      "glossZh": "化学的；化学制品的",
+      "note": "relating to or used in chemistry / of or made from or using substances produced by or used in reactions。形容词义。两条边界英文有别（涉及化学 vs 由化学品制成），中文统一译「化学的」，看不出差别，合并。线索：chemical industry / chemical weapons。"
+    }
+  ]
+}

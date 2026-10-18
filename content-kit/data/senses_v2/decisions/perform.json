@@ -1,0 +1,49 @@
+{
+  "word": "perform",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "执行，履行，进行"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "起作用，起功能（perform a function）"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "表演，演出"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "进行",
+      "action": "m",
+      "reason": "raw=0 carry out an action"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "履行",
+      "action": "m",
+      "reason": "与进行同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "完成",
+      "action": "m",
+      "reason": "与进行同指"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "执行",
+      "action": "m",
+      "reason": "与进行同指"
+    }
+  ]
+}

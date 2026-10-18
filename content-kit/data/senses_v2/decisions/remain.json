@@ -1,0 +1,31 @@
+{
+  "word": "remain",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "保持，剩下；仍然是"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "保持",
+      "action": "m",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "逗留",
+      "action": "m",
+      "reason": "与保持同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "剩余",
+      "action": "m",
+      "reason": "与保持同指"
+    }
+  ]
+}

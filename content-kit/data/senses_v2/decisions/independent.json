@@ -1,0 +1,49 @@
+{
+  "word": "independent",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "独立的，不依赖的；有主见的"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "（从句）语法上能独立成句的"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "无党派的；独立的"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "独立自主者",
+      "action": "m",
+      "reason": "drop：independent 无名词义，名词是 independent person"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "无党派者",
+      "action": "m",
+      "reason": "raw=2 not controlled by a party"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "独立的",
+      "action": "m",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "有主见的",
+      "action": "m",
+      "reason": "raw=0 同指"
+    }
+  ]
+}

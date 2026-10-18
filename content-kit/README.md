@@ -48,12 +48,20 @@ python content-kit/pipeline/build_bundle.py
 #    -> build/bundle/cards.json，打印 词/义项/句/有句义项 统计
 ```
 
-应用侧标记的坏句子回流：
+应用侧标记的坏句子回流（**两个来源，同一套输出**）：
 
 ```bash
-python content-kit/pipeline/triage_flags.py            # 汇总 app/state/user.db 里的标记
-python content-kit/pipeline/triage_flags.py --word lay # 只看某词，--json 出 JSON
+# 浏览器端的应用（当前应用）：用户在错题板点「导出清单」拿到 flags_*.json
+python content-kit/pipeline/triage_flags.py --from app/web/flags_20261017.json
+#   格式 word-flags v1；脚本会拿内容包核对，原文已不在包里的直接标「疑似已修」
+
+# 旧服务端那一线：直接只读 app/state/user.db 的 sentence_flag 表
+python content-kit/pipeline/triage_flags.py
+python content-kit/pipeline/triage_flags.py --word lay   # 只看某词，--json 出 JSON
 ```
+
+两种来源的关单动作不同：旧服务端用 `node app/tools/flags.mjs`，
+浏览器端在错题板的「已修好」逐条点掉。清单末尾会打印对应的那套流程。
 
 ## 铁律
 

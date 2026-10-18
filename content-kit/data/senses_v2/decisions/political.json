@@ -1,0 +1,49 @@
+{
+  "word": "political",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "政治的；政党的"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "（看法上）政治的（关于社会关系的）"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "（关于）政治职业/统治的"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "政治的",
+      "action": "m",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "政治上的",
+      "action": "m",
+      "reason": "与政治同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "政党的",
+      "action": "m",
+      "reason": "与政治同指"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "从事政治的",
+      "action": "m",
+      "reason": "与政治同指"
+    }
+  ]
+}

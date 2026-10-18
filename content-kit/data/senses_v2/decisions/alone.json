@@ -1,0 +1,50 @@
+{
+  "word": "alone",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "孤独的，无伴的"
+    },
+    {
+      "fromLines": [
+        1,
+        2
+      ],
+      "glossZh": "单独的；无与伦比的"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "glossZh": "独自，单独（adv.）"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "孤独的",
+      "action": "m",
+      "reason": "raw=1+2 同指"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "单独的",
+      "action": "m",
+      "reason": "raw=0+3+4 同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "独自的",
+      "action": "m",
+      "reason": "与单独同指"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "独自地",
+      "action": "m",
+      "reason": "raw=4 without anybody else"
+    }
+  ]
+}

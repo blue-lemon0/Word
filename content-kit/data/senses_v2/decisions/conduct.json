@@ -1,0 +1,44 @@
+{
+  "word": "conduct",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "行为，举止（名词）"
+    },
+    {
+      "fromLines": [
+        1,
+        2
+      ],
+      "glossZh": "指挥，主持（乐队）；带领，管理"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "行为",
+      "action": "m",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "举动",
+      "action": "m",
+      "reason": "与行为同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "指导",
+      "action": "m",
+      "reason": "与行为同指"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "为人",
+      "action": "m",
+      "reason": "与行为同指"
+    }
+  ]
+}

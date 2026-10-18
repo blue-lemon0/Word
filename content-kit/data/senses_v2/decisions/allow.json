@@ -1,0 +1,68 @@
+{
+  "_comment": "allow —— 4 英文边界 / 4 现有中文义项，一一对得上，无合并。现有 允许/同意给予/承认/容许 四个中文词看起来重叠高（都含「允许」），但按 D24 标准逐条判：宾语与搭配集合完全不同。这是「中文同义词但英文分得开」的典型。注：raw=0「let have」因释义过短被 min_en_words 清洗掉，无对应内容。",
+  "_mergeNote": "无合并。allow 的四个义项靠**宾语**区分：资源(allow sb sth) / 可能与有效性(allow for) / 折扣(allow a discount) / 不禁止而允许在场(allow sb to do)。中文四个词可部分互换（容许≈允许），但英文搭配集合不同，故保留。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "允许",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=1 give or assign a resource to a particular person or cause —— 允许某人拥有某资源（钱、权限、时间）。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "同意给予",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与「允许」是同一概念的中文两种说法（allow = 同意给予），且都归 raw=1。合并合法。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "承认",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "对应 raw=2 allow or plan for a certain possibility; concede the truth or validity of something —— 承认某事的可能性/有效性。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "容许",
+      "action": "merged",
+      "into": "v2 s4",
+      "reason": "对应 WordNet 补缺 raw=('wn',4) allow the presence of or allow (an activity) without opposing —— 不反对而允许在场/进行。"
+    }
+  ],
+  "word": "allow",
+  "senses": [
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "允许，准许；同意给予",
+      "note": "give or assign a resource to a particular person or cause。允许某人拥有某资源（钱、权限、时间）。allow sb sth / allow sb to do sth。"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "承认；考虑到",
+      "note": "allow or plan for a certain possibility; concede the truth or validity of something。线索：allow for / allow that + 从句，强调「把某种可能性算进去」。We must allow for delays."
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "glossZh": "折让，给（折扣）",
+      "note": "grant as a discount or in exchange。线索：宾语是折扣或交换物。The shop allows 10% discount to students."
+    },
+    {
+      "fromLines": [
+        [
+          "wn",
+          "allow.v.10"
+        ]
+      ],
+      "glossZh": "容许（存在/进行）",
+      "note": "WORDNET 补缺 allow the presence of or allow (an activity) without opposing or prohibiting。不禁止而允许某人在场或某事进行。Smoking is not allowed in the hall."
+    }
+  ]
+}

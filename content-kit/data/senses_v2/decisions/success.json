@@ -1,0 +1,43 @@
+{
+  "word": "success",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "成功（实现了目的的事）"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "成功；成就"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "成功；兴旺，得意"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "成功",
+      "action": "m",
+      "reason": "raw=1 an attainment that is successful"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "成就",
+      "action": "m",
+      "reason": "与成功同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "胜利",
+      "action": "m",
+      "reason": "raw=2 a state of prosperity or fame"
+    }
+  ]
+}

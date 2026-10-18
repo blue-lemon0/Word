@@ -1,0 +1,64 @@
+{
+  "word": "extra",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "（报纸的）号外"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "额外的东西"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "额外的（added to a regular schedule）"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "glossZh": "额外的；进一步的"
+    },
+    {
+      "fromLines": [
+        [
+          "wn",
+          "extra.r.01"
+        ]
+      ],
+      "glossZh": "异常地，非常（unusually）"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "额外的事物",
+      "action": "m",
+      "reason": "raw=1 something additional"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "另外的收费",
+      "action": "m",
+      "reason": "drop：英文 surcharge 非 extra"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "特别的",
+      "action": "m",
+      "reason": "raw=2+3 同指"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "额外地",
+      "action": "m",
+      "reason": "raw=3+4 同指"
+    }
+  ]
+}

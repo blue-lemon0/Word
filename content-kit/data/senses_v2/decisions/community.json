@@ -1,0 +1,64 @@
+{
+  "word": "community",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "社区，群体（同一住区）"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "共有，共同（common ownership）"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "（国家）共同体，联盟"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "glossZh": "共识，认同"
+    },
+    {
+      "fromLines": [
+        [
+          "wn",
+          "community.n.06"
+        ]
+      ],
+      "glossZh": "（生态）群落"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "社区",
+      "action": "m",
+      "reason": "raw=0+4 同指"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "公众",
+      "action": "m",
+      "reason": "raw=2 a group of nations"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "共有",
+      "action": "m",
+      "reason": "raw=1 common ownership"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "共同体",
+      "action": "m",
+      "reason": "与社区同指"
+    }
+  ]
+}

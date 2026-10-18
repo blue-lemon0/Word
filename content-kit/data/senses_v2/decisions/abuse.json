@@ -1,0 +1,63 @@
+{
+  "_comment": "abuse —— 3 英文边界 / 4 现有中文义项。raw=0（辱骂的名词面）与 raw=1（辱骂的动词面）是同一概念的两种词性，按 D24 合并；「虐待」在 ECDICT 侧没有边界，走 fromZh。",
+  "_mergeNote": "4 -> 3。① 滥用+恶习 同指 raw=2（恶习是滥用的名词化：drug abuse / abuse of power）。② 辱骂 名词面+动词面 合并为 s3。③ 虐待 走 fromZh。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "滥用",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=2 use wrongly or improperly or excessively。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "虐待",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "英文对应 abuse（粗暴对待他人）。ECDICT definition 侧没有这条边界，走 fromZh 补洞。线索：a child abuse / abuse a person。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "恶习",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与「滥用」同指 raw=2 —— 恶习是滥用的名词化说法（drug abuse、the abuse of power），不是泛指「坏习惯」。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "辱骂",
+      "action": "merged",
+      "into": "v2 s3",
+      "reason": "对应 raw=0 a rude expression intended to offend or hurt（名词面）与 raw=1 use foul or abusive language towards（动词面）。同一概念两种词性，合并。"
+    }
+  ],
+  "word": "abuse",
+  "senses": [
+    {
+      "fromLines": [
+        2
+      ],
+      "fromZh": [
+        0,
+        2
+      ],
+      "glossZh": "滥用，误用；（名词）恶习，弊端",
+      "note": "use wrongly or improperly or excessively。线索：abuse power / drug abuse / abuse of。宾语决定是哪种「滥用」。"
+    },
+    {
+      "fromZh": [
+        1
+      ],
+      "glossZh": "虐待，粗暴对待",
+      "note": "英文 abuse（粗暴对待）。ECDICT definition 侧无边界，走 fromZh 补洞，glossEn 留空。线索：child / domestic + abuse。名词 abuse 指「虐待行为」时也走这条。"
+    },
+    {
+      "fromLines": [
+        0,
+        1
+      ],
+      "glossZh": "辱骂（的话）",
+      "note": "a rude expression intended to offend or hurt / use foul or abusive language towards。名词与动词两面合并。线索：a term of abuse / abuse sb verbally。注意与 s1 分界：宾语是「权力/药物」还是「人」。"
+    }
+  ]
+}

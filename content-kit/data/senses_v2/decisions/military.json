@@ -1,0 +1,77 @@
+{
+  "_comment": "military —— 4 英文边界 / 4 现有中文义项，一一对应无合并。这是「同词多条真义项」的干净样本：军队(名) / 军事学的(形) / 军人的(形) / 军队执行的(形)。四条判别句全部成立。",
+  "_mergeNote": "4 -> 4。无合并、无舍弃。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "军队",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 the military forces of a nation。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "军事的",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "对应英文 raw=1 of or relating to the study of the principles of warfare —— 军事学的/军事的。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "军人的",
+      "action": "merged",
+      "into": "v2 s3",
+      "reason": "对应英文 raw=2 characteristic of or associated with soldiers or the military —— **修饰「人」**。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "适于战争的",
+      "action": "merged",
+      "into": "v2 s4",
+      "reason": "对应英文 raw=3 associated with or performed by members of the armed services —— 由军队执行的。中文「适于战争的」对应得上这个意思。"
+    }
+  ],
+  "word": "military",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "fromZh": [
+        0
+      ],
+      "glossZh": "军队，陆军",
+      "note": "the military forces of a nation。名词义。线索：join the military / the military industrial complex。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "fromZh": [
+        1
+      ],
+      "glossZh": "军事的，军事学的",
+      "note": "of or relating to the study of the principles of warfare。线索：military science / military strategy。"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "fromZh": [
+        2
+      ],
+      "glossZh": "军人的；军人的气质",
+      "note": "characteristic of or associated with soldiers。**主语是人**。线索：military personnel / a military bearing。"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "fromZh": [
+        3
+      ],
+      "glossZh": "（军队）执行的；军用的",
+      "note": "associated with or performed by members of the armed services。**主语是行动**。线索：a military operation / military aircraft。**与 s3 分界只看主语是人还是行动。**"
+    }
+  ]
+}

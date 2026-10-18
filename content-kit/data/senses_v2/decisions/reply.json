@@ -1,0 +1,43 @@
+{
+  "_comment": "reply。本批最典型的过度切分样本：ECDICT 中文侧把同义词平铺成 答复/回答/答辩/回击/反响 共 9 段，英文只有 1 条边界。答复/回答/答辩 三者 overlap 1.00，按英文合并成一个义项 —— 这正是按英文切要治的病。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "答复",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与 回答/答辩 同义（overlap 1.00），英文只给一条边界 the speech act of continuing a conversational exchange。切三条无法判别，合并。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "回答",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "同上，与 答复 同义。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "答辩",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "同上。答辩在中文语境偏考试作答，但英文 reply 的边界覆盖它，作为同义并入；造句时可用场景词（考试/答辩席）把中文侧细分做线索。"
+    }
+  ],
+  "word": "reply",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "答复，回答，答辩",
+      "note": "the speech act of continuing a conversational exchange。合并现有 答复/回答/答辩 三义。"
+    },
+    {
+      "fromZh": [
+        3
+      ],
+      "glossZh": "回击，反驳",
+      "note": "以言回敬、反驳回去。英文 definition 未收录此动词义，走补洞。"
+    }
+  ]
+}

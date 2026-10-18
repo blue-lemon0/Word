@@ -1,0 +1,37 @@
+{
+  "word": "occur",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "（想法）被想到，浮现"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "存在，出现"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "发生",
+      "action": "m",
+      "reason": "v. come to one's mind 误收：occur 不作不及物「发生」"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "被想到",
+      "action": "m",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "存在",
+      "action": "m",
+      "reason": "raw=1"
+    }
+  ]
+}

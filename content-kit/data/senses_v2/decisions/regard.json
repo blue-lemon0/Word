@@ -1,0 +1,49 @@
+{
+  "word": "regard",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "（复数）问候，祝愿"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "尊重，关心；敬意"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "注视；看待，把…视为；与…有关"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "关心",
+      "action": "merged",
+      "reason": "regard.n.06"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "注意",
+      "action": "merged",
+      "reason": "regard.v.02 look at attentively"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "尊敬",
+      "action": "merged",
+      "reason": "regard.n.06"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "关系",
+      "action": "merged",
+      "reason": "regard.v.02 as regards"
+    }
+  ]
+}

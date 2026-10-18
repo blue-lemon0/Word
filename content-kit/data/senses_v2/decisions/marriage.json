@@ -1,0 +1,75 @@
+{
+  "_comment": "marriage —— 4 英文边界 / 4 现有中文义项，一一对应无合并。「合并」对应 raw=3 a close and intimate union（密切结合），中文「合并」在这个语境下是对得上的（联合/结合），保留。raw=1（一对已婚夫妇）是完全被漏掉的义项。",
+  "_mergeNote": "4 -> 4。结婚+婚礼 合并为 s3（同一条释义 the act of marrying; the nuptial ceremony 同时涵盖两者）。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "婚姻",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 the state of being a married couple voluntarily joined for life。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "结婚",
+      "action": "merged",
+      "into": "v2 s3",
+      "reason": "对应英文 raw=2 the act of marrying; the nuptial ceremony。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "婚礼",
+      "action": "merged",
+      "into": "v2 s3",
+      "reason": "与「结婚」同指 raw=2 —— 该释义本身就写了 nuptial ceremony（婚礼），不是两个义项。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "合并",
+      "action": "merged",
+      "into": "v2 s4",
+      "reason": "对应英文 raw=3 a close and intimate union —— 比喻义「密切结合/联合」。中文「合并」在这个比喻语境下对应得上。"
+    }
+  ],
+  "word": "marriage",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "fromZh": [
+        0
+      ],
+      "glossZh": "婚姻（关系、状态）",
+      "note": "the state of being a married couple voluntarily joined for life。指**持续的关系**。线索：a happy marriage / marriage of convenience。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "（一对）已婚夫妇",
+      "note": "two people who are married to each other。指**这两个人**。罕见（英语更常说 married couple）。现有中文无此义项，属新增。"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "fromZh": [
+        1,
+        2
+      ],
+      "glossZh": "结婚；婚礼",
+      "note": "the act of marrying; the nuptial ceremony。指**那件事/仪式**。线索：a civil marriage / their marriage broke down。**这条释义同时涵盖结婚与婚礼，所以不是两个义项。**"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "fromZh": [
+        3
+      ],
+      "glossZh": "（比喻）密切结合，联合",
+      "note": "a close and intimate union。比喻义。线索：the marriage of two ideas / their marriage of convenience。抽象用法。"
+    }
+  ]
+}

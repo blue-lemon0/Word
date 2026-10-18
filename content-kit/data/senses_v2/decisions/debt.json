@@ -1,0 +1,33 @@
+{
+  "word": "debt",
+  "senses": [
+    {
+      "fromLines": [
+        0,
+        1,
+        2
+      ],
+      "glossZh": "债务，欠款"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "债务",
+      "action": "m",
+      "reason": "raw=0+1 同指"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "罪过",
+      "action": "m",
+      "reason": "drop：英文 sin/offence，非 debt"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "欠款",
+      "action": "m",
+      "reason": "与债务同指"
+    }
+  ]
+}

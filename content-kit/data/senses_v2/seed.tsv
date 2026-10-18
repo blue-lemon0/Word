@@ -1,0 +1,7 @@
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	种子，籽	a small hard fruit / a mature fertilized plant ovule consisting of an embryo and its food source and having a protective coat or testa	0	T1	a small hard fruit / a mature fertilized plant ovule consisting of an embryo and its food supply。线索：plant / sow + seed。默认可数名词。
+s2	v.	结实，结籽	go to seed; shed seeds	0	T1	go to seed; shed seeds。线索：plant + seeds。现有中文无此义项，属新增。补缺层的 seed.v.01 与本条同释义，已被 D28 跨源去重消除。
+s3	v.	播种；培育，扶植（创业早期）	help (an enterprise) in its early stages of development by providing seed money	0	T1	help (an enterprise) in its early stages of development by providing seed capital。线索：seed a project / seed money / seed funding。现有中文无此义项，属新增。补缺层的 seed.v.02 同释义，已被 D28 去重。
+s4	n.	（比喻）开端，萌芽；起因		0	T1	[glossEn 空：ECDICT 与 WordNet 均无对应义位] [ZH-FALLBACK 英文零覆盖] 英文对应 seed = something that leads to growth / an initiating cause。ECDICT definition 侧漏导，走 fromZh 补洞，glossEn 留空。线索：the seeds of revolution / the seeds of discontent。
+s5	n.	后代，子孙		0	T1	[glossEn 空：ECDICT 与 WordNet 均无对应义位] [ZH-FALLBACK 英文零覆盖] 英文对应 seed = offspring / descendant。真实但古雅（the seed of Abraham），ECDICT 侧漏导，走 fromZh 补洞，glossEn 留空。造句须带宗教/家族线索。
+s6	v.	（体育）种子抽签；种子队	bear seeds	0	T1	[WORDNET 补缺 ECDICT 未收录] distribute (players or teams) so that outstanding teams or players will not meet in the early rounds。领域义但真实常用（seeded teams / seeding）。补缺层另外三条（人工降雨 seed the clouds、疫苗接种 inoculate、脱粒 remove the seeds）均只在固定搭配中成立，按域丢弃。

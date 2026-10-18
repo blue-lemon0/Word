@@ -1,0 +1,49 @@
+{
+  "word": "popular",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "受欢迎的，得人心的"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "通俗的，大众的；普及的"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "（音乐/艺术）新潮而受欢迎的"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "通俗的",
+      "action": "m",
+      "reason": "raw=1 carried on by or for the people"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "流行的",
+      "action": "m",
+      "reason": "raw=0 regarded with great favor"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "受欢迎的",
+      "action": "m",
+      "reason": "与流行同指"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "大众的",
+      "action": "m",
+      "reason": "与通俗同指"
+    }
+  ]
+}

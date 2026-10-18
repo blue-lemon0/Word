@@ -1,0 +1,5 @@
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	（海）洋	any very large body of (salt) water	0	T1	any very large body of (salt) water。名词义。现有中文无此义项，属新增。判别句：the open main（公海）。
+s2	n.	（水/气）主干管，主管	a principal pipe in a system that distributes water or gas or electricity or that collects sewage	0	T1	a principal pipe in a system that distributes water or gas or electricity。名词义。线索：shut the main / the water main。
+s3	a.	主要的；全力的，最强度的	of force; of the greatest possible intensity	0	T1	of force; of the greatest possible intensity。形容词义。线索：the main reason / with all one's might（= main 之力）。**注意 main 与 Maine（美国缅因州）同音不同义。**
+s4	n.	主要部分，要点		0	T1	[glossEn 空：ECDICT 与 WordNet 均无对应义位] [ZH-FALLBACK 英文零覆盖] 英文 the main 作名词。走 fromZh 补洞，glossEn 留空。线索：the main of the argument。

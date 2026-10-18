@@ -1,0 +1,31 @@
+{
+  "word": "accuse",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "指责，控告，归咎于"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "归咎于",
+      "action": "merged",
+      "reason": "charge against 与 accuse 归咎同一边界"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "指责",
+      "action": "merged",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "控告",
+      "action": "merged",
+      "reason": "raw=0"
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "word": "speed",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "速度，速率（物理）"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "迅速，快速（a rate）"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "快速移动（changing location rapidly）"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "glossZh": "加速，超速"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "速率",
+      "action": "m",
+      "reason": "raw=0 distance travelled per unit time"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "速度",
+      "action": "m",
+      "reason": "与速率同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "迅速",
+      "action": "m",
+      "reason": "raw=1 a rate at which something happens"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "加速",
+      "action": "m",
+      "reason": "raw=3 travel at an excessive velocity"
+    }
+  ]
+}

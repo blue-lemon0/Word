@@ -1,0 +1,64 @@
+{
+  "word": "effect",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "印象（人为的/刻意的）"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "（演说/作品）的主旨，要旨"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "（法律）有效，生效"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "glossZh": "（药物的）作用，效用"
+    },
+    {
+      "fromLines": [
+        [
+          "wn",
+          "effect.v.02"
+        ]
+      ],
+      "glossZh": "实现，实行（bring into existence）"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "结果",
+      "action": "m",
+      "reason": "drop：唯一相关是 raw=4 symptom caused by illness；result 是名词结果但英文 effect 无此义"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "影响",
+      "action": "m",
+      "reason": "drop：同前"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "效果",
+      "action": "m",
+      "reason": "raw=4+1 同类"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "印象",
+      "action": "m",
+      "reason": "raw=0 an impression"
+    }
+  ]
+}

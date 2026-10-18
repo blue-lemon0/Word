@@ -1,0 +1,4 @@
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	交换台，总机（电话接线处）	a workplace that serves as a telecommunications facility where lines from telephones can be connected together to permit communication	0	T1	a workplace that serves as a telecommunications facility where telephone calls are placed。名词义但极罕见。现有中文无对应，属新增。
+s2	a.	中央的，中心的；中间的	in or near a center or constituting a center; the inner area	0	T1	in or near a center or constituting a center; the inner area。线索：central part / central heating。
+s3	a.	重要的，核心的		0	T1	[glossEn 空：ECDICT 与 WordNet 均无对应义位] [ZH-FALLBACK 英文零覆盖] 英文对应 of greatest importance。ECDICT definition 侧漏导，走 fromZh 补洞，glossEn 留空。线索：central to + 名词（central to the argument）。与 s2 的判别句：The heating is central.（中央供暖）/ This is central to the debate.（核心）

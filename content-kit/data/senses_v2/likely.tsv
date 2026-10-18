@@ -1,0 +1,4 @@
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	a.	有可能的， probable的	has a good chance of being the case or of coming about	0	T1	has a good chance of being the case。**最常用义**。线索：likely to happen / it is likely that。与 possible 强弱不同：likely 概率更高。
+s2	a.	前途有望的，很可能的（有指望）	expected to become or be; in prospect	0	T1	expected to become or be; in prospect。**着眼于将来会有好结果**。线索：the likely winner / a likely candidate。与 s1 分界：s1 只说可能性，s2 带「有望成为」的预期。
+s3	adv.	（副词）很可能，或许		0	T1	[glossEn 空：ECDICT 与 WordNet 均无对应义位] [ZH-FALLBACK 英文零覆盖] 英文 likely 作副词。走 fromZh 补洞，glossEn 留空。线索：He will likely come / It is likely true.（注意这个用法里 likely 前要加 be）

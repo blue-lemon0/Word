@@ -1,0 +1,4 @@
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	进口货，进口商品	commodities (goods or services) bought from a foreign country	0	T1	commodities (goods or services) bought from a foreign country。名词义指**货**。线索：import duties / imports and exports。
+s2	n.	进口的劳工；侨民	an imported person brought from a foreign country	0	T1	an imported person brought from a foreign country。罕见（多指历史上的外籍劳工/移民）。现有中文无对应，属新增。
+s3	v.	进口，输入，导入	bring in from abroad / transfer (electronic data) into a database or document	0	T1	bring in from abroad / transfer electronic data into a database。动词义。线索：import goods / import a module。两条边界只差「境外」与「数据库」，中文统一译「输入」，合并。**注意与 important 区分：import 动词与 important 形容词拼写只差一个字母。**

@@ -1,0 +1,61 @@
+{
+  "_comment": "god —— 2 英文边界 / 4 现有中文义项。「使神化」是误收：英文对应 deify，且 god 在英语里没有及物动词义。raw=1「被神化的人」（a god among men）是真实且经典的比喻义，现有中文没有。",
+  "_mergeNote": "4 -> 3。舍弃 1 个，新增 1 个。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "上帝",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 the supernatural being conceived as the perfect and omnipotent and omniscient being。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "神像",
+      "action": "merged",
+      "into": "v2 s3",
+      "reason": "英文 a god 指「神像/神祇」（carved gods / the gods of Olympus）。走 fromZh 补洞。与「偶像」同指，合并。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "偶像",
+      "action": "merged",
+      "into": "v2 s3",
+      "reason": "与「神像」同指，中文可互换（神像/偶像/神祇）。走 fromZh 补洞。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "使神化",
+      "action": "dropped",
+      "reason": "英文对应 deify / apotheosize，是别的词。**god 在英语里没有及物动词义**（查证：WordNet 只有 n.01/n.02 两条名词义项）。中文侧疑由「神化」这一动词说法串入了名词词条。"
+    }
+  ],
+  "word": "god",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "fromZh": [
+        0
+      ],
+      "glossZh": "上帝；神，诸神",
+      "note": "the supernatural being conceived as the perfect and omnipotent and omniscient being。线索：the God / gods and monsters。专指神或诸神，不指神像。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "（被神化的）伟人；像神一样的人物",
+      "note": "a man of such superior qualities that he seems like a deity。经典比喻义（he is a god among men）。现有中文无对应，属新增。"
+    },
+    {
+      "fromZh": [
+        1,
+        2
+      ],
+      "glossZh": "神像，神祇；偶像",
+      "note": "英文 a god / the gods 指「被崇拜的神」。走 fromZh 补洞，glossEn 留空。与 s1 分界：s1 是「神本身」，s3 是「神的具体形象/崇拜物」。"
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "_comment": "argue —— 3 英文边界 / 4 现有中文义项。raw=2 give evidence of（表明/证明）是现有中文没有的义项，属新增。raw=0 present reasons and arguments 覆盖「提出理由」与「主张」两条。",
+  "_mergeNote": "4 -> 3。① 提出理由+主张 合并为 s1。② 争论+辩论 合并为 s2。③ 表明/证明 为新增。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "提出理由",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 present reasons and arguments。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "争论",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "对应英文 raw=1 have an argument about something。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "辩论",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "与「争论」同指 raw=1，中文可互换。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "主张",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与「提出理由」同指 raw=0 —— argue a point / argue that… 就是「提出主张并给理由」，中文可互换。"
+    }
+  ],
+  "word": "argue",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "fromZh": [
+        0,
+        3
+      ],
+      "glossZh": "提出理由，主张；论证",
+      "note": "present reasons and arguments。线索：argue that / argue a case。可不带介词，宾语是被论证的主张。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "fromZh": [
+        1,
+        2
+      ],
+      "glossZh": "争论，辩论，争吵",
+      "note": "have an argument about something。线索：argue with sb / argue about sth。"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "表明，证明（提供证据支持）",
+      "note": "give evidence of。线索：the evidence argues for/against。现有中文无此义项，属新增。判别句：He argued for a new policy.（论证）/ The facts argue against it.（表明反对）。"
+    }
+  ]
+}

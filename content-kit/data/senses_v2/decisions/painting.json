@@ -1,0 +1,44 @@
+{
+  "word": "painting",
+  "senses": [
+    {
+      "fromLines": [
+        0,
+        1
+      ],
+      "glossZh": "绘画，油画"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "油漆，涂漆（动作/涂料）"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "glossZh": "（房屋的）油漆工作，油漆工"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "画",
+      "action": "m",
+      "reason": "raw=0+1 同指"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "绘画",
+      "action": "m",
+      "reason": "与画同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "油漆",
+      "action": "m",
+      "reason": "raw=2 the act of applying paint"
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "word": "oil",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "油，石油"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "油画颜料，油画用的颜料"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "涂油于；使融化成油状"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "油",
+      "action": "m",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "石油",
+      "action": "m",
+      "reason": "与油同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "油画颜料",
+      "action": "m",
+      "reason": "raw=1 oil paint containing pigment"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "涂油于",
+      "action": "m",
+      "reason": "raw=2 cover with oil"
+    }
+  ]
+}

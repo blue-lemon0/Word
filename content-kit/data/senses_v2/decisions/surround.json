@@ -1,0 +1,31 @@
+{
+  "word": "surround",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "包围，环绕"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "包围",
+      "action": "merged",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "环绕",
+      "action": "merged",
+      "reason": "与包围同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "围绕物",
+      "action": "merged",
+      "reason": "与包围同指"
+    }
+  ]
+}

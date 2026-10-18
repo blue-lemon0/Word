@@ -1,0 +1,43 @@
+{
+  "word": "schedule",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "时间表，日程表；一览表"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "预定，安排；制定时间表"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "时间表",
+      "action": "m",
+      "reason": "raw=0 ordered list of times"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "一览表",
+      "action": "m",
+      "reason": "与时间表同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "计划表",
+      "action": "m",
+      "reason": "与时间表同指"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "议事日程",
+      "action": "m",
+      "reason": "与时间表同指"
+    }
+  ]
+}

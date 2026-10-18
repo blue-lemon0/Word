@@ -1,0 +1,55 @@
+{
+  "word": "normal",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "正常的，正规的；常态的"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "符合科学规律的（正态的）"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "普通的，平均水平的；正态的"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "glossZh": "（几何）成直角的"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "常态",
+      "action": "m",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "普通",
+      "action": "m",
+      "reason": "raw=2 being approximately average"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "正常的",
+      "action": "m",
+      "reason": "raw=0 同指"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "正规的",
+      "action": "m",
+      "reason": "raw=0 同指"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "word": "prefer",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "宁可，更喜欢"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "给…优先（债权人/债务）"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "（级别上）置于…之上"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "宁可",
+      "action": "m",
+      "reason": "raw=0 like better"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "较喜欢",
+      "action": "m",
+      "reason": "与宁可同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "提出",
+      "action": "m",
+      "reason": "drop：英文 prefer 无「提出」义，advance/propose 才是"
+    }
+  ]
+}

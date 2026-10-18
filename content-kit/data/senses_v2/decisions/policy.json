@@ -1,0 +1,49 @@
+{
+  "word": "policy",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "政策，方针"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "（政府的）政策理由，方针论据"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "保险单"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "政策",
+      "action": "m",
+      "reason": "raw=0 a plan of action adopted"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "方针",
+      "action": "m",
+      "reason": "与政策同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "策略",
+      "action": "m",
+      "reason": "与政策同指"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "保险单",
+      "action": "m",
+      "reason": "raw=2 written contract or certificate of insurance"
+    }
+  ]
+}

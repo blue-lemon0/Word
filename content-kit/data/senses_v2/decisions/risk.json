@@ -1,0 +1,50 @@
+{
+  "word": "risk",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "冒险，风险；危险"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "（保险/医学）风险概率"
+    },
+    {
+      "fromLines": [
+        2,
+        3
+      ],
+      "glossZh": "冒…的危险；冒险干（动词）"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "冒险",
+      "action": "m",
+      "reason": "raw=0 a venture undertaken without regard to possible loss"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "危险",
+      "action": "m",
+      "reason": "raw=0 同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "保险额",
+      "action": "m",
+      "reason": "drop：英文 premium/insured value，非 risk"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "冒...的危险",
+      "action": "m",
+      "reason": "raw=3 expose to a chance of loss"
+    }
+  ]
+}

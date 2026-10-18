@@ -1,0 +1,39 @@
+{
+  "word": "delay",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "（被耽搁的）时间，等待期"
+    },
+    {
+      "fromLines": [
+        1,
+        2,
+        3
+      ],
+      "glossZh": "耽搁，延迟（动词）"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "耽搁",
+      "action": "m",
+      "reason": "raw=1+2+3 同指"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "迟滞",
+      "action": "m",
+      "reason": "与耽搁同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "延迟",
+      "action": "m",
+      "reason": "与耽搁同指"
+    }
+  ]
+}

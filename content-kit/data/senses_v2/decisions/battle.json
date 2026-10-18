@@ -1,0 +1,37 @@
+{
+  "_comment": "battle —— 2 英文边界 / 2 现有中文义项，一一对应，无合并。这是最干净的样本：名词「战役」与动词「战斗」分属两条边界，中文侧本来就分对了。",
+  "_mergeNote": "2 -> 2。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "战役",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 a hostile meeting of opposing military forces in the course of some action or campaign。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "战斗",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "对应英文 raw=1 battle or contend against in or as if in a battle。"
+    }
+  ],
+  "word": "battle",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "战役，会战",
+      "note": "a hostile meeting of opposing military forces。线索：a / the Battle of + 地名 / battle cry。军事义，与 s2 分界在有无具体战役。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "战斗，搏斗；与…斗争",
+      "note": "battle or contend against in or as if in a battle。线索：battle against / battle with。也可抽象用（battle with cancer）。"
+    }
+  ]
+}

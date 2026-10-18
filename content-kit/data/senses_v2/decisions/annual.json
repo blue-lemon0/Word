@@ -1,0 +1,73 @@
+{
+  "_comment": "annual —— 4 英文边界 / 4 现有中文义项，**词性完全对不上**：ECDICT 侧给的是 n.一年生植物 / n.年刊 / a.一年生的 / a.每年的四条，现有中文却是 年刊/年报/每年的/一年一次的（缺「一年生植物」与「一年生的」，多了「年报」）。",
+  "_mergeNote": "4 -> 4。① 年报 归入 s2（是 raw=1 的子类型）。② 每年的+一年一次的 合并为 s4（同一条释义）。③ 两条植物义是新增。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "年刊",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "对应英文 raw=1 a reference book that is published regularly once every year。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "年报",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "年报（annual report）是 raw=1「一年出一期的参考书」的子类型，不是独立义项。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "每年的",
+      "action": "merged",
+      "into": "v2 s4",
+      "reason": "对应英文 raw=3 occurring or payable every year。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "一年一次的",
+      "action": "merged",
+      "into": "v2 s4",
+      "reason": "与「每年的」同指 raw=3，中文可互换。"
+    }
+  ],
+  "word": "annual",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "一年生植物",
+      "note": "(botany) a plant that completes its entire life cycle within a year。名词义。现有中文无对应，属新增。植物学义，造句须带 plant/botany 语境。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "fromZh": [
+        0,
+        1
+      ],
+      "glossZh": "年刊，年报；年度的（书刊）",
+      "note": "a reference book that is published regularly once every year。线索：the annual report / an annual publication。「年报」是它的子类型。"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "一年生的（植物）",
+      "note": "completing its life cycle within a year。形容词义，专指植物。现有中文无对应，属新增。与 s4 的判别句：an annual plant（一年生）/ an annual meeting（年度）。"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "fromZh": [
+        2,
+        3
+      ],
+      "glossZh": "每年的，一年一次的；全年的",
+      "note": "occurring or payable every year。线索：annual report / annual income / annual leave。**本词最常用的义**。"
+    }
+  ]
+}

@@ -146,10 +146,17 @@ for f in sorted(os.listdir(SE)):
 # 句子是逐词增量加的，一天里常常改好几次；日期版 version 会让 app/db.mjs 的
 # syncBundle 判定「bundle 没变」而跳过重建 —— 于是新句子永远进不了 App，
 # 而界面上看不出任何异常。症状：刚生成的句子在浏览器里不出现。
+#
+# 2026-10 补上 glossEn / pos / ipa：这三项都是会随词库重做而整体变化的字段
+# （D19 起 glossEn 从空变成有值）。原哈希只含 word/senseId/句数/gloss/trap，
+# 后果是**补了英文释义后 version 一字不变** -> syncBundle 跳过重建 ->
+# 界面永远拿不到英文释义，且没有任何报错。与 README 铁律 4 描述的
+# 「改一句译文也要让 version 变化」是同一类问题，字段清单不全而已。
 h = hashlib.sha1()
 for c in cards:
-    h.update(("%s\x1f%s\x1f%d\x1f%s\x1f%d\x1e" % (
-        c["word"], c["senseId"], len(c["sentences"]), c["gloss"], c["trap"])).encode("utf-8"))
+    h.update(("%s\x1f%s\x1f%d\x1f%s\x1f%s\x1f%s\x1f%s\x1e" % (
+        c["word"], c["senseId"], len(c["sentences"]), c["gloss"],
+        c["glossEn"], c["pos"], c["trap"])).encode("utf-8"))
     for r in c["sentences"]:
         h.update(("%s\x1f%s\x1e" % (r["text"], r["clue"])).encode("utf-8"))
 version = "%s-%s" % (time.strftime("%Y%m%d"), h.hexdigest()[:8])

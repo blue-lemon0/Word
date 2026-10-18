@@ -1,0 +1,38 @@
+{
+  "_comment": "majority —— 3 英文边界 / 2 现有中文义项。raw=0（一般意义的多数）与 raw=1（选举中的多数票）英文有别但中文统一译「多数」，合并；raw=2「成年」是完全被漏掉的法律义项。",
+  "_mergeNote": "2 -> 2。多数+大半 合并为 s1。成年 为新增。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "多数",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 the property resulting from being or relating to the greater number 与 raw=1 (elections) more than half of the votes（同指「多数」，中文统一译法，合并）。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "大半",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与「多数」同指，中文可互换。"
+    }
+  ],
+  "word": "majority",
+  "senses": [
+    {
+      "fromLines": [
+        0,
+        1
+      ],
+      "glossZh": "多数，大半；多数票",
+      "note": "the greater number / (elections) more than half of the votes。**不可数**，用 a/the majority of。线索：a majority of students / an absolute majority。两条边界只差「选举语境」，中文统一译「多数」，合并。"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "成年（法定年龄）",
+      "note": "the age at which persons are considered competent to manage their own affairs。法律义，指「成年年龄」。现有中文无此义项，属新增。罕见。"
+    }
+  ]
+}

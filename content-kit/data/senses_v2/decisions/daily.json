@@ -1,0 +1,49 @@
+{
+  "word": "daily",
+  "senses": [
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "每日的，日常的"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "每日地，日常地"
+    },
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "日报"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "每日的",
+      "action": "m",
+      "reason": "raw=1"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "日常的",
+      "action": "m",
+      "reason": "与每日的同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "每日地",
+      "action": "m",
+      "reason": "raw=2"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "日常地",
+      "action": "m",
+      "reason": "与每日地同指"
+    }
+  ]
+}

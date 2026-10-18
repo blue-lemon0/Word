@@ -1,0 +1,49 @@
+{
+  "_comment": "environment —— 2 英文边界 / 3 现有中文义项。「围绕」是误收：英文对应 surround / encircle，而且它是动词，环境不是动词。raw=0（全部周围条件的总和）与 raw=1（某物所处的那片区域）英文确实区分，中文都译「环境」，靠 gloss 点明。",
+  "_mergeNote": "3 -> 2。舍弃 1 个。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "环境",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 the totality of surrounding conditions —— 全部周围条件的总和。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "外界",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "对应英文 raw=1 the area in which something exists or lives —— 某个具体区域。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "围绕",
+      "action": "dropped",
+      "reason": "英文对应 surround / encircle，是**动词**，与 environment（名词）不同词性。中文侧疑由 environment 的「周围」义误取了「围绕」这个动词的中文说法。"
+    }
+  ],
+  "word": "environment",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "fromZh": [
+        0
+      ],
+      "glossZh": "环境（全部周围条件的总和）",
+      "note": "the totality of surrounding conditions。抽象、整体。线索：protect the environment / a hostile environment（对整体而言）。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "fromZh": [
+        1
+      ],
+      "glossZh": "环境（某物所处的那片环境）；外界",
+      "note": "the area in which something exists or lives。具体、有主语。线索：adapt to a marine environment / in a work environment。与 s1 分界：s1 谈「整体」，s2 谈「某物的所在地」。"
+    }
+  ]
+}

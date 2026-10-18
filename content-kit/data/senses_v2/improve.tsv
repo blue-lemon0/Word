@@ -1,0 +1,2 @@
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	v.	改良，提高，改善	to make better	0	T1	to make better。线索：improve sth / improve 形容词（ improving / improved）。只作及物。注：vi. 义「变得更好」的释义是 get better（2 词），被 min_en_words=3 清洗掉；实际英语里 improve 不作不及物，故不补。

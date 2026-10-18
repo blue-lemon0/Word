@@ -1,0 +1,3 @@
+senseId	pos	glossZh	glossEn	trap	tier	note
+s1	n.	犯罪，罪行（违法行为）	(criminal law) an act punishable by law; usually considered an evil act	0	T1	(criminal law) an act punishable by law; usually considered an evil act。线索：commit a crime / war / violent + crime。关键：受法律惩罚。
+s2	n.	罪恶（道德上的恶，不必然违法）	an evil act not necessarily punishable by law	0	T1	an evil act not necessarily punishable by law。与 s1 的分界是「是否受法律惩罚」：greed 在中文可说成罪恶，但英语不叫 crime。判别句：Murder is a crime, but greed is only a sin.

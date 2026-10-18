@@ -1,0 +1,71 @@
+{
+  "_comment": "equal —— 4 英文边界 / 4 现有中文义项。现有四个中文义项里**三个是名词**（对手/匹敌/同辈），而 ECDICT 给的四条全是动词+形容词。所以三个名词义都要走 fromZh，另有「等于」这个高频动词义现有中文没有。raw=0 与 raw=1（等于/相当于）合并。",
+  "_mergeNote": "4 -> 4。① 对手+匹敌+同辈 合并为名词义 s1。② raw=0+raw=1 合并为「等于/相当于」s3。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "对手",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "英文 one's equal（与自己旗鼓相当的人）。WordNet 无 equal 的名词义项，走 fromZh 补洞。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "匹敌",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与「对手」同指，中文可互换。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "同辈",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "英文 one's equals（同辈/同地位的人）。与「对手」同指（one's equals），走 fromZh 补洞。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "相等的",
+      "action": "merged",
+      "into": "v2 s4",
+      "reason": "对应英文 raw=3 having the same quantity, value, or measure as another —— 形容词面。"
+    }
+  ],
+  "word": "equal",
+  "senses": [
+    {
+      "fromZh": [
+        0,
+        1,
+        2
+      ],
+      "glossZh": "对手，匹敌者；（one's equals）同辈",
+      "note": "英文 one's equal / one's equals。WordNet 无名词义项，走 fromZh 补洞，glossEn 留空。判别句：He is my equal.（对手）/ They are my equals.（同辈）"
+    },
+    {
+      "fromLines": [
+        0,
+        1
+      ],
+      "glossZh": "等于；相当于；（能力）相当",
+      "note": "be identical or equivalent to / be equal to in quality or ability。**高频动词义，但现有中文完全没有**。线索：equal to / three equal parts。两条边界只差「数值」与「能力」，合并。"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "使相等，使平等；配平",
+      "note": "make equal, uniform, corresponding, or matching。及物动词。线索：equalize / equal the shares。现有中文无对应，属新增。"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "fromZh": [
+        3
+      ],
+      "glossZh": "相等的，平等的",
+      "note": "having the same quantity, value, or measure as another。线索：equal weight / equal treatment。**注意拼写**：equal（相等的）vs equally（同样地）vs equality（平等）。"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "word": "excellent",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "优良的，杰出的，出色的"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "优良的",
+      "action": "m",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "杰出的",
+      "action": "m",
+      "reason": "与优良同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "出色的",
+      "action": "m",
+      "reason": "与优良同指"
+    }
+  ]
+}

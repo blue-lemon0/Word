@@ -1,0 +1,19 @@
+{
+  "word": "museum",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "博物馆"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "博物馆",
+      "action": "merged",
+      "reason": "raw=0"
+    }
+  ]
+}

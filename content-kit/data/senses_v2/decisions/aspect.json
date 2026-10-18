@@ -1,0 +1,52 @@
+{
+  "_comment": "aspect —— 3 英文边界 vs 4 现有中文义项。现有 外观/方面/面貌/方向 里，raw=2（the beginning or duration of the action of a verb）是语法学的「时/体」义，中文侧没收录；raw=0 与 raw=1 语义高度接近（都是「问题的一个特征/方面」），但 WordNet 分成两个 synset —— 按 D24 标准，synset 分开不等于必须分开，需按「中文能否互换 + 搭配是否相同」判。",
+  "_mergeNote": "raw=0 与 raw=1 合并为一条：a distinct feature or element in a problem 与 a characteristic to be considered 都指「看待某问题时要考虑的一个要素」，中文「方面」/「面貌」可互换，且搭配集合相同（an aspect of / aspects to consider）。这两条 WordNet 分开是它把近义 synset 也拆开的结果，不是语义差异。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "外观",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "对应英文 raw=2 the beginning or duration or completion or repetition of the action of a verb —— 语法学的「时/体」（aspects of the verb）。中文叫「外观」有歧义，此处指语法体。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "方面",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 a distinct feature or element in a problem —— 看待某问题的一个要素。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "面貌",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与「方面」同指 raw=0/raw=1 那一组概念，中文可互换（问题的面貌/问题的方面），搭配相同，合并合法。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "方向",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "对应 raw=2 的语法义 —— 中文把「时/体」这一语法概念叫作「方面/方向」，属同一概念的中文不同叫法。"
+    }
+  ],
+  "word": "aspect",
+  "senses": [
+    {
+      "fromLines": [
+        0,
+        1
+      ],
+      "glossZh": "方面；面貌",
+      "note": "a distinct feature or element in a problem / a characteristic to be considered。看待某问题时要考虑的一个要素。线索：an aspect of + 名词。the financial aspect of the plan。"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "（语法）时、体",
+      "note": "the beginning or duration or completion or repetition of the action of a verb。语法学的 aspect（时态/体貌）。线索：verbal aspects / the progressive aspect。"
+    }
+  ]
+}

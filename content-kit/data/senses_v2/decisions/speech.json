@@ -1,0 +1,49 @@
+{
+  "word": "speech",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "言语，说话（语言学）"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "话语，说的话（具体一次）"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "交谈"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "演讲",
+      "action": "m",
+      "reason": "drop：speech 指「言语」与「演讲」，但 raw 是 spoken words 类"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "说话",
+      "action": "m",
+      "reason": "raw=0+2 同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "谈话",
+      "action": "m",
+      "reason": "与说话同指"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "言语",
+      "action": "m",
+      "reason": "与说话同指"
+    }
+  ]
+}

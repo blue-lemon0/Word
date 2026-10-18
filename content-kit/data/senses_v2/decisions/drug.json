@@ -1,0 +1,66 @@
+{
+  "_comment": "drug —— 3 英文边界 / 4 现有中文义项。药/麻药/麻醉药 三义在同一条释义下（a substance used as a medicine or narcotic），中文三个词可互换，合并。补缺层新收一条动词义 raw=1（给…用药）。",
+  "_mergeNote": "4 -> 3。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "药",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 a substance that is used as a medicine or narcotic。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "麻药",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与「药」同指 raw=0 —— 释义本身就写了 medicine or narcotic，中文可互换。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "麻醉药",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与「药」同指 raw=0，中文可互换。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "吸毒",
+      "action": "merged",
+      "into": "v2 s3",
+      "reason": "对应英文 raw=2 use recreational drugs。"
+    }
+  ],
+  "word": "drug",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "fromZh": [
+        0,
+        1,
+        2
+      ],
+      "glossZh": "药，药物；毒品，麻醉品",
+      "note": "a substance that is used as a medicine or narcotic。**释义同时涵盖药与毒品**，所以不必拆 —— 上瘾与否取决于用法（drug test vs drug dealer）。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "给…用药，使服麻醉药",
+      "note": "administer a drug to。现有中文无此义项，属新增。罕见（兽医/文学语境）。"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "fromZh": [
+        3
+      ],
+      "glossZh": "吸毒，吸食毒品",
+      "note": "use recreational drugs。线索：He drugs / drug abuse。不及物。"
+    }
+  ]
+}

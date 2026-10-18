@@ -1,0 +1,20 @@
+{
+  "word": "email",
+  "senses": [
+    {
+      "fromLines": [
+        0,
+        1
+      ],
+      "glossZh": "电子信函，电子邮件"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "电子信函",
+      "action": "m",
+      "reason": "raw=0+1 同指"
+    }
+  ]
+}

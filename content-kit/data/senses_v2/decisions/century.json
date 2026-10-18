@@ -1,0 +1,25 @@
+{
+  "word": "century",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "世纪，百年"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "世纪",
+      "action": "merged",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "百年",
+      "action": "merged",
+      "reason": "与世纪同指"
+    }
+  ]
+}

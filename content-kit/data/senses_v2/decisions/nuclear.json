@@ -1,0 +1,55 @@
+{
+  "word": "nuclear",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "核的，核能的（核武器）"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "（原子）核的"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "（细胞）核的"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "glossZh": "中心的，核心的"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "核子的",
+      "action": "m",
+      "reason": "raw=0+1 同指"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "原子能的",
+      "action": "m",
+      "reason": "raw=0 weapons 同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "核的",
+      "action": "m",
+      "reason": "raw=1+2 同指"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "中心的",
+      "action": "m",
+      "reason": "raw=3 constituting a nucleus"
+    }
+  ]
+}

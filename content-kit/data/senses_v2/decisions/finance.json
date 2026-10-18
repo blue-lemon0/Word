@@ -1,0 +1,64 @@
+{
+  "word": "finance",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "财政；财务（提供资金的活动）"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "（经济学分支）金融学"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "资金管理，银行与投资"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "glossZh": "供给…经费；筹措资金（vt./vi.）"
+    },
+    {
+      "fromLines": [
+        [
+          "wn",
+          "finance.v.02"
+        ]
+      ],
+      "glossZh": "赊销，提供信贷"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "财政",
+      "action": "m",
+      "reason": "raw=0 commercial activity of providing funds"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "财务",
+      "action": "m",
+      "reason": "与财政同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "供给...经费",
+      "action": "m",
+      "reason": "raw=3 obtain or provide money for"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "负担经费",
+      "action": "m",
+      "reason": "与供给同指"
+    }
+  ]
+}

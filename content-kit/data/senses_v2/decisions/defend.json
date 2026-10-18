@@ -1,0 +1,43 @@
+{
+  "word": "defend",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "为…辩护；抗辩"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "防守，保卫"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "（出庭）担任辩护律师"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "防护",
+      "action": "m",
+      "reason": "raw=2 protect against a challenge"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "辩护",
+      "action": "m",
+      "reason": "raw=0+3 同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "防卫",
+      "action": "m",
+      "reason": "raw=1 be on the defensive"
+    }
+  ]
+}

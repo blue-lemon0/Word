@@ -1,0 +1,50 @@
+{
+  "_comment": "edition。已发布词。现有 版本/版/翻版 三义，版本与版 overlap 1.00（切错），翻版是被我上一轮误删的 —— 没有依据说它错，保留。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "版本",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与 版 overlap 1.00，同义，合并到英文 raw=0 那条。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "版",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "同 ���。中文侧把「版本/版」切成两个义项，英文只有一条 the form in which a text is published。"
+    }
+  ],
+  "word": "edition",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "版本，版次",
+      "note": "the form in which a text (especially a printed book) is published。同一著作的出书形式。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "一版（同一时间发行的全套相同副本）",
+      "note": "all of the identical copies offered to the public at the same time。某次印行的整套书；报刊的 a new edition 走这条。"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "报纸的一次发行",
+      "note": "an issue of a newspaper。报刊的某一次/某版。"
+    },
+    {
+      "fromZh": [
+        2
+      ],
+      "glossZh": "翻版",
+      "note": "保留。上一轮我以「英文侧无独立义位」为理由删掉它是错的 —— 词典没收录不等于英文里没这个意思（真实用法 reprint / pirated edition）。ECDICT definition 收不到，glossEn 留空。"
+    }
+  ]
+}

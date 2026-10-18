@@ -1,0 +1,65 @@
+{
+  "_comment": "arrest —— 【D27】ECDICT 的英文释义是错的。这是本批发现的最严重的数据事故：ECDICT 只给了一条 n. 义位 'the state of inactivity following an interruption'（心脏骤停后的停搏状态），而 arrest 的常用义「逮捕」在 WordNet 里挂在 collar.v.01 / check.v.18 / halt.v.01 三个别的词的 synset 下，首词为 arrest 的只有那条罕见医学义。放宽到 lemma 匹配能救回，但实测会让全库义位暴涨 54%（find 6→18、cut 54→70），同义词污染全回来。所以本词只能显式指定。",
+  "_exceptions": [
+    "放宽 first_word_only：手动收下 collar.v.01(take into custody) 与 check.v.18(hold back, as of a danger)。理由：arrest 的「逮捕/制止」是核心常用义，ECDICT 侧数据错误导致首词规则把它过滤掉了。",
+    "不收 arrest.n.02(the state of inactivity following an interruption)：心脏骤停后的停搏状态，与「逮捕」无关，对考研零价值。这条正是 ECDICT 唯一导出的义位。"
+  ],
+  "_wordnet_exceptions": [
+    "collar.v.01",
+    "check.v.18"
+  ],
+  "_mergeNote": "4 个现有中文义项全部保留。逮捕/拘捕同义合并（中文可互换），监禁/抑制同指「制止」义合并。ECDICT 那条罕见医学义不产出。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "逮捕",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应 collar.v.01 take into custody —— 抓住、拘捕。首词非 arrest，故 ECDICT 与首词规则都收不到，本词显式指定。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "拘捕",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与「逮捕」同义，中文可互换，合并。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "监禁",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "check.v.18 hold back, as of a danger or an enemy —— 制止、遏制。与「逮捕」是不同概念：一个是抓，一个是拦阻。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "抑制",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "与「监禁」同指 check.v.18 的「制止/遏制」义，中文可互换，合并。"
+    }
+  ],
+  "word": "arrest",
+  "senses": [
+    {
+      "fromLines": [
+        [
+          "wn",
+          "collar.v.01"
+        ]
+      ],
+      "glossZh": "逮捕，拘捕",
+      "note": "take into custody。抓住并带走。线索：宾语是人。The police arrested two suspects."
+    },
+    {
+      "fromLines": [
+        [
+          "wn",
+          "check.v.18"
+        ]
+      ],
+      "glossZh": "阻止，遏制",
+      "note": "hold back, as of a danger or an enemy。拦住、遏制。线索：宾语是过程/发展。Nothing could arrest the spread of the disease."
+    }
+  ]
+}

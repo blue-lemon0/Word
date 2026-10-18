@@ -1,0 +1,68 @@
+{
+  "_comment": "length —— 3 英文边界 / 4 现有中文义项，**四条中文义项与三条英文边界一对一，没有任何合并或舍弃**。这是最干净的样本：raw=0 空间长度、raw=1 时间长度、raw=2 物体的延伸段。",
+  "_mergeNote": "4 -> 4。无合并、无舍弃。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "长度",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 the linear extent in space from one end to the other; the extent of a line or plane。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "长",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与「长度」同指 raw=0，中文可互换。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "期间",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "对应英文 raw=1 the property of being the extent of something from beginning to end in time —— **时间上的长度**。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "一段",
+      "action": "merged",
+      "into": "v2 s3",
+      "reason": "对应英文 raw=2 a section of something that is long and narrow —— 细长的一段。"
+    }
+  ],
+  "word": "length",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "fromZh": [
+        0,
+        1
+      ],
+      "glossZh": "长度，长（空间距离）",
+      "note": "the linear extent in space from one end to the other。**空间维度的长度**。线索：the length of the room / a 2-metre length。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "fromZh": [
+        2
+      ],
+      "glossZh": "时长，期间",
+      "note": "the property of being the extent of something from beginning to end in time。**时间维度的长度**。线索：the length of the meeting / the length of time。与 s1 分界：量的是空间还是时间。"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "fromZh": [
+        3
+      ],
+      "glossZh": "（细长的）一段，一截",
+      "note": "a section of something that is long and narrow。指**物体本身**。线索：a length of rope / lengths of silk。"
+    }
+  ]
+}

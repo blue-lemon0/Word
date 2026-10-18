@@ -1,0 +1,37 @@
+{
+  "_comment": "basis —— 2 英文边界 / 2 现有中文义项，一一对应。这是一对**该保留的相似义项**：raw=0 是「基础（抽象前提）」，raw=1 是「主要成分（具体部分）」。判别句成立。",
+  "_mergeNote": "2 -> 2。无合并。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "基础",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 the fundamental assumptions from which something is begun or developed —— 抽象前提。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "主要成分",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "对应英文 raw=1 the most important or necessary part of something —— 具体部分。"
+    }
+  ],
+  "word": "basis",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "基础，根据（抽象前提）",
+      "note": "the fundamental assumptions from which something is begun or developed。线索：on the basis of / a sound basis。搭配上几乎只用 on the basis of。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "主要成分，主要部分",
+      "note": "the most important or necessary part of something。线索：the basis of the argument / water is the basis of life。与 s1 的判别句：We act on the basis of evidence.（前提）/ The basis of the problem is poverty.（成因部分）"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "word": "district",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "区域，地方，辖区"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "区域",
+      "action": "m",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "地方",
+      "action": "m",
+      "reason": "与区域同指"
+    }
+  ]
+}

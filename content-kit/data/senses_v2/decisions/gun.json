@@ -1,0 +1,31 @@
+{
+  "word": "gun",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "枪，炮"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "鸣枪（军礼）；枪声"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "用枪射击"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "枪",
+      "action": "m",
+      "reason": "raw=0 a weapon that discharges a missile"
+    }
+  ]
+}

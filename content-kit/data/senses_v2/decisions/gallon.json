@@ -1,0 +1,20 @@
+{
+  "word": "gallon",
+  "senses": [
+    {
+      "fromLines": [
+        0,
+        1
+      ],
+      "glossZh": "加仑"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "加仑",
+      "action": "m",
+      "reason": "raw=0+1 英美制同指"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "word": "insist",
+  "senses": [
+    {
+      "fromLines": [
+        0,
+        1
+      ],
+      "glossZh": "坚持，坚决主张，强调"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "坚持",
+      "action": "merged",
+      "reason": "raw=0+1 同指"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "坚决主张",
+      "action": "merged",
+      "reason": "raw=0+1 同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "强调",
+      "action": "merged",
+      "reason": "raw=0+1 同指"
+    }
+  ]
+}

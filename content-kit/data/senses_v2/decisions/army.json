@@ -1,0 +1,37 @@
+{
+  "_comment": "army —— 2 英文边界 vs 2 现有中文义项。现有「军队」/「陆军」两义，英文 raw=0 是「一国的常备陆军」正对应中文两者的合称，raw=1 是「大批人为某目的聚集」引申义。中文把「军队」与「陆军」分开列了两个义项，但英文看是一个概念（陆军的集合）加一个引申。按 D24 标准：军队/陆军中文可互换（中国的军队/中国的陆军），归 raw=0。",
+  "_mergeNote": "一处合并：军队+陆军 -> raw=0。中文两个词在 army 语境下可互换，英文也只有一条边界覆盖这个概念。raw=1 引申义（大批人聚集）独立保留 —— 它有完全不同的搭配（an army of volunteers / an army of locusts），是独立概念。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "军队",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 a permanent organization of the military land forces of a nation or state。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "陆军",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与「军队」同指 raw=0 这一概念，中文可互换（中国的军队 / 中国的陆军），英文也只有一条边界。合并合法。"
+    }
+  ],
+  "word": "army",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "军队，陆军",
+      "note": "a permanent organization of the military land forces of a nation or state。线索：所属国家。the US Army / raise an army。合并现有 军队/陆军 两义。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "大批人；大军",
+      "note": "a large number of people united for some specific purpose。引申义：大批人为某目的聚集（不一定是军队）。线索：an army of + 复数名词。an army of volunteers swept the field."
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "word": "fight",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "打架，战斗；搏斗（任何争斗）"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "（激烈的）争吵"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "（拳击/摔跤）比赛"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "glossZh": "对抗，抵抗（fight against）"
+    },
+    {
+      "fromLines": [
+        [
+          "wn",
+          "fight.v.03"
+        ]
+      ],
+      "glossZh": "奋斗，竭力"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "打架",
+      "action": "m",
+      "reason": "raw=0 the act of fighting"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "争吵",
+      "action": "m",
+      "reason": "raw=1 an intense verbal dispute"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "斗志",
+      "action": "m",
+      "reason": "drop：英文 fighting spirit，ECDICT 无该义项"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "对抗",
+      "action": "m",
+      "reason": "raw=3 fight against"
+    }
+  ]
+}

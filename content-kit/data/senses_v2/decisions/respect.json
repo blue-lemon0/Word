@@ -1,0 +1,45 @@
+{
+  "word": "respect",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "（复数）致意，问候"
+    },
+    {
+      "fromLines": [
+        1,
+        2,
+        3
+      ],
+      "glossZh": "尊敬，尊重"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "尊敬",
+      "action": "m",
+      "reason": "raw=1+2+3 同指"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "尊重",
+      "action": "m",
+      "reason": "与尊敬同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "问候",
+      "action": "m",
+      "reason": "drop：英文 regards，非 respect"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "注意",
+      "action": "m",
+      "reason": "drop：英文 regard/notice，非 respect"
+    }
+  ]
+}

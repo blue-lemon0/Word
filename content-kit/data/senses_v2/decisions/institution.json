@@ -1,0 +1,43 @@
+{
+  "word": "institution",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "机构；设施（研究所/医院）"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "（国家的）行政分区"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "制度，惯例；社会机构"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "机构",
+      "action": "m",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "惯例",
+      "action": "m",
+      "reason": "raw=2 a custom"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "制度",
+      "action": "m",
+      "reason": "与惯例同指"
+    }
+  ]
+}

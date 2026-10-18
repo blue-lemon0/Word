@@ -1,0 +1,25 @@
+{
+  "word": "international",
+  "senses": [
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "国际的"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "国际的",
+      "action": "m",
+      "reason": "raw=1；raw=0 是国际组织名词义"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "国别设定",
+      "action": "m",
+      "reason": "drop：计算机 locale，非 international"
+    }
+  ]
+}

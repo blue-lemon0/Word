@@ -1,0 +1,44 @@
+{
+  "word": "constant",
+  "senses": [
+    {
+      "fromLines": [
+        0,
+        1
+      ],
+      "glossZh": "常数，恒量（数学）"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "坚定的，不变的"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "常数",
+      "action": "m",
+      "reason": "raw=1 数学固定值"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "恒量",
+      "action": "m",
+      "reason": "与常数同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "不变的",
+      "action": "m",
+      "reason": "raw=0+2 同指"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "一定的",
+      "action": "m",
+      "reason": "与不变同指"
+    }
+  ]
+}

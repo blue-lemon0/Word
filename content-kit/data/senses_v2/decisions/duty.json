@@ -1,0 +1,66 @@
+{
+  "_comment": "duty —— 3 英文边界 / 4 现有中文义项。「尊敬」是误收：英文对应 respect / deference。这是「义务 / 职责 / 关税」三条边界一一对应、其中两条是真实同词多义的干净样本。",
+  "_mergeNote": "4 -> 3。舍弃 1 个。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "责任",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 the social force that binds you to the courses of action demanded by moral or legal obligation —— 道德或法律上的义务感。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "关税",
+      "action": "merged",
+      "into": "v2 s3",
+      "reason": "对应英文 raw=2 a government tax on imports or exports。判别句：pay duty on imports（关税）/ It's your duty to help.（义务）"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "职务",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "对应英文 raw=1 work that you are obliged to perform for moral or legal reasons —— 具体要做的工作。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "尊敬",
+      "action": "dropped",
+      "reason": "英文对应 respect / deference / reverence，是别的词。中文侧疑由 duty「敬职/尽本分」串到了「尊敬」。"
+    }
+  ],
+  "word": "duty",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "fromZh": [
+        0
+      ],
+      "glossZh": "责任，义务",
+      "note": "the social force that binds you to the courses of action demanded by moral or legal obligation。抽象的义务感。线索：a sense of duty / duty to do sth。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "fromZh": [
+        2
+      ],
+      "glossZh": "职务，职责；值勤",
+      "note": "work that you are obliged to perform for moral or legal reasons。具体的职责/值班。线索：on duty / night duty。与 s1 分界：s1 是「义务感」，s2 是「要干的活」。"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "fromZh": [
+        1
+      ],
+      "glossZh": "关税",
+      "note": "a government tax on imports or exports。线索：customs duty / import duty。判别句：pay duty on imports（关税）/ off duty now（下班了）。"
+    }
+  ]
+}

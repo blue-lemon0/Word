@@ -1,0 +1,69 @@
+{
+  "_comment": "award —— 4 英文边界 / 4 现有中文义项。裁定+判决 同指 raw=0（法院的 grant）。两个「给予」动词义（raw=2 按荣誉给予 / raw=3 按判决给予）中文都是「授予」，合并。",
+  "_mergeNote": "4 -> 3。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "奖品",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=1 a tangible symbol signifying approval or distinction —— 实物形式的奖（奖杯/奖章）。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "裁定",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "对应英文 raw=0 a grant made by a law court。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "判决",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "与「裁定」同指 raw=0，中文可互换。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "授予",
+      "action": "merged",
+      "into": "v2 s3",
+      "reason": "对应英文 raw=2 give, especially as an honor or reward 与 raw=3 give as judged due or on the basis of merit（同为「给予」，后者强调按功绩/判决）。"
+    }
+  ],
+  "word": "award",
+  "senses": [
+    {
+      "fromLines": [
+        1
+      ],
+      "fromZh": [
+        0
+      ],
+      "glossZh": "奖品，奖章，奖赏",
+      "note": "a tangible symbol signifying approval or distinction。线索：win / receive an award。强调是**实物**；award ceremony/prize 是抽象的「奖项」。"
+    },
+    {
+      "fromLines": [
+        0
+      ],
+      "fromZh": [
+        1,
+        2
+      ],
+      "glossZh": "裁定，判决（法院的授予）",
+      "note": "a grant made by a law court。线索：an award of damages / the court awarded。法律义，与 s1 分界在是否由法院作出。"
+    },
+    {
+      "fromLines": [
+        2,
+        3
+      ],
+      "fromZh": [
+        3
+      ],
+      "glossZh": "授予，给予；判给",
+      "note": "give, especially as an honor or reward / give as judged due。动词义。线索：award sb sth / be awarded a grant。"
+    }
+  ]
+}

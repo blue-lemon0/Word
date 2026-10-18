@@ -1,0 +1,71 @@
+{
+  "_comment": "entry —— 2 英文边界 / 4 现有中文义项。ECDICT definition 只给了词典/会计两个义项（偏商业），漏掉「进入（过程）」「入口」这两个高频义 —— 走 fromZh。",
+  "_mergeNote": "4 -> 4。无合并。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "登录",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "对应英文 raw=1 a written record of a commercial transaction —— 账簿上的一笔商业记录（entry）。中文的「登录」是计算机义，见 s4。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "条目",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 an item inserted in a written record —— 记录里的一个条目。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "进入",
+      "action": "merged",
+      "into": "v2 s3",
+      "reason": "英文 entry 也指「进入这一过程」（the entry of X into Y / Entry is not permitted）。ECDICT definition 侧漏导，走 fromZh 补洞。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "入口",
+      "action": "merged",
+      "into": "v2 s4",
+      "reason": "英文 entry 指入口处。ECDICT definition 侧漏导，走 fromZh 补洞。**高频义，缺失是定义源的问题，不是这个义项的问题。**"
+    }
+  ],
+  "word": "entry",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "fromZh": [
+        1
+      ],
+      "glossZh": "条目，款项（记录中的一项）",
+      "note": "an item inserted in a written record。线索：a dictionary entry / an entry in a ledger。抽象的「一条记录」。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "fromZh": [
+        0
+      ],
+      "glossZh": "（商业）记账；（税务）报关单",
+      "note": "a written record of a commercial transaction。线索：a bookkeeping entry / a customs entry。专指商业/税务记录。"
+    },
+    {
+      "fromZh": [
+        2
+      ],
+      "glossZh": "进入（过程）",
+      "note": "英文 the entry of + 名词 + into（…的进入）/ Entry is not permitted（禁止入内）。ECDICT definition 侧漏导，走 fromZh 补洞，glossEn 留空。"
+    },
+    {
+      "fromZh": [
+        3
+      ],
+      "glossZh": "入口；入场（许可）",
+      "note": "英文 entry 指入口处 / 入场权（an entry permit）。ECDICT definition 侧漏导，走 fromZh 补洞，glossEn 留空。**本词最常用的义**。"
+    }
+  ]
+}

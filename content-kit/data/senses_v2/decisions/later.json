@@ -1,0 +1,41 @@
+{
+  "_comment": "later —— 2 英文边界 / 现有 2 个中文义项都是副词，但 raw=0 是**形容词**。词性对不上，需在 note 里说明。「更晚地」是现有中文缺的第二条边界。",
+  "_mergeNote": "2 -> 2。以后+随后 合并为 s1。更晚地 为新增。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "以后",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 coming at a subsequent time or stage（形容词面，修饰名词：a later date）。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "随后",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与「以后」同指，中文可互换。"
+    }
+  ],
+  "word": "later",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "fromZh": [
+        0,
+        1
+      ],
+      "glossZh": "以后的，随后的（修饰名词）",
+      "note": "coming at a subsequent time or stage。**这里是形容词**，只能修饰名词：a later date / in later years（这是本词最常见的用法）。副词用法见 s2。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "更晚地；后来",
+      "note": "comparative of the adverb `late。副词面。线索：He arrived later. / later on。**注意与 s1 区分**：later（更晚）≠ latter（后者），后者拼作 latter。"
+    }
+  ]
+}

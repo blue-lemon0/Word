@@ -1,0 +1,44 @@
+{
+  "word": "progress",
+  "senses": [
+    {
+      "fromLines": [
+        0,
+        1
+      ],
+      "glossZh": "前进，进展；进行"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "进步，发展（动词）"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "进步",
+      "action": "m",
+      "reason": "raw=2 develop in a positive way"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "发展",
+      "action": "m",
+      "reason": "与进步同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "前进",
+      "action": "m",
+      "reason": "raw=0+1 同指"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "进行",
+      "action": "m",
+      "reason": "与前进同指"
+    }
+  ]
+}

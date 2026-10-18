@@ -1,0 +1,31 @@
+{
+  "word": "technique",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "技巧，技术，方法"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "技巧",
+      "action": "merged",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "技术",
+      "action": "merged",
+      "reason": "与技巧同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "方法",
+      "action": "merged",
+      "reason": "与技巧同指"
+    }
+  ]
+}

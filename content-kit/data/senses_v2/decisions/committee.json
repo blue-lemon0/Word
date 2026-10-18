@@ -1,0 +1,20 @@
+{
+  "word": "committee",
+  "senses": [
+    {
+      "fromLines": [
+        0,
+        1
+      ],
+      "glossZh": "委员会"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "委员会",
+      "action": "m",
+      "reason": "raw=0+1 同指"
+    }
+  ]
+}

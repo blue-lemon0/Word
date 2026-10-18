@@ -1,0 +1,39 @@
+{
+  "word": "doubt",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "怀疑，疑惑（名词）"
+    },
+    {
+      "fromLines": [
+        1,
+        2,
+        3
+      ],
+      "glossZh": "怀疑，不相信（动词）"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "怀疑",
+      "action": "m",
+      "reason": "raw=0+2+3 同指"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "疑惑",
+      "action": "m",
+      "reason": "与怀疑同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "不信",
+      "action": "m",
+      "reason": "与怀疑同指"
+    }
+  ]
+}

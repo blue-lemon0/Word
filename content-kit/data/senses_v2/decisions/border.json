@@ -1,0 +1,72 @@
+{
+  "_comment": "border —— 3 英文边界 / 4 现有中文义项。这是个反直觉的词：中文把「花坛」列为义项，而它**确实是英文义项**（a flower border = 花坛/花圃）。若只凭「中文词典这么写」就删，会误删真义项 —— 按 D24 只在英文明确指向别的词时才舍弃。「在...上镶边」现有中文没有，属新增。",
+  "_mergeNote": "4 -> 4。① 边缘+边界 合并为 s1。② 边境 s3。③ 镶边 新增。④ 花坛 走 fromZh（真实英文义项）。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "边缘",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 a strip forming the outer edge of something。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "边境",
+      "action": "merged",
+      "into": "v2 s3",
+      "reason": "对应英文 raw=2 lie adjacent to another or share a boundary —— 动词义「接壤」。名词侧的 border（边境）同属这条。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "边界",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与「边缘」同指 raw=0，中文可互换。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "花坛",
+      "action": "merged",
+      "into": "v2 s4",
+      "reason": "英文确实有：a flower border（花坛/花圃）= a strip of flowers along a path。ECDICT definition 侧没导这条边界，走 fromZh 补洞 —— **不能因为「中文词典这么写」就删**，它对应真实英文搭配。"
+    }
+  ],
+  "word": "border",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "fromZh": [
+        0,
+        2
+      ],
+      "glossZh": "边缘，边界；镶边",
+      "note": "a strip forming the outer edge of something。线索：on / at the border of。也可指装饰性的「花边/镶边」（verb border 的名词面）。"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "fromZh": [
+        1
+      ],
+      "glossZh": "接壤，与…接界；边境",
+      "note": "lie adjacent to another or share a boundary。动词义。线索：border on / border a country。名词 border（国界）同属这条。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "给…镶边；围绕",
+      "note": "provide with a border or edge。现有中文无此义项，属新增。线索：bordered with plants。"
+    },
+    {
+      "fromZh": [
+        3
+      ],
+      "glossZh": "花坛，花圃（沿路的花带）",
+      "note": "英文 a flower border 指沿路/沿墙的一条花带。ECDICT definition 侧无边界，走 fromZh 补洞，glossEn 留空。真实搭配但罕见。"
+    }
+  ]
+}

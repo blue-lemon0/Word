@@ -1,0 +1,64 @@
+{
+  "word": "aim",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "目标；意图"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "瞄准，对准"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "瞄准；把…对准（vt.）"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "glossZh": "打算，意图（vt. propose or intend）"
+    },
+    {
+      "fromLines": [
+        [
+          "wn",
+          "aim.v.06"
+        ]
+      ],
+      "glossZh": "（把话语）引向（direct a remark toward）"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "目标",
+      "action": "m",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "瞄准",
+      "action": "m",
+      "reason": "raw=1 the action of directing"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "击中目标的能力",
+      "action": "m",
+      "reason": "与瞄准同指"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "对准目标",
+      "action": "m",
+      "reason": "raw=3 propose or intend"
+    }
+  ]
+}

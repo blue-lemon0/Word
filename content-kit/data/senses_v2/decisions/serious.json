@@ -1,0 +1,49 @@
+{
+  "word": "serious",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "严肃的，认真的；重大的"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "严重的（问题、后果）"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "（问题）严肃的，需认真对待的"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "严肃的",
+      "action": "m",
+      "reason": "raw=0 concerned with work or important matters"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "认真的",
+      "action": "m",
+      "reason": "与严肃同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "重要的",
+      "action": "m",
+      "reason": "raw=1 of great consequence"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "严重的",
+      "action": "m",
+      "reason": "raw=2 requiring effort or concentration"
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "word": "injury",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "伤害（身体损伤）"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "造成伤害的事故"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "（对权利的）侵害，损害"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "伤害",
+      "action": "m",
+      "reason": "raw=0+2+3 同指"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "侮辱",
+      "action": "m",
+      "reason": "raw=3 wrongdoing that violates another's rights"
+    }
+  ]
+}

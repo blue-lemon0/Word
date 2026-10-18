@@ -1,0 +1,20 @@
+{
+  "word": "ton",
+  "senses": [
+    {
+      "fromLines": [
+        0,
+        1
+      ],
+      "glossZh": "吨"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "吨",
+      "action": "m",
+      "reason": "raw=0+1 英美制同指"
+    }
+  ]
+}

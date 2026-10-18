@@ -1,0 +1,49 @@
+{
+  "_comment": "emergency —— 2 英文边界 / 3 现有中文义项。raw=1「戒严状态」是真实但罕见的一条。「紧急需要」归入 raw=0（该释义明写 requires immediate action，即「紧急需要立即行动」）。",
+  "_mergeNote": "3 -> 2。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "紧急状况",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 a sudden unforeseen crisis (usually involving danger) that requires immediate action。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "紧急事件",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与「紧急状况」同指 raw=0，中文可互换。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "紧急需要",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与「紧急状况」同指 raw=0 —— 释义里的 requires immediate action 正是「紧急需要立即行动」，是同一义位的描述性说法。"
+    }
+  ],
+  "word": "emergency",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "fromZh": [
+        0,
+        1,
+        2
+      ],
+      "glossZh": "紧急状况，紧急事件",
+      "note": "a sudden unforeseen crisis (usually involving danger) that requires immediate action。线索：in an emergency / emergency services / emergency room（急诊室）。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "紧急状态（实行戒严）",
+      "note": "a state in which martial law applies。罕见但真实。现有中文无对应，属新增。线索：declare a state of emergency / under emergency regulations。与 s1 分界：是否由政府正式宣布。"
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "_comment": "handle —— 3 英文边界 / 4 现有中文义项（全是名词）。英文侧给的是「名词-柄」+「动词-触摸」+「动词-驯」，所以动词义全部要从英文侧新增。「把柄」「柄状物」都是 raw=0 名词面的说法。",
+  "_mergeNote": "4 -> 3。① 柄+把手+柄状物+把柄 合并为 s1（都是同一个名词面）。② 触摸/处理 新增。③ 驯 新增。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "柄",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 the appendage to an object that is designed to be held in the hand。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "把手",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与「柄」同指，中文可互换。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "把柄",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与「柄」同指 raw=0 —— give sb a handle on sth（给某人一个抓手/把柄）。走 fromZh 接住。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "柄状物",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与「柄」同指 raw=0，中文可互换。"
+    }
+  ],
+  "word": "handle",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "fromZh": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "glossZh": "柄，把手；把手（可抓之处）",
+      "note": "the appendage to an object that is designed to be held in the hand。线索：a door handle / a case handle / a handle on sth（把柄、抓手）。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "触摸，拿；处理，运用",
+      "note": "touch, lift, or hold with the hands。动词义。线索：handle a delicate situation / handle data。**实际语料中最常用的动词义**，中文现有义项里完全没有。"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "驯（马）；训练",
+      "note": "show and train。指驯服/训练（多用于马）。现有中文无此义项，属新增。线索：a well-handled horse。"
+    }
+  ]
+}

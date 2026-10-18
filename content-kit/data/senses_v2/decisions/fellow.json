@@ -1,0 +1,55 @@
+{
+  "word": "fellow",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "（学会的）会员，同志"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "老兄（对男人的非正式称呼）"
+    },
+    {
+      "glossZh": "同伴的，同道的（adj.，fromZh）",
+      "fromZh": [
+        0
+      ]
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "男人",
+      "action": "m",
+      "reason": "raw=1 an informal form of address for a man"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "朋友",
+      "action": "m",
+      "reason": "drop：英文 friend，非 fellow（作名词指同伴但非「朋友」）"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "同事",
+      "action": "m",
+      "reason": "与男人同指"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "同伴的",
+      "action": "m",
+      "reason": "drop：ECDICT 无 adj. 边界"
+    },
+    {
+      "oldSenseIndex": 4,
+      "oldGlossZh": "同事的",
+      "action": "m",
+      "reason": "drop：同前"
+    }
+  ]
+}

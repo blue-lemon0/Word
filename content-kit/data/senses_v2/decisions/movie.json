@@ -1,0 +1,19 @@
+{
+  "word": "movie",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "电影"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "电影",
+      "action": "merged",
+      "reason": "raw=0"
+    }
+  ]
+}

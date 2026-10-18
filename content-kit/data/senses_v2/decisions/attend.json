@@ -1,0 +1,65 @@
+{
+  "_comment": "attend —— 4 英文边界 / 4 现有中文义项，一一对应，无合并。注：raw=3 give heed (to) 在 min_en_words=4 时被误伤，正是「专心」的边界，D25 修复后回来。这四个义项靠宾语区分：会议(attend a meeting) / 事务(attend to business) / 后果伴随(attend upon) / 专心(attend to a task)。",
+  "_mergeNote": "无合并。attend 的四义在中文里看似接近（参加/照料/伴随/专心），但英文搭配集合完全不同：attend a meeting（到场）vs attend to business（照料）vs a well attended storm（伴随）vs attend to your studies（专心）。关键是 attend 与 attend to 的介词差异。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "参加",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 be present at (meetings, church services, university) —— 到场。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "照料",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "对应 raw=1 take charge of or deal with —— 照料/处理事务（attend to）。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "伴随",
+      "action": "merged",
+      "into": "v2 s3",
+      "reason": "对应 raw=2 to accompany as a circumstance or follow as a result —— 作为伴随结果。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "专心于",
+      "action": "merged",
+      "into": "v2 s4",
+      "reason": "对应 raw=3 give heed (to) —— 专心致志。D25 修复 min_en_words=4→3 后这条边界才存活。"
+    }
+  ],
+  "word": "attend",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "出席，参加",
+      "note": "be present at (meetings, church services, university)。线索：宾语是会议/课程/礼拜。She attended the conference in Beijing."
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "照料，处理",
+      "note": "take charge of or deal with。线索：attend to + 事务/需求。He attended to the needs of his patients."
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "伴随，随之而来",
+      "note": "to accompany as a circumstance or follow as a result。线索：伴随主语（不接宾语）。Success attended on years of hard work."
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "glossZh": "专心于",
+      "note": "give heed (to)。线索：attend to + 抽象名词。Attend to what your teacher is saying."
+    }
+  ]
+}

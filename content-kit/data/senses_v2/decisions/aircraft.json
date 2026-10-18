@@ -1,0 +1,25 @@
+{
+  "word": "aircraft",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "航空器，飞机"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "航空器",
+      "action": "merged",
+      "reason": "raw=0"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "飞机",
+      "action": "merged",
+      "reason": "raw=0"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "_comment": "cash —— 3 英文边界 / 2 现有中文义项。补缺层的同名歌手 Cash（encyclopedia 过滤器正确挡下），无影响。raw=1「立即付款」是真实义项（cash = 立即付现），现有中文没有，属新增。",
+  "_mergeNote": "2 -> 3。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "现金",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 money in the form of bills or coins。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "兑现",
+      "action": "merged",
+      "into": "v2 s3",
+      "reason": "对应英文 raw=3 exchange for cash —— 把票据兑现成现金。"
+    }
+  ],
+  "word": "cash",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "现金",
+      "note": "money in the form of bills or coins。**不可数**。线索：in cash / cash payment。固定搭配 cash on delivery。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "（立即付款；）现金结算",
+      "note": "prompt payment for goods or services in currency or by check。现有中文无此义项，属新增。判别句：cash on delivery（用现金）/ They cashed a cheque（兑现）。**cash 作动词的第二个义项，不只是「兑现票据」。**"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "glossZh": "兑现（票据）",
+      "note": "exchange for cash。线索：cash a cheque / cash a bond。只能带票据类宾语。"
+    }
+  ]
+}

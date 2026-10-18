@@ -1,0 +1,19 @@
+{
+  "word": "scientist",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "科学家"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "科学家",
+      "action": "merged",
+      "reason": "raw=0"
+    }
+  ]
+}

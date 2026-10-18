@@ -1,0 +1,51 @@
+{
+  "_comment": "dozen —— 2 英文边界 / 3 现有中文义项。「打」是「一打」的量词说法，与「十二个」同指，合并。",
+  "_mergeNote": "3 -> 2。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "打",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与「十二个」同指 —— 「打」是一打（十二个）的量词说法（a dozen eggs / 两打鸡蛋），不是独立义项。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "十二个",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 the cardinal number that is the sum of eleven and one。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "一打的",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "对应英文 raw=1 denoting a quantity consisting of 12 items or units —— 形容词面。"
+    }
+  ],
+  "word": "dozen",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "fromZh": [
+        0,
+        1
+      ],
+      "glossZh": "十二个，一打",
+      "note": "the cardinal number that is the sum of eleven and one。线索：a / two dozen。用法：dozen 后通常不加 of（a dozen eggs），但 two dozen of 也可见到。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "fromZh": [
+        2
+      ],
+      "glossZh": "一打的（十二个的）",
+      "note": "denoting a quantity consisting of 12 items or units。形容词面，实际英语里 dozen 本身已含这个意思，形容词用法较少见。"
+    }
+  ]
+}

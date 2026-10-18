@@ -1,0 +1,41 @@
+{
+  "_comment": "include —— 3 英文边界 / 3 现有中文义项。「包住」是误收：英文对应 enclose / surround，而且是动词性描述。「把…算入」对应的是 raw=1「视为…的一部分」，与 raw=0「由…组成」有别但中文难分 —— 按 D24 仍判合并，并在 note 说明区分靠搭配。",
+  "_mergeNote": "3 -> 2。舍弃 1 个。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "包括",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 have as a part, be made up out of 与 raw=1 consider as part of something（同指「把…算作一部分」，中文统一译「包括」，合并）。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "把...算入",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与「包括」同指，中文可互换。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "包住",
+      "action": "dropped",
+      "reason": "英文对应 enclose / surround，是**另一个词**（enclose 有「围住」义，include 只有「包含」）。中文侧疑由「把…包括在内」这一说法引申成了「包住」。"
+    }
+  ],
+  "word": "include",
+  "senses": [
+    {
+      "fromLines": [
+        0,
+        1
+      ],
+      "fromZh": [
+        0,
+        1
+      ],
+      "glossZh": "包括，把…包括在内；把…算入",
+      "note": "have as a part / consider as part of something / add as part of a set。**关键：include 只表示「是其中一部分」，不表示「在空间上围住」** —— 后者是 enclose。这是 include 最常见的误解。线索：The price includes breakfast. / include sb in the team."
+    }
+  ]
+}

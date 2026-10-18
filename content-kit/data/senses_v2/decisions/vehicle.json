@@ -1,0 +1,43 @@
+{
+  "word": "vehicle",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "交通工具，车辆"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "传播媒介，手段"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "（药剂/颜料的）载体，媒介物"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "交通工具",
+      "action": "m",
+      "reason": "raw=0 a conveyance that transports"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "车辆",
+      "action": "m",
+      "reason": "与交通工具同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "传播媒介",
+      "action": "m",
+      "reason": "raw=1 a medium for the expression"
+    }
+  ]
+}

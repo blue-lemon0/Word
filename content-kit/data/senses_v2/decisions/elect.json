@@ -1,0 +1,82 @@
+{
+  "_comment": "elect —— 3 英文边界 / 4 现有中文义项。现有「当选人/被选的人」是名词义，但 WordNet 只有形容词与动词义项，走 fromZh。补缺层的 elect.v.02「choose（不必投票）」因释义只有 1 词被挡 —— 那是本词第二义（选出），值得救。",
+  "_wordnet_exceptions": [
+    "elect.v.02"
+  ],
+  "_mergeNote": "4 -> 5。当选人+被选的人 合并为名词义 s2（fromZh）。选出的 ← raw=2。当选的（尚未就职）← raw=3，这个区分英语真实存在但中文容易混，故 gloss 点明。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "当选人",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "英文 the elect / an elect（当选者）。WordNet 只有形容词与动词义项，名词义走 fromZh 补洞。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "被选的人",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "与「当选人」同指，中文可互换。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "选出的",
+      "action": "merged",
+      "into": "v2 s3",
+      "reason": "对应英文 raw=2 selected as the best —— 形容词面。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "选举",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 select by a vote for an office or membership。"
+    }
+  ],
+  "word": "elect",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "选举，推选",
+      "note": "select by a vote for an office or membership。线索：elect sb president / be elected to。"
+    },
+    {
+      "fromLines": [
+        [
+          "wn",
+          "elect.v.02"
+        ]
+      ],
+      "glossZh": "选择，挑选（不必经投票）",
+      "note": "choose。**本词第二义**，但释义只有 1 词被 min_en_words=3 挡掉，本词显式指定保留。判别句：They elected him chairman.（推选）/ He elected to stay.（选择）"
+    },
+    {
+      "fromZh": [
+        0,
+        1
+      ],
+      "glossZh": "当选人，当选者",
+      "note": "英文 the elect / an elect（当选者集合或单数）。WordNet 无名词义项，走 fromZh 补洞，glossEn 留空。"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "fromZh": [
+        2
+      ],
+      "glossZh": "选出的；精选的",
+      "note": "selected as the best。线索：the elect few。形容词面。"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "glossZh": "当选的（尚未就职的）",
+      "note": "elected but not yet installed in office。真实且易被忽略的区分：**当选 ≠ 就职**。线索：the president-elect。现有中文无对应，属新增。"
+    }
+  ]
+}

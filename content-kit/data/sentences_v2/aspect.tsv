@@ -1,0 +1,14 @@
+senseId	text	clue	span_start	span_len	translation	note	source
+s1	The financial aspect of the plan worries him most.	financial	14	6	这个计划的财务方面最让他担心。	方面；面貌（看待某问题的一个要素）。线索是 financial + of the plan，指计划里的一个考量维度。	GENERATED
+s1	We should consider every aspect of the problem.	every	25	6	我们应该考虑这个问题的每个方面。	方面。线索是 consider every aspect of，是固定搭配。	GENERATED
+s1	One aspect of the design still looks unfinished to me.	design	4	6	这个设计有一处让我觉得还没完成。	方面。线索是 One aspect of the design，指设计里的某一处。	GENERATED
+s2	His face showed a different aspect after years abroad.	face	28	6	在国外多年后，他的脸显出另一种神采。	面貌，外观。线索是 face showed a ... aspect，指人的神情外貌。	GENERATED
+s1	The legal aspect was completely new to us.	legal	10	6	法律这一方面对我们来说完全是新的。	方面。线索是 legal（法律的）+ was new to us，指知识领域。	GENERATED
+s2	We must see both sides of the problem, not just one aspect.	sides	52	6	我们必须看到问题的两面，而不只是一个方面。	方面。线索是 not just one aspect，强调片面性。	GENERATED
+s1	From a practical aspect, the plan seems workable.	practical	17	6	从实际角度看，这个方案似乎可行。	方面。线索是 From a ... aspect，是介词短语引出视角。	GENERATED
+s1	Nobody studied the political aspect of the case.	political	29	6	没有人研究过这个案件的政治层面。	方面。线索是 political + of the case，指案件的一个维度。	GENERATED
+s1	The worst aspect was the long waiting time.	worst	10	6	最糟糕的方面是漫长的等待时间。	方面。线索是 the worst aspect was，指其中最差的一项。	GENERATED
+s1	She questioned one aspect of his argument carefully.	argument	19	6	她仔细质疑了他论证中的一个方面。	方面。线索是 one aspect of his argument，指论证里的某一环。	GENERATED
+s2	"The verb ""was"" has a past aspect and a present one."	past	26	6	动词 was 有过去体和现在体两种。	（语法）时、体。线索是 verb + past/present aspect，是语法学的时态体貌术语。	GENERATED
+s2	In that grammar book each tense has four aspects.	tense	41	7	那本语法书里每个时态有四个体。	（语法）时、体。线索是 tense（时态）+ four aspects，指时态系统。	GENERATED
+s2	"The verb ""run"" carries the aspect of motion."	motion	27	6	动词 run 带有动作体的特征。	（语法）时、体。线索是 the aspect of motion（动作体），语法学术语。	GENERATED

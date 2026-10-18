@@ -1,0 +1,44 @@
+{
+  "word": "opinion",
+  "senses": [
+    {
+      "fromLines": [
+        0,
+        1
+      ],
+      "glossZh": "意见，看法；评价"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "（法院的）判词理由书"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "glossZh": "（判决的）理由（区别判决本身）"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "意见",
+      "action": "m",
+      "reason": "raw=0+1 同指"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "评价",
+      "action": "m",
+      "reason": "与意见同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "主张",
+      "action": "m",
+      "reason": "与意见同指"
+    }
+  ]
+}

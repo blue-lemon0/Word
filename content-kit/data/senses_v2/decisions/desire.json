@@ -1,0 +1,64 @@
+{
+  "word": "desire",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "欲望"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "愿望，意欲"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "想要的东西，所求"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "glossZh": "想要，渴望（vt.）"
+    },
+    {
+      "fromLines": [
+        [
+          "wn",
+          "desire.v.03"
+        ]
+      ],
+      "glossZh": "表达愿望，请求"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "欲望",
+      "action": "m",
+      "reason": "raw=0 the feeling that accompanies unsatisfied state"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "要求",
+      "action": "m",
+      "reason": "raw=2 something that is desired"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "想要",
+      "action": "m",
+      "reason": "raw=3 feel or have a desire for"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "请求",
+      "action": "m",
+      "reason": "与想要同指"
+    }
+  ]
+}

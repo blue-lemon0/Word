@@ -1,0 +1,61 @@
+{
+  "_comment": "economic —— 4 英文边界 / 3 现有中文义项。raw=0「与经济有关」与 raw=1「与经济学有关」英文有别但中文统一译「经济的」，且实际用法几乎不分，合并 —— 这正是 D24 说的「按是不是同一概念判，不是按英文给了几条判」。raw=3 单独成义（实用/重物质利益）。",
+  "_mergeNote": "3 -> 3。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "经济上的",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 of or relating to an economy 与 raw=1 of or relating to the science of economics（同指「经济的」，中文统一译法，实际用法不分，合并）。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "实用的",
+      "action": "merged",
+      "into": "v2 s3",
+      "reason": "对应英文 raw=3 concerned with worldly necessities of life (especially money) —— 着眼于现实物质需要。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "节省的",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "对应英文 raw=2 using the minimum of time or resources necessary for effective results。"
+    }
+  ],
+  "word": "economic",
+  "senses": [
+    {
+      "fromLines": [
+        0,
+        1
+      ],
+      "fromZh": [
+        0
+      ],
+      "glossZh": "经济的，经济上的",
+      "note": "of or relating to an economy / of or relating to the science of economics。**本词最常用的义**。线索：economic growth / economic policy。两条边界英文有别（经济体系 vs 经济学），中文看不出差别，合并。注意与 economical（节省的）拼写差一个字母。"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "fromZh": [
+        2
+      ],
+      "glossZh": "节省的；合算的",
+      "note": "using the minimum of time or resources necessary for effective results。线索：an economical car / economical use of time。**注意拼写**：economic（经济的）vs economical（节省的），这是常见错拼点。"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "fromZh": [
+        1
+      ],
+      "glossZh": "实用的；重实际利益的",
+      "note": "concerned with worldly necessities of life (especially money)。现代英语里较少单独使用，raw=2 那条（节省的）在实际语料中远比本条常见。"
+    }
+  ]
+}

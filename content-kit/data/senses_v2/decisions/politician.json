@@ -1,0 +1,43 @@
+{
+  "word": "politician",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "政治家（民选的）"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "政党活动家，政客"
+    },
+    {
+      "fromLines": [
+        2
+      ],
+      "glossZh": "（组织内的）钻营者"
+    }
+  ],
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "政客",
+      "action": "m",
+      "reason": "raw=1+2"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "政治家",
+      "action": "m",
+      "reason": "与政客同指"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "从事党派政治的人",
+      "action": "m",
+      "reason": "与政客同指"
+    }
+  ]
+}

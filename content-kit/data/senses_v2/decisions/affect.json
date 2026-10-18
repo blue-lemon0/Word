@@ -1,0 +1,73 @@
+{
+  "_comment": "affect —— 4 英文边界 / 4 现有中文义项。raw=0 是**名词**（情感/情绪面），现有四义全是动词，这条属新增。现有「假装/模仿」在 ECDICT definition 侧没有边界（affect 兼作「假装」是古雅用法），走 fromZh 并合并为一条。",
+  "_mergeNote": "4 -> 4。① 影响 ← raw=1 + raw=2（have an effect upon 与 act physically on 同概念）。② 感动 ← raw=3。③ 假装+模仿 合并为 fromZh。④ 情感 ← raw=0（新增名词义）。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "影响",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "对应英文 raw=1 have an effect upon 与 raw=2 act physically on; have an effect upon（同概念，后者多了「物理作用」的语域）。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "感动",
+      "action": "merged",
+      "into": "v2 s3",
+      "reason": "对应英文 raw=3 have an emotional or cognitive impact upon。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "假装",
+      "action": "merged",
+      "into": "v2 s4",
+      "reason": "英文对应 affect（古雅用法，假装/做作）。ECDICT definition 侧没有这条边界，走 fromZh 补洞。与「模仿」同指，合并。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "模仿",
+      "action": "merged",
+      "into": "v2 s4",
+      "reason": "与「假装」同指（affect an air of confidence = 装出一副自信的样子），走 fromZh 补洞。"
+    }
+  ],
+  "word": "affect",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "（名词）情感，情绪",
+      "note": "the conscious subjective aspect of feeling or emotion。**本词的动词义远比这个名词义常用**，但既在 ECDICT 里就保留。造句时注意：the affect 是心理学/戏剧术语，日常英语几乎不用。"
+    },
+    {
+      "fromLines": [
+        1,
+        2
+      ],
+      "fromZh": [
+        0
+      ],
+      "glossZh": "影响；作用于",
+      "note": "have an effect upon / act physically on。线索：affect + 名词（中性，不含褒贬）。与 s3 分界：宾语是人且有情绪反应 → 感动。"
+    },
+    {
+      "fromLines": [
+        3
+      ],
+      "fromZh": [
+        1
+      ],
+      "glossZh": "感动，打动",
+      "note": "have an emotional or cognitive impact upon。线索：be deeply affected。宾语是人。"
+    },
+    {
+      "fromZh": [
+        2,
+        3
+      ],
+      "glossZh": "假装，装作",
+      "note": "英文对应 affect（古雅用法）。ECDICT definition 侧无边界，走 fromZh 补洞，glossEn 留空。线索：affect an air of / affect to do。真实但罕见，古英语文学里常见。"
+    }
+  ]
+}

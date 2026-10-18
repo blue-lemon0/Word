@@ -1,0 +1,50 @@
+{
+  "_comment": "tour —— 2 英文边界 / 4 现有中文义项。旅游与观光旅行同指合并；旅行（动词）对上 raw=1。「任期」是误收：英文对应 term / tenure，tour 无此义（political tour 是巡回访问，不是任期）。",
+  "_mergeNote": "4 -> 2。",
+  "_oldSenses": [
+    {
+      "oldSenseIndex": 0,
+      "oldGlossZh": "旅游",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "对应英文 raw=0 a journey or route all the way around a particular place or area。"
+    },
+    {
+      "oldSenseIndex": 1,
+      "oldGlossZh": "观光旅行",
+      "action": "merged",
+      "into": "v2 s1",
+      "reason": "与「旅游」同指，中文可互换（旅游/观光旅行）。"
+    },
+    {
+      "oldSenseIndex": 2,
+      "oldGlossZh": "任期",
+      "action": "dropped",
+      "reason": "英文对应 term / tenure / office，是别的词。tour 作政治名词时是「巡回访问」（a presidential tour），与「任期」不是同一概念。与 equipment「才能」同类误收。"
+    },
+    {
+      "oldSenseIndex": 3,
+      "oldGlossZh": "旅行",
+      "action": "merged",
+      "into": "v2 s2",
+      "reason": "对应英文 raw=1 make a tour of a certain place（动词义：游历、周游）。"
+    }
+  ],
+  "word": "tour",
+  "senses": [
+    {
+      "fromLines": [
+        0
+      ],
+      "glossZh": "旅游，观光旅行；环游",
+      "note": "a journey or route all the way around a particular place or area。线索：go on / make a + tour（+ of）。"
+    },
+    {
+      "fromLines": [
+        1
+      ],
+      "glossZh": "旅行，周游，游览",
+      "note": "make a tour of a certain place。线索：tour Europe / tour the factory。名词 tour 与动词 tour 同义，区别在词性。"
+    }
+  ]
+}

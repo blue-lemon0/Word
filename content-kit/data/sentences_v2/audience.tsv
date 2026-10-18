@@ -1,0 +1,11 @@
+senseId	text	clue	span_start	span_len	translation	note	source
+s1	The audience clapped for ten minutes after the show.	clapped	4	8	演出结束后观众鼓掌了十分钟。	听众，观众（在场）。线索是 clapped + after the show，是演出散场时的反应者。	GENERATED
+s1	She spoke to the audience without notes.	spoke	17	8	她不看讲稿地对听众讲话。	听众，观众。线索是 spoke to + without notes，是当众讲话。	GENERATED
+s1	His lecture drew a small but quiet audience.	drew	35	8	他的讲座吸引了一小群安静的听众。	听众，观众。线索是 lecture（讲座）+ quiet，说明是小规模听讲者。	GENERATED
+s1	The audience at the concert hall was mostly elderly.	concert	4	8	音乐厅的听众大多是老年人。	听众，观众。线索是 concert hall（音乐厅），是演出场所。	GENERATED
+s1	Never talk back to the audience, the director said.	talk	23	8	导演说：永远不要跟观众顶嘴。	听众，观众。线索是 talk back to + director 的告诫语气。	GENERATED
+s2	Her book found a wide audience among young readers.	wide	22	8	她的书在年轻读者中拥有广泛的读者群。	受众（某内容的接受者）。线索是 among young readers，指阅读这本书的人，不是在场听看。	GENERATED
+s2	The show was written for a family audience.	family	34	8	这场演出是为家庭观众写的。	受众。线索是 for a + 某类人群（family），指目标观众群体而非在场者。	GENERATED
+s2	His technical papers reach a narrow academic audience.	narrow	45	8	他的技术论文读者群很窄。	受众。线索是 technical papers + academic（学术），指专业读者。	GENERATED
+s2	The advertisement targets a young male audience.	targets	39	8	这则广告瞄准的是年轻男性受众。	受众。线索是 advertisement + targets，指广告投放的目标人群。	GENERATED
+s2	Sorry, this film contains violence not suitable for young audience.	contains	58	8	抱歉，本片含有不适合年轻观众的暴力内容。	受众。线索是 not suitable for + 某类观众，是内容分级用语。	GENERATED
