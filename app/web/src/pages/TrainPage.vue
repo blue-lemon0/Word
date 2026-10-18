@@ -917,6 +917,7 @@ watch(
               no: steps[i]?.result === 'WRONG',
               skip: steps[i]?.result === 'PENDING',
               todo: !steps[i],
+              loop: loopRound > 0 && wrongIdx.includes(i),
             }"
             :title="`第 ${i + 1} 题`"
             @click="goTo(i)"
@@ -935,7 +936,7 @@ watch(
         <p v-else class="where">
           第 <b>{{ cursor + 1 }}</b> / {{ queue.length }} 题
           <span v-if="reviewing" class="rv">· 回看中</span>
-          <span v-else-if="jumpedAhead" class="rv">· 跳过题</span>
+          <span v-else-if="jumpedAhead && loopRound === 0" class="rv">· 跳过题</span>
           <span class="wb-sp" />
           <span v-if="loopRound > 0" class="rv">
           · 第 {{ loopRound + 1 }} 轮重练 · 还剩 {{ wrongIdx.length }} 个
@@ -1449,6 +1450,11 @@ watch(
 }
 
 /* 当前题：加粗 + 一圈描边，一眼能定位 */
+.chip.loop {
+  border-color: #d99a2b;
+  box-shadow: inset 0 0 0 1px #d99a2b;
+}
+
 .chip.cur {
   border-color: var(--wb-primary);
   border-width: 2px;
