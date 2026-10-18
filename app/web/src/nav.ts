@@ -24,6 +24,14 @@
  */
 import type { Router } from 'vue-router'
 
+/** 连点防抖：350ms 内只认第一次。
+ *
+ *  ★ 返回键的另一个「没反应」来源是**连点**：第一次点了已经在退，
+ *    第二次落在退场动画里 —— 有的会退两层，有的什么都不做。
+ *    统一成「最短间隔 350ms」，行为就只剩一种：退一层。
+ */
+let lastGoBackAt = 0
+
 /** 只取 path 部分（去掉 ?query 与 #hash）。导出给测试用。 */
 export function pathOf(full: string): string {
   const i = full.indexOf('?')
@@ -34,6 +42,10 @@ export function pathOf(full: string): string {
 
 /** 回上一屏；退不了、上一屏是自己、或 back() 没动时，去 parent。 */
 export function goBack(router: Router, parent: string): void {
+  const at = Date.now()
+  if (at - lastGoBackAt < 350) return
+  lastGoBackAt = at
+
   const cur = router.currentRoute.value.path
   const state = router.options.history.state as { back?: string | null } | null
   const from = typeof state?.back === 'string' ? state.back : ''

@@ -660,7 +660,7 @@ interaction = [
      _re.search(r'v-else-if="card\s*===\s*undefined"', home) is not None),
     ("首页的「词库还是空的」只在读完且为空时出现",
      _re.search(r'v-else-if="card === undefined"[\s\S]*?'
-                r'v-else[^>]*>\s*<div class="empty">词库还是空的</div>', home) is not None),
+                r'v-else[^>]*>\s*<p class="empty">词库还是空的</p>', home) is not None),
     ("首页统计口径也有同步版（loadStatsNow）",
      _re.search(r"loadStatsNow", home) is not None),
     ("抽卡与统计的算法同步/异步共用一份（pickCard/computeStats）",
@@ -1360,9 +1360,13 @@ interaction = [
      'class="reveal"' in home and "点一下看意思" in home),
     # 首页不放搜索框：词库页已有同一个搜索，两个入口做一件事
     ("首页不再有搜索框（搜索归词库）", "van-search" not in home),
-    # 通往训练只有一个入口：一屏两个入口做同一件事，点哪个都行反而让人以为不同
-    ("首页只有一个通往训练的入口（去复习）",
-     home.count("router.push('/train')") == 1),
+    # 信息流式首页（D45）：每块都通向一个**具体的动作**
+    ("首页是信息流：今天一行 + 快捷卡 + 随手背一句 + 最近在练",
+     all(k in home for k in ["todayline", "row-cards", "随手背一句", "最近在练"])),
+    # 快捷卡带 scope：点了直接开练，别再把人送回「怎么练」选一次
+    ("首页快捷卡直接带 scope 进训练", "scope=due" in home and "scope=new" in home),
+    # 每块只深一层：首页自己不发往三级页（意思页）的链接
+    ("首页链接只深一层（不发往 /sense/）", "/sense/" not in home),
     # 例句里点词开浮层、不跳页（跳页会把首页这张卡顶掉）
     ("首页例句点词开浮层（不跳页）",
      "<WordPeek" in home and "peekOpen" in home),
