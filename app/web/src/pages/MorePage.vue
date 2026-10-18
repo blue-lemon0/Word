@@ -10,7 +10,7 @@ import InstallPrompt from '../components/InstallPrompt.vue'
 import SwipePanels from '../components/SwipePanels.vue'
 import AiSettings from '../components/AiSettings.vue'
 import { incomingFile, nativeBridge } from '../bridge'
-import { loadStats, type Stats } from '../composables'
+import { APP_NAME, APP_NAME_EN, APP_VERSION } from '../app-info'
 import { downloadBackup, importLine, listSnapshots, restoreBackup, rollback } from '../backup'
 import { classifyImport, importBundle, unknownFormatText } from '../import'
 import { pickJsonFile } from '../fileio'
@@ -19,7 +19,7 @@ import { toast } from '../toast'
 import type { ImportLog, Sense, Snapshot } from '../types'
 
 const router = useRouter()
-const stats = ref<Stats | null>(null)
+const logoUrl = new URL('../../public/icon-192.png', import.meta.url).href
 const snaps = ref<Snapshot[]>([])
 const imports = ref<ImportLog[]>([])
 const trash = ref<Sense[]>([])
@@ -43,7 +43,6 @@ function onAsk(): void {
 }
 
 async function load(): Promise<void> {
-  stats.value = await loadStats()
   snaps.value = await listSnapshots()
   imports.value = (await db.importLog.orderBy('ts').reverse().limit(10).toArray()).filter(
     (r) => r.id != null,
@@ -235,14 +234,17 @@ onMounted(load)
     <div class="wb-wrap">
       <InstallPrompt variant="full" />
 
-      <div v-if="stats" class="stat">
-        <div><b>{{ stats.words }}</b><span>词</span></div>
-        <div><b>{{ stats.senses }}</b><span>意思</span></div>
-        <div><b>{{ stats.mastered }}</b><span>已掌握</span></div>
-        <!-- 口径写清楚：这里是**义项**级（词库页那个是词级），两个数字不一样，
-             不写清楚会以为是同一个数对不上 -->
-        <div><b>{{ stats.noSentence }}</b><span>缺例句的意思</span></div>
-      </div>
+      <!-- 原来这里是一排数字（词 / 意思 / 已掌握 / 缺例句）。
+           那几个数在词库页都有，放在这里只是"顺手看看"，占掉首屏最贵的位置。
+           换成品牌块：名字 + 版本 + 一句数据归属，比四个数字更像一个"关于"。 -->
+      <section class="brand">
+        <img class="logo" :src="logoUrl" alt="" width="52" height="52" />
+        <div class="meta">
+          <p class="nm">{{ APP_NAME }}</p>
+          <p class="ver">v{{ APP_VERSION }} · {{ APP_NAME_EN }}</p>
+          <p class="note">进度只在这台手机上，换机前记得导出。</p>
+        </div>
+      </section>
 
       <!-- 备份区：导出两种 + 导入一个（导入会自动认出文件是哪一种，见 applyIncoming）
            原来这里是「导入备份」，而内容包另在词库页有个「导入内容包」——
@@ -456,6 +458,45 @@ onMounted(load)
     linear-gradient(var(--wb-card) 30%, rgba(255, 255, 255, 0)) top / 100% 18px no-repeat,
     linear-gradient(rgba(255, 255, 255, 0), var(--wb-card) 70%) bottom / 100% 18px no-repeat;
   background-attachment: local, local;
+}
+
+.brand {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  margin-bottom: 12px;
+  background: var(--wb-card);
+  border: 1px solid var(--wb-line);
+  border-radius: 16px;
+}
+
+.brand .logo {
+  margin-top: 2px;
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  flex: 0 0 auto;
+}
+
+.brand .nm {
+  font-size: 16px;
+  font-weight: 650;
+  color: var(--wb-ink);
+}
+
+.brand .ver {
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--wb-ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.brand .note {
+  margin-top: 6px;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--wb-ink-3);
 }
 
 .stat {

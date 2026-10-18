@@ -1249,6 +1249,10 @@ interaction = [
     ("图标母版在库里（脚本可重跑，不是一次性手工作品）",
      os.path.exists(os.path.join(WEB, "public", "icon-master.png"))
      and os.path.exists(os.path.join(WEB, "public", "icon-glyph.png"))),
+    ("更多页有品牌块（名字 + 版本，数据面板已移除）",
+     'class="brand"' in _src(os.path.join("pages", "MorePage.vue"))
+     and "APP_VERSION" in _src(os.path.join("pages", "MorePage.vue"))
+     and 'class="stat"' not in _src(os.path.join("pages", "MorePage.vue"))),
 ]
 
 fi = 0
