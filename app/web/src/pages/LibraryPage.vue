@@ -287,8 +287,9 @@ onMounted(load)
           <van-button v-else-if="head.new" type="primary" round block @click="drill('new', head.new)">
             学几个新词
           </van-button>
-          <van-button v-else plain round block @click="router.push('/train')">
-            随便练两句
+          <!-- ★ 原来这里是「随便练两句」——随机已经搬到首页屏一了，别再留第二入口 -->
+          <van-button v-else plain round block @click="router.push('/')">
+            回首页随便刷两句
           </van-button>
         </div>
       </section>
@@ -413,7 +414,6 @@ onMounted(load)
             >
               {{ f.t }}
             </button>
-            <button class="chip" type="button" @click="router.push('/audit')">AI 体检</button>
           </div>
         </template>
       </section>

@@ -104,7 +104,7 @@ onMounted(load)
     <header class="wb-topbar">
       <div class="in">
         <h1>错题板</h1>
-        <van-button size="mini" plain @click="router.push('/train')">去训练</van-button>
+        <van-button size="mini" plain @click="router.push('/train?scope=due')">去复习</van-button>
       </div>
     </header>
 

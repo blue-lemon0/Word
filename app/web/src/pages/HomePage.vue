@@ -192,13 +192,6 @@ const drillOpen = ref(false)
 const drillSense = ref('')
 const drillSent = ref<number | undefined>(undefined)
 
-function onListDrill(it: ScanItem): void {
-  scanItem.value = null
-  drillSense.value = it.sense.id
-  drillSent.value = it.sentence.id
-  drillOpen.value = true
-}
-
 /* ── 查词浮层 / 跳转 ── */
 const peekOpen = ref(false)
 const peekToken = ref('')
@@ -349,9 +342,15 @@ onMounted(async () => {
 
         <!-- 屏二底部：复习 / 学习 两颗大按钮（拇指区，一左一右） -->
         <div class="pads">
-          <button class="pad" type="button" @click="openPlan('due')">
+          <button
+            class="pad"
+            type="button"
+            :disabled="dueN === 0"
+            :class="{ off: dueN === 0 }"
+            @click="dueN && openPlan('due')"
+          >
             <b>{{ dueN }}</b>
-            <span>复习 · 今天剩余</span>
+            <span>{{ dueN ? '复习 · 今天剩余' : '今天没有到期的' }}</span>
           </button>
           <button class="pad study" type="button" @click="openPlan('new')">
             <b>{{ wordsN }}</b>
@@ -366,7 +365,6 @@ onMounted(async () => {
       :item="scanItem"
       :total="scanItem?.count ?? 0"
       @close="scanItem = null"
-      @drill="onListDrill"
     />
     <WordPeek :show="peekOpen" :token="peekToken" @close="peekOpen = false" />
     <AiSheet
@@ -676,6 +674,11 @@ onMounted(async () => {
 
 .pad:active {
   background: var(--wb-bg);
+}
+
+.pad.off {
+  opacity: 0.55;
+  cursor: default;
 }
 
 .pad.study {

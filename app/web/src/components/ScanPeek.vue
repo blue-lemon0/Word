@@ -59,12 +59,11 @@ const sentence = computed(() => props.item?.sentence)
       </div>
       <p v-if="sense.note" class="note">{{ sense.note }}</p>
 
+      <!-- ★ 这里原来有「练这一句」：既然答案就摆在上面，再让人去猜一遍是多余的。
+           想练就回首页点「复习 / 学习」，那里才是一轮。 -->
       <div class="acts">
-        <van-button type="primary" block round @click="emit('drill', item)">
-          练这一句
-        </van-button>
+        <van-button block round @click="emit('close')">知道了</van-button>
       </div>
-      <p class="hint">「练这一句」会出一道只考这句话的题；不练也看得到答案。</p>
     </div>
   </van-popup>
 </template>

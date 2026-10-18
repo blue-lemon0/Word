@@ -12,8 +12,6 @@ import { useRoute, useRouter } from 'vue-router'
 import BackBtn from '../components/BackBtn.vue'
 import MarkedText from '../components/MarkedText.vue'
 import { goBack as goBackNav } from '../nav'
-import ModePicker, { type Mode as PickerMode } from '../components/ModePicker.vue'
-import ScanList from '../components/ScanList.vue'
 import ScanPeek from '../components/ScanPeek.vue'
 import DrillSheet from '../components/DrillSheet.vue'
 import {
@@ -174,7 +172,6 @@ function backToPicker(): void {
   if (route.query.solo || route.query.sent || route.query.scope) {
     void router.replace({ path: '/train' })
   }
-  void refreshDueCount()
 }
 
 /** 解释区（对错 + 释义 + 标记）只在真正作答之后出现 */
@@ -207,52 +204,6 @@ void practicePool().then((pool) => {
 })
 
 const mode = ref<Mode>('due')
-
-/** 两种练法。**说明文字是这里的关键** —— 光有「按计划 / 随便练」两个词
- *  不足以让人判断选哪个，所以每一项都带一行「它到底怎么练」。
- *
- *  ★「按计划」会**按有没有得练置灰**：没得练的时候先把这件事说清楚，
- *    而不是让人点进去 → 组出空队列 → 自动跳去另一种练法 → 弹一句看不清的提示。
- *    代价前置比事后补救好；顺带也去掉了「点一下被丢到别处」这种莫名其妙。
- *
- *  ★ 扫读**不在这里**：它是这一屏下面的一节，不是和它们并列的第三种练法。
- *    「按计划 / 随便练」是回答「接下来练什么」，扫读是回答「随手看看」——
- *    后者不需要被选，它一直在那儿。 */
-const dueCount = ref(0)
-
-async function refreshDueCount(): Promise<void> {
-  dueCount.value = (await buildQueue(1)).length
-}
-
-const MODES = computed<PickerMode[]>(() => [
-  {
-    key: 'due',
-    label: '按计划',
-    hint: dueCount.value
-      ? `今天到期 ${dueCount.value} 题 + 没学过的新卡`
-      : '今天没有到期的',
-    primary: true,
-    disabled: dueCount.value === 0,
-  },
-  { key: 'random', label: '随便练', hint: '全库随机抽，不看到期' },
-])
-
-void refreshDueCount()
-
-/** 入口就在**这一屏**里完成，不跳去别的页面。
- *  扫读尤其不该是另一个页面 —— 它就是「随手看一眼，不懂点哪句」，
- *  和练法是同一件事的两种做法，跳一次反而把它埋深了（而那一屏很空）。
- *  现在它连「练法」都不算：它是这一屏下面的一节（ScanList），
- *  点某一句才进单题 —— 从「练什么」到「随手扫」到「练这一句」是一条直线。 */
-function onMode(key: string): void {
-  void start(key as Mode)
-}
-
-/** 点哪句猜哪句：把那一行的两个 id 一起带进答题流程 */
-function onScanPick(it: ScanItem): void {
-  // 先摊开「这句什么意思」，再由用户决定要不要练（见 ScanPeek）
-  scanItem.value = it
-}
 
 function onScanDrill(it: ScanItem): void {
   scanItem.value = null
@@ -289,7 +240,6 @@ async function start(which: Mode = mode.value): Promise<void> {
   mode.value = which
   sessionId.value = newSessionId()
   stats.value = { correct: 0, wrong: 0, pending: 0, dueCorrect: 0, dueTotal: 0 }
-  void refreshDueCount()
   // ★ 单挑（错题板 / 扫读点句）是「指哪打哪」：只练这一个意思，**不看到期**。
   //   走 buildQueue 的话，一个还没到期、也不是新卡的义项会被过滤掉 ——
   //   队列是空的，人看到的直接是结算屏（「这一句练完了」但什么都没练）。
@@ -626,8 +576,7 @@ onActivated(() => {
     phase.value = 'playing'
     solo.value = false
     queue.value = []
-    void refreshDueCount()
-  }
+    }
 })
 
 async function onMastered(): Promise<void> {
@@ -1036,7 +985,6 @@ watch(
                    「再刷一遍」要的是**重刷刚做完的那批**，所以用 redo。 -->
               <van-button type="primary" block round @click="start('redo')">再来一遍</van-button>
 
-              <van-button block round @click="start('random')">随便练</van-button>
               <!-- 用路由名，不写路径：首页的路径是 '/'，写成 '/home' 会匹配不到
                    任何路由 —— 表现是点了之后一片空白（既不是首页也不是报错），
                    而 /home 这种「看起来应该存在」的错字编译器不会拦。 -->
@@ -1045,19 +993,14 @@ watch(
           </template>
         </section>
 
-        <!-- 开场屏：把「今天没到期」从死胡同变成一个选择。
-     过去只有「准备开始」一个按钮，而今天的题答完之后队列是空的 ——
-     「今天没有到期的」这句话后面没有任何可做的事，人就闲着了。
-     两种练法在 ModePicker 里（纯展示，动作由这里派发），
-     下面接一节扫读：同屏既回答「今天练什么」，也让人随手能扫两句。 -->
+        <!-- ★ 这里原来是「怎么练」选择器 + 扫读列表。
+             两样都被首页接走了：屏一 = 随机刷，屏二 = 句子列表。
+             于是这一页只负责「按计划/单挑的那一轮」，没有再让人选一次练法的道理。 -->
         <template v-else>
-          <ModePicker
-            :modes="MODES"
-            :solo-title="solo ? '单挑这个意思' : '怎么练'"
-            :sub="solo ? undefined : '按空格显示选项，A/B/C/D 选，Enter 下一个'"
-            @choose="onMode"
-          />
-          <ScanList @pick="onScanPick" />
+          <p class="wb-dim empty-tip">
+            这一组没有可练的了。回首页刷两句，或者去词库看看。
+          </p>
+          <van-button block round @click="router.push('/')">回首页</van-button>
         </template>
       </template>
     </div>
