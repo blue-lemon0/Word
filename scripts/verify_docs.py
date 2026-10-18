@@ -1228,6 +1228,16 @@ interaction = [
     ("首页的数字来自能练的池子（与队列同口径）",
      "practicePool()" in _src(os.path.join("pages", "HomePage.vue"))
      and "allWords()" not in _src(os.path.join("pages", "HomePage.vue"))),
+    # ── 这一轮：翻页动画、词库吸顶搜索、词库按钮口径 ──
+    ("背单词页左右翻页有动画（不是硬切）",
+     "slideFromRight" in _src(os.path.join("pages", "TrainPage.vue"))
+     and "playAnim(" in _src(os.path.join("pages", "TrainPage.vue"))),
+    ("词库搜索框吸顶且底色不透明（滚动时不会漏出词条）",
+     "position: sticky" in _src(os.path.join("pages", "LibraryPage.vue"))
+     and "box-shadow: 0 -10px 0 0 var(--wb-bg)" in _src(os.path.join("pages", "LibraryPage.vue"))),
+    ("词库顶部按钮只承诺练得到的词（数字来自出题池）",
+     "practicePool()" in _src(os.path.join("pages", "LibraryPage.vue"))
+     and "practisable" in _src(os.path.join("pages", "LibraryPage.vue"))),
 ]
 
 fi = 0

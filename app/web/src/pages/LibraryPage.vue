@@ -18,6 +18,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { allProgress, allSentences, allWords, cachedNow, liveSenses } from '../db'
+import { practicePool } from '../quiz'
 import AddWordSheet from '../components/AddWordSheet.vue'
 import type { Progress, Sense, Sentence, Word } from '../types'
 
@@ -151,6 +152,7 @@ function readyFromMemory(): boolean {
 }
 
 async function load(): Promise<void> {
+  void refreshPractisable()
   if (readyFromMemory()) return
   loading.value = true
   const [all, wrows, srows, prows] = await Promise.all([
@@ -161,6 +163,41 @@ async function load(): Promise<void> {
   ])
   applyRows(buildRows(all, wrows, srows, prows))
 }
+
+/** 出题池里的词各有多少（到期 / 待学）—— 顶部按钮的数字用它 */
+async function refreshPractisable(): Promise<void> {
+  const [pool, prows] = await Promise.all([practicePool(), allProgress()])
+  const pmap = new Map(prows.map((p) => [p.senseId, p]))
+  const now = Math.floor(Date.now() / 1000)
+  const rankOf = (id: string): number => {
+    const p = pmap.get(id)
+    if (!p || p.reps === 0) return 2
+    if (p.mastered && !p.rusty) return 3
+    return p.dueAt <= now ? 0 : 1
+  }
+  const buckets = new Map<string, number>()
+  for (const s of pool) {
+    const r = rankOf(s.id)
+    const cur = buckets.get(s.word)
+    if (cur === undefined || r < cur) buckets.set(s.word, r)
+  }
+  let due = 0
+  let fresh = 0
+  for (const r of buckets.values()) {
+    if (r === 0) due++
+    else if (r === 2) fresh++
+  }
+  practisable.value = { due, new: fresh }
+}
+
+/**
+ * 顶部按钮上的数字：**只算练得到的词**（有例句、没被标记）。
+ *
+ * ★ 这一页的桶要如实显示"库里有什么"（含没有例句、待补内容的词），
+ *   但「学几个新词 / 复习这 N 个」承诺的是一次练习 —— 数字必须和出题池一致，
+ *   否则就会出现「说有新词可以学，点进去 0 题」。
+ */
+const practisable = ref<{ due: number; new: number }>({ due: 0, new: 0 })
 
 /** 顶上的四个数：今天到期 / 在学 / 待学 / 已掌握（都按**词**算） */
 const head = computed(() => {
@@ -263,28 +300,36 @@ onMounted(load)
       <!-- 今天：一句话回答「我现在该干什么」 -->
       <section class="today">
         <p class="t-h">
-          <template v-if="head.due">
-            今天有 <b>{{ head.due }}</b> 个词到期
+          <template v-if="practisable.due">
+            今天有 <b>{{ practisable.due }}</b> 个词到期
           </template>
-          <template v-else-if="head.new">
-            今天没有到期的 —— 有 <b>{{ head.new }}</b> 个新词可以学
+          <template v-else-if="practisable.new">
+            今天没有到期的 —— 有 <b>{{ practisable.new }}</b> 个新词可以学
           </template>
           <template v-else>今天没有要复习的</template>
         </p>
         <p class="t-s">
-          在学 {{ head.learning }} · 待学 {{ head.new }} · 已掌握 {{ head.mastered }}
+          在学 {{ head.learning }} · 待学 {{ head.new }}<template
+            v-if="practisable.new < head.new"
+          >（{{ practisable.new }} 个有例句）</template> · 已掌握 {{ head.mastered }}
         </p>
         <div class="t-acts">
           <van-button
-            v-if="head.due"
+            v-if="practisable.due"
             type="primary"
             round
             block
-            @click="drill('due', head.due)"
+            @click="drill('due', practisable.due)"
           >
-            复习这 {{ head.due }} 个
+            复习这 {{ practisable.due }} 个
           </van-button>
-          <van-button v-else-if="head.new" type="primary" round block @click="drill('new', head.new)">
+          <van-button
+            v-else-if="practisable.new"
+            type="primary"
+            round
+            block
+            @click="drill('new', practisable.new)"
+          >
             学几个新词
           </van-button>
           <!-- ★ 原来这里是「随便练两句」——随机已经搬到首页屏一了，别再留第二入口 -->
@@ -455,8 +500,19 @@ onMounted(load)
 
 /* ── 搜索与 chips ── */
 .sbox {
-  margin: 0 0 6px;
-  background: transparent;
+  /* 吸在顶栏下面：滚到下面找词时，搜索框还在。 */
+  position: sticky;
+  top: calc(var(--wb-sb-h) + 43px);
+  z-index: 12;
+  /* 往上多盖一点：顶栏下沿到搜索框之间有几个像素的缝，
+     缝隙里会露出正在滚动的词条（看起来就像搜索框底色是破的）。 */
+  padding: 8px 0 6px;
+  margin: -8px 0 6px;
+  /* 必须是**不透明**底色：吸顶元素只覆盖自己的盒子，背景透明时
+     下面的词条会从搜索框周围透出来（看起来像"搜索框是空的飘在上面"）。 */
+  background: var(--wb-bg);
+  /* 再往上一截涂同一底色：吸顶后它正上方的 1~2px 缝隙里会露出滚过去的词条 */
+  box-shadow: 0 -10px 0 0 var(--wb-bg);
   --van-search-background: transparent;
   --van-search-content-background: var(--wb-card);
 }

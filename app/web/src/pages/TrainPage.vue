@@ -418,6 +418,7 @@ async function resume(): Promise<void> {
 /** 上一张。没有上一张时不去跳到别的会话，避免「按了没反应」的错觉 */
 async function prev(): Promise<void> {
   if (cursor.value === 0) return
+  playAnim('right')
   cursor.value--
   await loadQ()
 }
@@ -576,6 +577,7 @@ async function save(result: 'CORRECT' | 'WRONG' | 'PENDING'): Promise<void> {
  *  3. 第一遍走到头：还有答错的 → 开始重练，跳到最早那个错的；全对 → 结算。
  */
 async function next(): Promise<void> {
+  playAnim('left')
   // 1) 重练中：**这一轮里每题只问一次**，答对就往下走 ——
   //    还需要再答对的题，留到下一轮，不是原地反复问同一题。
   if (loopRound.value > 0) {
@@ -825,6 +827,15 @@ function onKey(ev: KeyboardEvent): void {
  *   4. 弹层开着时一律不翻题（否则在浮层里一划，底下的题就换了）；
  *   5. 没作答就往左划：给一句提示，而不是「什么都没发生」。
  */
+/** 翻页动画方向（left = 下一题从右边进来） */
+const animDir = ref<'' | 'left' | 'right'>('')
+let animTimer = 0
+function playAnim(dir: 'left' | 'right'): void {
+  animDir.value = dir
+  window.clearTimeout(animTimer)
+  animTimer = window.setTimeout(() => (animDir.value = ''), 220)
+}
+
 const SWIPE_MIN = 40
 const touch = { x: 0, y: 0, locked: false, dx: 0, dy: 0, blocked: false }
 
@@ -964,7 +975,7 @@ watch(
       </div>
     </header>
 
-    <div class="wb-wrap">
+    <div class="wb-wrap" :class="animDir ? 'qanim in-' + animDir : ''">
       <!-- ★ 扫读不再是一个「页面」，是训练页下面的一节。
            封装在 ScanList.vue 里（自己取句子、自己换一批、自己管空/加载态），
            但显示上和「今天练什么」在同一屏：用户滚一屏就知道自己能练什么、
@@ -1522,6 +1533,37 @@ watch(
 }
 
 /* 当前题：加粗 + 一圈描边，一眼能定位 */
+/* 左右翻页：新题从手指方向的另一侧滑进来（180ms，短到不打断节奏） */
+.qanim.in-left {
+  animation: slideFromRight 0.18s ease;
+}
+
+.qanim.in-right {
+  animation: slideFromLeft 0.18s ease;
+}
+
+@keyframes slideFromRight {
+  from {
+    transform: translateX(26px);
+    opacity: 0.35;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@keyframes slideFromLeft {
+  from {
+    transform: translateX(-26px);
+    opacity: 0.35;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
 .loop-out {
   margin-left: auto;
   border: 0;
