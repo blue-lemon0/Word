@@ -103,8 +103,12 @@ const cursor = ref(0)
  */
 const needFix = ref<Record<number, number>>({})
 
-/** 还剩几道题没清（用于顶部文案与「跳到最早那个」） */
+/** 还剩几道题没清 */
 const needCount = computed(() => Object.keys(needFix.value).length)
+
+/** 当前这一轮要依次问的题号（**一轮里每题只问一次**，答对就往下走） */
+const passQueue = ref<number[]>([])
+const passPos = ref(0)
 /** 0 = 第一遍；>0 = 第几轮重练 */
 const loopRound = ref(0)
 
@@ -180,6 +184,8 @@ function backToPicker(): void {
   steps.value = {}
   asked.value = {}
   needFix.value = {}
+  passQueue.value = []
+  passPos.value = 0
   loopRound.value = 0
   cursor.value = 0
   lastRound.value = []
@@ -390,6 +396,8 @@ async function start(which: Mode = mode.value): Promise<void> {
   steps.value = {}
   asked.value = {}
   needFix.value = {}
+  passQueue.value = []
+  passPos.value = 0
   loopRound.value = 0
   cursor.value = 0
   await loadQ()
@@ -568,14 +576,22 @@ async function save(result: 'CORRECT' | 'WRONG' | 'PENDING'): Promise<void> {
  *  3. 第一遍走到头：还有答错的 → 开始重练，跳到最早那个错的；全对 → 结算。
  */
 async function next(): Promise<void> {
-  // 1) 重练中：只在错题里转
+  // 1) 重练中：**这一轮里每题只问一次**，答对就往下走 ——
+  //    还需要再答对的题，留到下一轮，不是原地反复问同一题。
   if (loopRound.value > 0) {
+    passPos.value++
+    if (passPos.value < passQueue.value.length) {
+      await jumpTo(passQueue.value[passPos.value])
+      return
+    }
+    // 这一轮问完了：还有没连对够的 → 开下一轮
     const rest = Object.keys(needFix.value).map(Number).sort((a, b) => a - b)
     if (!rest.length) {
       finishRound()
       return
     }
-    await jumpTo(rest[0])
+    loopRound.value++
+    await startPass(rest)
     return
   }
   // 2) 第一遍：还没到最后一张
@@ -588,10 +604,17 @@ async function next(): Promise<void> {
   const pending = Object.keys(needFix.value).map(Number).sort((a, b) => a - b)
   if (pending.length) {
     loopRound.value = 1
-    await jumpTo(pending[0])
+    await startPass(pending)
     return
   }
   finishRound()
+}
+
+/** 开一轮重练：这一轮依次问 list 里的题（每题一次），答对就往下走 */
+async function startPass(list: number[]): Promise<void> {
+  passQueue.value = list
+  passPos.value = 0
+  await jumpTo(list[0])
 }
 
 /** 跳到某一张重新作答：清掉它上一次的作答快照，让它重新出题 */
@@ -966,8 +989,11 @@ watch(
           <span v-else-if="jumpedAhead && loopRound === 0" class="rv">· 跳过题</span>
           <span class="wb-sp" />
           <span v-if="loopRound > 0" class="rv">
-          · 第 {{ loopRound + 1 }} 轮重练 · 还剩 {{ needCount }} 个（要连对 2 次）
+          · 错题重练 · 还剩 {{ needCount }} 个（每题要连对 2 次）
         </span>
+        <button v-if="loopRound > 0" class="loop-out" type="button" @click="finishRound">
+          先不练了
+        </button>
         <span v-else>已答 {{ answeredCount }} · 对 {{ stats.correct }} · 错 {{ stats.wrong }}</span>
         </p>
 
@@ -1477,6 +1503,18 @@ watch(
 }
 
 /* 当前题：加粗 + 一圈描边，一眼能定位 */
+.loop-out {
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--wb-ink-3);
+  text-decoration: underline;
+  padding: 0 2px;
+  cursor: pointer;
+}
+
 .chip.loop {
   border-color: #d99a2b;
   box-shadow: inset 0 0 0 1px #d99a2b;
