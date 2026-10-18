@@ -93,8 +93,18 @@ const headerTitle = computed(() => {
 const steps = ref<Record<number, Step>>({})
 /** 光标：当前显示第几张 */
 const cursor = ref(0)
-/** 这一轮里**还没答对**的题（存 index）。走到头就只在这些里循环，直到全对。 */
-const wrongIdx = ref<number[]>([])
+/**
+ * 每道题**还需要连对几次**（index → 剩余次数）。
+ *
+ * ★ 规则：错一次（或说不会）就要求**连续答对两次**才算过 ——
+ *   `needFix[i] = 2`；答对一次减一，再错一次重置回 2。
+ *   第一遍就答对的题不进这个表，不额外加练。
+ * ★ 为什么是 2：错一次说明"刚才那个判断是错的"，连对两次才说明它被纠正了。
+ */
+const needFix = ref<Record<number, number>>({})
+
+/** 还剩几道题没清（用于顶部文案与「跳到最早那个」） */
+const needCount = computed(() => Object.keys(needFix.value).length)
 /** 0 = 第一遍；>0 = 第几轮重练 */
 const loopRound = ref(0)
 
@@ -169,7 +179,7 @@ function backToPicker(): void {
   queue.value = []
   steps.value = {}
   asked.value = {}
-  wrongIdx.value = []
+  needFix.value = {}
   loopRound.value = 0
   cursor.value = 0
   lastRound.value = []
@@ -224,6 +234,8 @@ const spellInput = ref('')
 const spellState = ref<'ask' | 'right' | 'wrong'>('ask')
 const spellHits = ref(0)
 const spellMissed = ref<SpellItem[]>([])
+/** 每个词还需要连对几次（id → 剩余次数）；错一次要连对两次 */
+const spellNeed = ref<Record<string, number>>({})
 const spellHint = ref(false)
 /** 0 = 第一遍；>0 = 第几轮（只拼上一轮写错的） */
 const spellRound = ref(0)
@@ -263,10 +275,20 @@ function checkSpell(): void {
   if (spellMatched(spellInput.value, cur.word)) {
     spellState.value = 'right'
     spellHits.value++
+    // 连对计数：错过的词要连对两次才算过
+    const need = spellNeed.value[cur.id]
+    if (need != null) {
+      const left = need - 1
+      const copy = { ...spellNeed.value }
+      if (left > 0) copy[cur.id] = left
+      else delete copy[cur.id]
+      spellNeed.value = copy
+    }
     // 对了自动走下一个：拼写是「快节奏」的练习，多停一下反而打断
     window.setTimeout(() => spellNext(), 550)
   } else {
     spellState.value = 'wrong'
+    spellNeed.value = { ...spellNeed.value, [cur.id]: 2 }
     spellMissed.value = [...spellMissed.value, cur]
   }
 }
@@ -274,11 +296,9 @@ function checkSpell(): void {
 function spellNext(): void {
   if (spellIdx.value >= spellQueue.value.length - 1) {
     // ★ 走到头：这一遍写错的**再拼一遍**，只拼它们，直到全对
-    if (spellMissed.value.length) {
-      const seen = new Set<string>()
-      spellQueue.value = spellMissed.value.filter((m) =>
-        seen.has(m.id) ? false : (seen.add(m.id), true),
-      )
+    const left = new Set(Object.keys(spellNeed.value))
+    if (left.size) {
+      spellQueue.value = spellQueue.value.filter((m) => left.has(m.id))
       spellMissed.value = []
       spellRound.value++
       spellIdx.value = 0
@@ -369,7 +389,7 @@ async function start(which: Mode = mode.value): Promise<void> {
   }
   steps.value = {}
   asked.value = {}
-  wrongIdx.value = []
+  needFix.value = {}
   loopRound.value = 0
   cursor.value = 0
   await loadQ()
@@ -525,13 +545,19 @@ async function save(result: 'CORRECT' | 'WRONG' | 'PENDING'): Promise<void> {
   }
   steps.value = { ...steps.value, [cursor.value]: step }
 
-  // ★ 错题集合：答对就移出，答错/说不会就留下。
-  //   它是「重练循环」唯一的依据 —— 走到头就照着它跳。
+  // ★ 连对计数：错/不会 → 需要连对两次；答对一次减一，清零才算过。
   const at = cursor.value
   if (result === 'CORRECT') {
-    wrongIdx.value = wrongIdx.value.filter((k) => k !== at)
-  } else if (!wrongIdx.value.includes(at)) {
-    wrongIdx.value = [...wrongIdx.value, at].sort((a, b) => a - b)
+    const need = needFix.value[at]
+    if (need != null) {
+      const left = need - 1
+      const copy = { ...needFix.value }
+      if (left > 0) copy[at] = left
+      else delete copy[at]
+      needFix.value = copy
+    }
+  } else {
+    needFix.value = { ...needFix.value, [at]: 2 }
   }
 }
 
@@ -544,7 +570,7 @@ async function save(result: 'CORRECT' | 'WRONG' | 'PENDING'): Promise<void> {
 async function next(): Promise<void> {
   // 1) 重练中：只在错题里转
   if (loopRound.value > 0) {
-    const rest = wrongIdx.value
+    const rest = Object.keys(needFix.value).map(Number).sort((a, b) => a - b)
     if (!rest.length) {
       finishRound()
       return
@@ -559,9 +585,10 @@ async function next(): Promise<void> {
     return
   }
   // 3) 第一遍走到头
-  if (wrongIdx.value.length) {
+  const pending = Object.keys(needFix.value).map(Number).sort((a, b) => a - b)
+  if (pending.length) {
     loopRound.value = 1
-    await jumpTo(wrongIdx.value[0])
+    await jumpTo(pending[0])
     return
   }
   finishRound()
@@ -917,7 +944,7 @@ watch(
               no: steps[i]?.result === 'WRONG',
               skip: steps[i]?.result === 'PENDING',
               todo: !steps[i],
-              loop: loopRound > 0 && wrongIdx.includes(i),
+              loop: loopRound > 0 && (needFix[i] ?? 0) > 0,
             }"
             :title="`第 ${i + 1} 题`"
             @click="goTo(i)"
@@ -939,7 +966,7 @@ watch(
           <span v-else-if="jumpedAhead && loopRound === 0" class="rv">· 跳过题</span>
           <span class="wb-sp" />
           <span v-if="loopRound > 0" class="rv">
-          · 第 {{ loopRound + 1 }} 轮重练 · 还剩 {{ wrongIdx.length }} 个
+          · 第 {{ loopRound + 1 }} 轮重练 · 还剩 {{ needCount }} 个（要连对 2 次）
         </span>
         <span v-else>已答 {{ answeredCount }} · 对 {{ stats.correct }} · 错 {{ stats.wrong }}</span>
         </p>
