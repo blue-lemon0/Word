@@ -15,6 +15,7 @@ import { goBack as goBackNav } from '../nav'
 import ModePicker, { type Mode as PickerMode } from '../components/ModePicker.vue'
 import ScanList from '../components/ScanList.vue'
 import ScanPeek from '../components/ScanPeek.vue'
+import DrillSheet from '../components/DrillSheet.vue'
 import {
   buildQueue,
   buildRandomQueue,
@@ -261,12 +262,17 @@ function onScanPick(it: ScanItem): void {
 
 function onScanDrill(it: ScanItem): void {
   scanItem.value = null
-  // ★ 用 replace，不是 push：扫读列表**就在这一页**，点一行不该多占一格历史。
-  //   否则「点一句 → 练 → 返回」会退到同一页的上一个状态 —— 看起来像返回没反应。
-  void router.replace({
-    path: '/train',
-    query: { solo: it.sense.id, sent: String(it.sentence.id) },
-  })
+  // ★ 练一句是**浮层**，不是跳页（D46）：扫读列表就在下面，练完接着扫。
+  //   原来这里 replace 到 /train?solo=，虽不占历史，但仍然把整屏换掉了。
+  drillSense.value = it.sense.id
+  drillSent.value = it.sentence.id
+  drillOpen.value = true
+}
+
+/** 浮层里点词名 → 进词条页（先关浮层，别盖在上一层上面） */
+function onDrillWord(w: string): void {
+  drillOpen.value = false
+  void router.push(`/word/${encodeURIComponent(w)}`)
 }
 
 /** 扫读模式钉过来的**具体那一句**（`?sent=<id>`）。
@@ -563,6 +569,10 @@ const peekToken = ref('')
 const soloOthers = ref<Sentence[]>([])
 /** 扫读里点中的那一行：先给「这句什么意思」的浮层 */
 const scanItem = ref<ScanItem | null>(null)
+/** 练一句的浮层（不跳页，见 D46） */
+const drillOpen = ref(false)
+const drillSense = ref('')
+const drillSent = ref<number | undefined>(undefined)
 
 function onPickToken(tok: string): void {
   if (!submitted.value) return
@@ -1132,6 +1142,15 @@ watch(
       :total="scanItem?.count ?? 0"
       @close="scanItem = null"
       @drill="onScanDrill"
+    />
+
+    <!-- 练这一句：浮层，不跳页（D46） -->
+    <DrillSheet
+      :open="drillOpen"
+      :sense-id="drillSense"
+      :sentence-id="drillSent"
+      @close="drillOpen = false"
+      @word="onDrillWord"
     />
 
     <!-- AI 提议（换一句）：和词条页/意思页共用同一张浮层 -->

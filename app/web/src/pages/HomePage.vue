@@ -23,6 +23,7 @@ import { useRouter } from 'vue-router'
 import InstallPrompt from '../components/InstallPrompt.vue'
 import MarkedText from '../components/MarkedText.vue'
 import WordPeek from '../components/WordPeek.vue'
+import DrillSheet from '../components/DrillSheet.vue'
 import {
   loadStats,
   loadStatsNow,
@@ -45,6 +46,18 @@ const dueN = ref(0)
 const learningN = ref(0)
 const freshN = ref(0)
 const flagN = ref(0)
+
+/* ── 副页：在学 / 待学 的词表（和词库的五个桶同一套口径）── */
+interface WordMeta {
+  word: string
+  gloss: string
+  done: number
+  total: number
+}
+
+const learningWords = ref<WordMeta[]>([])
+const freshWords = ref<WordMeta[]>([])
+const tab = ref(0)
 
 async function loadToday(): Promise<void> {
   const [senses, prows, flags] = await Promise.all([allSenses(), allProgress(), listFlags()])
@@ -78,6 +91,25 @@ async function loadToday(): Promise<void> {
   learningN.value = learn
   freshN.value = fresh
   flagN.value = flags.length
+
+  // 副页的词表：每个词一行（释义取它的第一个义项，练过几个意思也标出来）
+  const meta = new Map<string, WordMeta>()
+  for (const s of senses) {
+    const m = meta.get(s.word) ?? { word: s.word, gloss: s.gloss || '', done: 0, total: 0 }
+    m.total++
+    if ((pmap.get(s.id)?.reps ?? 0) > 0) m.done++
+    if (!m.gloss && s.gloss) m.gloss = s.gloss
+    meta.set(s.word, m)
+  }
+  const pick = (rank: number): WordMeta[] =>
+    [...buckets.entries()]
+      .filter(([, r]) => r === rank)
+      .map(([w]) => meta.get(w))
+      .filter((m): m is WordMeta => !!m)
+      .sort((a, b) => a.word.localeCompare(b.word))
+      .slice(0, 60)
+  learningWords.value = pick(1)
+  freshWords.value = pick(2)
 }
 
 /* ── 最近在练：按上次复习时间倒序取三个词 ── */
@@ -131,11 +163,16 @@ async function roll(): Promise<void> {
 function drill(): void {
   const c = card.value
   if (!c) return
-  router.push({
-    path: '/train',
-    query: { solo: c.senseId, sent: String(c.sentence.id) },
-  })
+  // ★ 浮层，不跳页（D46）：练一句不该把这一屏顶掉，关掉就还在原地。
+  drillSense.value = c.senseId
+  drillSent.value = c.sentence.id
+  drillOpen.value = true
 }
+
+/* ── 练这一句的浮层 ── */
+const drillOpen = ref(false)
+const drillSense = ref('')
+const drillSent = ref<number | undefined>(undefined)
 
 function pick(word: string): void {
   if (card.value && word === card.value.word.toLowerCase()) return
@@ -184,129 +221,209 @@ onMounted(async () => {
 
 <template>
   <div class="wb-page home">
-    <div class="wb-wrap">
-      <InstallPrompt />
+    <!-- ★ 首页内部再分「副页」：横向滑动切换（D46）。
+         你原话是「淘宝底部三个 tab，首页那个 tab 里面还能左右滑」——
+         道理是：一屏给不了四种状态，但**滑一下**就能。
+         三页分别是：今天（信息流）/ 在学 / 待学。都用同一套口径，滑过去就换一批词。 -->
+    <van-tabs
+      v-model:active="tab"
+      class="htabs"
+      swipeable
+      sticky
+      offset-top="0"
+      :animated="false"
+      title-active-color="#4f46e5"
+      title-inactive-color="#8b8b9a"
+      color="#4f46e5"
+      line-width="22"
+    >
+      <van-tab title="今天">
+        <div class="wb-wrap">
+          <InstallPrompt />
 
-      <!-- 一行「今天」：四个数字，读到就知道现在是什么状态 -->
-      <div class="todayline">
-        <span class="t-d">今天</span>
-        <span class="t-i hot"><b>{{ dueN }}</b> 到期</span>
-        <span class="t-i"><b>{{ learningN }}</b> 在学</span>
-        <span class="t-i"><b>{{ freshN }}</b> 待学</span>
-        <span v-if="flagN" class="t-i warn"><b>{{ flagN }}</b> 错题</span>
-      </div>
+          <!-- 一行「今天」：只留**需要现在动手**的两个数。
+               「在学/待学」已经写在下面的快捷卡上，这里再说一遍就是重复；
+               底栏已经有「词库 / 更多」，底部再摆一排入口也是重复。 -->
+          <div class="todayline">
+            <span class="t-d">今天</span>
+            <span v-if="dueN" class="t-i hot"><b>{{ dueN }}</b> 个词到期</span>
+            <span v-if="flagN" class="t-i warn"><b>{{ flagN }}</b> 条错题</span>
+            <span v-if="!dueN && !flagN" class="t-i quiet">没有到期的，随手背两句</span>
+          </div>
 
-      <!-- 快捷卡：横滑，每张通向一个具体动作 -->
-      <div v-if="quicks.length" class="row-cards">
-        <button
-          v-for="q in quicks"
-          :key="q.key"
-          class="qc"
-          :class="q.tone"
-          type="button"
-          @click="go(q.to)"
-        >
-          <b>{{ q.n }}</b>
-          <span class="qc-t">{{ q.title }}</span>
-          <span class="qc-s">{{ q.sub }}</span>
-        </button>
-      </div>
-
-      <!-- 随手背一句 -->
-      <section class="sect">
-        <header class="s-h">
-          <b>随手背一句</b>
-          <span class="wb-sp" />
-          <button class="s-act" type="button" @click="roll">
-            <van-icon name="replay" size="13" />
-            换一个
-          </button>
-        </header>
-
-        <div v-if="card" class="bcard">
-          <p class="sn">
-            <MarkedText
-              :text="card.sentence.en"
-              :form="card.sentence.form"
-              :span-start="card.sentence.spanStart"
-              :span-len="card.sentence.spanLen"
-              pickable
-              @pick="pick"
-            />
-          </p>
-          <div class="wrow">
-            <button class="w" type="button" @click="go(`/word/${encodeURIComponent(card.word)}`)">
-              {{ card.word }}
+          <!-- 快捷卡：横滑，每张通向一个具体动作 -->
+          <div v-if="quicks.length" class="row-cards">
+            <button
+              v-for="q in quicks"
+              :key="q.key"
+              class="qc"
+              :class="q.tone"
+              type="button"
+              @click="go(q.to)"
+            >
+              <b>{{ q.n }}</b>
+              <span class="qc-t">{{ q.title }}</span>
+              <span class="qc-s">{{ q.sub }}</span>
             </button>
-            <span v-if="card.ipa" class="ipa">/{{ card.ipa }}/</span>
           </div>
 
-          <button v-if="!revealed" class="reveal" type="button" @click="doReveal">
-            点一下看意思
+          <!-- 随手背一句 -->
+          <section class="sect">
+            <header class="s-h">
+              <b>随手背一句</b>
+            </header>
+
+            <div v-if="card" class="bcard">
+              <!-- 词在前、句在后：这是一张卡片的读法（先看见要背的词，再看它怎么用）。
+                   反过来读像一道「猜词题」，而这一屏是「随手背」。 -->
+              <div class="wrow">
+                <button
+                  class="w"
+                  type="button"
+                  @click="go(`/word/${encodeURIComponent(card.word)}`)"
+                >
+                  {{ card.word }}
+                </button>
+                <span v-if="card.ipa" class="ipa">/{{ card.ipa }}/</span>
+              </div>
+              <p class="sn">
+                <MarkedText
+                  :text="card.sentence.en"
+                  :form="card.sentence.form"
+                  :span-start="card.sentence.spanStart"
+                  :span-len="card.sentence.spanLen"
+                  pickable
+                  @pick="pick"
+                />
+              </p>
+
+              <button v-if="!revealed" class="reveal" type="button" @click="doReveal">
+                点一下看意思
+              </button>
+              <div v-else class="ans">
+                <p class="g">
+                  <span class="pos">{{ sense?.pos || '—' }}</span>
+                  <span class="gt">{{ sense?.gloss || '（这个意思还没有释义）' }}</span>
+                </p>
+                <p v-if="card.sentence.zh" class="zh">{{ card.sentence.zh }}</p>
+                <p v-if="sense?.note" class="note">{{ sense.note }}</p>
+              </div>
+
+              <div class="bacts">
+                <van-button size="small" plain @click="roll">换一个</van-button>
+                <van-button size="small" type="primary" @click="drill">练这一句</van-button>
+              </div>
+            </div>
+
+            <div v-else-if="card === undefined" class="bcard skel">
+              <div class="l w90" />
+              <div class="l w60" />
+            </div>
+            <div v-else class="bcard">
+              <p class="empty">词库还是空的</p>
+              <p class="tap">先去词库导入一份词库</p>
+            </div>
+          </section>
+
+          <!-- 最近在练：条目本身可点进词条；不再挂「词库 ›」——
+               底栏就有「词库」，那是同一个去处的第二个入口。 -->
+          <section v-if="recent.length" class="sect">
+            <header class="s-h">
+              <b>最近在练</b>
+            </header>
+            <button
+              v-for="r in recent"
+              :key="r.word"
+              class="rrow"
+              type="button"
+              @click="go(`/word/${encodeURIComponent(r.word)}`)"
+            >
+              <span class="rw">{{ r.word }}</span>
+              <span class="rg">{{ r.gloss }}</span>
+              <span class="rt">{{ fmtWhen(r.when) }}</span>
+            </button>
+          </section>
+
+          <!-- 兜底入口：快捷卡一张都没有时（全库都掌握了之类），至少给一条去训练的路。 -->
+          <div v-if="!quicks.length" class="fallback">
+            <van-button block round @click="go('/train')">去训练</van-button>
+          </div>
+        </div>
+      </van-tab>
+
+      <!-- 副页二：在学（练过、没掌握） -->
+      <van-tab :title="`在学 ${learningN}`">
+        <div class="wb-wrap">
+          <div class="sub-h">
+            <b>在学 {{ learningN }}</b>
+            <span class="sub-s">练过、还没掌握</span>
+            <span class="wb-sp" />
+            <van-button
+              v-if="learningN"
+              size="mini"
+              type="primary"
+              plain
+              @click="go('/train?scope=learning')"
+            >
+              练这组
+            </van-button>
+          </div>
+          <button
+            v-for="w in learningWords"
+            :key="w.word"
+            class="rrow"
+            type="button"
+            @click="go(`/word/${encodeURIComponent(w.word)}`)"
+          >
+            <span class="rw">{{ w.word }}</span>
+            <span class="rg">{{ w.gloss }}</span>
+            <span class="rt">{{ w.done }}/{{ w.total }}</span>
           </button>
-          <div v-else class="ans">
-            <p class="g">
-              <span class="pos">{{ sense?.pos || '—' }}</span>
-              <span class="gt">{{ sense?.gloss || '（这个意思还没有释义）' }}</span>
-            </p>
-            <p v-if="card.sentence.zh" class="zh">{{ card.sentence.zh }}</p>
-            <p v-if="sense?.note" class="note">{{ sense.note }}</p>
+          <van-empty v-if="!learningWords.length" description="还没有在学的词" />
+        </div>
+      </van-tab>
+
+      <!-- 副页三：待学（一次都没练过） -->
+      <van-tab :title="`待学 ${freshN}`">
+        <div class="wb-wrap">
+          <div class="sub-h">
+            <b>待学 {{ freshN }}</b>
+            <span class="sub-s">一次都没练过</span>
+            <span class="wb-sp" />
+            <van-button
+              v-if="freshN"
+              size="mini"
+              type="primary"
+              plain
+              @click="go('/train?scope=new')"
+            >
+              学几个
+            </van-button>
           </div>
-
-          <div class="bacts">
-            <van-button size="small" plain @click="roll">换一个</van-button>
-            <van-button size="small" type="primary" @click="drill">练这一句</van-button>
-          </div>
+          <button
+            v-for="w in freshWords"
+            :key="w.word"
+            class="rrow"
+            type="button"
+            @click="go(`/word/${encodeURIComponent(w.word)}`)"
+          >
+            <span class="rw">{{ w.word }}</span>
+            <span class="rg">{{ w.gloss }}</span>
+            <span class="rt">{{ w.total }} 句</span>
+          </button>
+          <van-empty v-if="!freshWords.length" description="待学的词都练过了" />
         </div>
-
-        <div v-else-if="card === undefined" class="bcard skel">
-          <div class="l w90" />
-          <div class="l w60" />
-        </div>
-        <div v-else class="bcard">
-          <p class="empty">词库还是空的</p>
-          <p class="tap">先去词库导入一份词库</p>
-        </div>
-      </section>
-
-      <!-- 最近在练 -->
-      <section v-if="recent.length" class="sect">
-        <header class="s-h">
-          <b>最近在练</b>
-          <span class="wb-sp" />
-          <button class="s-act" type="button" @click="go('/library')">词库 ›</button>
-        </header>
-        <button
-          v-for="r in recent"
-          :key="r.word"
-          class="rrow"
-          type="button"
-          @click="go(`/word/${encodeURIComponent(r.word)}`)"
-        >
-          <span class="rw">{{ r.word }}</span>
-          <span class="rg">{{ r.gloss }}</span>
-          <span class="rt">{{ fmtWhen(r.when) }}</span>
-        </button>
-      </section>
-
-      <!-- 底部入口 -->
-      <div class="row-links">
-        <button class="lk" type="button" @click="go('/train')">
-          <van-icon name="aim" size="16" />
-          去训练
-        </button>
-        <button class="lk" type="button" @click="go('/library')">
-          <van-icon name="apps-o" size="16" />
-          我的词库
-        </button>
-        <button class="lk" type="button" @click="go('/more')">
-          <van-icon name="ellipsis" size="16" />
-          更多
-        </button>
-      </div>
-    </div>
+      </van-tab>
+    </van-tabs>
 
     <WordPeek :show="peekOpen" :token="peekToken" @close="peekOpen = false" />
+    <DrillSheet
+      :open="drillOpen"
+      :sense-id="drillSense"
+      :sentence-id="drillSent"
+      @close="drillOpen = false"
+      @word="(w) => { drillOpen = false; go(`/word/${encodeURIComponent(w)}`) }"
+    />
   </div>
 </template>
 
@@ -320,9 +437,67 @@ onMounted(async () => {
     var(--wb-bg);
 }
 
+/* 顶部让位交给 van-tabs 自己的 sticky 条（它有 safe-area），
+   这里只留左右与底部；底部要让出 tabbar */
 .wb-wrap {
-  padding-top: calc(12px + env(safe-area-inset-top, 0px));
+  padding-top: 8px;
   padding-bottom: calc(14px + var(--wb-tabbar-h));
+}
+
+/* 首页内部的副页标签：贴在状态栏下面，白底 + 细线 */
+.htabs :deep(.van-tabs__wrap) {
+  /* 和 .wb-topbar 同一套让位（--wb-sb-h = max(safe-area, 24px)）：
+     这里用 env() 直接写会在没有 viewport-fit 的环境里得到 0，标签就钻到状态栏底下。
+     ★ 再多给 10px：标签贴着状态栏时，手指点在字的上一半就会碰到系统手势区
+       —— 「太贴、容易误触」不是审美问题，是热区问题。 */
+  padding-top: calc(var(--wb-sb-h) + 10px);
+  /* Vant 给 .van-tabs__wrap 写死了 44px 高 —— 加 padding 会把标签挤出盒子裁掉。
+     必须 height: auto，不然标签就藏在状态栏底下只露出半行。 */
+  height: auto;
+  /* 标签本身也加高到 48px：一行三个 tab，点起来要稳 */
+  --van-tabs-line-height: 48px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--wb-line);
+  box-shadow: 0 1px 0 rgba(17, 17, 27, 0.03);
+}
+
+.htabs :deep(.van-tab) {
+  font-size: 14.5px;
+}
+
+.htabs :deep(.van-tab--active) {
+  font-weight: 650;
+}
+
+.htabs :deep(.van-tabs__nav) {
+  background: transparent;
+}
+
+.htabs :deep(.van-tabs__line) {
+  border-radius: 2px;
+}
+
+/* 副页的小标题行 */
+.sub-h {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 2px 10px;
+}
+
+.sub-h b {
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.sub-s {
+  font-size: 11.5px;
+  color: var(--wb-ink-3);
+}
+
+.fallback {
+  margin-top: 14px;
 }
 
 /* ── 今天一行 ── */
@@ -439,18 +614,7 @@ onMounted(async () => {
   font-weight: 650;
 }
 
-.s-act {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  border: 0;
-  background: transparent;
-  font-family: inherit;
-  font-size: 12.5px;
-  color: var(--wb-primary);
-  padding: 4px 2px;
-  cursor: pointer;
-}
+
 
 /* ── 背一句的卡 ── */
 .bcard {
@@ -461,6 +625,7 @@ onMounted(async () => {
 }
 
 .sn {
+  margin-top: 8px;
   font-size: 16.5px;
   line-height: 1.65;
   color: var(--wb-ink);
@@ -470,7 +635,6 @@ onMounted(async () => {
   display: flex;
   align-items: baseline;
   gap: 7px;
-  margin-top: 10px;
 }
 
 .w {
@@ -628,30 +792,5 @@ onMounted(async () => {
   color: var(--wb-ink-3);
 }
 
-/* ── 底部入口 ── */
-.row-links {
-  display: flex;
-  gap: 8px;
-  margin-top: 14px;
-}
-
-.lk {
-  flex: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  padding: 10px 6px;
-  border: 1px solid var(--wb-line);
-  background: var(--wb-card);
-  border-radius: 12px;
-  font-family: inherit;
-  font-size: 13px;
-  color: var(--wb-ink-2);
-  cursor: pointer;
-}
-
-.lk:active {
-  background: var(--wb-bg);
-}
+/* 兜底入口只有一张按钮，不需要额外样式 */
 </style>

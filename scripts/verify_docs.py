@@ -839,10 +839,10 @@ interaction = [
     ("有「扫读」：报纸式多行例句，点哪句看哪句（先摊开答案再问练不练）",
      _re.search(r"export async function scanBatch", _code(
          os.path.join(WEB, "src", "quiz.ts"))) is not None
-     # 点一行 → 先弹「这句什么意思」（ScanPeek），不再直接进答题
+     # 点一行 → 先弹「这句什么意思」（ScanPeek），再问要不要练
      and _re.search(r'@click="emit\(.pick., it\)"', scanlist) is not None
      and _re.search(r"<ScanPeek", train) is not None
-     and _re.search(r"sent:\s*String\(it\.sentence\.id\)", train) is not None
+     and _re.search(r"drillSent\.value = it\.sentence\.id", train) is not None
      # 不许再单独存在一个扫读页面 —— 「藏得深」本身就是要去掉的东西
      and not os.path.exists(os.path.join(WEB, "src", "pages", "ScanPage.vue"))
      and not _re.search(r"router\.push\('/scan'\)", _all_src)),
@@ -1339,10 +1339,20 @@ interaction = [
      "排进明天练" in _src(os.path.join("components", "WordPeek.vue"))
      and _re.search(r'class="pin">明天练', lib) is not None),
 
-    # ── D43：训练页的返回栈 + 扫读「先看再练」──
-    # 扫读列表就在训练页里，点一行不该多占一格历史（否则返回会退到同一页的上一个状态）
-    ("扫读点句用 replace（不往历史里塞同一页）",
-     _re.search(r"void router\.replace\(\{\s*\n\s*path: '/train',\s*\n\s*query: \{ solo:", train) is not None),
+    # ── D43：训练页的返回栈 + 扫读「先看再练」（D46 起改为浮层，不跳页）──
+    ("扫读点句开浮层（不跳页、不占历史）",
+     _re.search(r"function onScanDrill[\s\S]{0,500}?drillOpen\.value = true", train) is not None
+     and "<DrillSheet" in train),
+
+    # ── D46：练习是浮层，不是房间；首页内部有可横滑的副页 ──
+    ("练一句是浮层（不跳页）",
+     os.path.exists(os.path.join(WEB, "src", "components", "DrillSheet.vue"))
+     and "recordAnswer(" in _src(os.path.join("components", "DrillSheet.vue"))
+     # 判分链路必须和训练页同一条（不是另写一个迷你练习）
+     and "makeQuestion(" in _src(os.path.join("components", "DrillSheet.vue"))),
+    ("首页内部有可横滑的副页（今天 / 在学 / 待学）",
+     'swipeable' in home and home.count("<van-tab ") >= 3
+     and all(k in home for k in ["在学", "待学"])),
     # 单挑/扫读那一轮里，第一次返回 = 回到「怎么练」，不是直接退出训练
     ("单挑/扫读那一轮里，返回先回「怎么练」",
      _re.search(r"function backToPicker", train) is not None
