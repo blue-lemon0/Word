@@ -1,5 +1,10 @@
 <script setup lang="ts">
-/** 错题板 —— 单挑入口**只在这里**。
+/**
+ * 错题板 —— **只是一份清单**。
+ *
+ * ★ 原来这里挂着「单挑这个意思」：可现在列表上明写着词和释义，等于先给答案再让猜，
+ *   和句子浮层里那句「练这一句」是同一个毛病。练错题就去首页「复习」，
+ *   那里抽到哪个意思是未知的，才有意义。
  *  理由：错题板上你不知道会抽到哪个意思，练它才有意义；
  *  在意思页点「练这个意思」是送分（那句提示在意思页也写着）。
  *
@@ -116,7 +121,7 @@ onMounted(load)
         wrapable
         :scrollable="false"
       >
-        单挑入口<b>只在这里</b>：错题板上你不知道会抽到哪个意思，练它才有意义。知道答案再练，是送分。
+        这里是<b>清单</b>：哪几个意思老错、哪几句有问题。练它们去首页「复习」，别在这儿再猜一遍。
       </van-notice-bar>
 
       <van-tabs
@@ -175,15 +180,6 @@ onMounted(load)
           <span v-if="!r.sample" class="warn">没有可用例句</span>
         </div>
         <van-space class="acts" wrap>
-          <van-button
-            size="mini"
-            type="primary"
-            plain
-            :disabled="!r.sample"
-            @click.stop="router.push(`/train?solo=${r.sense.id}`)"
-          >
-            单挑这个意思
-          </van-button>
           <van-button size="mini" plain @click.stop="router.push(`/sense/${r.sense.id}`)">去编辑</van-button>
         </van-space>
       </div>
