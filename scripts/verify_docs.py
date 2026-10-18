@@ -1187,6 +1187,25 @@ interaction = [
      os.path.exists(os.path.join(WEB, "src", "components", "QuestionBox.vue"))
      and "<QuestionBox" in home
      and "<QuestionBox" in _src(os.path.join("components", "DrillSheet.vue"))),
+    # ── D51：冗余判定标准 ──
+    # 1) 给过答案的地方不设答题入口
+    ("句子浮层不再出题（答案已给，不设答题入口）",
+     "练这一句" not in _code(os.path.join(WEB, "src", "components", "ScanPeek.vue"))
+     and "@drill" not in _code(os.path.join(WEB, "src", "pages", "HomePage.vue"))),
+    ("错题板只是清单（没有「单挑」这类答题入口）",
+     "单挑这个意思" not in _code(os.path.join(WEB, "src", "pages", "BoardPage.vue"))
+     and "train?solo" not in _code(os.path.join(WEB, "src", "pages", "BoardPage.vue"))),
+    # 2) 数量为 0 的按钮不跳转
+    ("数量 0 的按钮置灰（首页「复习 · 今天剩余 0」）",
+     re.search(r':disabled="dueN === 0"', home) is not None),
+    # 3) 同一个动作只留一个入口：随机只在首页
+    ("随机入口只有首页屏一（背单词页不再自带随机）",
+     "buildRandomQueue" in _code(os.path.join(WEB, "src", "pages", "HomePage.vue"))
+     and "buildRandomQueue" not in _code(os.path.join(WEB, "src", "pages", "TrainPage.vue"))),
+    # 4) 一页只管一件事：背单词页不再自带选练法与扫读
+    ("背单词页不再自带选练法与扫读列表",
+     "ModePicker" not in _src(os.path.join("pages", "TrainPage.vue"))
+     and "<ScanList" not in _src(os.path.join("pages", "TrainPage.vue"))),
 ]
 
 fi = 0

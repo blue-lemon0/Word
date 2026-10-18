@@ -16,7 +16,6 @@ import ScanPeek from '../components/ScanPeek.vue'
 import DrillSheet from '../components/DrillSheet.vue'
 import {
   buildQueue,
-  buildRandomQueue,
   buildScopeQueue,
   flagQuestion,
   makeQuestion,
@@ -141,7 +140,7 @@ const masteredFlash = ref('')
  *           随手抽一句猜个意思本来就是学习的一部分，只是过去没入口。
  *  `redo`   重刷**刚做完这一轮**的那批卡。
  */
-type Mode = 'due' | 'random' | 'redo' | 'scan'
+type Mode = 'due' | 'redo' | 'scan'
 
 const sessionId = ref('')
 const stats = ref<SessionStats>({ correct: 0, wrong: 0, pending: 0, dueCorrect: 0, dueTotal: 0 })
@@ -247,19 +246,16 @@ async function start(which: Mode = mode.value): Promise<void> {
     ? [...only]
     : scopeQuery.value
       ? await buildScopeQueue(scopeQuery.value, SESSION_SIZE)
-      : which === 'random'
-        ? await buildRandomQueue(SESSION_SIZE)
-        : which === 'redo'
+      : which === 'redo'
           ? lastRound.value.filter((id) => poolIds.has(id))
           : await buildQueue(SESSION_SIZE)
   if (!queue.value.length) {
     if (which === 'redo') {
       toast('上一轮已经不在库里了')
-      queue.value = await buildRandomQueue(SESSION_SIZE, only)
+      queue.value = []
     } else {
-      // 正常到不了这里：「按计划」已按「有没有得练」置灰（见 MODES）。
-      // 这里**不再自动跳去另一种练法** —— 那正是「点一下被丢到别处、
-      // 再弹一句看不清的提示」的那条路。留着兜底，但只把空队列如实呈现。
+      // 正常到不了这里：没得练时首页那两个按钮本身就是置灰的。
+      // 兜底只做一件事：把空队列如实呈现，**不自动跳去另一种练法**。
       queue.value = []
     }
   }
