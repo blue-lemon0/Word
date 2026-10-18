@@ -20,6 +20,14 @@ interface NativeBridgeApi {
   copyText: (text: string) => Promise<boolean>
   /** 打开系统分享面板发一个文件（内部用 intent） */
   toast: (msg: string) => void
+  /**
+   * 原生发 JSON POST（AI 那一条路）。
+   *
+   *  为什么需要它：WebView 里 fetch 打第三方 API 会被 CORS 拦，
+   *  而原生这一层没有 CORS。结果通过 `window.__wbHttp(id, status, text)`
+   *  回到页面（见 src/ai/transport.ts）。
+   */
+  httpPost?: (id: string, url: string, headersJson: string, body: string) => void
 }
 
 declare global {

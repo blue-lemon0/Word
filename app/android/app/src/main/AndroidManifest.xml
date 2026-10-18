@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!-- 原生桥接（导出走系统分享面板）与图标，必须声明：
      · 没有 provider，FileProvider.getUriForFile 会抛 IllegalArgumentException，
        于是「导出」按钮毫无反应 —— 表现为备份功能坏了，但看不出是权限缺了
@@ -6,6 +6,14 @@
        写这一句是为了让意图显式，不留「靠默认继承」的隐患 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- ★ INTERNET：AI 用得上（原生 httpPost 发到用户配置的接口）。
+         这个 app 的**主体**是离线的（内容与进度都在 assets / IndexedDB），
+         所以之前一直没声明这个权限；而一旦没有它，
+         原生请求会抛 SecurityException: Permission denied (missing INTERNET permission?),
+         页面上只会显示「连不上 AI 服务」—— 看起来像网络问题，其实是权限。
+         声明它不会让 app 变成必须联网：没有配置 AI 时一个字节都不发。 -->
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"

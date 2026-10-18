@@ -31,6 +31,7 @@ import { toast } from '../toast'
 import { db } from '../db'
 import type { Sentence, Sense } from '../types'
 import QuickEdit from '../components/QuickEdit.vue'
+import WordPeek from '../components/WordPeek.vue'
 
 /** 名字要显式声明：App.vue 只 keep-alive 这一页（`include` 靠的就是名字）。
  *  不声明的话 keep-alive 静默不生效 —— 跳去核验再回来，
@@ -469,11 +470,44 @@ async function onEdited(): Promise<void> {
   await loadQ()
 }
 
+/* ── 点词查义（答完之后）──
+ *
+ *  ★ 时机是这条功能的**边界**，不是实现细节：
+ *    这道题问的就是「这个词在这句话里是什么意思」，答之前把词义摊开，
+ *    测的就成了「你能不能忍住不看」。所以 `pickable` 只绑 submitted，
+ *    而且处理函数里再挡一道 —— 守卫和断言都盯着这两处。
+ *
+ *  ★ 点开之后停在浮层，不跳页：多半只是想扫一眼；真想细看再点进详情。
+ *    跳页会把人从这一题上带走，回来还得重新找回这道题。
+ */
+const peekOpen = ref(false)
+const peekToken = ref('')
+
+function onPickToken(tok: string): void {
+  if (!submitted.value) return
+  peekToken.value = tok
+  peekOpen.value = true
+}
+
 /** 从意思详情/词条页核验完回来：题目要跟着变新。
  *  状态在 keep-alive 里，所以回来还在原题、进度不丢；
  *  但**内容**不能沿用内存里那份 —— 用户在那边可能刚改过句子。 */
 onActivated(() => {
-  if (q.value) void loadQ()
+  if (q.value) {
+    void loadQ()
+    return
+  }
+  // ★ 结算屏不能跟着组件缓存一起留在下一次进入里（坑 58）。
+  //   keep-alive 缓存的是**组件状态**，而「从首页点『去训练』」在路由上
+  //   仍然是 /train —— 与「刚才那一轮」同一个组件、同一个路由。
+  //   不重置的话，用户再进来看到的是上一轮的「这一轮练完了 / 0 题」，
+  //   而下面没有「怎么练」可选：界面上没有任何东西告诉他还能练。
+  if (phase.value === 'done' && !route.query.solo) {
+    phase.value = 'playing'
+    solo.value = false
+    queue.value = []
+    void refreshDueCount()
+  }
 })
 
 async function onMastered(): Promise<void> {
@@ -663,13 +697,19 @@ watch(
              分成「改例句」「改选项」两个入口，等于让人先判断
              「我发现的这个问题属于哪一类」才找得到入口。 -->
         <div class="qsent">
+          <!-- ★ 答完之后整句才可点：点任何一个词都能查它是什么意思（浮层），
+               想细看再进词条/义项详情；不在库里的词可以当场加入词库。
+               答之前保持不可点 —— 否则「查一下这个词」就成了答题的一部分。 -->
           <MarkedText
             :text="q.sentence.en"
             :form="q.sentence.form"
             :span-start="q.sentence.spanStart"
             :span-len="q.sentence.spanLen"
+            :pickable="submitted"
+            @pick="onPickToken"
           />
         </div>
+        <p v-if="submitted" class="peektip">句子里任意一个词都能点开查</p>
 
         <!-- ★ 三态的判断式要分开：作答（submitted）压过呈现（revealed）。
              原来是 `v-if="!revealed"` / `v-else`，把**解释卡关在 v-else 里面** ——
@@ -835,7 +875,7 @@ watch(
     </div>
 
     <!-- 改东西：先选「是哪一处不对」，再改它 -->
-    <van-popup :show="pickBox" position="bottom" round @close="pickBox = false">
+    <van-popup :show="pickBox" position="bottom" round close-on-popstate @close="pickBox = false">
       <div class="pick">
         <h3>哪里不对？</h3>
         <button
@@ -884,6 +924,9 @@ watch(
       :sense="edSense"
       @saved="onEdited"
     />
+
+    <!-- 点词查义：答完之后才可能被打开（见 onPickToken 的守卫） -->
+    <WordPeek :show="peekOpen" :token="peekToken" @close="peekOpen = false" />
 
     <!-- ★ 固定在底部的主操作条。
          之前的「再来一个」按钮在解释卡里，只有答完题才出现，而且位置在
@@ -1107,6 +1150,16 @@ watch(
   font-size: 12.5px;
   color: var(--wb-ink-2);
   margin-bottom: 8px;
+}
+
+/* 答完之后的小提示：告诉用户「现在能点词了」。
+   点词这件事**没有视觉入口**（句子就是句子），不说一句就没人会去点。 */
+.peektip {
+  text-align: center;
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: var(--wb-ink-3);
+  margin: -8px 0 10px;
 }
 
 .blank {

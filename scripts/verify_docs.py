@@ -408,6 +408,8 @@ kb = _code(os.path.join(WEB, "src", "keyboard.ts"))
 # 底栏让位写在 App.vue 的 scoped 样式里，不在 style.css —— 别查错文件
 appvue = _code(os.path.join(WEB, "src", "App.vue"))
 scanlist = _src(os.path.join("components", "ScanList.vue"))
+wordpeek = _src(os.path.join("components", "WordPeek.vue"))
+lookup_ts = _src("lookup.ts")
 
 # ── 全仓文本扫描（坑 57 与「坑号都得有正文」两条守卫共用）──
 # 只收人会写的地方：依赖（node_modules）、派生产物（build/、dist/）、
@@ -465,6 +467,27 @@ def _documented_pitfalls():
     """踩坑记录里有正文的坑号（`## 46. 标题` 这种标题的编号）。"""
     t = _read(os.path.join(PROJ, "docs", "notes", "踩坑记录.md"))
     return {int(n) for n in re.findall(r"^## (\d+)\. ", t, re.M)}
+
+
+# ── AI 子系统的判据（D38）──
+# 「AI 代码内聚」不是靠自觉：这里直接扫「ai/ 以外有没有外网调用」。
+_AI_DIR = os.path.abspath(os.path.join(WEB, "src", "ai"))
+
+
+def _ai_src(name):
+    return _read(os.path.join(_AI_DIR, name))
+
+
+def _ai_page(name):
+    return _read(os.path.join(WEB, "src", "pages", name))
+
+
+def _non_ai_sources():
+    import glob
+    files = glob.glob(os.path.join(WEB, "src", "**", "*.ts"), recursive=True) + \
+        glob.glob(os.path.join(WEB, "src", "**", "*.vue"), recursive=True)
+    return {p: _read(p) for p in files if not os.path.abspath(p).startswith(_AI_DIR)}
+
 
 
 def _code_all():
@@ -1049,6 +1072,99 @@ interaction = [
     # 读者就只能看到「坑 56」这四个字，然后找不到 56 是什么。
     ("引用到的每个「坑 N」都有正文（坑 0 的索引不骗人）",
      not (_cited_pitfalls() - _documented_pitfalls())),
+
+    # ── 坑 58：keep-alive 缓存的是组件状态，「再进一次」不等于重开一轮 ──
+    # 训练页被 KeepAlive 留着（D36：跳去核验不丢这一轮）。
+    # 代价是「从首页点去训练」与「刚才那一轮」是同一个组件实例：
+    # 不显式重置，用户再进来看到的就是上一轮的结算屏，而屏幕上没有
+    # 任何东西告诉他还能练。判据是 onActivated 里那段重置在不在。
+    ("再进训练不会端出上一轮的结算屏（坑 58）",
+     _re.search(
+         r"if \(phase\.value === 'done' && !route\.query\.solo\) \{[\s\S]{0,160}phase\.value = 'playing'",
+         train) is not None),
+
+    # ── 系统返回键要先关浮层，而不是退页（D33 的延伸）──
+    # 浮层没有自己的历史条目，Android 的返回键会直接把 WebView 退一层 ——
+    # 用户的感受是「我关个弹层，结果题没了 / 页面跳走了」。
+    # Vant popup 的 close-on-popstate 干的就是这件事（开时压一条历史，
+    # 返回时关掉并吃掉这次后退）。判据是四个承载浮层的地方都开着它。
+    ("浮层能被系统返回键关掉（close-on-popstate）",
+     "close-on-popstate" in _src(os.path.join("components", "WordPeek.vue"))
+     and "close-on-popstate" in _src(os.path.join("components", "Sheet.vue"))
+     and "close-on-popstate" in _src(os.path.join("components", "QuickEdit.vue"))
+     and _re.search(r'<van-popup :show="pickBox"[^>]*close-on-popstate', train) is not None),
+
+    # ── 答完之后才许查词（D37）──
+    # 这道题问的就是「这个词在这句话里是什么意思」。答之前把词义摊开，
+    # 测的就不是记忆，而是「你能不能忍住不看」。所以判据是**绑定位置**：
+    # `pickable` 必须绑 submitted，处理函数里再挡一道 —— 两处都要：
+    # 只写模板的话，别处调用同一条路就绕过；只写函数的话，句子一直是可点的。
+    ("查词只在作答之后（pickable 绑 submitted + 处理函数再挡一次）",
+     _re.search(r':pickable="submitted"', train) is not None
+     and _re.search(
+         r"function onPickToken\(tok: string\): void \{\s*\n\s*if \(!submitted\.value\) return",
+         train) is not None),
+    # 浮层必须给三条路：进义项详情、进词条整页、把没入库的词加进来
+    ("点词浮层能进详情，也能顺手把生词加入词库",
+     '<WordPeek' in train
+     and _re.search(r"router\.push\(`/sense/\$\{id\}`\)", wordpeek) is not None
+     and _re.search(r"router\.push\(`/word/\$\{encodeURIComponent\(title\.value\)\}`\)",
+                    wordpeek) is not None
+     and "addPendingWord(" in wordpeek),
+    # 占位义项必须标「需精修」：空壳混进复习池就是一张永远学不会的卡
+    ("顺手加入的词条是占位义项（needsRefine=1，不许静默混进复习池）",
+     _re.search(r"export async function addPendingWord", _code(
+         os.path.join(WEB, "src", "edit.ts"))) is not None
+     and _re.search(r"addWord\(w\)[\s\S]{0,240}needsRefine: 1", _code(
+         os.path.join(WEB, "src", "edit.ts"))) is not None),
+    # 虚词不给「加入词库」：否则词库里会多出 the / of / was 这种垃圾
+    ("虚词不给加入入口",
+     _re.search(r'v-if="!peek\.stop && !justAdded"', wordpeek) is not None
+     and "STOP" in lookup_ts),
+    # 形态还原必须**验证候选真的在词库里**，不能只按规则拼
+    ("形态还原只采信词库里真有的候选（猜错不带偏）",
+     _re.search(r"for \(const c of candidates\) \{\s*\n\s*if \(byWord\.has\(c\)\)",
+                lookup_ts) is not None),
+
+    # ── AI 接入（D38）：内聚、可换、省钱、不越权 ──
+    # 这五条合起来就是「AI 只是可选增强」这个承诺的机械形态：
+    # 代码集中、结果只能提议、花钱花在刀口上、密钥不出本机、没有它也能用。
+    ("AI 代码只在 ai/ 里（别处不直连外网）",
+     not any("Authorization" in t or "chat/completions" in t for t in _non_ai_sources().values())),
+    ("AI 只提议不写库（写库只走 ai/apply → edit 原语）",
+     _re.search(r"db\.(senses|sentences|words|progress)\.(put|add|update|delete|bulk)",
+                _ai_src("actions.ts")) is None
+     and "from '../edit'" not in _ai_src("actions.ts")
+     and "from '../edit'" in _ai_src("apply.ts")),
+    ("AI 的建议必须绑定到真实行（幻觉不落库）",
+     "parseProposals(" in _ai_src("actions.ts")
+     and _re.search(r"bySlot\.get", _ai_src("parse.ts")) is not None
+     and _re.search(r"sentenceHasWord\(", _ai_src("parse.ts")) is not None),
+    ("同样的内容不重复花钱（缓存键含内容指纹与模型名）",
+     "hashOf(" in _ai_src("actions.ts")
+     and "JSON.stringify(ctx)" in _ai_src("actions.ts")
+     and "cfg.model" in _ai_src("actions.ts")
+     and "cached: true" in _ai_src("actions.ts")),
+    ("API Key 只在构建机上，不进备份",
+     "apiKey" not in _src("backup.ts") and "apiKey" not in _src("importWrite.ts")
+     and "localStorage" in _ai_src("config.ts")),
+    ("手机端走原生网络（WebView 里 fetch 会被 CORS 拦）",
+     "httpPost" in _read(os.path.join(PROJ, "app", "android", "app", "src", "main",
+                                     "java", "com", "wordbank", "app", "NativeBridge.java"))
+     and "evalJs" in _read(os.path.join(PROJ, "app", "android", "app", "src", "main",
+                                       "java", "com", "wordbank", "app", "MainActivity.java"))
+     and "__wbHttp" in _ai_src("transport.ts")),
+    ("没配 AI 时入口不出现（不是点进去才说要配）",
+     _re.search(r'v-if="aiOn"', word) is not None
+     and _re.search(r'v-if="aiOn"', sense) is not None
+     and "isConfigured()" in _ai_page("WordPage.vue")
+     and "isConfigured()" in _ai_page("SensePage.vue")),
+    ("AI 一次改多条前先打快照（人才可能整批退回）",
+     _re.search(r"await snapshot\(", _ai_src("apply.ts")) is not None),
+    ("换例句必须重算高亮区间（否则高亮打在别的词上）",
+     "export async function replaceSentence" in _code(os.path.join(WEB, "src", "edit.ts"))
+     and _re.search(r"locate\(text, sen\.form\)", _code(
+         os.path.join(WEB, "src", "edit.ts"))) is not None),
 ]
 
 fi = 0

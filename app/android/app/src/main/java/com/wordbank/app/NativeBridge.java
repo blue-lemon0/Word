@@ -126,4 +126,72 @@ public class NativeBridge {
             }
         });
     }
+
+    /**
+     * 发一个 JSON POST，把结果回调给页面。
+     *
+     * <p>★ 为什么这一步必须由原生做（而不是页面里 fetch）：
+     * WebView 里的页面虽然挂在一个 https 虚拟域名下，但它发**跨域**请求时
+     * 仍然受 CORS 约束 —— 第三方 AI 接口不返回 {@code Access-Control-Allow-Origin}
+     * 时，浏览器连请求都不发，页面上只会看到一个「Failed to fetch」。
+     * 原生这一层没有 CORS 这个概念。
+     *
+     * <p>★ 为什么是「回调」而不是「返回字符串」：
+     * {@code @JavascriptInterface} 只能同步返回基本类型。所以这里起线程，
+     * 拿到结果后 {@code evaluateJavascript} 回调页面侧的
+     * {@code window.__wbHttp(id, status, text)}。页面侧用 id 把 Promise 接回去
+     * （见 src/ai/transport.ts）。status < 0 表示根本没发出去（网络/DNS）。
+     *
+     * <p>★ 超时给得很宽（读 120s）：AI 生成一整段 JSON 本来就要几秒到几十秒，
+     * 页面上还有自己的 90s 兜底；这里再短就会把「模型有点慢」变成「失败」。
+     */
+    @JavascriptInterface
+    public void httpPost(final String id, final String url,
+                         final String headersJson, final String body) {
+        final MainActivity activity = act;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                int status = -1;
+                String text = "";
+                try {
+                    java.net.HttpURLConnection c =
+                            (java.net.HttpURLConnection) new java.net.URL(url).openConnection();
+                    c.setRequestMethod("POST");
+                    c.setConnectTimeout(20000);
+                    c.setReadTimeout(120000);
+                    c.setDoOutput(true);
+                    c.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+                    if (headersJson != null && headersJson.length() > 0) {
+                        org.json.JSONObject h = new org.json.JSONObject(headersJson);
+                        java.util.Iterator<String> it = h.keys();
+                        while (it.hasNext()) {
+                            String k = it.next();
+                            c.setRequestProperty(k, h.optString(k));
+                        }
+                    }
+                    try (java.io.OutputStream os = c.getOutputStream()) {
+                        os.write(body.getBytes(StandardCharsets.UTF_8));
+                    }
+                    status = c.getResponseCode();
+                    java.io.InputStream is = status >= 400 ? c.getErrorStream() : c.getInputStream();
+                    if (is != null) {
+                        java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
+                        byte[] buf = new byte[8192];
+                        int n;
+                        while ((n = is.read(buf)) > 0) bos.write(buf, 0, n);
+                        is.close();
+                        text = new String(bos.toByteArray(), StandardCharsets.UTF_8);
+                    }
+                } catch (Exception e) {
+                    status = -1;
+                    text = e.getClass().getSimpleName() + ": " + e.getMessage();
+                    android.util.Log.e("wordbank", "httpPost 失败 " + url, e);
+                }
+                activity.evalJs("window.__wbHttp && window.__wbHttp("
+                        + MainActivity.jsonString(id) + "," + status + ","
+                        + MainActivity.jsonString(text) + ")");
+            }
+        }).start();
+    }
 }

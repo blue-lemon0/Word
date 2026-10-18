@@ -65,6 +65,7 @@ async function save(): Promise<void> {
     :show="!!sentence || !!sense"
     position="bottom"
     round
+    close-on-popstate
     :style="{ maxHeight: '86vh' }"
     @close="$emit('saved')"
   >

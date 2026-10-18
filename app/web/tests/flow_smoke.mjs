@@ -28,7 +28,7 @@ const M = await import(pathToFileURL(out).href)
 /* entry.ts 按命名空间导出：dbApi.db 是那个 Dexie 实例，dbApi.<fn> 是 src/db 里的函数 */
 const dbApi = M.db
 const db = dbApi.db
-const { edit, importer, backup, quiz, bundleImport, flags } = M
+const { edit, importer, backup, quiz, bundleImport, flags, lookup, ai } = M
 
 let bad = 0
 function ok(cond, msg, detail = '') {
@@ -283,6 +283,191 @@ ok((await db.sentences.get(afterTake[0].sentenceId)).en === flagged.sentence.en,
   await edit.purgeWord(R)
   ok((await db.words.get(W)) == null && (await db.words.get(R)) == null,
      '造出来的探针词已清干净（不留残骸）')
+}
+
+/* ── 6.3 点词查义：形态还原、命中、未入库加入（D36 的延伸）──
+ * 这一组守的是「答完之后句子里任何一个词都查得到」这条体验：
+ * 句子里的词是**屈折形式**（ordered / sides / studies），词库存的是原形。
+ * 只按 `db.words.get(token)` 查会大面积落空，而落空在界面上长得像
+ * 「词库里没这个词」—— 用户会以为词库缺词。 */
+{
+  // 纯函数：候选顺序错了，就会把人带到不存在的词上
+  const seq = (w) => lookup.guessLemmas(w)
+  ok(seq('ordered')[1] === 'order', 'ordered → order（去掉 ed，第一个派生候选）', seq('ordered').join(','))
+  ok(seq('sides')[1] === 'side', 'sides → side（先只去一个 s）', seq('sides').join(','))
+  ok(seq('studies')[1] === 'study', 'studies → study（ies → y）', seq('studies').join(','))
+  ok(seq('stopped').includes('stop'), 'stopped → stop（去双写）', seq('stopped').join(','))
+  ok(seq('making').includes('make'), 'making → make（补 e）', seq('making').join(','))
+  ok(seq('boxes')[1] === 'box', 'boxes → box（去 es；以 x 结尾先试去 es）', seq('boxes').join(','))
+  ok(seq('Army,')[0] === 'army', '大小写与标点先规范化', seq('Army,').join(','))
+
+  // 命中：原形直接查得到
+  const p1 = await lookup.peekWord('army')
+  ok(p1.exact && p1.word?.word === 'army' && p1.senses.length > 0,
+     `库里有的词直接命中（${p1.senses.length} 个义项）`)
+  ok(p1.senses.every((s) => s.word === 'army'), '只给这个词自己的义项，不混别的词')
+  ok(p1.senses.every((s) => p1.sentenceCounts.has(s.id)),
+     '每个义项都带例句条数（浮层要让人知道点进去有没有东西看）')
+
+  // 命中：屈折形式落到原形（armies → army）
+  const p2 = await lookup.peekWord('armies')
+  ok(!p2.exact && p2.word?.word === 'army', 'armies 命中原形 army（exact=false）')
+  ok(p2.lemma === 'army' && p2.token === 'armies', '浮层要能说清「句子里的是 X、原形是 Y」')
+
+  // 未入库：给得出「最像原形」的候选，而且不假装命中
+  const p3 = await lookup.peekWord('blorping')
+  ok(!p3.word && p3.senses.length === 0, '库里没有的词不会假装命中')
+  ok(p3.lemma === 'blorp', `未入库时给出候选原形（${p3.lemma}）`)
+  ok(p3.stop === false, '普通生词不是虚词，应该给「加入词库」入口')
+
+  // 虚词不给加入入口（否则词库里会多出 the / of 这种垃圾）
+  ok((await lookup.peekWord('the')).stop === true, '虚词被识别出来（不提供加入）')
+
+  // 加入词库：建词条 + 占位义项，且**必须标 needsRefine**
+  const add1 = await edit.addPendingWord('blorp')
+  ok(add1.existed === false && add1.word === 'blorp', '加入词库建出了词条')
+  const added = await db.senses.get(add1.senseId)
+  ok(added?.needsRefine === 1 && added.gloss === '',
+     '占位义项标了「需精修」、释义为空（空壳不能静默混进复习池）')
+  ok((await lookup.peekWord('blorp')).word?.word === 'blorp', '加入之后立刻查得到')
+  const add2 = await edit.addPendingWord('blorp')
+  ok(add2.existed === true && add2.senseId === add1.senseId, '重复加入不建第二个词条/义项')
+  await edit.purgeWord('blorp')
+  ok((await db.words.get('blorp')) == null, '探针词已清干净')
+}
+
+/* ── 6.4 AI 全链路（假传输）：配置门禁 → 请求 → 解析 → 缓存 → 应用 ──
+ * ★ 为什么这里能测 AI：传输层是注入的（`__setTransportForTest`），
+ *   所以整条链路（拼提示词 → 发请求 → 解析 → 校验 → 提案 → 应用）都在
+ *   Node 里真跑，只有「字节怎么出门」被换成假的。
+ *
+ * ★ 重点验三件**容易静默坏掉**的事：
+ *   1. 没配 key 时必须报「没配置」，而不是发一个空 Bearer 出去；
+ *   2. AI 的幻觉必须被挡住（不存在的 slot、句子里没有目标词）；
+ *   3. 内容没变时第二次调用必须走缓存（省钱这条要能被证明）。
+ */
+{
+  const W = 'zzzai'
+  const { senseId } = await edit.addWord(W, '/zzz/')
+  await edit.updateSense(senseId, { gloss: '原释义', pos: 'n.' })
+  await edit.addSentence(senseId, W, `A ${W} stood here.`)
+  const sid1 = (await db.sentences.where('senseId').equals(senseId).toArray())[0].id
+
+  // 1) 没配置 → 明确报 no-config（不是发出去再失败）
+  let noCfg = null
+  try {
+    await ai.reviewWord(W)
+  } catch (e) {
+    noCfg = e
+  }
+  ok(noCfg && noCfg.kind === 'no-config', '没配 key 时直接报「没配置」，不发请求')
+
+  // 2) 注入假传输：记录请求，返回一段包含幻觉的 JSON
+  let calls = 0
+  let lastBody = null
+  let lastUrl = ''
+  let lastAuth = ''
+  const fake = {
+    name: 'fake',
+    async postJson(url, headers, body /*, timeoutMs */) {
+      calls++
+      lastUrl = url
+      lastAuth = headers.Authorization ?? ''
+      lastBody = JSON.parse(body)
+      const canned = {
+        note: '看了一下，有 3 处',
+        proposals: [
+          { kind: 'sense.update', slot: 1, gloss: 'AI 修的释义', pos: 'n.', why: '更准确' },
+          { kind: 'sentence.add', slot: 1, en: `The ${W} stood on the hill.`, zh: '它站在山上。', why: '补一句' },
+          { kind: 'sentence.replace', sentenceId: sid1, en: `A ${W} appeared near the river.`, zh: '它出现在河边。', why: '换一句' },
+          // 幻觉一号：句子里根本没有目标词
+          { kind: 'sentence.add', slot: 1, en: 'Nothing to see here.', zh: '这里什么都没有。', why: '不含目标词' },
+          // 幻觉二号：不存在的槽位
+          { kind: 'sense.update', slot: 9, gloss: '不存在的意思' },
+        ],
+      }
+      return {
+        status: 200,
+        body: JSON.stringify({
+          choices: [{ message: { content: JSON.stringify(canned) } }],
+          usage: { prompt_tokens: 100, completion_tokens: 50, total_tokens: 150 },
+        }),
+      }
+    },
+  }
+  ai.__setTransportForTest(fake)
+  ai.__setConfigForTest({
+    enabled: true,
+    baseUrl: 'https://example.test/v1',
+    apiKey: 'sk-test',
+    model: 'test-model',
+    maxTokens: 800,
+    temperature: 0.2,
+  })
+
+  const r = await ai.reviewWord(W)
+  ok(calls === 1, '一次审查只发一次请求（不是每个义项一次）')
+  ok(lastUrl === 'https://example.test/v1/chat/completions', '端点拼对了（baseUrl 会自动补 /chat/completions）', lastUrl)
+  ok(lastAuth === 'Bearer sk-test', 'Authorization 头带上了 key')
+  ok(lastBody?.model === 'test-model' && lastBody?.max_tokens === 800, '模型与输出上限来自配置')
+  ok(lastBody?.response_format?.type === 'json_object', '要求 JSON 输出（省掉一半解析麻烦）')
+  ok(r.proposals.length === 3, `幻觉被挡掉，只剩 3 条可用（实际 ${r.proposals.length}）`)
+  ok(r.usage?.total === 150, '带回了 token 用量（界面要显示这次花了多少）')
+  ok(r.note.includes('不可用'), '被丢掉的建议有交代，不是静默消失', r.note)
+  ok(r.cached === false, '首次是真调用')
+
+  // 3) 内容没变 → 第二次必须命中缓存（省钱这条要能被证明）
+  const r2 = await ai.reviewWord(W)
+  ok(r2.cached === true && calls === 1, '同样内容第二次调用走缓存，没有再花钱')
+  ok(r2.proposals.length === 3, '缓存回来的提案一样可用')
+
+  // 4) 应用：改释义 + 补一句 + 换一句（换句要重算高亮区间）
+  const { applied } = await ai.applyAll(r.proposals)
+  ok(applied === 3, `三条都应用了（${applied}）`)
+  const senseNow = await db.senses.get(senseId)
+  ok(senseNow.gloss === 'AI 修的释义' && senseNow.pos === 'n.', '释义改对了，词性没被顺手清掉')
+  const sentsNow = await db.sentences.where('senseId').equals(senseId).toArray()
+  ok(sentsNow.length === 2, `两句（原来 1 句 + 补 1 句，替换不新增）实际 ${sentsNow.length}`)
+  const replaced = sentsNow.find((s) => s.id === sid1)
+  ok(replaced?.en === `A ${W} appeared near the river.`, '被替换的句子换成新内容')
+  ok(replaced?.zh === '它出现在河边。', '替换时中文也跟着换')
+  ok(replaced?.form === W && replaced.spanStart >= 0 &&
+     replaced.en.slice(replaced.spanStart, replaced.spanStart + replaced.spanLen) === W,
+     '替换后重新定位了目标词区间（高亮不会打偏）')
+  ok((await db.snapshots.count()) > 0, '应用前自动存了快照（AI 一次改多条，人可以整批退回）')
+
+  // 5) 「换一句」单个动作
+  ai.__setTransportForTest({
+    name: 'fake2',
+    async postJson() {
+      calls++
+      return {
+        status: 200,
+        body: JSON.stringify({
+          choices: [{ message: { content: JSON.stringify({
+            note: 'ok',
+            proposals: [{ kind: 'sentence.replace', sentenceId: sid1, en: `Every ${W} has a name.`, zh: '每个都有名字。' }],
+          }) } }],
+        }),
+      }
+    },
+  })
+  const r3 = await ai.replaceSentence(sid1, '原句不自然')
+  ok(r3.proposals.length === 1 && r3.proposals[0].kind === 'sentence.replace', '换一句只产出一条替换提议')
+  await ai.applyAll(r3.proposals)
+  ok((await db.sentences.get(sid1)).en === `Every ${W} has a name.`, '换一句落库了')
+
+  // 6) 内容一改，缓存必须失效（否则会拿旧建议改新内容）
+  const beforeCalls = calls
+  await edit.updateSense(senseId, { gloss: '又改了一次' })
+  await ai.reviewWord(W)
+  ok(calls > beforeCalls, '内容变了就不再用旧缓存（重新问一次）')
+
+  // 收尾
+  ai.__setTransportForTest(null)
+  ai.__setConfigForTest(null)
+  await edit.purgeWord(W)
+  ok((await db.words.get(W)) == null, 'AI 探针词已清干净')
 }
 
 /* ── 7. 备份 + 回滚 ── */

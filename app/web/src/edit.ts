@@ -103,6 +103,34 @@ export async function updateSense(id: string, patch: Partial<Sense>): Promise<vo
   await db.senses.update(id, { ...patch, updatedAt: now() })
 }
 
+/**
+ * 查词时「顺手加入词库」—— 只建词条 + 一个**占位义项**，不假装有内容。
+ *
+ *  ★ 为什么允许占位：点开一个生词、发现不在库里时，用户想要的往往是
+ *    「先记下它，别丢」，而不是当场写释义。硬要他先想好释义才能加，
+ *    结果就是不加、下次再遇到还是不加。
+ *
+ *  ★ 为什么必须标 `needsRefine`：空白义项混在词库里就是脏数据，
+ *    而「需精修」是这套系统里已有的处理队列 —— 词库页能筛出来，
+ *    下一步 AI 审查（`ai.reviewWord`）也能直接把这一条补全。
+ *    不标的话，这条空壳会静默混进复习池，变成一张永远学不会的卡。
+ */
+export async function addPendingWord(
+  word: string,
+): Promise<{ word: string; senseId: string; existed: boolean }> {
+  const w = word.trim().toLowerCase()
+  const existing = await db.words.get(w)
+  if (existing) {
+    const live = (await db.senses.where('word').equals(w).toArray())
+      .filter((s) => s.deletedAt == null)
+      .sort((a, b) => a.slot - b.slot)
+    return { word: w, senseId: live[0]?.id ?? '', existed: true }
+  }
+  const { word: created, senseId } = await addWord(w)
+  await db.senses.update(senseId, { needsRefine: 1 })
+  return { word: created, senseId, existed: false }
+}
+
 /** 把某词的 slot 重排成 1..n（插入/删除/重排之后调用） */
 export async function normalizeSlots(word: string): Promise<void> {
   const rows = (await db.senses.where('word').equals(word).toArray())
@@ -219,6 +247,33 @@ export async function addSentence(senseId: string, word: string, en: string, zh 
 
 export async function updateSentence(id: number, patch: Partial<Sentence>): Promise<void> {
   await db.sentences.update(id, patch)
+}
+
+/**
+ * 换掉一句例句的正文（AI 换一句、或手改英文都走这里）。
+ *
+ *  ★ 必须**重算高亮区间**：换了句子之后旧的 spanStart 指向的是别的词，
+ *    训练页的高亮会打在错误的位置上 —— 那等于告诉用户错误的答案位置，
+ *    比不高亮糟得多。重算的顺序：
+ *      1. 旧的目标词形态（form）还在新句子里 → 用它；
+ *      2. 否则用词条原形（AI 常常换用它的屈折形式）；
+ *      3. 都找不到 → spanStart=-1（`MarkedText` 会退回不高亮，句子仍然可读）。
+ */
+export async function replaceSentence(id: number, en: string, zh?: string): Promise<void> {
+  const sen = await db.sentences.get(id)
+  if (!sen) return
+  const text = en.trim()
+  if (!text) return
+  const sense = await db.senses.get(sen.senseId)
+  let span = locate(text, sen.form)
+  if (span.spanStart < 0 && sense) span = locate(text, sense.word)
+  await db.sentences.update(id, {
+    en: text,
+    zh: (zh ?? sen.zh).trim(),
+    spanStart: span.spanStart,
+    spanLen: span.spanLen,
+    form: span.spanStart >= 0 ? text.slice(span.spanStart, span.spanStart + span.spanLen) : '',
+  })
 }
 
 export async function deleteSentence(id: number): Promise<void> {

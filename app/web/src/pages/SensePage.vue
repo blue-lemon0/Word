@@ -39,6 +39,10 @@ import { useDragReorder } from '../draglist'
 import { setAvoidTarget } from '../keyboard'
 import { goBack } from '../nav'
 import { toast } from '../toast'
+import { addSentence as aiAddSentence, replaceSentence as aiReplaceSentence } from '../ai/actions'
+import { isConfigured } from '../ai/config'
+import { describeAiError, type AiResult } from '../ai/types'
+import AiSheet from '../components/AiSheet.vue'
 import type { Progress, Sense, Sentence } from '../types'
 
 /** 每个义项的例句目标数，与 content-kit/spec.yaml 的 sentences_per_sense 对齐。
@@ -250,6 +254,41 @@ async function onAddSentence(): Promise<void> {
   showAdd.value = false
   toast('已添加')
   await load()
+}
+
+/* ── AI（可选）：补一句 / 换一句 ──
+ *  ★ 两个动作都只发**一次请求**，而且只带这个义项与它已有的例句 ——
+ *    审查整词才需要整词上下文，换/补一句不需要，多带就是多花钱。
+ *  ★ 结果只进 AiSheet（提议），点应用才落库；应用前自动存内容快照。 */
+const aiOn = ref(isConfigured())
+const aiOpen = ref(false)
+const aiBusy = ref(false)
+const aiResult = ref<AiResult | null>(null)
+const aiError = ref('')
+
+async function runAi(fn: () => Promise<AiResult>): Promise<void> {
+  aiError.value = ''
+  aiResult.value = null
+  aiOpen.value = true
+  aiBusy.value = true
+  try {
+    aiResult.value = await fn()
+  } catch (e) {
+    aiError.value = describeAiError(e)
+  } finally {
+    aiBusy.value = false
+  }
+}
+
+function onAiAdd(): void {
+  const s = sense.value
+  if (!s) return
+  void runAi(() => aiAddSentence(s.id, 3))
+}
+
+function onAiReplace(sen: Sentence): void {
+  if (sen.id == null) return
+  void runAi(() => aiReplaceSentence(sen.id as number, ''))
 }
 
 /** 进编辑态。
@@ -590,6 +629,7 @@ function onDelete(): void {
                 <van-button size="mini" plain :type="s.flagged ? 'warning' : 'default'" @click="onFlag(s)">
                   {{ s.flagged ? '★ 有问题' : '☆ 标记' }}
                 </van-button>
+                <van-button v-if="aiOn" size="mini" plain @click="onAiReplace(s)">AI 换一句</van-button>
                 <span class="wb-sp" />
                 <van-button v-if="!isEditing(s)" size="mini" plain icon="edit" @click="onEdit(s)">
                   改
@@ -617,6 +657,12 @@ function onDelete(): void {
             添加例句
             <span class="cnt">{{ sents.length }}/{{ TARGET }}</span>
           </button>
+        </div>
+        <!-- AI 补例句：和「添加例句」并列，但它是**生成**而不是手写 -->
+        <div v-if="aiOn" class="aiadd">
+          <van-button size="small" plain block :loading="aiBusy" @click="onAiAdd">
+            让 AI 补 3 条候选例句
+          </van-button>
         </div>
       </div>
 
@@ -731,6 +777,15 @@ function onDelete(): void {
         :title="`复制给 AI · ${word}`"
         :text="promptText"
         @close="showPrompt = false"
+      />
+      <!-- AI 提议：补一句 / 换一句都走这张浮层（同一种「提议」，不分两套 UI） -->
+      <AiSheet
+        :show="aiOpen"
+        :result="aiResult"
+        :busy="aiBusy"
+        :error="aiError"
+        @close="aiOpen = false"
+        @applied="load"
       />
     </div>
   </div>
@@ -1010,6 +1065,13 @@ function onDelete(): void {
   color: var(--wb-ink-3);
   font-weight: 400;
   font-size: 12px;
+}
+
+/* AI 补例句：和固定的「添加例句」条分开摆 ——
+   它是生成（要等、要花钱），不该长得跟「立刻就能写」一样。
+   margin-bottom 让出固定条的高度，否则最后这个按钮永远被压在条下面。 */
+.aiadd {
+  margin: 10px 0 calc(64px + var(--wb-safe-bottom));
 }
 
 .addfoot {

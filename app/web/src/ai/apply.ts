@@ -1,0 +1,65 @@
+/** 把「提案」落成真实的库改动。
+ *
+ *  ★ AI 永远不直接写库：它只产出提案，写库只走这里 —— 而这里用的都是
+ *    已有的编辑原语（`edit.updateSense` / `edit.addSentence` / …），
+ *    也就是说 AI 改内容的能力**不超过手点界面能做的范围**。
+ *    这条边界是刻意的：出问题时，用户手改一次就能覆盖它。
+ *
+ *  ★ 批量应用之前先打一张内容层快照：AI 一次改好几条时，
+ *    人不可能逐条回滚。快照只含内容（词/义项/例句），不碰学习进度。
+ */
+import { snapshot } from '../backup'
+import { db } from '../db'
+import {
+  addSentence as addSentenceEdit,
+  addSense,
+  replaceSentence as replaceSentenceEdit,
+  updateSense,
+} from '../edit'
+import type { Proposal } from './types'
+
+/** 应用一条提案。返回给人看的一句话（用于 toast / 界面回执）。 */
+export async function applyOne(p: Proposal): Promise<string> {
+  switch (p.kind) {
+    case 'sense.update': {
+      const patch: Record<string, string> = {}
+      if (p.gloss != null) patch.gloss = p.gloss
+      if (p.pos != null) patch.pos = p.pos
+      if (p.note != null) patch.note = p.note
+      if (p.glossEn != null) patch.glossEn = p.glossEn
+      await updateSense(p.senseId, patch)
+      return `改了 s${p.slot} 的释义`
+    }
+    case 'sentence.replace': {
+      await replaceSentenceEdit(p.sentenceId, p.en, p.zh)
+      return '换了一条例句'
+    }
+    case 'sentence.add': {
+      const sense = await db.senses.get(p.senseId)
+      if (!sense) throw new Error('义项不存在')
+      await addSentenceEdit(p.senseId, sense.word, p.en, p.zh ?? '')
+      return `给 s${sense.slot} 补了一句`
+    }
+    case 'sense.add': {
+      const id = await addSense(p.word, p.gloss)
+      if (p.pos) await updateSense(id, { pos: p.pos })
+      return `新增了义项：${p.gloss}`
+    }
+  }
+}
+
+/**
+ * 批量应用。**先打快照再动手**：中途失败时至少能整批退回去，
+ * 而不是留下「改了一半」的库。
+ */
+export async function applyAll(ps: Proposal[]): Promise<{ applied: number; label: string }> {
+  if (!ps.length) return { applied: 0, label: '' }
+  const label = `AI 应用前（${ps.length} 条）`
+  await snapshot(label)
+  let n = 0
+  for (const p of ps) {
+    await applyOne(p)
+    n++
+  }
+  return { applied: n, label }
+}

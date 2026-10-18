@@ -227,7 +227,24 @@ public class MainActivity extends android.app.Activity {
         }
     }
 
-    private static String jsonString(String s) {
+    /**
+     * 从原生往页面里执行一段 JS（AI 的原生网络请求回调走这条）。
+     *
+     * <p>必须切到 UI 线程再 evaluate：WebView 的方法只能在创建它的线程调用。
+     * 用 {@code evaluateJavascript} 而不是 {@code loadUrl("javascript:...")} ——
+     * 后者会走一遍导航逻辑，对正在跑的应用来说是不必要的副作用。
+     */
+    void evalJs(final String js) {
+        if (web == null) return;
+        web.post(new Runnable() {
+            @Override
+            public void run() {
+                web.evaluateJavascript(js, null);
+            }
+        });
+    }
+
+    static String jsonString(String s) {
         StringBuilder sb = new StringBuilder("\"");
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);

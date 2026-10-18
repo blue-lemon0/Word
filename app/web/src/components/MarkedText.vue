@@ -104,6 +104,12 @@ function onPickToken(tok: string): void {
   color: var(--primary);
 }
 
+/* 手机上没有 hover：按下时给一次反馈，别让人怀疑「点了个寂寞」 */
+.pickable .link:active {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
 /* 可点 + 高亮：hover 的反馈不能盖住高亮本身，否则鼠标一放上去
    就看不出该盯哪个词了 */
 .pickable .hit {

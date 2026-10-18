@@ -23,6 +23,10 @@ import { useDragReorder } from '../draglist'
 import { aiPrompt } from '../import'
 import { goBack } from '../nav'
 import { toast } from '../toast'
+import { describeAiError, type AiResult } from '../ai/types'
+import { reviewWord } from '../ai/actions'
+import { isConfigured } from '../ai/config'
+import AiSheet from '../components/AiSheet.vue'
 import type { Progress, Sense, Word } from '../types'
 import { masteryPercent } from '../types'
 
@@ -38,6 +42,29 @@ const showImport = ref(false)
 const showPrompt = ref(false)
 /** 「加进词库」弹层（搜到的生词） */
 const showAdd = ref(false)
+
+/* ── AI 审查（可选，配了才出现）──
+ *  ★ 审查是**整词一次请求**：义项、例句一起带上，一次看全（省钱也看得准）。
+ *  ★ 结果只是提议：AiSheet 里逐条看，点应用才落库（AI 没有写库的权限）。 */
+const aiOn = ref(isConfigured())
+const aiOpen = ref(false)
+const aiBusy = ref(false)
+const aiResult = ref<AiResult | null>(null)
+const aiError = ref('')
+
+async function runReview(): Promise<void> {
+  aiError.value = ''
+  aiResult.value = null
+  aiOpen.value = true
+  aiBusy.value = true
+  try {
+    aiResult.value = await reviewWord(props.word)
+  } catch (e) {
+    aiError.value = describeAiError(e)
+  } finally {
+    aiBusy.value = false
+  }
+}
 /** 词条在不在库里。它和「有没有释义」是两件事，空态要分开说 */
 const inLibrary = computed(() => word.value != null)
 
@@ -202,6 +229,16 @@ function onAsk(): void {
       <div class="in">
         <van-icon name="arrow-left" size="18" @click="goBack(router, '/library')" />
         <h1>{{ props.word }}</h1>
+        <van-button
+          v-if="aiOn"
+          size="mini"
+          plain
+          type="primary"
+          :disabled="!senses.length"
+          @click="runReview"
+        >
+          AI 审查
+        </van-button>
         <van-button size="mini" plain type="primary" :disabled="!senses.length" @click="showPrompt = true">
           复制模板
         </van-button>
@@ -335,6 +372,16 @@ function onAsk(): void {
     </div>
 
     <ImportSheet :open="showImport" :word="props.word" @close="showImport = false" @done="load" />
+
+    <!-- AI 提议：只摆「想改什么」，应用才落库 -->
+    <AiSheet
+      :show="aiOpen"
+      :result="aiResult"
+      :busy="aiBusy"
+      :error="aiError"
+      @close="aiOpen = false"
+      @applied="load"
+    />
     <ConfirmSheet
       :open="!!ask"
       :title="ask?.title ?? ''"

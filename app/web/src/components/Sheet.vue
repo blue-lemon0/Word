@@ -18,6 +18,7 @@ const emit = defineEmits<{ (e: 'close'): void }>()
     :show="open"
     position="bottom"
     round
+    close-on-popstate
     :style="{ maxHeight: '88dvh', display: 'flex', flexDirection: 'column' }"
     @update:show="(v: boolean) => !v && emit('close')"
   >

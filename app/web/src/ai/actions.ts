@@ -1,0 +1,132 @@
+/** AI 的三个动作 —— 对上层只暴露「审一个词 / 补一句 / 换一句」。
+ *
+ *  ★ 三个动作共用一条流水线（取上下文 → 拼提示词 → 查缓存 → 调一次
+ *    → 解析成提案 → 写缓存）。新增第四个动作只要写个 prompt 函数，
+ *    再在下面加一个四行的包装 —— 这是「不专门为某个 AI 设计」的落点。
+ *
+ *  ★ 每个动作都是**一次请求**：审查整词时把该词的义项与例句一次带上，
+ *    而不是「每个义项问一次」。这是省钱的主要手段（见 prompts.ts 的约束）。
+ */
+import { db, sensesOf } from '../db'
+import type { Sense, Sentence } from '../types'
+import { cacheGet, cachePut, hashOf } from './cache'
+import { chat } from './client'
+import { isConfigured, loadConfig } from './config'
+import { parseProposals } from './parse'
+import { addSentencePrompt, replaceSentencePrompt, reviewWordPrompt } from './prompts'
+import { AiError, type AiActionKind, type AiResult, type WordContext } from './types'
+
+interface Rows {
+  word: string
+  ipa: string
+  senses: Sense[]
+  sentences: Sentence[]
+}
+
+async function rowsOf(word: string): Promise<Rows> {
+  const w = await db.words.get(word)
+  const senses = await sensesOf(word)
+  const sentences: Sentence[] = []
+  for (const s of senses) {
+    const list = await db.sentences.where('senseId').equals(s.id).toArray()
+    sentences.push(...list.sort((a, b) => a.idx - b.idx))
+  }
+  return { word, ipa: w?.ipa ?? '', senses, sentences }
+}
+
+function contextOf(r: Rows): WordContext {
+  return {
+    word: r.word,
+    ipa: r.ipa,
+    senses: r.senses.map((s) => ({
+      id: s.id,
+      slot: s.slot,
+      pos: s.pos,
+      gloss: s.gloss,
+      glossEn: s.glossEn,
+      note: s.note,
+      tier: s.tier,
+      trap: s.trap,
+    })),
+    sentences: r.sentences.map((s) => ({
+      id: s.id as number,
+      senseId: s.senseId,
+      en: s.en,
+      zh: s.zh,
+      form: s.form,
+    })),
+  }
+}
+
+/** 一次「取缓存 → 调用 → 解析 → 写缓存」。 */
+async function run(
+  action: AiActionKind,
+  rows: Rows,
+  messages: { role: 'system' | 'user'; content: string }[],
+  extra = '',
+): Promise<AiResult> {
+  const cfg = loadConfig()
+  if (!isConfigured(cfg)) throw new AiError('no-config', 'AI 还没配置')
+
+  const ctx = contextOf(rows)
+  // 键里必须有**内容指纹**：内容一改，旧建议立刻作废（见 cache.ts）
+  const key = hashOf([action, cfg.model, extra, JSON.stringify(ctx)].join('|'))
+  const bind = { word: rows.word, senses: rows.senses, sentences: rows.sentences }
+
+  const hit = await cacheGet(key)
+  if (hit) {
+    const p = parseProposals(hit.payload, bind)
+    return {
+      action,
+      proposals: p.proposals,
+      note: p.note,
+      cached: true,
+    }
+  }
+
+  const reply = await chat(messages, { json: true })
+  const p = parseProposals(reply.text, bind)
+  await cachePut(key, cfg.model, reply.text)
+  return {
+    action,
+    proposals: p.proposals,
+    note: p.note + (p.dropped.length ? `（${p.dropped.length} 条建议不可用：${p.dropped[0]}）` : ''),
+    usage: reply.usage,
+    cached: false,
+  }
+}
+
+/** 审查一个词：义项与例句的问题，附补充建议。 */
+export async function reviewWord(word: string): Promise<AiResult> {
+  const rows = await rowsOf(word)
+  if (!rows.senses.length) throw new AiError('refused', '这个词还没有义项，没什么可审的')
+  return run('reviewWord', rows, reviewWordPrompt(contextOf(rows)))
+}
+
+/** 给某个义项补几条候选例句。 */
+export async function addSentence(senseId: string, howMany = 3): Promise<AiResult> {
+  const sense = await db.senses.get(senseId)
+  if (!sense) throw new AiError('refused', '这个义项不存在')
+  const rows = await rowsOf(sense.word)
+  return run(
+    'addSentence',
+    rows,
+    addSentencePrompt(contextOf(rows), sense.slot, howMany),
+    `${senseId}:${howMany}`,
+  )
+}
+
+/** 换掉某一条例句（保留它要教的义项）。 */
+export async function replaceSentence(sentenceId: number, why = ''): Promise<AiResult> {
+  const sen = await db.sentences.get(sentenceId)
+  if (!sen) throw new AiError('refused', '这句例句不存在')
+  const sense = await db.senses.get(sen.senseId)
+  if (!sense) throw new AiError('refused', '这句例句挂的义项不存在')
+  const rows = await rowsOf(sense.word)
+  return run(
+    'replaceSentence',
+    rows,
+    replaceSentencePrompt(contextOf(rows), sentenceId, why),
+    `sentence:${sentenceId}`,
+  )
+}

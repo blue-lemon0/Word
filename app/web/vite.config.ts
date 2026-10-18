@@ -22,6 +22,15 @@ export default defineConfig({
     proxy: {
       // ← Node 后端还活着时用它做对照；新前端走 IndexedDB，不依赖它
       '/api': 'http://127.0.0.1:8777',
+      // AI：桌面浏览器直接打第三方 API 会被 CORS 拦（对方不给 ACAO 头）。
+      // 开发时把 AI 配置里的地址填 `/ai`，由这里同源转发 —— 代码不变，
+      // 手机上则由原生桥发请求（见 src/ai/transport.ts）。
+      '/ai': {
+        target: 'https://api.deepseek.com',
+        changeOrigin: true,
+        secure: true,
+        rewrite: (p) => p.replace(/^\/ai/, ''),
+      },
     },
   },
   preview: {

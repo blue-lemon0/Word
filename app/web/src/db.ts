@@ -11,6 +11,7 @@
  */
 import Dexie, { type Table } from 'dexie'
 import type { Word, Sense, Sentence, Progress, ReviewLog, ImportLog, Snapshot } from './types'
+import type { AiCacheRow } from './ai/cache'
 
 export class WordBankDB extends Dexie {
   words!: Table<Word, string>
@@ -20,6 +21,7 @@ export class WordBankDB extends Dexie {
   reviewLog!: Table<ReviewLog, [string, number]>
   importLog!: Table<ImportLog, number>
   snapshots!: Table<Snapshot, number>
+  aiCache!: Table<AiCacheRow, string>
 
   constructor() {
     super('wordbank')
@@ -47,6 +49,20 @@ export class WordBankDB extends Dexie {
       importLog: '++id, ts, word',
       snapshots: '++id, ts',
     })
+    // v3：AI 结果缓存（按内容指纹存，内容一改就失效）
+    //   ★ 缓存放在库里的理由：它要和内容同生命周期 —— 内容被导入覆盖、
+    //     或者用户删了这个词，旧建议就该跟着没用；放 localStorage 反而
+    //     会留下一堆指向已不存在义项的 JSON。
+    this.version(3).stores({
+      words: 'word, hidden, updatedAt',
+      senses: 'id, word, [word+slot], deletedAt, needsRefine, trap, tier',
+      sentences: '++id, senseId, [senseId+idx], flagged',
+      progress: 'senseId, dueAt, mastered',
+      reviewLog: '[sessionId+idx], senseId, ts',
+      importLog: '++id, ts, word',
+      snapshots: '++id, ts',
+      aiCache: 'id, ts',
+    })
   }
 }
 
@@ -69,6 +85,7 @@ export async function verifySchema(): Promise<{ ok: boolean; error?: string }> {
       db.reviewLog.count(),
       db.importLog.count(),
       db.snapshots.count(),
+      db.aiCache.count(),
     ])
     return { ok: true }
   } catch (e) {
@@ -172,6 +189,7 @@ const TABLE_CACHES: Record<string, CacheKey[]> = {
   importLog: [],
   reviewLog: [],
   snapshots: [],
+  aiCache: [],
 }
 
 for (const [name, table] of [
@@ -182,6 +200,7 @@ for (const [name, table] of [
   ['reviewLog', db.reviewLog],
   ['importLog', db.importLog],
   ['snapshots', db.snapshots],
+  ['aiCache', db.aiCache],
 ] as [string, unknown][]) {
   // Dexie 的 hook() 是重载签名（creating/updating/deleting 各一份），
   // 循环里传联合类型过不了类型检查；这里显式收成单一签名，语义不变。

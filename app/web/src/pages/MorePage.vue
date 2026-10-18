@@ -7,6 +7,7 @@ import { onMounted, ref, watch } from 'vue'
 import ConfirmSheet from '../components/ConfirmSheet.vue'
 import InstallPrompt from '../components/InstallPrompt.vue'
 import SwipePanels from '../components/SwipePanels.vue'
+import AiSettings from '../components/AiSettings.vue'
 import { incomingFile, nativeBridge } from '../bridge'
 import { loadStats, type Stats } from '../composables'
 import { downloadBackup, importLine, listSnapshots, restoreBackup, rollback } from '../backup'
@@ -261,6 +262,11 @@ onMounted(load)
           title="导入不用挑按钮，它自己认：词库内容包（只加不改已有的）、本应用导出的备份（会覆盖，先问你）、AI 按「复制给 AI」回来的单词（请到那个词的意思页粘贴）。从微信/QQ 里直接点开这个文件也可以。"
         />
       </van-cell-group>
+
+      <!-- AI 助手（可选）：配置只存本机，不进备份。
+           放在「备份与导入」下面、记录区上面 —— 它属于「设置这台设备怎么工作」，
+           不属于「已经发生过的记录」。 -->
+      <AiSettings />
 
       <!-- 快照 / 导入历史 / 回收站：三个平级的列表，同一个盒子，左右滑动切换。
            它们本来就是一类东西 —— 都是「已经发生过的、会留痕的记录」，
