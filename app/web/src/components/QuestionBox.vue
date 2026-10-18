@@ -87,6 +87,16 @@ async function load(): Promise<void> {
 
 watch(() => [props.senseId, props.serial, props.sentenceId], load, { immediate: true })
 
+/** 点句子里的词：目标词在**作答前**不响应（点了就等于泄题），
+ *  其它词随时可点 —— 读到不认识的字，应该能立刻查、立刻加进词库。 */
+function onPick(w: string): void {
+  const q0 = q.value
+  if (!q0) return
+  const target = (q0.sentence.form || q0.sense.word).toLowerCase()
+  if (!submitted.value && w.toLowerCase() === target) return
+  emit('pick', w)
+}
+
 function reveal(): void {
   revealed.value = true
   emit('state', { revealed: true, submitted: false })
@@ -135,8 +145,8 @@ defineExpose({ reveal, save, reload: load })
           :form="q.sentence.form"
           :span-start="q.sentence.spanStart"
           :span-len="q.sentence.spanLen"
-          :pickable="props.allowPick && submitted"
-          @pick="emit('pick', $event)"
+          :pickable="props.allowPick"
+          @pick="onPick"
         />
       </p>
 

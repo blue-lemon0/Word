@@ -18,7 +18,11 @@ const props = defineProps<{
   /** 这个义项一共几条例句 —— 让人知道「练这一句」之后还有没有别的 */
   total: number
 }>()
-const emit = defineEmits<{ (e: 'close'): void; (e: 'drill', item: ScanItem): void }>()
+const emit = defineEmits<{
+  (e: 'close'): void
+  (e: 'drill', item: ScanItem): void
+  (e: 'word', w: string): void
+}>()
 
 const sense = computed(() => props.item?.sense)
 const sentence = computed(() => props.item?.sentence)
@@ -48,6 +52,8 @@ const sentence = computed(() => props.item?.sentence)
           :form="sentence.form"
           :span-start="sentence.spanStart"
           :span-len="sentence.spanLen"
+          pickable
+          @pick="emit('word', $event)"
         />
       </div>
       <p v-if="sentence.zh" class="s-zh">{{ sentence.zh }}</p>

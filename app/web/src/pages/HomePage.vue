@@ -363,6 +363,7 @@ onMounted(async () => {
 
     <ScanPeek
       :item="scanItem"
+      @word="(w) => { scanItem = null; pick(w) }"
       :total="scanItem?.count ?? 0"
       @close="scanItem = null"
     />
