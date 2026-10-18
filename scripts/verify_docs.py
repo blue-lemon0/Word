@@ -1344,15 +1344,19 @@ interaction = [
      _re.search(r"function onScanDrill[\s\S]{0,500}?drillOpen\.value = true", train) is not None
      and "<DrillSheet" in train),
 
-    # ── D46：练习是浮层，不是房间；首页内部有可横滑的副页 ──
+    # ── D46/D47：练习是浮层或副页，不是房间 ──
     ("练一句是浮层（不跳页）",
      os.path.exists(os.path.join(WEB, "src", "components", "DrillSheet.vue"))
-     and "recordAnswer(" in _src(os.path.join("components", "DrillSheet.vue"))
-     # 判分链路必须和训练页同一条（不是另写一个迷你练习）
-     and "makeQuestion(" in _src(os.path.join("components", "DrillSheet.vue"))),
-    ("首页内部有可横滑的副页（今天 / 在学 / 待学）",
-     'swipeable' in home and home.count("<van-tab ") >= 3
+     # 题目本体只有一份：浮层与首页练习副页共用 QuestionBox，判分链路同一条
+     and "makeQuestion(" in _src(os.path.join("components", "QuestionBox.vue"))
+     and "recordAnswer(" in _src(os.path.join("components", "QuestionBox.vue"))
+     and "<QuestionBox" in _src(os.path.join("components", "DrillSheet.vue"))),
+    ("首页内部有可横滑的副页（今天 / 在学 / 待学 / 练）",
+     'swipeable' in home and home.count("<van-tab ") >= 4
      and all(k in home for k in ["在学", "待学"])),
+    # 练习是首页的一个副页：快捷卡就地开练，不再跳 /train（D47）
+    ("首页快捷卡就地开练（不跳 /train）",
+     "startPractice(" in home and "scope: 'due'" in home),
     # 单挑/扫读那一轮里，第一次返回 = 回到「怎么练」，不是直接退出训练
     ("单挑/扫读那一轮里，返回先回「怎么练」",
      _re.search(r"function backToPicker", train) is not None
@@ -1373,8 +1377,6 @@ interaction = [
     # 信息流式首页（D45）：每块都通向一个**具体的动作**
     ("首页是信息流：今天一行 + 快捷卡 + 随手背一句 + 最近在练",
      all(k in home for k in ["todayline", "row-cards", "随手背一句", "最近在练"])),
-    # 快捷卡带 scope：点了直接开练，别再把人送回「怎么练」选一次
-    ("首页快捷卡直接带 scope 进训练", "scope=due" in home and "scope=new" in home),
     # 每块只深一层：首页自己不发往三级页（意思页）的链接
     ("首页链接只深一层（不发往 /sense/）", "/sense/" not in home),
     # 例句里点词开浮层、不跳页（跳页会把首页这张卡顶掉）

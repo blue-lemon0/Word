@@ -24,6 +24,8 @@ import InstallPrompt from '../components/InstallPrompt.vue'
 import MarkedText from '../components/MarkedText.vue'
 import WordPeek from '../components/WordPeek.vue'
 import DrillSheet from '../components/DrillSheet.vue'
+import QuestionBox from '../components/QuestionBox.vue'
+import { buildScopeQueue } from '../quiz'
 import {
   loadStats,
   loadStatsNow,
@@ -54,6 +56,9 @@ interface WordMeta {
   done: number
   total: number
 }
+
+/* 今天练过几个意思 —— 和「有没有到期」是两件事 */
+const todayN = ref(0)
 
 const learningWords = ref<WordMeta[]>([])
 const freshWords = ref<WordMeta[]>([])
@@ -87,6 +92,12 @@ async function loadToday(): Promise<void> {
     else if (r === 1) learn++
     else if (r === 2) fresh++
   }
+  // 今天练过的意思：progress.lastReview 落在今天 0 点之后
+  const t0 = new Date()
+  t0.setHours(0, 0, 0, 0)
+  const dayStart = Math.floor(t0.getTime() / 1000)
+  todayN.value = prows.filter((p) => (p.lastReview ?? 0) >= dayStart).length
+
   dueN.value = due
   learningN.value = learn
   freshN.value = fresh
@@ -190,27 +201,119 @@ function fmtWhen(ts: number): string {
   return `${Math.round(hours / 24)} 天前`
 }
 
-/** 快捷卡：点哪张就带着对应 scope 进训练页（只深一层） */
+/** 快捷卡：**点「练」的卡不跳页，直接切到练习副页开练**（D47）。
+ *  错题那张是个例外 —— 错题板本身是一页（列表 + 单挑），没有对应副页。 */
 interface Quick {
   key: string
   n: number
   title: string
   sub: string
-  to: string
+  /** 有 scope = 在首页的练习副页里练；没有 = 跳去某个页面 */
+  scope?: 'due' | 'new' | 'learning'
+  to?: string
   tone: 'hot' | 'cool' | 'warn' | 'ink'
 }
 
-const quicks = computed<Quick[]>(() =>
-  [
-    { key: 'due', n: dueN.value, title: '今天复习', sub: '到期就练', to: '/train?scope=due', tone: 'hot' as const },
-    { key: 'new', n: freshN.value, title: '学新词', sub: '一次都没练过', to: '/train?scope=new', tone: 'cool' as const },
-    { key: 'flag', n: flagN.value, title: '错题', sub: '标记过的句子', to: '/board', tone: 'warn' as const },
-    { key: 'learn', n: learningN.value, title: '在学', sub: '再刷一遍', to: '/train?scope=learning', tone: 'ink' as const },
-  ].filter((q) => q.n > 0),
+const quicks = computed<Quick[]>(() => {
+  const all: Quick[] = [
+    { key: 'due', n: dueN.value, title: '今天复习', sub: '到期就练', scope: 'due', tone: 'hot' },
+    { key: 'new', n: freshN.value, title: '学新词', sub: '一次都没练过', scope: 'new', tone: 'cool' },
+    { key: 'flag', n: flagN.value, title: '错题', sub: '标记过的句子', to: '/board', tone: 'warn' },
+    { key: 'learn', n: learningN.value, title: '在学', sub: '再刷一遍', scope: 'learning', tone: 'ink' },
+  ]
+  return all.filter((q) => q.n > 0)
+})
+
+function onQuick(q: Quick): void {
+  if (q.scope) {
+    void startPractice(q.scope)
+    return
+  }
+  if (q.to) go(q.to)
+}
+
+/* ── 练习副页（第四个 tab）──
+ *
+ *  ★ 这是「练习成为首页副页」的落点（D47）：快捷卡不再跳 /train，
+ *    而是把队列就地装进这个副页 —— 一次都不离开首页。
+ *  ★ 队列仍然走 buildScopeQueue（和词库「练这组」同一条口径），
+ *    判分走 QuestionBox（和浮层、训练页同一份实现）。
+ */
+const P_TAB = 3
+const pScope = ref<'due' | 'new' | 'learning'>('due')
+const pQueue = ref<string[]>([])
+const pIdx = ref(0)
+const pSerial = ref(0)
+const pDone = ref(0)
+const pRight = ref(0)
+const pLoading = ref(false)
+const pCur = computed(() => pQueue.value[pIdx.value] ?? '')
+const pTotal = computed(() => pQueue.value.length)
+
+const pScopeText = computed(() =>
+  pScope.value === 'due' ? '今天到期' : pScope.value === 'new' ? '新词' : '在学',
 )
+
+async function startPractice(s: 'due' | 'new' | 'learning'): Promise<void> {
+  pScope.value = s
+  tab.value = P_TAB
+  pLoading.value = true
+  try {
+    pQueue.value = await buildScopeQueue(s, 20)
+  } finally {
+    pLoading.value = false
+  }
+  pIdx.value = 0
+  pSerial.value++
+  pDone.value = 0
+  pRight.value = 0
+}
+
+function pNext(): void {
+  if (pIdx.value < pQueue.value.length - 1) {
+    pIdx.value++
+    pSerial.value++
+  } else {
+    pQueue.value = []
+    pIdx.value = 0
+  }
+}
+
+function onAnswered(r: 'CORRECT' | 'WRONG' | 'PENDING'): void {
+  pDone.value++
+  if (r === 'CORRECT') pRight.value++
+}
 
 function go(to: string): void {
   router.push(to)
+}
+
+/** 进某个词的词条页（练习副页里点词名用） */
+function goWord(w: string): void {
+  void router.push(/word/ + encodeURIComponent(w))
+}
+
+/* ── 整页横滑切副页 ──
+ *  ★ 不能只靠 van-tabs 的 swipeable：副页里是长列表，纵向滚动会吃掉横向手势，
+ *    于是「下半部分滑不动」。在页面根节点上自己判一次：
+ *    横向位移 > 60px 且明显大于纵向，才切页；其余一律放行给滚动。 */
+const TAB_N = 4
+let sx = 0
+let sy = 0
+
+function onTouchStart(e: TouchEvent): void {
+  const t = e.touches[0]
+  sx = t.clientX
+  sy = t.clientY
+}
+
+function onTouchEnd(e: TouchEvent): void {
+  const t = e.changedTouches[0]
+  const dx = t.clientX - sx
+  const dy = t.clientY - sy
+  if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.6) return
+  if (dx < 0 && tab.value < TAB_N - 1) tab.value++
+  else if (dx > 0 && tab.value > 0) tab.value--
 }
 
 onMounted(async () => {
@@ -220,7 +323,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="wb-page home">
+  <div class="wb-page home" @touchstart.passive="onTouchStart" @touchend.passive="onTouchEnd">
     <!-- ★ 首页内部再分「副页」：横向滑动切换（D46）。
          你原话是「淘宝底部三个 tab，首页那个 tab 里面还能左右滑」——
          道理是：一屏给不了四种状态，但**滑一下**就能。
@@ -244,11 +347,15 @@ onMounted(async () => {
           <!-- 一行「今天」：只留**需要现在动手**的两个数。
                「在学/待学」已经写在下面的快捷卡上，这里再说一遍就是重复；
                底栏已经有「词库 / 更多」，底部再摆一排入口也是重复。 -->
+          <!-- ★ 「今天练了没有」和「有没有到期」是两件事，必须分开写。
+               原来只说「没有到期的」，人刚练完十几个，读到这句会以为白练了。 -->
           <div class="todayline">
             <span class="t-d">今天</span>
+            <span v-if="todayN" class="t-i ok"><b>{{ todayN }}</b> 个意思练过</span>
+            <span v-else class="t-i quiet">还没开始练</span>
             <span v-if="dueN" class="t-i hot"><b>{{ dueN }}</b> 个词到期</span>
             <span v-if="flagN" class="t-i warn"><b>{{ flagN }}</b> 条错题</span>
-            <span v-if="!dueN && !flagN" class="t-i quiet">没有到期的，随手背两句</span>
+            <span v-if="!todayN && !dueN && !flagN" class="t-i quiet">随手背两句也行</span>
           </div>
 
           <!-- 快捷卡：横滑，每张通向一个具体动作 -->
@@ -259,7 +366,7 @@ onMounted(async () => {
               class="qc"
               :class="q.tone"
               type="button"
-              @click="go(q.to)"
+              @click="onQuick(q)"
             >
               <b>{{ q.n }}</b>
               <span class="qc-t">{{ q.title }}</span>
@@ -414,6 +521,49 @@ onMounted(async () => {
           <van-empty v-if="!freshWords.length" description="待学的词都练过了" />
         </div>
       </van-tab>
+      <!-- 副页四：练 —— 就地练，不跳页（D47） -->
+      <van-tab :title="pTotal ? `练 ` : '练'">
+        <div class="wb-wrap">
+          <div class="sub-h">
+            <b>练 · {{ pScopeText }}</b>
+            <span v-if="pDone" class="sub-s">已答 {{ pDone }} · 对 {{ pRight }}</span>
+            <span class="wb-sp" />
+            <van-button v-if="!pCur && pDone" size="mini" plain type="primary" @click="startPractice(pScope)">
+              再来一组
+            </van-button>
+          </div>
+
+          <van-loading v-if="pLoading" class="p-ld" color="#4f46e5">组题…</van-loading>
+
+          <template v-else-if="pCur">
+            <QuestionBox
+              :sense-id="pCur"
+              :serial="pSerial"
+              @answered="onAnswered"
+              @word="goWord"
+            >
+              <template #after>
+                <div class="pacts">
+                  <van-button type="primary" block round @click="pNext">
+                    {{ pIdx + 1 < pTotal ? '下一题' : '练完了' }}
+                  </van-button>
+                </div>
+              </template>
+            </QuestionBox>
+          </template>
+
+          <template v-else>
+            <p class="p-empty">
+              {{ pDone ? `这一组练完了  个，对了  个` : '这组现在没有可练的' }}
+            </p>
+            <div class="p-choose">
+              <van-button block round @click="startPractice('new')">学新词</van-button>
+              <van-button block round @click="startPractice('learning')">在学的再刷</van-button>
+            </div>
+          </template>
+        </div>
+      </van-tab>
+
     </van-tabs>
 
     <WordPeek :show="peekOpen" :token="peekToken" @close="peekOpen = false" />
@@ -792,5 +942,25 @@ onMounted(async () => {
   color: var(--wb-ink-3);
 }
 
+.p-ld {
+  padding: 24px 0;
+}
+
+.pacts {
+  margin-top: 16px;
+}
+
+.p-empty {
+  padding: 20px 0 12px;
+  font-size: 13.5px;
+  color: var(--wb-ink-2);
+  text-align: center;
+}
+
+.p-choose {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 /* 兜底入口只有一张按钮，不需要额外样式 */
 </style>
