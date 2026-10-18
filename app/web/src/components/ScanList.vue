@@ -52,7 +52,10 @@ onMounted(load)
   <section class="scan">
     <header class="head">
       <h2>
-        扫读例句
+        <span class="t">
+          扫读例句
+          <span v-if="items.length" class="cnt">{{ items.length }} 句</span>
+        </span>
         <span class="wb-dim">不懂哪句点哪句，只练那一句</span>
       </h2>
       <button class="again" type="button" :disabled="loading" @click="nextBatch">换一批</button>
@@ -86,12 +89,26 @@ onMounted(load)
   border-top: 1px solid var(--wb-line);
 }
 
+/* ★ 标题栏吸顶：句子列表会很长，「扫读例句 / 换一批」不该被滚出屏幕。
+   注意挂的是真正的类名 .head（不是 .hd）—— 挂错类名时 sticky 完全不生效，
+   而且没有任何报错，只是行为没发生。 */
 .head {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: var(--wb-bg);
+  padding-bottom: 6px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
   margin-bottom: 4px;
+}
+
+.head h2 .t {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
 }
 
 .head h2 {
@@ -105,6 +122,14 @@ onMounted(load)
 .head h2 .wb-dim {
   font-size: 12px;
   font-weight: 400;
+}
+
+.cnt {
+  margin-left: 6px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--wb-ink-3);
+  font-variant-numeric: tabular-nums;
 }
 
 .again {

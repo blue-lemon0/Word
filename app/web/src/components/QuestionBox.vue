@@ -112,7 +112,7 @@ function choose(opt: string): void {
   void save(isRight(opt) ? 'CORRECT' : 'WRONG')
 }
 
-defineExpose({ reveal, save })
+defineExpose({ reveal, save, reload: load })
 </script>
 
 <template>

@@ -60,7 +60,6 @@ const sentence = computed(() => props.item?.sentence)
       <p v-if="sense.note" class="note">{{ sense.note }}</p>
 
       <div class="acts">
-        <van-button block round @click="emit('close')">继续扫</van-button>
         <van-button type="primary" block round @click="emit('drill', item)">
           练这一句
         </van-button>

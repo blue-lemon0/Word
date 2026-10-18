@@ -18,6 +18,10 @@ import DrillSheet from '../components/DrillSheet.vue'
 import WordPeek from '../components/WordPeek.vue'
 import QuestionBox from '../components/QuestionBox.vue'
 import QuickEdit from '../components/QuickEdit.vue'
+import AiSheet from '../components/AiSheet.vue'
+import { replaceSentence } from '../ai/actions'
+import { aiReady } from '../ai/config'
+import { describeAiError, type AiResult } from '../ai/types'
 import type { Question } from '../quiz'
 import type { Sense, Sentence } from '../types'
 import { allProgress, allWords } from '../db'
@@ -73,11 +77,42 @@ async function setMode(_m: Mode = 'random'): Promise<void> {
 }
 
 /** 当前这页题面组件的引用（底栏按钮要指挥它） */
-const boxes = new Map<number, { reveal: () => void; save: (r: 'CORRECT' | 'WRONG' | 'PENDING') => void }>()
+const boxes = new Map<number, { reveal: () => void; save: (r: 'CORRECT' | 'WRONG' | 'PENDING') => void; reload: () => void }>()
 
 function setBox(i: number, el: unknown): void {
   if (el) boxes.set(i, el as never)
   else boxes.delete(i)
+}
+
+/** 把「AI 换一句」也搬到屏一：作答后发现这句不好，当场换（和背单词页同一个动作）。
+ *  换完重新出这一题 —— 不然解析里还挂着旧例句。 */
+const aiOn = aiReady
+const aiOpen = ref(false)
+const aiBusy = ref(false)
+const aiResult = ref<AiResult | null>(null)
+const aiError = ref('')
+
+async function aiReplace(): Promise<void> {
+  const q = curQ.value
+  if (!q) return
+  aiError.value = ''
+  aiResult.value = null
+  aiOpen.value = true
+  aiBusy.value = true
+  try {
+    const sid = q.sentence.id
+    if (sid == null) return
+    aiResult.value = await replaceSentence(sid, '首页觉得这句别扭')
+  } catch (e) {
+    aiError.value = describeAiError(e)
+  } finally {
+    aiBusy.value = false
+  }
+}
+
+function onAiApplied(): void {
+  aiOpen.value = false
+  boxes.get(idx.value)?.reload()
 }
 
 /** 当前题的完整对象（改内容、查词都要用它） */
@@ -286,6 +321,9 @@ onMounted(async () => {
           <div v-if="boxState.submitted" class="qfix">
             <button class="qfix-b" type="button" @click="openFix('sentence')">改例句</button>
             <button class="qfix-b" type="button" @click="openFix('sense')">改释义</button>
+            <button v-if="aiOn" class="qfix-b" type="button" :disabled="aiBusy" @click="aiReplace">
+              {{ aiBusy ? '换句中…' : 'AI 换一句' }}
+            </button>
           </div>
 
           <!-- ★ 「我不会 / 显示选项 / 下一题」固定在底部：
@@ -331,6 +369,15 @@ onMounted(async () => {
       @drill="onListDrill"
     />
     <WordPeek :show="peekOpen" :token="peekToken" @close="peekOpen = false" />
+    <AiSheet
+      :show="aiOpen"
+      :result="aiResult"
+      :busy="aiBusy"
+      :error="aiError"
+      :label="curQ?.sense.word ?? ''"
+      @close="aiOpen = false"
+      @applied="onAiApplied"
+    />
     <QuickEdit
       :sentence="edSentence"
       :sense="edSense"
