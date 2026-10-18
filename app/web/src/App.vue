@@ -110,7 +110,7 @@ const active = computed(() => activeTab(route.path))
          留着它，回来还在原题；内容新不新鲜由训练页自己在 onActivated 里刷新。
          别的页面一律不留：词库/意思页都是「改了要马上看到」的地方，
          缓存它们等于制造「明明改了，列表还是旧的」。 -->
-    <KeepAlive :include="['TrainPage']">
+    <KeepAlive :include="['TrainPage', 'HomePage']">
       <component :is="Component" />
     </KeepAlive>
   </RouterView>

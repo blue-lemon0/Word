@@ -17,6 +17,8 @@ import type { Sentence } from '../types'
 const props = defineProps<{
   /** true = 不自带「我不会 / 显示选项」，由外壳固定底栏渲染（首页屏一用） */
   hideActions?: boolean
+  /** true = 作答后句子里的词可点开（查义） */
+  allowPick?: boolean
   senseId: string
   /** 钉住哪一句（扫读点的那句）。不给就随机 */
   sentenceId?: number
@@ -30,6 +32,8 @@ const emit = defineEmits<{
   (e: 'loaded', q: Question): void
   /** 状态变化：外壳用它在「我不会/显示选项」与「下一题」之间切换 */
   (e: 'state', s: { revealed: boolean; submitted: boolean }): void
+  /** 作答后点句子里的某个词（外壳拿它开查义浮层） */
+  (e: 'pick', w: string): void
 }>()
 
 const KEYS = ['A', 'B', 'C', 'D']
@@ -131,6 +135,8 @@ defineExpose({ reveal, save })
           :form="q.sentence.form"
           :span-start="q.sentence.spanStart"
           :span-len="q.sentence.spanLen"
+          :pickable="props.allowPick && submitted"
+          @pick="emit('pick', $event)"
         />
       </p>
 

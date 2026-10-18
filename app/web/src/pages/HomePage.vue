@@ -10,13 +10,16 @@
  *
  *  ★ 所以 `/train` 那一页删了：它的两种形态就是这两屏。
  */
-import { computed, nextTick, onMounted, ref } from 'vue'
+import { computed, nextTick, onActivated, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import ScanList from '../components/ScanList.vue'
 import ScanPeek from '../components/ScanPeek.vue'
 import DrillSheet from '../components/DrillSheet.vue'
 import WordPeek from '../components/WordPeek.vue'
 import QuestionBox from '../components/QuestionBox.vue'
+import QuickEdit from '../components/QuickEdit.vue'
+import type { Question } from '../quiz'
+import type { Sense, Sentence } from '../types'
 import { allProgress, allWords } from '../db'
 import { buildRandomQueue, type ScanItem } from '../quiz'
 
@@ -75,6 +78,23 @@ const boxes = new Map<number, { reveal: () => void; save: (r: 'CORRECT' | 'WRONG
 function setBox(i: number, el: unknown): void {
   if (el) boxes.set(i, el as never)
   else boxes.delete(i)
+}
+
+/** 当前题的完整对象（改内容、查词都要用它） */
+const curQ = ref<Question | null>(null)
+function onLoaded(i: number, q: Question): void {
+  if (i === idx.value) curQ.value = q
+}
+
+const edSentence = ref<Sentence | null>(null)
+const edSense = ref<Sense | null>(null)
+
+/** 「有问题？改」：和背单词页同一套 QuickEdit，只是入口更轻 */
+function openFix(what: 'sentence' | 'sense'): void {
+  const q = curQ.value
+  if (!q) return
+  edSentence.value = what === 'sentence' ? q.sentence : null
+  edSense.value = what === 'sense' ? q.sense : null
 }
 
 /** 当前题的呈现状态（决定底栏显示哪两个按钮） */
@@ -140,6 +160,11 @@ function onListDrill(it: ScanItem): void {
 const peekOpen = ref(false)
 const peekToken = ref('')
 
+function pick(w: string): void {
+  peekToken.value = w
+  peekOpen.value = true
+}
+
 function goWord(w: string): void {
   void router.push(`/word/${encodeURIComponent(w)}`)
 }
@@ -165,6 +190,17 @@ function onScrollRoot(): void {
 function openPlan(scope: 'due' | 'new' | 'learning'): void {
   void router.push({ path: '/train', query: { scope } })
 }
+
+/** keep-alive 回来时：刷新数字 + **把横滑位置放回去**。
+ *  ★ 组件虽然被缓存了，但 DOM 离开再插回来时滚动位置会丢 ——
+ *    表现就是从背单词页返回后，明明是从第二屏进去的，回来却停在第一屏。 */
+onActivated(() => {
+  void loadNums()
+  void nextTick(() => {
+    const el = rootEl.value
+    if (el) el.scrollLeft = pane.value * el.clientWidth
+  })
+})
 
 onMounted(async () => {
   await loadNums()
@@ -215,10 +251,13 @@ onMounted(async () => {
                   v-if="Math.abs(i - idx) <= 1"
                   :ref="(el) => setBox(i, el)"
                   hide-actions
+                  allow-pick
                   :sense-id="sid"
                   :serial="i"
                   @answered="onAnsweredAt(i, $event)"
                   @state="(st) => onBoxState(i, st)"
+                  @loaded="(q) => onLoaded(i, q)"
+                  @pick="pick"
                   @word="goWord"
                 />
               </div>
@@ -231,6 +270,12 @@ onMounted(async () => {
               <van-button block round type="primary" @click="setMode('random')">换一批</van-button>
               <van-button block round @click="openPlan('new')">去学新词</van-button>
             </div>
+          </div>
+
+          <!-- 作答后：这一句/这个意思有问题，就地改（和背单词页同一个 QuickEdit） -->
+          <div v-if="boxState.submitted" class="qfix">
+            <button class="qfix-b" type="button" @click="openFix('sentence')">改例句</button>
+            <button class="qfix-b" type="button" @click="openFix('sense')">改释义</button>
           </div>
 
           <!-- ★ 「我不会 / 显示选项 / 下一题」固定在底部：
@@ -276,6 +321,11 @@ onMounted(async () => {
       @drill="onListDrill"
     />
     <WordPeek :show="peekOpen" :token="peekToken" @close="peekOpen = false" />
+    <QuickEdit
+      :sentence="edSentence"
+      :sense="edSense"
+      @saved="() => { edSentence = null; edSense = null; }"
+    />
     <DrillSheet
       :open="drillOpen"
       :sense-id="drillSense"
@@ -439,6 +489,30 @@ onMounted(async () => {
   flex-direction: column;
   gap: 8px;
   margin-top: 8px;
+}
+
+/* 改内容：两颗小字按钮，不抢主行动 */
+.qfix {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  padding: 8px 2px 0;
+}
+
+.qfix-b {
+  border: 1px dashed var(--wb-line);
+  background: transparent;
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--wb-ink-3);
+  cursor: pointer;
+}
+
+.qfix-b:active {
+  background: var(--wb-bg);
 }
 
 /* 固定底栏：我不会 / 显示选项 / 下一题 */
