@@ -10,7 +10,7 @@
  *
  *  ★ 所以 `/train` 那一页删了：它的两种形态就是这两屏。
  */
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ScanList from '../components/ScanList.vue'
 import ScanPeek from '../components/ScanPeek.vue'
@@ -73,38 +73,28 @@ async function setMode(m: Mode): Promise<void> {
   serial.value++
   done.value = 0
   right.value = 0
+  resultAt.value = {}
+  await nextTick()
+  const el = qscroll.value
+  if (el) el.scrollTop = 0
 }
 
-/** 上滑下一题、下滑上一题（短视频那套手势） */
-let sy = 0
-let sx = 0
-function onQStart(e: TouchEvent): void {
-  sy = e.touches[0].clientY
-  sx = e.touches[0].clientX
-}
-function onQEnd(e: TouchEvent): void {
-  const dy = e.changedTouches[0].clientY - sy
-  const dx = e.changedTouches[0].clientX - sx
-  if (Math.abs(dy) < 70 || Math.abs(dy) < Math.abs(dx) * 1.4) return
-  if (dy < 0) nextQ()
-  else prevQ()
+/** 滚动到第几题（原生吸附负责动画，这里只同步「第 n / m 题」与统计） */
+const qscroll = ref<HTMLElement | null>(null)
+
+function onQScroll(): void {
+  const el = qscroll.value
+  if (!el) return
+  const i = Math.round(el.scrollTop / (el.clientHeight || 1))
+  if (i !== idx.value) idx.value = Math.min(Math.max(i, 0), Math.max(total.value - 1, 0))
 }
 
-function nextQ(): void {
-  if (idx.value < total.value - 1) {
-    idx.value++
-    serial.value++
-  }
-}
+/** 每题只记一次结果（上下滑来回不会重复计数） */
+const resultAt = ref<Record<number, 'CORRECT' | 'WRONG' | 'PENDING'>>({})
 
-function prevQ(): void {
-  if (idx.value > 0) {
-    idx.value--
-    serial.value++
-  }
-}
-
-function onAnswered(r: 'CORRECT' | 'WRONG' | 'PENDING'): void {
+function onAnsweredAt(i: number, r: 'CORRECT' | 'WRONG' | 'PENDING'): void {
+  if (resultAt.value[i]) return
+  resultAt.value = { ...resultAt.value, [i]: r }
   done.value++
   if (r === 'CORRECT') right.value++
 }
@@ -185,7 +175,7 @@ onMounted(async () => {
     <div ref="rootEl" class="hroot" @scroll.passive="onScrollRoot">
       <!-- 屏一：一题一屏（照背单词页） -->
       <section class="hpage">
-        <div class="qpane" @touchstart.passive="onQStart" @touchend.passive="onQEnd">
+        <div class="qpane">
           <div class="qtop">
             <span class="qmode">{{ modeText }}</span>
             <span v-if="total" class="qnum">{{ idx + 1 }} / {{ total }}</span>
@@ -194,16 +184,24 @@ onMounted(async () => {
             <button class="qmore" type="button" @click="setMode('random')">换一批</button>
           </div>
 
-          <div class="qbody">
-            <van-loading v-if="loading" class="qld" color="#4f46e5">组题…</van-loading>
-            <QuestionBox
-            v-else-if="cur"
-            :sense-id="cur"
-            :serial="serial"
-              @answered="onAnswered"
-              @word="goWord"
-            />
+          <van-loading v-if="loading" class="qld" color="#4f46e5">组题…</van-loading>
+
+          <!-- ★ 一题一屏，用**原生吸附滚动**：这一版才是你要的那个滑动效果
+               （上一版用 touch 手势直接换内容，没有动画）。 -->
+          <div v-else ref="qscroll" class="qscroll" @scroll.passive="onQScroll">
+            <section v-for="(sid, i) in queue" :key="sid + i" class="qpage">
+              <div class="qpage-in">
+                <QuestionBox
+                  v-if="Math.abs(i - idx) <= 1"
+                  :sense-id="sid"
+                  :serial="i"
+                  @answered="onAnsweredAt(i, $event)"
+                  @word="goWord"
+                />
+              </div>
+            </section>
           </div>
+
           <div v-if="!loading && !cur" class="qempty">
             <p>这组现在没有可练的</p>
             <div class="qempty-btns">
@@ -322,7 +320,30 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   padding: calc(var(--wb-sb-h) + 26px) 18px calc(10px + env(safe-area-inset-bottom, 0px));
+  overflow: hidden;
+}
+
+/* 一题一屏：竖向吸附 + 原生滚动动画 */
+.qscroll {
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  margin: 0 -18px;
+}
+
+.qscroll::-webkit-scrollbar {
+  display: none;
+}
+
+.qpage {
+  height: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  box-sizing: border-box;
+  display: flex;
 }
 
 .qtop {
@@ -385,12 +406,14 @@ onMounted(async () => {
   color: var(--wb-ink-3);
 }
 
-.qbody {
+.qpage-in {
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  padding: 0 18px;
+  overflow-y: auto;
 }
 
 /* ── 屏二 ── */

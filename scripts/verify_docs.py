@@ -551,9 +551,9 @@ interaction = [
     # 坑 21：可点范围不能挂在整张大卡片上。
     #        首页词卡约 280px 高，整块可点会抢走搜索框和例句里选词的点击。
     # 首页屏一 = 一题一屏（照背单词页）：上下滑换题，左右滑换屏
-    ("首页屏一上下滑换题、左右滑换屏",
-     "onQEnd" in home and "scroll-snap-type: x mandatory" in home),
-
+    ("首页屏一上下滑换题（原生吸附，有动画）、左右滑换屏",
+     "scroll-snap-type: y mandatory" in home
+     and "scroll-snap-type: x mandatory" in home),
     # 坑 22：键盘基准值必须在收起时也更新，否则只有第一次避让。
     ("键盘避让的基准值无条件回退",
      _re.search(r"if \(kb <= last\) return", kb) is None),
