@@ -28,7 +28,7 @@ const M = await import(pathToFileURL(out).href)
 /* entry.ts 按命名空间导出：dbApi.db 是那个 Dexie 实例，dbApi.<fn> 是 src/db 里的函数 */
 const dbApi = M.db
 const db = dbApi.db
-const { edit, importer, backup, quiz, bundleImport, flags, lookup, ai } = M
+const { edit, importer, backup, quiz, bundleImport, flags, lookup, ai, nav } = M
 
 let bad = 0
 function ok(cond, msg, detail = '') {
@@ -669,6 +669,12 @@ ok((await db.sentences.get(afterTake[0].sentenceId)).en === flagged.sentence.en,
     .filter((s) => !s.flagged).length
   ok(one.count === realCount, `扫读条目带对了例句条数（${one.count} vs ${realCount}）`)
   ok(one.sentence.zh !== undefined, '扫读条目带了中文翻译（浮层里要直接给答案）')
+
+  // 13) 返回键：同屏判断只看 path（query/hash 不算「换了一屏」）
+  ok(nav.pathOf('/train?scope=due') === '/train', 'pathOf 去掉 query')
+  ok(nav.pathOf('/word/x#top') === '/word/x', 'pathOf 去掉 hash')
+  ok(nav.pathOf('/train?scope=due') === nav.pathOf('/train?scope=new'),
+     '只差 query 的两条路由算同一屏（否则返回是空操作）')
 
   // 收尾
   ai.__setTransportForTest(null)

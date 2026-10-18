@@ -963,7 +963,7 @@ interaction = [
      _code(os.path.join(WEB, "src", "main.ts")).count("meta: { tab: true }") == 3),
     # 训练从首页进、盖满全屏，所以必须有返回（顶栏箭头 = 系统返回键）
     ("训练页有返回箭头（不再是 tab 就得给自己一条退出路径）",
-     'name="arrow-left"' in train and "goBack" in train
+     "<BackBtn" in train and "goBack" in train
      # 标题现在由 headerTitle 统一给（单挑 / 复习到期 / 学新词 / 在学的 / 练习）
      and "headerTitle" in train and "{{ headerTitle }}" in train),
     # 「按计划」没有得练时置灰，而不是点进去才发现是空的
@@ -1366,6 +1366,22 @@ interaction = [
     # 例句里点词开浮层、不跳页（跳页会把首页这张卡顶掉）
     ("首页例句点词开浮层（不跳页）",
      "<WordPeek" in home and "peekOpen" in home),
+
+    # ── 「返回键按了没反应」：热区 + 空转兜底 ──
+    # 原来每页都写 van-icon（18×18 的可点区域），手指差一点就点空
+    ("所有顶栏返回都是 BackBtn（44×44 热区）",
+     all(("BackBtn" in _code(p)) for p in
+         [os.path.join(WEB, "src", "pages", n) for n in
+          ["WordPage.vue", "SensePage.vue", "TrainPage.vue", "AuditPage.vue"]])
+     and 'name="arrow-left"' not in (word + sense + train + _src(
+         os.path.join("pages", "AuditPage.vue")))),
+    # back() 空转（上一屏被 replace 掉）时会静默什么都不做 —— 必须有兜底
+    ("goBack 有「back() 空转就自己去 parent」的兜底",
+     _re.search(r"if \(router\.currentRoute\.value\.fullPath === before\)", _src("nav.ts"))
+     is not None),
+    # 上一屏和自己是同一屏（只差 query）时不该 back()：退了也不会有反应
+    ("上一屏同屏（只差 query）时直接去 parent",
+     "pathOf(from) === cur" in _src("nav.ts")),
 ]
 
 fi = 0

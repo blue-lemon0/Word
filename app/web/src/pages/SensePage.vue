@@ -11,6 +11,7 @@ import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import ConfirmSheet from '../components/ConfirmSheet.vue'
 import ImportSheet from '../components/ImportSheet.vue'
+import BackBtn from '../components/BackBtn.vue'
 import MarkedText from '../components/MarkedText.vue'
 import PromptSheet from '../components/PromptSheet.vue'
 import Sheet from '../components/Sheet.vue'
@@ -511,7 +512,7 @@ function onDelete(): void {
     <div>
       <header class="wb-topbar">
         <div class="in">
-          <van-icon name="arrow-left" size="18" @click="goBack(router, `/word/${word}`)" />
+          <BackBtn @click="goBack(router, `/word/${word}`)" />
           <h1>{{ word }}</h1>
           <van-tag plain round type="primary">{{ repsText(prog) }} · {{ dueText(prog) }}</van-tag>
         </div>

@@ -9,6 +9,7 @@
  */
 import { computed, onActivated, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import BackBtn from '../components/BackBtn.vue'
 import MarkedText from '../components/MarkedText.vue'
 import { goBack as goBackNav } from '../nav'
 import ModePicker, { type Mode as PickerMode } from '../components/ModePicker.vue'
@@ -773,7 +774,7 @@ watch(
              上一版把它藏起来（`v-if="!solo"`），于是扫读点进来之后
              既没有返回箭头、底栏也没有回列表 —— 人被困在一个只有一道题的屏上。
              单挑时它退到「怎么练」（扫读列表在那一屏），见 goBack。 -->
-        <van-icon name="arrow-left" size="18" @click="goBack" />
+        <BackBtn @click="goBack" />
         <h1>{{ headerTitle }}</h1>
         <!-- ★ 这里原来有一个「错题板」按钮，拿掉了。
              错题板上就是「词 + 释义」—— 那是**这道题的答案本身**。

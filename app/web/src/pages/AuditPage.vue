@@ -15,6 +15,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import AiSheet from '../components/AiSheet.vue'
+import BackBtn from '../components/BackBtn.vue'
 import {
   auditEstimate,
   auditOne,
@@ -184,7 +185,7 @@ function finish(): void {
   <div class="wb-page">
     <header class="wb-topbar">
       <div class="in">
-        <van-icon name="arrow-left" size="18" @click="goBack(router, '/more')" />
+        <BackBtn @click="goBack(router, '/more')" />
         <h1>AI 体检</h1>
         <span class="wb-sp" />
         <van-button v-if="running" size="mini" plain type="danger" @click="stop">停止</van-button>

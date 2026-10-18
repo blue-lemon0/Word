@@ -5,6 +5,7 @@
  */
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import BackBtn from '../components/BackBtn.vue'
 import ConfirmSheet from '../components/ConfirmSheet.vue'
 import ImportSheet from '../components/ImportSheet.vue'
 import AddWordSheet from '../components/AddWordSheet.vue'
@@ -288,7 +289,7 @@ function onAsk(): void {
   <div class="wb-page">
     <header class="wb-topbar">
       <div class="in">
-        <van-icon name="arrow-left" size="18" @click="goBack(router, '/library')" />
+        <BackBtn @click="goBack(router, '/library')" />
         <h1>{{ props.word }}</h1>
         <!-- 空壳走「补全」，有内容走「审查」：同一个位置只放一个，
              避免用户在两个都像能用的按钮之间猜。 -->
