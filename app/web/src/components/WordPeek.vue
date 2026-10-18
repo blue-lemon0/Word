@@ -21,6 +21,7 @@ import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { peekWord, type PeekResult } from '../lookup'
 import { addPendingWord } from '../edit'
+import { aiReady } from '../ai/config'
 import { toast } from '../toast'
 
 const props = defineProps<{
@@ -33,8 +34,10 @@ const emit = defineEmits<{ (e: 'close'): void }>()
 const router = useRouter()
 const peek = ref<PeekResult | null>(null)
 const busy = ref(false)
-/** 刚刚加入词库的那个词 —— 用来把按钮换成「去补义项」 */
+/** 刚加入词库的那个词 —— 用来把按钮换成「去补义项」 */
 const justAdded = ref('')
+/** 配了 AI 才承诺「AI 补全」，否则只让人去手改 */
+const aiOn = aiReady
 
 const hasContent = computed(() => !!peek.value?.senses.some((s) => s.gloss.trim()))
 const title = computed(() => peek.value?.word?.word ?? peek.value?.lemma ?? '')
@@ -62,6 +65,14 @@ function goWord(): void {
   if (!title.value) return
   close()
   void router.push(`/word/${encodeURIComponent(title.value)}`)
+}
+
+/** 刚加入的生词：直接去词条页，并让那边**当场**开始补全（?fill=1）。
+ *  少一次「到了之后再找一个按钮」—— 那个按钮的形状和这一屏的完全不一样。 */
+function goWordAndFill(): void {
+  if (!title.value) return
+  close()
+  void router.push({ path: `/word/${encodeURIComponent(title.value)}`, query: { fill: '1' } })
 }
 
 async function add(): Promise<void> {
@@ -146,8 +157,8 @@ async function add(): Promise<void> {
         >
           {{ busy ? '加入中…' : `加入词库：${title}` }}
         </button>
-        <button v-if="justAdded" class="btn" type="button" @click="goWord">
-          去补义项与例句
+        <button v-if="justAdded" class="btn" type="button" @click="goWordAndFill">
+          {{ aiOn ? '让 AI 补全义项与例句' : '去补义项与例句' }}
         </button>
       </template>
 

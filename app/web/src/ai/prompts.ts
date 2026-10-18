@@ -20,7 +20,9 @@ const SYSTEM = `你是英语学习词库的内容审校助手。你只输出严�
 - 释义 gloss 要与词性 pos、英文释义 glossEn 一致；中文要能区分同词的其它义项（近义/重复的要指出）。
 - 例句必须真的用到「这个词的这个义项」，中文翻译要忠实；例句里不该出现目标词的其它义项。
 - 例句用常见词、自然书面英语，12-20 个词，且必须包含目标词或它的屈折形式。
-- 宁缺勿滥：只报告**确实有问题**的条目，没问题的不要列。改一条错的，胜过多改十条对的。`
+- 宁缺勿滥：只报告**确实有问题**的条目，没问题的不要列。改一条错的，胜过多改十条对的。
+- why 是写给用户看的一句话：**不要出现 sentenceId / slot 这类内部编号**，
+  用「原来那句」「第 2 个义项」这样的说法。`
 
 const SHAPE = `输出 JSON：
 {"note":"整体判断一句话；全部没问题就写 ok","proposals":[
@@ -92,6 +94,34 @@ export function replaceSentencePrompt(c: WordContext, sentenceId: number, why: s
 请**替换** sentenceId=${sentenceId} 这一句${why ? `（问题：${why}）` : ''}：
 新句要教同一个义项，换一个不同的情境与措辞，不要和已有例句相似。只给 1 条，kind="sentence.replace"，sentenceId=${sentenceId}。
 ${SHAPE}`,
+    },
+  ]
+}
+
+/** 把一个「空壳词」补成能背的卡：义项 + 每个义项 1-2 句例句。
+ *
+ *  ★ 这个动作为 D37 的「顺手加入词库」收尾：点词 → 不在库里 → 加进来
+ *    （占位义项）→ 让 AI 一次补齐。没有它，占位词条会一直躺在「需精修」里。
+ *
+ *  ★ 为什么例句要挂在 `sense.add` 里面：新义项还没有 id/slot，
+ *    单独给 `sentence.add` 无从绑定（见 types.ts 的说明）。
+ */
+export function fillWordPrompt(c: WordContext, howManySenses = 3): ChatMessage[] {
+  return [
+    { role: 'system', content: SYSTEM },
+    {
+      role: 'user',
+      content: `${ctxBody(c)}
+
+这个词在词库里是**空壳**（没有释义，或只有占位义项）。请把它补成能背的卡：
+1. 给 ${howManySenses} 个以内最常用的义项（按常用度排序）；如果已有占位义项（slot 有编号但 gloss 为空或明显不对），
+   用 kind="sense.update" + 那个 slot 直接改写它，不要重复新建；
+2. 其余义项用 kind="sense.add"，并且在**同一条提案里**带上 1-2 条例句：
+   "sentences":[{"en":"……","zh":"……"}] —— 新义项还没有编号，例句必须跟它一起提；
+3. 每条例句都必须真的用上这个词（可以屈折变化），12-20 个词，自然书面英语。
+
+${SHAPE}
+对 kind="sense.add"，例句写在提案的 "sentences" 数组里。`,
     },
   ]
 }

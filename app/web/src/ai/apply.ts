@@ -43,7 +43,12 @@ export async function applyOne(p: Proposal): Promise<string> {
     case 'sense.add': {
       const id = await addSense(p.word, p.gloss)
       if (p.pos) await updateSense(id, { pos: p.pos })
-      return `新增了义项：${p.gloss}`
+      // 新义项自带的例句：现在它才有 id，能挂上去了
+      for (const s of p.sentences ?? []) {
+        await addSentenceEdit(id, p.word, s.en, s.zh ?? '')
+      }
+      const n = p.sentences?.length ?? 0
+      return `新增了义项：${p.gloss}${n ? `（含 ${n} 句例句）` : ''}`
     }
   }
 }

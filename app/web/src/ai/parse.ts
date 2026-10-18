@@ -29,6 +29,8 @@ interface RawProposal {
   en?: string
   zh?: string
   why?: string
+  /** sense.add 自带的例句（新义项没有编号，例句只能跟义项一起提） */
+  sentences?: { en?: string; zh?: string }[]
 }
 
 export function extractJson(text: string): { note?: string; proposals?: RawProposal[] } {
@@ -164,6 +166,22 @@ export function parseProposals(
         dropped.push('sense.add 没有给释义')
         continue
       }
+      // 新义项自带的例句：逐条过「必须含目标词」这道门槛，最多留 2 条。
+      // 模型偶尔会把某句写得漂亮但里面没有目标词 —— 那种句子进库就是一张
+      // 永远答不对的卡（与 sentence.add 同一条判据）。
+      const rawSents = Array.isArray(p.sentences) ? p.sentences : []
+      const sentences: { en: string; zh?: string }[] = []
+      for (const rs of rawSents.slice(0, 3)) {
+        const en = s(rs?.en)
+        if (!en) continue
+        if (!sentenceHasWord(en, bind.word)) {
+          dropped.push(`新义项「${gloss}」的一句例句里找不到「${bind.word}」`)
+          continue
+        }
+        if (sentences.some((x) => x.en === en)) continue
+        sentences.push({ en, zh: s(rs?.zh) || undefined })
+        if (sentences.length >= 2) break
+      }
       const key = `n:${gloss}:${s(p.pos)}`
       if (dup.has(key)) continue
       dup.add(key)
@@ -174,6 +192,7 @@ export function parseProposals(
         gloss,
         pos: s(p.pos),
         why: s(p.why),
+        sentences: sentences.length ? sentences : undefined,
       })
     } else {
       dropped.push(`不认识的 kind=${kind || '（空）'}`)

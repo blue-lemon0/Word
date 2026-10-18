@@ -40,7 +40,7 @@ import { setAvoidTarget } from '../keyboard'
 import { goBack } from '../nav'
 import { toast } from '../toast'
 import { addSentence as aiAddSentence, replaceSentence as aiReplaceSentence } from '../ai/actions'
-import { isConfigured } from '../ai/config'
+import { aiReady } from '../ai/config'
 import { describeAiError, type AiResult } from '../ai/types'
 import AiSheet from '../components/AiSheet.vue'
 import type { Progress, Sense, Sentence } from '../types'
@@ -260,7 +260,7 @@ async function onAddSentence(): Promise<void> {
  *  ★ 两个动作都只发**一次请求**，而且只带这个义项与它已有的例句 ——
  *    审查整词才需要整词上下文，换/补一句不需要，多带就是多花钱。
  *  ★ 结果只进 AiSheet（提议），点应用才落库；应用前自动存内容快照。 */
-const aiOn = ref(isConfigured())
+const aiOn = aiReady
 const aiOpen = ref(false)
 const aiBusy = ref(false)
 const aiResult = ref<AiResult | null>(null)

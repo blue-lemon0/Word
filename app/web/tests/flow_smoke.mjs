@@ -463,11 +463,69 @@ ok((await db.sentences.get(afterTake[0].sentenceId)).en === flagged.sentence.en,
   await ai.reviewWord(W)
   ok(calls > beforeCalls, '内容变了就不再用旧缓存（重新问一次）')
 
+  // 7) 空壳词「AI 补全」：义项 + 例句一起提（新义项没有 slot，例句必须跟义项走）
+  const F = 'zzzfill'
+  const pend = await edit.addPendingWord(F)
+  ok((await db.senses.get(pend.senseId)).gloss === '', '先有一个空壳词条（占位义项）')
+  ai.__setTransportForTest({
+    name: 'fake3',
+    async postJson() {
+      calls++
+      return {
+        status: 200,
+        body: JSON.stringify({
+          choices: [{ message: { content: JSON.stringify({
+            note: '补好了',
+            proposals: [
+              { kind: 'sense.update', slot: 1, gloss: '填充出来的释义', pos: 'n.', why: '占位义项' },
+              {
+                kind: 'sense.add',
+                gloss: '第二个意思',
+                pos: 'v.',
+                why: '常用义项',
+                sentences: [
+                  { en: `They ${F} the box every day.`, zh: '他们每天这样处理箱子。' },
+                  { en: 'Nothing relevant here.', zh: '不含目标词，应被丢弃' },
+                ],
+              },
+            ],
+          }) } }],
+        }),
+      }
+    },
+  })
+  const rf = await ai.fillWord(F, 3)
+  ok(rf.action === 'fillWord', '动作标记是 fillWord（界面据此换标题）')
+  ok(rf.proposals.length === 2, `两条提案：改占位义项 + 新增义项（实际 ${rf.proposals.length}）`)
+  const addedProp = rf.proposals.find((p) => p.kind === 'sense.add')
+  ok(addedProp?.sentences?.length === 1, '新义项只留下含目标词的那 1 句（幻觉句被丢）')
+  ok(rf.note.includes('不可用'), '丢掉的句子有交代', rf.note)
+
+  await ai.applyAll(rf.proposals)
+  const s1After = await db.senses.get(pend.senseId)
+  ok(s1After.gloss === '填充出来的释义' && s1After.needsRefine === 1,
+     '占位义项被改写（needsRefine 保持 1，等用户确认后再清）')
+  const filled = (await db.senses.where('word').equals(F).toArray()).find((s) => s.gloss === '第二个意思')
+  ok(!!filled, '新义项建出来了')
+  const fSents = await db.sentences.where('senseId').equals(filled.id).toArray()
+  ok(fSents.length === 1, '例句跟着新义项一起落库（没有 id/slot 时只能这么提）')
+  ok(fSents[0].form === F && fSents[0].spanStart >= 0, '落库时算好了高亮区间')
+
+  // 有释义的词不许再「补全」：那会重写已经有主的内容
+  let refused = null
+  try {
+    await ai.fillWord(F, 3)
+  } catch (e) {
+    refused = e
+  }
+  ok(refused && refused.kind === 'refused', '已经有释义的词走「审查」，不走「补全」')
+
   // 收尾
   ai.__setTransportForTest(null)
   ai.__setConfigForTest(null)
   await edit.purgeWord(W)
-  ok((await db.words.get(W)) == null, 'AI 探针词已清干净')
+  await edit.purgeWord(F)
+  ok((await db.words.get(W)) == null && (await db.words.get(F)) == null, 'AI 探针词已清干净')
 }
 
 /* ── 7. 备份 + 回滚 ── */

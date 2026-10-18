@@ -4,7 +4,7 @@
  *  只说「crime 我会了」，用户并不知道哪个意思还是生的。
  */
 import { computed, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import ConfirmSheet from '../components/ConfirmSheet.vue'
 import ImportSheet from '../components/ImportSheet.vue'
 import AddWordSheet from '../components/AddWordSheet.vue'
@@ -24,14 +24,15 @@ import { aiPrompt } from '../import'
 import { goBack } from '../nav'
 import { toast } from '../toast'
 import { describeAiError, type AiResult } from '../ai/types'
-import { reviewWord } from '../ai/actions'
-import { isConfigured } from '../ai/config'
+import { fillWord, reviewWord } from '../ai/actions'
+import { aiReady } from '../ai/config'
 import AiSheet from '../components/AiSheet.vue'
 import type { Progress, Sense, Word } from '../types'
 import { masteryPercent } from '../types'
 
 const props = defineProps<{ word: string }>()
 const router = useRouter()
+const route = useRoute()
 
 const word = ref<Word | undefined>()
 const senses = ref<Sense[]>([])
@@ -46,24 +47,37 @@ const showAdd = ref(false)
 /* ── AI 审查（可选，配了才出现）──
  *  ★ 审查是**整词一次请求**：义项、例句一起带上，一次看全（省钱也看得准）。
  *  ★ 结果只是提议：AiSheet 里逐条看，点应用才落库（AI 没有写库的权限）。 */
-const aiOn = ref(isConfigured())
+const aiOn = aiReady
 const aiOpen = ref(false)
 const aiBusy = ref(false)
 const aiResult = ref<AiResult | null>(null)
 const aiError = ref('')
 
-async function runReview(): Promise<void> {
+/** 「空壳」：没有义项，或所有义项都没有释义（D37 顺手加入的就是这种）。
+ *  空壳走「补全」，有内容的走「审查」—— 两件事不能混：对已有的正经释义
+ *  做「补全」，AI 会试图重写已经有主的内容。 */
+const hollow = computed(() => !senses.value.length || senses.value.every((s) => !s.gloss.trim()))
+
+async function runAi(fn: () => Promise<AiResult>): Promise<void> {
   aiError.value = ''
   aiResult.value = null
   aiOpen.value = true
   aiBusy.value = true
   try {
-    aiResult.value = await reviewWord(props.word)
+    aiResult.value = await fn()
   } catch (e) {
     aiError.value = describeAiError(e)
   } finally {
     aiBusy.value = false
   }
+}
+
+function runReview(): void {
+  void runAi(() => reviewWord(props.word))
+}
+
+function runFill(): void {
+  void runAi(() => fillWord(props.word, 3))
 }
 /** 词条在不在库里。它和「有没有释义」是两件事，空态要分开说 */
 const inLibrary = computed(() => word.value != null)
@@ -145,6 +159,30 @@ async function load(): Promise<void> {
 }
 
 watch(() => props.word, load, { immediate: true })
+
+/* ── 从「点词查义」的浮层过来时带 `?fill=1` ──
+ *  那条路上用户点的是「让 AI 补全义项与例句」，导航到这里就该直接开始，
+ *  而不是让他再找一个刚看过一次的按钮。
+ *
+ *  ★ 必须等 `load()` 结束再判断「空壳」：senses 是异步读的，一进来就判会
+ *    把任何词都当成空壳 —— 那样打开一个已经有释义的词就会莫名其妙花一次调用。
+ *    所以这里盯的是 `loading` 落下的那一拍。
+ */
+const wantFill = ref(false)
+
+function maybeFill(): void {
+  if (!wantFill.value || loading.value || !aiOn.value || !hollow.value) return
+  wantFill.value = false
+  void router.replace({ path: route.path })   // 去掉 query，刷新不再重复触发
+  runFill()
+}
+
+watch(() => route.query.fill, (v) => {
+  wantFill.value = v === '1'
+  maybeFill()
+}, { immediate: true })
+
+watch(loading, maybeFill)
 
 const MASTERY_TEXT = { mastered: '已掌握', learning: '学习中', new: '未学' } as const
 const MASTERY_TYPE = { mastered: 'success', learning: 'warning', new: 'default' } as const
@@ -229,8 +267,19 @@ function onAsk(): void {
       <div class="in">
         <van-icon name="arrow-left" size="18" @click="goBack(router, '/library')" />
         <h1>{{ props.word }}</h1>
+        <!-- 空壳走「补全」，有内容走「审查」：同一个位置只放一个，
+             避免用户在两个都像能用的按钮之间猜。 -->
         <van-button
-          v-if="aiOn"
+          v-if="aiOn && hollow"
+          size="mini"
+          plain
+          type="primary"
+          @click="runFill"
+        >
+          AI 补全
+        </van-button>
+        <van-button
+          v-else-if="aiOn"
           size="mini"
           plain
           type="primary"

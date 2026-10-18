@@ -10,7 +10,7 @@
  *  ★ 为什么要「测试连接」：最贵的错误是「配错了 key，等真正用 AI 时
  *    才发现」—— 一次 8 token 的 ping 比一次审查便宜两个数量级。
  */
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { cacheClear, cacheInfo } from '../ai/cache'
 import { ping } from '../ai/client'
 import { DEFAULT_CONFIG, isConfigured, loadConfig, maskKey, saveConfig, type AiConfig } from '../ai/config'
@@ -24,6 +24,22 @@ const cache = ref<{ count: number; chars: number }>({ count: 0, chars: 0 })
 
 void refreshCache()
 
+/** 开关**当下就生效**，不等「保存」。
+ *  真实的踩法：打开开关、离开这一页 —— 回词条页发现还是没入口，
+ *  因为那个开关只改了内存里的 c.enabled。开关这种「一眼就能看出状态」
+ *  的控件，人不认为它还需要再点一次保存。 */
+watch(
+  () => c.value.enabled,
+  (on) => {
+    if (on && !c.value.apiKey.trim()) {
+      c.value.enabled = false
+      toast('先填 API Key 再打开')
+      return
+    }
+    saveConfig({ ...c.value })
+  },
+)
+
 async function refreshCache(): Promise<void> {
   cache.value = await cacheInfo()
 }
@@ -31,7 +47,14 @@ async function refreshCache(): Promise<void> {
 function save(): void {
   const cfg: AiConfig = { ...c.value }
   const k = keyDraft.value.trim()
-  if (k) cfg.apiKey = k
+  if (k) {
+    cfg.apiKey = k
+    // ★ 刚填了 key 就顺手打开开关。
+    //   真实的失败长这样：key 填好了、点保存、回词条页 —— 按钮不出现。
+    //   因为开关还关着，而「开关」这个词在界面上只是一个右上角的小圆点。
+    //   「我填了 key」这个动作的意图就是「我要用」，别让人再找一次那个圆点。
+    cfg.enabled = true
+  }
   // 打开开关但没 key、没地址 —— 直接说清，而不是让它静默失效
   if (cfg.enabled && !isConfigured(cfg)) {
     toast('要填 API Key 才能开启')
@@ -80,6 +103,11 @@ function reset(): void {
     <p class="hint">
       用来审查义项/例句、补一句、换一句。Key 只存在这台设备上，不进备份；
       内容不变时结果走缓存，不重复花钱。
+    </p>
+    <!-- ★ 「填了 key 但开关是关的」是最容易踩的一格：
+         页面上看不出 AI 没开，只会觉得「功能没生效」。所以显式说出来。 -->
+    <p v-if="c.apiKey && !c.enabled" class="warnline">
+      已保存 Key，但开关是关着的 —— 打开右上角开关（或重新填一次 Key）才有 AI 入口。
     </p>
 
     <label class="f">
@@ -148,6 +176,16 @@ function reset(): void {
   line-height: 1.7;
   color: var(--wb-ink-3);
   margin-bottom: 12px;
+}
+
+.warnline {
+  margin: -4px 0 12px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #fff6e6;
+  color: #9a6400;
+  font-size: 12.5px;
+  line-height: 1.6;
 }
 
 .f {

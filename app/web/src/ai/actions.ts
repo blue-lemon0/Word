@@ -13,7 +13,7 @@ import { cacheGet, cachePut, hashOf } from './cache'
 import { chat } from './client'
 import { isConfigured, loadConfig } from './config'
 import { parseProposals } from './parse'
-import { addSentencePrompt, replaceSentencePrompt, reviewWordPrompt } from './prompts'
+import { addSentencePrompt, fillWordPrompt, replaceSentencePrompt, reviewWordPrompt } from './prompts'
 import { AiError, type AiActionKind, type AiResult, type WordContext } from './types'
 
 interface Rows {
@@ -113,6 +113,28 @@ export async function addSentence(senseId: string, howMany = 3): Promise<AiResul
     rows,
     addSentencePrompt(contextOf(rows), sense.slot, howMany),
     `${senseId}:${howMany}`,
+  )
+}
+
+/** 把一个空壳词补成能背的卡（义项 + 每义项 1-2 句例句）。
+ *
+ *  ★ 这是 D37「顺手加入词库」的收尾动作：占位义项一直留在「需精修」里
+ *    不算完成，补上义项和例句才算。
+ *  ★ 只对**空壳**用它：有正经释义的词应该走 reviewWord（审查），
+ *    否则 AI 会试图重写已经有主的内容。 */
+export async function fillWord(word: string, howManySenses = 3): Promise<AiResult> {
+  const rows = await rowsOf(word)
+  const hollow = rows.senses.length === 0 && rows.sentences.length === 0
+    ? true
+    : rows.senses.every((s) => !s.gloss.trim())
+  if (!hollow) {
+    throw new AiError('refused', '这个词已经有释义了；要检查它请用「AI 审查」')
+  }
+  return run(
+    'fillWord',
+    rows,
+    fillWordPrompt(contextOf(rows), howManySenses),
+    `fill:${howManySenses}`,
   )
 }
 

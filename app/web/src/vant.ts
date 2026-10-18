@@ -28,6 +28,7 @@ import {
   Progress,
   Search,
   Space,
+  Switch,
   Tab,
   Tabbar,
   TabbarItem,
@@ -51,6 +52,7 @@ import 'vant/es/popup/style'
 import 'vant/es/progress/style'
 import 'vant/es/search/style'
 import 'vant/es/space/style'
+import 'vant/es/switch/style'
 import 'vant/es/tab/style'
 import 'vant/es/tabbar/style'
 import 'vant/es/tabbar-item/style'
@@ -77,6 +79,7 @@ export const VANT_COMPONENTS = [
   Progress,
   Search,
   Space,
+  Switch,
   Tab,
   Tabbar,
   TabbarItem,

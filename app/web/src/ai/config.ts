@@ -12,6 +12,7 @@
  *    聊天接口（/chat/completions）都能直接用，换供应商只改这一行。
  *    代码里不出现 "deepseek" 的判断，只有默认值里出现一次。
  */
+import { ref } from 'vue'
 
 export interface AiConfig {
   /** 总开关：关掉时所有 AI 入口隐藏 */
@@ -70,7 +71,23 @@ export function loadConfig(): AiConfig {
 export function saveConfig(c: AiConfig): void {
   if (typeof localStorage === 'undefined') return
   localStorage.setItem(KEY, JSON.stringify(c))
+  refreshAiReady()
 }
+
+/* ── 「现在能不能用 AI」是一个**跨页面的共享状态** ──
+ *
+ *  ★ 为什么不是每个页面自己 `isConfigured()`：配置是在「更多」页改的，
+ *    而入口在词条页/意思页。各自算一次的结果是：配置完回到词条页，
+ *    按钮还是不出现（那个页面是重新挂载的，或者干脆被缓存着）——
+ *    用户会以为「保存没生效」。
+ *    一个共享 ref 让「配置一变，各页面的入口立刻跟着变」。
+ */
+export const aiReady = ref(isConfigured())
+
+export function refreshAiReady(): void {
+  aiReady.value = isConfigured()
+}
+
 
 /** 配好了没有：开着 + 有 key。界面靠它决定「显不显示 AI 入口」。 */
 export function isConfigured(c: AiConfig = loadConfig()): boolean {

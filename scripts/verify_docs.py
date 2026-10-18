@@ -489,6 +489,26 @@ def _non_ai_sources():
     return {p: _read(p) for p in files if not os.path.abspath(p).startswith(_AI_DIR)}
 
 
+def _van_used():
+    """模板里用到的 van-* 组件名（转成 PascalCase：van-tabbar-item → TabbarItem）。"""
+    import glob
+    used = set()
+    for p in glob.glob(os.path.join(WEB, "src", "**", "*.vue"), recursive=True):
+        for name in re.findall(r"<van-([a-z0-9-]+)", _read(p)):
+            used.add("".join(part.capitalize() for part in name.split("-")))
+    return used
+
+
+def _van_registered():
+    """vant.ts 里注册过的组件名（import 块里那几个大写开头的标识符）。"""
+    t = _read(os.path.join(WEB, "src", "vant.ts"))
+    block = re.search(r"import \{([\s\S]*?)\} from 'vant'", t)
+    if not block:
+        return set()
+    return {n.strip() for n in block.group(1).split(",") if n.strip()}
+
+
+
 
 def _code_all():
     """整个 src/ 的代码（去掉注释），用来判「全站都不许有某个写法」。
@@ -1155,16 +1175,37 @@ interaction = [
                                        "java", "com", "wordbank", "app", "MainActivity.java"))
      and "__wbHttp" in _ai_src("transport.ts")),
     ("没配 AI 时入口不出现（不是点进去才说要配）",
-     _re.search(r'v-if="aiOn"', word) is not None
+     _re.search(r'v-(?:else-)?if="aiOn', word) is not None
      and _re.search(r'v-if="aiOn"', sense) is not None
-     and "isConfigured()" in _ai_page("WordPage.vue")
-     and "isConfigured()" in _ai_page("SensePage.vue")),
+     and "aiReady" in _ai_page("WordPage.vue")
+     and "aiReady" in _ai_page("SensePage.vue")),
     ("AI 一次改多条前先打快照（人才可能整批退回）",
      _re.search(r"await snapshot\(", _ai_src("apply.ts")) is not None),
     ("换例句必须重算高亮区间（否则高亮打在别的词上）",
      "export async function replaceSentence" in _code(os.path.join(WEB, "src", "edit.ts"))
      and _re.search(r"locate\(text, sen\.form\)", _code(
          os.path.join(WEB, "src", "edit.ts"))) is not None),
+    # 空壳词走「补全」、有内容的走「审查」：对已有正经释义的词做「补全」，
+    # AI 会试图重写已经有主的内容（那是审查的活，且审查也只出提案）。
+    ("空壳词走「补全」、有内容的走「审查」",
+     _re.search(r"export async function fillWord", _ai_src("actions.ts")) is not None
+     and _re.search(r"rows\.senses\.every\(\(s\) => !s\.gloss\.trim\(\)\)", _ai_src("actions.ts")) is not None
+     and _re.search(r"const hollow = computed", word) is not None
+     and "runFill(" in word),
+    # 新义项没有 id/slot，所以它的例句必须**跟着义项一起提**，落库时再挂上去。
+    # 分成两条提案的话，parse 绑不到 slot，例句会被丢掉 —— 而且不报错。
+    ("新义项自带的例句跟义项一起提、一起落库",
+     "sentences?: { en: string; zh?: string }[]" in _ai_src("types.ts")
+     and _re.search(r"rawSents\.slice\(0, 3\)", _ai_src("parse.ts")) is not None
+     and _re.search(r"for \(const s of p\.sentences", _ai_src("apply.ts")) is not None),
+
+    # ── 用到的 Vant 组件必须注册过（坑 52 的同族）──
+    # 这个 app 的组件是**手动按需注册**的（vant.ts），漏注册不报错：
+    # Vue 只警告一句 unknown component，页面上那一格**直接是空的**。
+    # 真实发生过：AI 设置的开关（van-switch）没注册，
+    # 设置页上「开关」根本不存在 —— 人只会觉得「没地方开」。
+    ("用到的 van-* 组件都注册过（漏了就是一个空白的格子）",
+     not (_van_used() - _van_registered())),
 ]
 
 fi = 0

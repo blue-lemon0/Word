@@ -7,7 +7,7 @@
  */
 import type { Sense, Sentence } from '../types'
 
-export type AiActionKind = 'reviewWord' | 'addSentence' | 'replaceSentence'
+export type AiActionKind = 'reviewWord' | 'addSentence' | 'replaceSentence' | 'fillWord'
 
 /** 一次提案：AI 想说「这里应该改成这样」。**它没有写库的能力**，
  *  只能提出；写库由用户点「应用」之后走 `ai/apply.ts` 的普通编辑原语。 */
@@ -51,6 +51,11 @@ export type Proposal =
       gloss: string
       pos?: string
       why?: string
+      /** 新义项自带的例句。
+       *  ★ 为什么例句必须**跟着义项一起提**：义项还没落库时它没有 id/slot，
+       *    单独一条 `sentence.add` 无从绑定（parse 会把它丢掉）。
+       *    所以「新建义项 + 它的例句」是一个原子提案：要么一起进，要么都不进。 */
+      sentences?: { en: string; zh?: string }[]
     }
 
 /** 调用统计：只用来告诉用户「这次花了多少」，不做计费 */

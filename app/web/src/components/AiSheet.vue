@@ -36,6 +36,8 @@ const title = computed(() => {
       return 'AI 换这一句'
     case 'reviewWord':
       return 'AI 审查结果'
+    case 'fillWord':
+      return 'AI 补全这个词'
     default:
       return 'AI'
   }
@@ -77,7 +79,13 @@ function lineOf(p: Proposal): { label: string; to: string; why: string } {
     case 'sentence.add':
       return { label: p.label, to: p.en, why: p.why ?? '' }
     case 'sense.add':
-      return { label: `新增义项`, to: [p.pos, p.gloss].filter(Boolean).join(' '), why: p.why ?? '' }
+      return {
+        label: '新增义项',
+        to:
+          [p.pos, p.gloss].filter(Boolean).join(' ') +
+          (p.sentences?.length ? `\n＋ ${p.sentences.length} 句例句` : ''),
+        why: p.why ?? '',
+      }
   }
 }
 
