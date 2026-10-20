@@ -28,6 +28,16 @@ interface NativeBridgeApi {
    *  回到页面（见 src/ai/transport.ts）。
    */
   httpPost?: (id: string, url: string, headersJson: string, body: string) => void
+  /**
+   * 朗读英文（单词 / 例句）。
+   *
+   *  为什么必须走原生：Android WebView 的 speechSynthesis 经常一个 voice
+   *  都列不出来，speak() 静默无声 —— 不报错、不出声，比没有还糟。
+   *  原生 TextToSpeech 用系统引擎（离线可用），不存在这个问题。
+   */
+  speak?: (text: string, rate: number) => boolean
+  /** 停止当前朗读 */
+  stopSpeak?: () => void
 }
 
 declare global {

@@ -137,7 +137,7 @@ const q = ref<Question | null>(null)
  *  选项的显隐看 revealed，作答状态看 submitted。
  * ★ 这三个必须分开：曾经用一个 phase 管两件事，结果点「显示选项」的瞬间
  *   submitted 就为真，正确答案在用户还没选之前就绿了 —— 那是泄题不是提示。 */
-const phase = ref<'playing' | 'done' | 'spell' | 'spellDone'>('playing')
+const phase = ref<'playing' | 'done' | 'spell'>('playing')
 /** 选项已展开（点空白处或按空格） */
 const revealed = ref(false)
 /** 真的做了选择或点了「我不会」 */
@@ -238,8 +238,12 @@ const spellQueue = ref<SpellItem[]>([])
 const spellIdx = ref(0)
 const spellInput = ref('')
 const spellState = ref<'ask' | 'right' | 'wrong'>('ask')
-const spellHits = ref(0)
-const spellMissed = ref<SpellItem[]>([])
+/** 整个拼写过程里「至少错过一次」的词（累计，跨遍）。
+ *  只看最后一遍的话它必然是空 —— 能收尾说明最后一遍全对 ——
+ *  曾经拿「最后一遍的错词」当结算展示，那是个永远渲染不出来的死分支。 */
+const spellEverMissed = ref<SpellItem[]>([])
+/** 拼完一遍（全连对够）写一次小结，回到结算页展示；null = 这轮还没拼过 */
+const spellSummary = ref<{ total: number; once: number; missed: SpellItem[] } | null>(null)
 /** 每个词还需要连对几次（id → 剩余次数）；错一次要连对两次 */
 const spellNeed = ref<Record<string, number>>({})
 const spellHint = ref(false)
@@ -266,8 +270,8 @@ async function startSpell(): Promise<void> {
   spellIdx.value = 0
   spellInput.value = ''
   spellState.value = 'ask'
-  spellHits.value = 0
-  spellMissed.value = []
+  spellEverMissed.value = []
+  spellSummary.value = null
   spellHint.value = false
   spellRound.value = 0
   phase.value = 'spell'
@@ -280,7 +284,6 @@ function checkSpell(): void {
   if (!cur || spellState.value !== 'ask') return
   if (spellMatched(spellInput.value, cur.word)) {
     spellState.value = 'right'
-    spellHits.value++
     // 连对计数：错过的词要连对两次才算过
     const need = spellNeed.value[cur.id]
     if (need != null) {
@@ -295,7 +298,9 @@ function checkSpell(): void {
   } else {
     spellState.value = 'wrong'
     spellNeed.value = { ...spellNeed.value, [cur.id]: 2 }
-    spellMissed.value = [...spellMissed.value, cur]
+    if (!spellEverMissed.value.some((m) => m.id === cur.id)) {
+      spellEverMissed.value = [...spellEverMissed.value, cur]
+    }
   }
 }
 
@@ -305,7 +310,6 @@ function spellNext(): void {
     const left = new Set(Object.keys(spellNeed.value))
     if (left.size) {
       spellQueue.value = spellQueue.value.filter((m) => left.has(m.id))
-      spellMissed.value = []
       spellRound.value++
       spellIdx.value = 0
       spellInput.value = ''
@@ -314,7 +318,14 @@ function spellNext(): void {
       void nextTick(() => spellInputEl.value?.focus())
       return
     }
-    phase.value = 'spellDone'
+    /* ★ 拼写没有自己的结束页：小结写进 spellSummary，回到训练结算页一起展示。
+         单独一页等于让人多看一次「结束了」——结束一次就够了。 */
+    spellSummary.value = {
+      total: lastRound.value.length,
+      once: lastRound.value.length - spellEverMissed.value.length,
+      missed: spellEverMissed.value,
+    }
+    phase.value = 'done'
     return
   }
   spellIdx.value++
@@ -373,6 +384,7 @@ async function start(which: Mode = mode.value): Promise<void> {
   mode.value = which
   sessionId.value = newSessionId()
   stats.value = { correct: 0, wrong: 0, pending: 0, dueCorrect: 0, dueTotal: 0 }
+  spellSummary.value = null // 新一轮的训练结算不该挂着上一轮的拼写小结
   // ★ 单挑（错题板 / 扫读点句）是「指哪打哪」：只练这一个意思，**不看到期**。
   //   走 buildQueue 的话，一个还没到期、也不是新卡的义项会被过滤掉 ——
   //   队列是空的，人看到的直接是结算屏（「这一句练完了」但什么都没练）。
@@ -728,7 +740,12 @@ const drillSense = ref('')
 const drillSent = ref<number | undefined>(undefined)
 
 function onPickToken(tok: string): void {
-  if (!submitted.value) return
+  /* 答之前点了不能装死（用户反馈：点了没反应，不知道是坏了还是不让点）——
+     不开查义（防止「查一下」变成答题的一部分），但要明说什么时候能点。 */
+  if (!submitted.value) {
+    toast('先作答 —— 答完句子里每个词都能点开查', 1900, true)
+    return
+  }
   peekToken.value = tok
   peekOpen.value = true
 }
@@ -1044,13 +1061,14 @@ watch(
         <div class="qsent">
           <!-- ★ 答完之后整句才可点：点任何一个词都能查它是什么意思（浮层），
                想细看再进词条/义项详情；不在库里的词可以当场加入词库。
-               答之前保持不可点 —— 否则「查一下这个词」就成了答题的一部分。 -->
+               答之前也保持可点，但 onPickToken 只弹一句提示 —— 点了装死
+               会让人以为坏了（查义本身仍锁着，防止「查一下」变成答题）。 -->
           <MarkedText
             :text="q.sentence.en"
             :form="q.sentence.form"
             :span-start="q.sentence.spanStart"
             :span-len="q.sentence.spanLen"
-            :pickable="submitted"
+            pickable
             @pick="onPickToken"
           />
         </div>
@@ -1065,7 +1083,14 @@ watch(
              正确的顺序：答了就显示结果，没答才问「要不要看选项」。 -->
         <template v-if="submitted">
           <!-- 「我不会」作答时选项从没露出来，这里补一次完整回放，
-               否则用户只看到结论、看不到正确答案是什么。 -->
+               否则用户只看到结论、看不到正确答案是什么。
+               ★ wrong 的判定不能带 !revealed（原来的 bug）：正常作答时
+                 revealed=true，提交后模板切到这一块，!revealed 把红标掐死，
+                 选错的选项只剩压暗、不红。picked 在「我不会」路径是空串，
+                 不会误伤回放。 -->
+          <!-- ★ 千万别加 class="done"：本文件底部有「结算屏 .done」，
+               它带 min-height: 100dvh - 32px ≈ 730px，会把这个选项容器
+               撑出 530px 的空气（坑 82）。答题完成态不需要专门 class。 -->
           <div class="opts" :class="{ replay: !revealed }">
             <button
               v-for="(opt, i) in q.options"
@@ -1073,8 +1098,8 @@ watch(
               class="opt"
               :class="{
                 right: isRight(opt),
-                wrong: !revealed && opt === picked,
-                dim: !isRight(opt),
+                wrong: opt === picked && !isRight(opt),
+                dim: !isRight(opt) && opt !== picked,
               }"
             >
 <span class="key">{{ KEYS[i] }}</span>
@@ -1222,8 +1247,24 @@ watch(
               到期题正确率 {{ stats.dueTotal ? accuracy : '—' }} · 共 {{ stats.dueTotal }} 题到期
             </p>
             <!-- ★ 拼写是**可选加练**：认得出 ≠ 写得出。
-                 只在「一轮」结束之后提供（单句练没有这个意义）。 -->
-            <div v-if="lastRound.length" class="spell-offer">
+                 只在「一轮」结束之后提供（单句练没有这个意义）。
+                 拼过之后这里就地变成小结 —— 拼写没有自己的结束页，
+                 结束一次就够了。 -->
+            <div v-if="spellSummary" class="spell-offer">
+              <p class="so-h">拼写也练完了</p>
+              <p class="so-s">
+                一次拼对 {{ spellSummary.once }} / {{ spellSummary.total }} 词<template v-if="spellSummary.missed.length">，下面这些值得再看一眼</template>
+              </p>
+              <div v-if="spellSummary.missed.length" class="miss">
+                <p v-for="m in spellSummary.missed" :key="m.id" class="miss-i">
+                  <b>{{ m.word }}</b> · {{ m.gloss }}
+                </p>
+              </div>
+              <van-button plain type="primary" block round @click="startSpell">
+                再拼一遍
+              </van-button>
+            </div>
+            <div v-else-if="lastRound.length" class="spell-offer">
               <p class="so-h">要不要再拼一遍？</p>
               <p class="so-s">看中文，把英文写出来。不计入间隔重复，只练手。</p>
               <van-button type="primary" block round @click="startSpell">
@@ -1258,11 +1299,15 @@ watch(
             <span class="wb-sp" />
             <button class="sp-x" type="button" @click="phase = 'done'">结束</button>
           </header>
+          <div class="sp-prog"><i :style="{ width: `${(spellIdx / spellQueue.length) * 100}%` }" /></div>
 
           <div class="sp-card">
             <p v-if="spellCur?.pos" class="sp-pos">{{ spellCur.pos }}</p>
             <p class="sp-gloss">{{ spellCur?.gloss }}</p>
-            <p v-if="spellHint" class="sp-hint">{{ spellHintText }}</p>
+            <!-- 长度是免费的底牌，一直亮着；「提示」才翻首字母 -->
+            <p class="sp-hint" :class="{ on: spellHint }">
+              {{ spellHint ? spellHintText : `${spellCur?.word.length ?? 0} 个字母` }}
+            </p>
           </div>
 
           <input
@@ -1277,42 +1322,32 @@ watch(
             spellcheck="false"
             placeholder="写出英文"
             :disabled="spellState !== 'ask'"
-            @keyup.enter="spellState === 'ask' ? checkSpell() : spellNext()"
+            @keyup.enter="
+              spellState === 'ask' ? checkSpell() : spellState === 'wrong' ? retrySpell() : spellNext()
+            "
           />
 
-          <p v-if="spellState === 'right'" class="sp-ok">对了</p>
-          <p v-else-if="spellState === 'wrong'" class="sp-no">
-            正确答案：<b>{{ spellCur?.word }}</b>
+          <!-- 反馈行占位固定：答对答错都不让输入框上下跳 -->
+          <p class="sp-fb" :class="spellState">
+            <template v-if="spellState === 'right'">对了</template>
+            <template v-else-if="spellState === 'wrong'"
+              >正确答案：<b>{{ spellCur?.word }}</b></template
+            >
           </p>
 
           <div class="sp-acts">
             <template v-if="spellState === 'ask'">
-              <button class="sp-b" type="button" @click="spellHint = true">提示</button>
+              <button class="sp-b" type="button" :disabled="spellHint" @click="spellHint = true">
+                提示
+              </button>
               <button class="sp-b primary" type="button" @click="checkSpell">对一下</button>
             </template>
-            <template v-else>
-              <button v-if="spellState === 'wrong'" class="sp-b" type="button" @click="retrySpell">
-                再试一次
-              </button>
-              <button class="sp-b primary" type="button" @click="spellNext">下一个</button>
+            <template v-else-if="spellState === 'wrong'">
+              <!-- 错了的第一直觉是重打一遍，所以「再试一次」是主按钮、回车也是它 -->
+              <button class="sp-b primary" type="button" @click="retrySpell">再试一次</button>
+              <button class="sp-b" type="button" @click="spellNext">跳过</button>
             </template>
-          </div>
-        </section>
-
-        <!-- 拼写结算 -->
-        <section v-else-if="phase === 'spellDone'" class="spell-done">
-          <p class="done-k">拼写完成</p>
-          <p class="done-big">{{ spellHits }}<span>/ {{ spellQueue.length }}</span></p>
-          <div v-if="spellMissed.length" class="miss">
-            <p class="miss-h">写错的 {{ spellMissed.length }} 个</p>
-            <p v-for="m in spellMissed" :key="m.id" class="miss-i">
-              <b>{{ m.word }}</b> · {{ m.gloss }}
-            </p>
-          </div>
-          <div class="done-btns">
-            <van-button type="primary" block round @click="startSpell">再拼一遍</van-button>
-            <van-button block round @click="phase = 'done'">回到结算</van-button>
-            <van-button block round @click="router.push({ name: 'home' })">回首页</van-button>
+            <!-- 答对 550ms 后自动下一个：这一瞬不摆按钮，免得闪 -->
           </div>
         </section>
 
@@ -1482,7 +1517,7 @@ watch(
   display: flex;
   gap: 5px;
   overflow-x: auto;
-  padding: 12px 0 2px;
+  padding: 6px 0 0;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
 }
@@ -1503,9 +1538,9 @@ watch(
   font-size: 12px;
   font-family: inherit;
   /* 触摸目标 26px 太小，手指粗的人会点空 —— 视觉 26px，热区用
-     padding 撑到 40px 高（上下各多 7px） */
-  padding-top: 7px;
-  padding-bottom: 7px;
+     padding 撑到 38px 高（上下各多 6px） */
+  padding-top: 6px;
+  padding-bottom: 6px;
   box-sizing: content-box;
   cursor: pointer;
 }
@@ -1593,7 +1628,7 @@ watch(
   display: flex;
   align-items: center;
   gap: 5px;
-  margin: 7px 0 4px;
+  margin: 4px 0 2px;
   font-size: 12.5px;
   color: var(--wb-ink-3);
 }
@@ -1657,7 +1692,7 @@ watch(
   font-size: 12px;
   color: var(--wb-ink-3);
   margin-top: 2px;
-  margin-bottom: 12px;
+  margin-bottom: 6px;
 }
 
 .qtag .fresh {
@@ -1669,7 +1704,7 @@ watch(
   text-align: center;
   font-size: 17px;
   line-height: 1.6;
-  margin: 8px 0 14px;
+  margin: 4px 0 8px;
 }
 
 /* 贴着例句右上角的一个小「改」。它安静到不像一个功能 ——
@@ -1698,7 +1733,7 @@ watch(
   text-align: center;
   font-size: 12.5px;
   color: var(--wb-ink-2);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 /* 答完之后的小提示：告诉用户「现在能点词了」。
@@ -1708,28 +1743,26 @@ watch(
   font-size: 11.5px;
   line-height: 1.6;
   color: var(--wb-ink-3);
-  margin: -8px 0 10px;
+  margin: -4px 0 6px;
 }
 
 .blank {
   background: var(--wb-card);
   border: 1.5px dashed var(--wb-line);
   border-radius: var(--wb-radius);
-  padding: 14px;
+  padding: 10px;
   text-align: center;
   color: var(--wb-ink-3);
   font-size: 13px;
   cursor: pointer;
 }
 
-/* ★ 两个选项一行（2×2）。
- * 一行一个的话四个选项就是 4×50 = 200px，加上单词/例句/结论，
- * 一屏放不下 —— 用户得翻页才能看到「下一题」。
- * 两列把这一块压到 2×44 = 88px，省下的 112px 正好够结论和操作条。
- * 宽度上 2 列每列约 165px，中文释义（多为 2~6 字）放得下。 */
+/* ★ 一律 1 列：每个选项独占一行。长释义在 2 列里折行会把那一行
+   grid 撑得高低不齐（实测 A 框"文字折行 + 下面空一块"），1 列后
+   每个选项自己长自己的，文字完整可读、行间高度一致。 */
 .opts {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 8px;
 }
 
@@ -1758,11 +1791,10 @@ watch(
 }
 
 .opt .tx {
-  /* 释义再长也要留在本行内：选项一旦换行，四行变五行，布局又挤出去了 */
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  /* 选项全文必须永远可读（用户实测：钳两行时**作答前**就读不全释义，
+     等于让人瞎选）。不再 clamp —— 页面本来就滚动，选项长就换行，
+     「四行变五行」不是缺陷，看不全才是。 */
+  display: block;
   line-height: 1.35;
 }
 
@@ -1785,7 +1817,7 @@ watch(
 }
 
 /* 训练页底部有一条固定操作条，页面留白要多让出它的高度，
-   否则最后一张题的选项会被压在条子底下点不到 */
+   否则最后一张题的选项会被压在条子底下点不到。 */
 .wb-page :deep(.wb-wrap) {
   padding-bottom: 64px;
 }
@@ -1829,16 +1861,18 @@ watch(
   color: #fff;
 }
 
-/* 没选中的其它项：答完后压暗，让对错一眼分明 */
+/* 没选中的其它项：答完后**不**压暗。
+   ★ 用户实测：半透明让没选中的释义读起来发灰、像"看不全"。
+   只有对错高亮就足够一眼分明，其它项保持原色才是"正常显示"。 */
 .opt.dim {
-  opacity: 0.55;
+  /* 原 opacity: 0.55 已删 */
 }
 
 .exp {
   background: var(--wb-card);
   border-radius: var(--wb-radius);
-  padding: 10px 12px;
-  margin-top: 10px;
+  padding: 8px 10px;
+  margin-top: 8px;
 }
 
 .exp .st {
@@ -1995,8 +2029,8 @@ watch(
 .fixrow {
   display: block;
   width: 100%;
-  margin-top: 10px;
-  padding: 8px;
+  margin-top: 8px;
+  padding: 6px;
   border: 1px dashed var(--wb-line);
   background: transparent;
   border-radius: 10px;
@@ -2144,43 +2178,77 @@ watch(
   flex: 0 0 auto;
   background: var(--wb-card);
   border: 1px solid var(--wb-line);
-  border-radius: 16px;
-  padding: 18px 16px;
+  border-radius: 18px;
+  padding: 22px 18px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.06);
 }
 
 .sp-pos {
-  font-size: 11.5px;
-  color: var(--wb-ink-3);
+  display: inline-block;
+  margin: 0;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: rgba(79, 70, 229, 0.08);
+  font-size: 11px;
+  color: var(--wb-primary);
 }
 
 .sp-gloss {
-  margin-top: 4px;
-  font-size: 20px;
+  margin: 8px 0 0;
+  font-size: 22px;
   line-height: 1.5;
-  font-weight: 600;
+  font-weight: 650;
   color: var(--wb-ink);
 }
 
 .sp-hint {
-  margin-top: 10px;
+  margin: 10px 0 0;
   font-size: 12.5px;
+  letter-spacing: 1px;
+  color: var(--wb-ink-3);
+}
+
+.sp-hint.on {
   color: var(--wb-primary);
+  font-weight: 600;
+}
+
+/* 进度细条：拼写是快节奏练习，进度只给一条线，不抢戏 */
+.sp-prog {
+  height: 3px;
+  border-radius: 999px;
+  background: var(--wb-line);
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+
+.sp-prog i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--wb-primary);
+  transition: width 0.25s ease;
 }
 
 .sp-input {
   flex: 0 0 auto;
-  margin-top: 16px;
+  margin-top: 14px;
   width: 100%;
   box-sizing: border-box;
-  padding: 14px;
+  padding: 16px;
   border: 1.5px solid var(--wb-line);
   border-radius: 14px;
   background: var(--wb-card);
   font-family: inherit;
-  font-size: 20px;
-  letter-spacing: 0.5px;
+  font-size: 22px;
+  text-align: center;
+  letter-spacing: 1px;
   color: var(--wb-ink);
   outline: none;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
 }
 
 .sp-input:focus {
@@ -2199,21 +2267,27 @@ watch(
   color: #c1291f;
 }
 
-.sp-ok {
-  margin-top: 10px;
+/* 反馈行占位固定（min-height），答对答错输入框都不跳 */
+.sp-fb {
+  margin: 10px 0 0;
+  min-height: 22px;
   font-size: 14px;
-  font-weight: 650;
-  color: #12a05c;
+  text-align: center;
+  color: var(--wb-ink-3);
 }
 
-.sp-no {
-  margin-top: 10px;
-  font-size: 14px;
+.sp-fb.right {
+  color: #12a05c;
+  font-weight: 650;
+}
+
+.sp-fb.wrong {
   color: #c1291f;
 }
 
-.sp-no b {
+.sp-fb.wrong b {
   font-size: 17px;
+  letter-spacing: 0.5px;
 }
 
 .sp-acts {
@@ -2226,7 +2300,7 @@ watch(
 
 .sp-b {
   flex: 1;
-  padding: 13px 10px;
+  padding: 14px 10px;
   border: 1px solid var(--wb-line);
   border-radius: 14px;
   background: var(--wb-card);
@@ -2234,6 +2308,11 @@ watch(
   font-size: 15px;
   color: var(--wb-ink);
   cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.sp-b:disabled {
+  opacity: 0.45;
 }
 
 .sp-b.primary {
@@ -2241,14 +2320,6 @@ watch(
   background: var(--wb-primary);
   color: #fff;
   font-weight: 600;
-}
-
-.spell-done {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-align: center;
 }
 
 .miss {

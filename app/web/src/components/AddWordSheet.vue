@@ -13,7 +13,7 @@
  *  ★ 仍然守 D38 的规矩：AI 只出提议，**应用要人点**。这里的按钮只是
  *    「让 AI 先生成」的同意，不是「替我决定内容」的同意。
  */
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import Sheet from './Sheet.vue'
 import AiSheet from './AiSheet.vue'
 import { db } from '../db'
@@ -23,7 +23,7 @@ import { aiReady } from '../ai/config'
 import { describeAiError, type AiResult } from '../ai/types'
 import { toast } from '../toast'
 
-const props = defineProps<{ open: boolean }>()
+const props = defineProps<{ open: boolean; initial?: string }>()
 const emit = defineEmits<{
   (e: 'close'): void
   /** 手动加：给义项 id，父组件跳编辑页 */
@@ -47,6 +47,18 @@ async function recheck(): Promise<void> {
   }
   exists.value = (await db.words.get(w)) != null
 }
+
+/* 搜索没搜到直接来加词（initial 带着搜索词）：打开时就填好、查好，
+   别让人把刚敲过的词再敲一遍。 */
+watch(
+  () => props.open,
+  (v) => {
+    if (v && props.initial) {
+      word.value = props.initial
+      void recheck()
+    }
+  },
+)
 
 function reset(): void {
   word.value = ''

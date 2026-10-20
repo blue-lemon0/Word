@@ -128,6 +128,26 @@ public class NativeBridge {
     }
 
     /**
+     * 朗读英文（单词 / 例句）。
+     *
+     * <p>为什么必须走原生：Android WebView 的 speechSynthesis 经常一个 voice
+     * 都列不出来，speak() 静默无声 —— 不报错也不出声，比没有还糟。
+     * 原生 TextToSpeech 走系统引擎，离线可用。引擎本体在 MainActivity 里，
+     * 生命周期跟壳走（初始化是异步的，第一次点的那句话会被记下来补读）。
+     */
+    @JavascriptInterface
+    public boolean speak(final String text, final float rate) {
+        act.speak(text, rate);
+        return true;
+    }
+
+    /** 停止当前朗读（页面销毁 / 快速连点时别让声音叠起来） */
+    @JavascriptInterface
+    public void stopSpeak() {
+        act.stopSpeak();
+    }
+
+    /**
      * 发一个 JSON POST，把结果回调给页面。
      *
      * <p>★ 为什么这一步必须由原生做（而不是页面里 fetch）：

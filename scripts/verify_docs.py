@@ -1256,6 +1256,62 @@ interaction = [
     ("词库「练不到的词」是一行提示 + 精确清单弹窗（不是含糊的筛选）",
      "stuckList" in _src(os.path.join("pages", "LibraryPage.vue"))
      and "这些词暂时练不到" in _src(os.path.join("pages", "LibraryPage.vue"))),
+
+    # ── 坑 74：snap 翻页容器的程序化滚动必须走 useSnapPager.goTo ──
+    ("页面/组件不裸写 scrollBy/scrollTo（程序化翻页只走 useSnapPager.goTo）",
+     not any(
+         "scrollBy(" in _code(os.path.join(WEB, "src", d, f))
+         or ".scrollTo(" in _code(os.path.join(WEB, "src", d, f))
+         for d in ("pages", "components")
+         for f in os.listdir(os.path.join(WEB, "src", d))
+         if f.endswith((".vue", ".ts"))
+     )),
+
+    # ── 坑 75：var(--primary) 被 8 个组件引用却从未定义 → 主按钮隐形 ──
+    # CSS 变量解析失败静默回退 unset，typecheck/lint/DOM 断言全看不见。
+    ("style.css 定义 --primary / --primary-soft 别名（存量组件的兜底）",
+     "--primary:" in _code(os.path.join(WEB, "src", "style.css"))
+     and "--primary-soft:" in _code(os.path.join(WEB, "src", "style.css"))),
+
+    # ── 坑 74（真机「翻一半停住」根治）：容器尺寸变化会把 snap 页边界整体搬家，
+    # smooth 动画的旧目标不再是 snap 点 → WebView 不重吸附、永久卡住。
+    # 两道防线缺一不可：pager 带 ResizeObserver 重建对齐；.qfix 常挂不拆（高度恒定）。
+    ("useSnapPager 带 ResizeObserver 尺寸守卫（容器变尺寸立即重建页对齐）",
+     "ResizeObserver" in _code(os.path.join(WEB, "src", "scroll-pager.ts"))),
+    ("首页 .qfix 行常挂 + visibility 切换（不用 v-if 拆掉，保持 .qscroll 高度恒定）",
+     'class="qfix" :class="{ ghost: !boxState.submitted }"'
+     in _code(os.path.join(WEB, "src", "pages", "HomePage.vue"))
+     and ".qfix.ghost" in _code(os.path.join(WEB, "src", "pages", "HomePage.vue"))),
+    # 坑 79：RO 若只挂在 onMounted，容器被 v-if 拆掉重挂后观测的是旧节点，守卫失效。
+    ("scroll-pager.ts 的 RO 用 watch(el) 挂载，而非 onMounted 一次性",
+     "watch(el" in _code(os.path.join(WEB, "src", "scroll-pager.ts"))
+     and "onMounted" not in _code(os.path.join(WEB, "src", "scroll-pager.ts"))),
+    # 坑 78：快速翻页时 QuestionBox 自己现场出题 = 每页都先亮「出题…」空壳。
+    ("QuestionBox 有 question 预取缓存 prop",
+     "question?: Question" in _code(os.path.join(WEB, "src", "components", "QuestionBox.vue"))),
+    ("HomePage 预取 makeQuestion 供 QuestionBox 直接渲染（首题 await、idx 变化续热）",
+     "makeQuestion" in _code(os.path.join(WEB, "src", "pages", "HomePage.vue"))
+     and "prefetchOne" in _code(os.path.join(WEB, "src", "pages", "HomePage.vue"))
+     and "preMade" in _code(os.path.join(WEB, "src", "pages", "HomePage.vue"))),
+    # 坑 80：qscroll 是 flex:1 的撑子，loading 期间拆走它 = 底栏漂到屏幕中部，
+    # 内容到达再跳回底部 = 用户看到的「打开就闪」。loading 只能是覆盖层。
+    ("首页 qscroll 常挂（v-show 而非 v-else），loading 为绝对定位覆盖层",
+     'v-show="loading || total > 0" ref="qscroll"'
+     in _code(os.path.join(WEB, "src", "pages", "HomePage.vue"))
+     and "position: absolute" in _code(os.path.join(WEB, "src", "pages", "HomePage.vue"))),
+    ("首页底栏 loading 期间不渲染（和首题同帧出现，不先弹出再挪位）",
+     'v-if="total && !loading" class="qbar"'
+     in _code(os.path.join(WEB, "src", "pages", "HomePage.vue"))),
+    # 坑 81：快速连甩时落定页码不动，渲染窗口只锚 page = 窗口外全是空壳。
+    ("useSnapPager 暴露 visual（视线页码，随 scroll 更新，不触发 onPage）",
+     "visual" in _code(os.path.join(WEB, "src", "scroll-pager.ts"))),
+    ("首页渲染窗口锚三者并集（page ∪ intent ∪ visual）",
+     "Math.abs(i - qVisual) <= 3"
+     in _code(os.path.join(WEB, "src", "pages", "HomePage.vue"))),
+    # 坑 82：class="opts done" 撞了结算屏 .done 的 min-height:100dvh-32px ≈ 730px，
+    # 选项容器被撑出 530px 空气。答题完成态不需要专门 class。
+    ("TrainPage 选项容器不带 done class（避免撞结算屏 .done 的 min-height）",
+     'class="opts done"' not in _code(os.path.join(WEB, "src", "pages", "TrainPage.vue"))),
 ]
 
 fi = 0

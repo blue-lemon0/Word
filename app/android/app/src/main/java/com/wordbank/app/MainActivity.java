@@ -195,6 +195,92 @@ public class MainActivity extends android.app.Activity {
         handleIncomingFile(getIntent());
     }
 
+    /* ── 朗读（TextToSpeech）──
+     *
+     * WebView 的 speechSynthesis 在 Android 上基本不可用（voice 列表为空），
+     * 单词 / 例句的朗读只能由原生做。
+     *
+     * 两个要点：
+     * <ol>
+     *   <li>引擎初始化是异步的：第一次点朗读时引擎可能还没好，把那句话记在
+     *       {@link #ttsPending} 里，onInit 成功后补读 —— 不然第一次点永远没声。</li>
+     *   <li>setLanguage 要检查返回值：设备没装英文语音包时 speak() 不出声，
+     *       只在 logcat 留一句话，别假装成功了。</li>
+     * </ol>
+     */
+    private android.speech.tts.TextToSpeech tts;
+    private boolean ttsReady = false;
+    private String ttsPending;
+    private float ttsPendingRate = 0.9f;
+
+    /** NativeBridge.speak 转到这里。JavascriptInterface 跑在 binder 线程，先切回 UI 线程。 */
+    void speak(final String text, final float rate) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (tts == null) {
+                    ttsPending = text;
+                    ttsPendingRate = rate;
+                    tts = new android.speech.tts.TextToSpeech(MainActivity.this,
+                            new android.speech.tts.TextToSpeech.OnInitListener() {
+                                @Override
+                                public void onInit(int status) {
+                                    if (status != android.speech.tts.TextToSpeech.SUCCESS) {
+                                        android.util.Log.w("wordbank", "TTS 初始化失败 status=" + status);
+                                        return;
+                                    }
+                                    int r = tts.setLanguage(java.util.Locale.ENGLISH);
+                                    ttsReady = r >= android.speech.tts.TextToSpeech.LANG_AVAILABLE;
+                                    if (!ttsReady) {
+                                        android.util.Log.w("wordbank", "TTS 没有英文语音包 r=" + r);
+                                        return;
+                                    }
+                                    if (ttsPending != null) {
+                                        speakNow(ttsPending, ttsPendingRate);
+                                        ttsPending = null;
+                                    }
+                                }
+                            });
+                    return;
+                }
+                if (ttsReady) {
+                    speakNow(text, rate);
+                } else {
+                    // 引擎还没好：只留最新的一句，别把队列越攒越长
+                    ttsPending = text;
+                    ttsPendingRate = rate;
+                }
+            }
+        });
+    }
+
+    private void speakNow(String text, float rate) {
+        if (tts == null) return;
+        tts.setSpeechRate(rate);
+        // QUEUE_FLUSH：背题时连点喇叭，听最新的一句，不排队
+        tts.speak(text, android.speech.tts.TextToSpeech.QUEUE_FLUSH, null, "wb-speak");
+    }
+
+    void stopSpeak() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (tts != null) tts.stop();
+            }
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+        // TTS 持有系统服务连接，不 shutdown 会泄漏到进程结束
+        if (tts != null) {
+            tts.stop();
+            tts.shutdown();
+            tts = null;
+        }
+        super.onDestroy();
+    }
+
     /**
      * 处理 VIEW intent 传来的文件。
      *

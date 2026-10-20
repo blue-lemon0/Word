@@ -27,6 +27,14 @@ const router = useRouter()
 
 /** 「新增词」弹层 */
 const showAdd = ref(false)
+/** 搜不到时一键加词：把搜索词直接带进 AddWordSheet，别让人再敲一遍 */
+const addInitial = ref('')
+
+function addFromSearch(): void {
+  addInitial.value = q.value.trim().toLowerCase()
+  if (!addInitial.value) return
+  showAdd.value = true
+}
 
 interface Row {
   word: string
@@ -346,7 +354,8 @@ onMounted(load)
 
     <AddWordSheet
       :open="showAdd"
-      @close="showAdd = false"
+      :initial="addInitial"
+      @close="showAdd = false; addInitial = ''"
       @added="(id) => { showAdd = false; router.push(`/sense/${id}`) }"
       @filled="(w) => { showAdd = false; router.push(`/word/${encodeURIComponent(w)}`) }"
     />
@@ -427,7 +436,22 @@ onMounted(load)
       </div>
 
       <van-loading v-if="loading" class="ld" color="#4f46e5">正在读库…</van-loading>
-      <van-empty v-else-if="!totalShown" description="没有匹配的词" />
+      <!-- 搜不到不是死胡同：这正是「想收这个词」的时刻，给个一键加入 -->
+      <van-empty
+        v-else-if="!totalShown"
+        :description="q.trim() ? `库里没有「${q.trim()}」` : '没有匹配的词'"
+      >
+        <van-button
+          v-if="q.trim()"
+          round
+          type="primary"
+          size="small"
+          icon="plus"
+          @click="addFromSearch"
+        >
+          把「{{ q.trim() }}」加进词库
+        </van-button>
+      </van-empty>
 
       <!-- 分桶列表 -->
       <template v-if="!loading">
@@ -535,7 +559,9 @@ onMounted(load)
   background: linear-gradient(135deg, #f5f3ff 0%, #eef2ff 100%);
   border: 1px solid #e6e6f7;
   border-radius: 16px;
-  padding: 16px;
+  /* 上内边距收窄（用户反馈：它把下面「缺例句」提示条挤得显示不全）——
+     板块的第一印象由标题承担，不靠留白 */
+  padding: 10px 16px 14px;
   margin-bottom: 12px;
 }
 
@@ -558,7 +584,7 @@ onMounted(load)
 }
 
 .t-acts {
-  margin-top: 12px;
+  margin-top: 8px;
 }
 
 /* ── 搜索与 chips ── */
@@ -620,7 +646,10 @@ onMounted(load)
   align-items: center;
   gap: 8px;
   width: 100%;
-  margin: 0 0 8px;
+  /* 下面吸顶搜索框用 margin-top:-8px + 10px 反向阴影往上盖（堵吸顶缝），
+     这 18px 会落在前一个元素身上 —— 底边距留不够，提示条的下半截
+     连边框一起被它盖掉（用户反馈「下半边框看不见」，坑见踩坑 77）。 */
+  margin: 0 0 20px;
   padding: 10px 12px;
   border: 1px solid #f0d9a8;
   border-radius: 12px;

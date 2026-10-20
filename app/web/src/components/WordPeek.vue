@@ -162,8 +162,12 @@ async function add(): Promise<void> {
         句子里是 <code>{{ peek.token }}</code> · 原形是 <code>{{ title }}</code>
       </p>
 
-      <!-- 在库里：列出义项，点哪个进哪个 -->
-      <template v-if="peek.senses.length">
+      <!-- 在库里：列出义项，点哪个进哪个。
+           ★ 刚加进来的那一刻（justAdded）必须留在下面的确认态：
+             add() 之后重新 peek 会带回刚建的占位义项，senses 变成 1 条，
+             若只看 senses.length，「已加入 + 去补全」这层确认就永远渲染不出来，
+             用户只剩一闪而过的 toast 和一行「还没有释义」。 -->
+      <template v-if="peek.senses.length && !justAdded">
         <button
           v-for="s in peek.senses"
           :key="s.id"

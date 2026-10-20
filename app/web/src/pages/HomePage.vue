@@ -8,9 +8,10 @@
  *          底部左右两颗按钮：复习（今天剩余）/ 学习（词库），
  *          它们只是把屏一切到对应来源再滑过去 —— 不再跳任何「练习页」。
  *
- *  ★ 所以 `/train` 那一页删了：它的两种形态就是这两屏。
+ *  ★ 本页只管「随机刷 + 扫句子」；「按计划的一整轮」（到期/新词/在学）
+ *    在 /train（openPlan 跳过去）。两个入口别混：这里不出现「练法选择」。
  */
-import { computed, nextTick, onActivated, onMounted, ref } from 'vue'
+import { computed, nextTick, onActivated, onMounted, reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import ScanList from '../components/ScanList.vue'
 import ScanPeek from '../components/ScanPeek.vue'
@@ -25,7 +26,8 @@ import { describeAiError, type AiResult } from '../ai/types'
 import type { Question } from '../quiz'
 import type { Sense, Sentence } from '../types'
 import { allProgress } from '../db'
-import { buildRandomQueue, practicePool, type ScanItem } from '../quiz'
+import { buildRandomQueue, makeQuestion, practicePool, type ScanItem } from '../quiz'
+import { useSnapPager } from '../scroll-pager'
 
 const router = useRouter()
 
@@ -75,9 +77,10 @@ async function loadNums(): Promise<void> {
    两个按钮进的是背单词页（一整轮、有进度格、能回看跳题）。 */
 const mode = ref<Mode>('random')
 const queue = ref<string[]>([])
-const idx = ref(0)
 const serial = ref(0)
-const loading = ref(false)
+/* 初始就是 loading（坑 80）：onMounted 必走 setMode，若初始 false，
+   首帧 DOM 会先摆出一副「空池」形状再被 loading 顶掉 —— 又是一次闪。 */
+const loading = ref(true)
 const done = ref(0)
 const right = ref(0)
 
@@ -85,14 +88,71 @@ const cur = computed(() => queue.value[idx.value] ?? '')
 const total = computed(() => queue.value.length)
 const modeText = computed(() => '随机')
 
+/** 当前题的呈现状态（决定底栏显示哪两个按钮） */
+const boxState = ref<{ revealed: boolean; submitted: boolean }>({ revealed: false, submitted: false })
+
+/** 竖滑一屏一题：页码即 idx，换页即重置作答状态。
+ *  keep-alive 回来的位置恢复在 useSnapPager 里（坑 62/71），页面不手写。 */
+const qPager = useSnapPager('y', {
+  max: () => total.value - 1,
+  onPage: () => {
+    boxState.value = { revealed: false, submitted: false }
+  },
+})
+const idx = qPager.page
+const qIntent = qPager.intent
+const qVisual = qPager.visual
+const qscroll = qPager.el
+const onQScroll = qPager.onScroll
+
+/* ── 题目预取（坑 78）──
+   QuestionBox 自己挂载后才 makeQuestion：快速连翻时每一页都先亮「出题…」
+   空壳， IndexedDB 那一跳在真机上足够被眼睛看见。修法照列表的预加载思路：
+   外壳提前把前后几页的题出好，子组件拿到现成的直接用。
+   键是**队列下标**（不是 senseId）：同一批里同一个义项出现两次也不串。 */
+const preMade = reactive(new Map<number, Question>())
+const preInflight = new Set<number>()
+
+async function prefetchOne(i: number): Promise<void> {
+  const sid = queue.value[i]
+  if (!sid || preMade.has(i) || preInflight.has(i)) return
+  preInflight.add(i)
+  try {
+    const q = await makeQuestion(sid)
+    // 等题途中用户可能已「换一批」—— 下标对不上就扔掉，别把旧批的题塞进新批
+    if (q && queue.value[i] === sid) preMade.set(i, q)
+  } finally {
+    preInflight.delete(i)
+  }
+}
+
+/** 以 n 为中心预热窗口：前后各 5 页（用户 2026-10-20：前后各 2 只是底线，
+ *  预取要大方 —— makeQuestion 就是几条 IndexedDB 读，成本可忽略；
+ *  渲染窗口 ±3，预取 ±5 留出余量，快速甩动落点也在热区内）。
+ *  边界由 prefetchOne 自己挡：队列头尾 sid 为空直接返回、
+ *  「换一批」后下标对不上旧题直接扔。 */
+const PRE_RANGE = 5
+function prefetchAround(n: number): void {
+  for (let d = -PRE_RANGE; d <= PRE_RANGE; d++) void prefetchOne(n + d)
+}
+
+watch(idx, (n) => prefetchAround(n))
+/* 甩动途中预取跟着视线走（坑 81）：落定前 idx 不动，但可视页早已翻远 */
+watch(qVisual, (n) => prefetchAround(n))
+
 async function setMode(_m: Mode = 'random'): Promise<void> {
   mode.value = 'random'
   loading.value = true
   try {
     queue.value = await buildRandomQueue(50)
+    preMade.clear()
+    /* 第一题**备好再亮屏**：否则用户看到的是「组题… → 出题… → 内容」
+       三段跳（坑 78 的另一半 —— 打开 App 那一刻的闪烁）。 */
+    await prefetchOne(0)
   } finally {
     loading.value = false
   }
+  prefetchAround(0)
   idx.value = 0
   serial.value++
   done.value = 0
@@ -145,6 +205,9 @@ function onAiApplied(): void {
 /** 当前题的完整对象（改内容、查词都要用它） */
 const curQ = ref<Question | null>(null)
 function onLoaded(i: number, q: Question): void {
+  // 组件自己出的题（含 AI 换句后的 reload）也回写进预取缓存 ——
+  // 不然往回翻时拿到的还是换句之前的那道旧题
+  preMade.set(i, q)
   if (i === idx.value) curQ.value = q
 }
 
@@ -159,9 +222,7 @@ function openFix(what: 'sentence' | 'sense'): void {
   edSense.value = what === 'sense' ? q.sense : null
 }
 
-/** 当前题的呈现状态（决定底栏显示哪两个按钮） */
-const boxState = ref<{ revealed: boolean; submitted: boolean }>({ revealed: false, submitted: false })
-
+/** 当前题变了就重置作答状态（在 qPager 的 onPage 里），这里只跟着组件回报 */
 function onBoxState(i: number, st: { revealed: boolean; submitted: boolean }): void {
   if (i !== idx.value) return
   boxState.value = st
@@ -182,25 +243,11 @@ function askGiveUp(): void {
   boxes.get(idx.value)?.save('PENDING')
 }
 
-/** 底栏「下一题」：滚到下一页（原生吸附给动画），到底就停 */
+/** 底栏「下一题」：goBy 基于 intent 累进 —— 连点三下翻三页，
+ *  页码等落地才结算（坑 74：动画途中的位置不配改页码）。到底就停 */
 function goNext(): void {
-  const el = qscroll.value
-  if (!el) return
-  if (idx.value >= total.value - 1) return
-  el.scrollBy({ top: el.clientHeight, behavior: 'smooth' })
-}
-
-/** 滚动到第几题（原生吸附负责动画，这里只同步「第 n / m 题」与统计） */
-const qscroll = ref<HTMLElement | null>(null)
-
-function onQScroll(): void {
-  const el = qscroll.value
-  if (!el) return
-  const i = Math.round(el.scrollTop / (el.clientHeight || 1))
-  if (i !== idx.value) {
-    idx.value = Math.min(Math.max(i, 0), Math.max(total.value - 1, 0))
-    boxState.value = { revealed: false, submitted: false }
-  }
+  if ((qIntent.value ?? idx.value) >= total.value - 1) return
+  qPager.goBy(1)
 }
 
 /** 每题只记一次结果（上下滑来回不会重复计数） */
@@ -232,22 +279,12 @@ function goWord(w: string): void {
   void router.push(`/word/${encodeURIComponent(w)}`)
 }
 
-/* ── 两屏切换 ── */
-const pane = ref(0)
-const rootEl = ref<HTMLElement | null>(null)
-
-/** 点指示点直接切屏（横滑之外的第二条路） */
-function goPane(i: number): void {
-  const el = rootEl.value
-  if (!el) return
-  el.scrollTo({ left: i * el.clientWidth, behavior: 'smooth' })
-}
-
-function onScrollRoot(): void {
-  const el = rootEl.value
-  if (!el) return
-  pane.value = Math.round(el.scrollLeft / (el.clientWidth || 1))
-}
+/* ── 两屏切换（横滑翻页容器：页码↔滚动同步、keep-alive 恢复都在 useSnapPager 里，坑 62/71）── */
+const hPager = useSnapPager('x')
+const pane = hPager.page
+const rootEl = hPager.el
+const goPane = hPager.goTo
+const onScrollRoot = hPager.onScroll
 
 /** 复习 / 学习：**进背单词页**（一整轮、有进度格、能回看跳题）；
  *  屏一留给「随便刷」——那里没有进度条，不该承担一轮复习。 */
@@ -255,15 +292,9 @@ function openPlan(scope: 'due' | 'new' | 'learning'): void {
   void router.push({ path: '/train', query: { scope } })
 }
 
-/** keep-alive 回来时：刷新数字 + **把横滑位置放回去**。
- *  ★ 组件虽然被缓存了，但 DOM 离开再插回来时滚动位置会丢 ——
- *    表现就是从背单词页返回后，明明是从第二屏进去的，回来却停在第一屏。 */
+/** keep-alive 回来：刷新数字。两个翻页容器的滚动位置由 useSnapPager 各自放回去（坑 62/71）。 */
 onActivated(() => {
   void loadNums()
-  void nextTick(() => {
-    const el = rootEl.value
-    if (el) el.scrollLeft = pane.value * el.clientWidth
-  })
 })
 
 onMounted(async () => {
@@ -296,18 +327,24 @@ onMounted(async () => {
           <van-loading v-if="loading" class="qld" color="#4f46e5">组题…</van-loading>
 
           <!-- ★ 一题一屏，用**原生吸附滚动**：这一版才是你要的那个滑动效果
-               （上一版用 touch 手势直接换内容，没有动画）。 -->
-          <div v-else ref="qscroll" class="qscroll" @scroll.passive="onQScroll">
+               （上一版用 touch 手势直接换内容，没有动画）。
+
+               ★ qscroll 常挂（坑 80）：不许为了 loading 把它 v-else 拆掉 ——
+               它是 flex:1 的撑子，一拆底栏「显示选项」就漂到屏幕中部，
+               内容到了再跳回底部 = 用户看到的「打开就闪」。loading 只做
+               覆盖层，布局从零帧起就是最终形状。 -->
+          <div v-show="loading || total > 0" ref="qscroll" class="qscroll" @scroll.passive="onQScroll">
             <section v-for="(sid, i) in queue" :key="sid + i" class="qpage">
               <div class="qpage-in">
                 <div class="qcenter">
                   <QuestionBox
-                  v-if="Math.abs(i - idx) <= 1"
+                  v-if="Math.abs(i - idx) <= 3 || (qIntent != null && Math.abs(i - qIntent) <= 3) || Math.abs(i - qVisual) <= 3"
                   :ref="(el) => setBox(i, el)"
                   hide-actions
                   allow-pick
                   :sense-id="sid"
                   :serial="i"
+                  :question="preMade.get(i)"
                   @answered="onAnsweredAt(i, $event)"
                   @state="(st) => onBoxState(i, st)"
                   @loaded="(q) => onLoaded(i, q)"
@@ -327,8 +364,13 @@ onMounted(async () => {
             </div>
           </div>
 
-          <!-- 作答后：这一句/这个意思有问题，就地改（和背单词页同一个 QuickEdit） -->
-          <div v-if="boxState.submitted" class="qfix">
+          <!-- 作答后：这一句/这个意思有问题，就地改（和背单词页同一个 QuickEdit）。
+
+               ★ 不许 v-if 拆掉这一行（坑 74 根治的一半）：它是 .qscroll 的兄弟，
+               出现/消失会让 .qscroll 高变 41px —— 翻页落定那一帧底栏正好切换，
+               容器变高 → snap 页边界整体搬家 → 动画停在已不是 snap 点的旧目标上，
+               真机永久卡在两页之间。容器常挂、visibility 切换，高度就恒定了。 -->
+          <div class="qfix" :class="{ ghost: !boxState.submitted }">
             <button class="qfix-b" type="button" @click="openFix('sentence')">改例句</button>
             <button class="qfix-b" type="button" @click="openFix('sense')">改释义</button>
             <button v-if="aiOn" class="qfix-b" type="button" :disabled="aiBusy" @click="aiReplace">
@@ -337,8 +379,9 @@ onMounted(async () => {
           </div>
 
           <!-- ★ 「我不会 / 显示选项 / 下一题」固定在底部：
-               它们是指头的主行动，不能跟着一屏一屏滚走。 -->
-          <div v-if="total" class="qbar">
+               它们是指头的主行动，不能跟着一屏一屏滚走。
+               loading 期间不显示：和首题内容同一帧出现，避免先弹出来再挪位。 -->
+          <div v-if="total && !loading" class="qbar">
             <template v-if="!boxState.revealed && !boxState.submitted">
               <button class="qb" type="button" @click="askGiveUp">我不会</button>
               <button class="qb primary" type="button" @click="askReveal">显示选项</button>
@@ -490,6 +533,7 @@ onMounted(async () => {
 
 /* ── 屏一 ── */
 .qpane {
+  position: relative;
   flex: 1;
   min-height: 0;
   display: flex;
@@ -552,7 +596,15 @@ onMounted(async () => {
 }
 
 .qld {
-  padding: 30px 0;
+  /* 覆盖层而不是布局参与者（坑 80）：盖在常挂的 .qscroll 上，
+     底下的布局从头到尾是最终形状，loading 消失时没有任何东西挪位 */
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--wb-bg);
 }
 
 .qempty {
@@ -580,6 +632,11 @@ onMounted(async () => {
   gap: 8px;
   justify-content: flex-end;
   padding: 8px 2px 0;
+}
+
+/* 未作答时占位但不可见：保住高度恒定，.qscroll 才不随作答状态伸缩（坑 74） */
+.qfix.ghost {
+  visibility: hidden;
 }
 
 .qfix-b {

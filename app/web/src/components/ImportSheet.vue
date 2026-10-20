@@ -66,26 +66,6 @@ async function apply(): Promise<void> {
     busy.value = false
   }
 }
-
-/** 「填入当前内容」：把本地现状导出成导入格式，方便让 AI 在此基础上改 */
-function fillTemplate(): void {
-  const s = plan.value?.senses ?? []
-  text.value = JSON.stringify(
-    {
-      word: props.word,
-      senses: s.map((p) => ({
-        slot: p.slot,
-        pos: p.incoming.pos,
-        gloss: p.incoming.gloss,
-        glossEn: p.incoming.glossEn,
-        note: p.incoming.note,
-        sentences: p.incoming.sentences,
-      })),
-    },
-    null,
-    2,
-  )
-}
 </script>
 
 <template>
@@ -104,7 +84,6 @@ function fillTemplate(): void {
     />
 
     <van-space class="row">
-      <van-button size="small" plain @click="fillTemplate">填入当前内容</van-button>
       <van-button size="small" type="primary" :disabled="!text.trim() || busy" @click="preview">
         看差异
       </van-button>

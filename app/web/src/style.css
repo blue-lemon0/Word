@@ -17,6 +17,11 @@
   --wb-ink-3: #969baa;
   --wb-line: #ebedf2;
   --wb-primary: #4f46e5;
+  /* 历史别名（坑 75）：一批组件写 var(--primary) / var(--primary-soft)，
+     没这两行它们解析为 unset —— 主按钮变成透明底 + 白字 = 肉眼隐形。
+     新代码请直接用 --wb-*，这两行只为存量组件兜底。 */
+  --primary: var(--wb-primary);
+  --primary-soft: rgba(79, 70, 229, 0.08);
   --wb-radius: 12px;
   --wb-tabbar-h: 50px;
 

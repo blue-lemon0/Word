@@ -12,6 +12,8 @@ import { ref, watch } from 'vue'
 import MarkedText from './MarkedText.vue'
 import { db } from '../db'
 import { makeQuestion, newSessionId, recordAnswer, type Question } from '../quiz'
+import { speakEn, speechOn } from '../speech'
+import { toast } from '../toast'
 import type { Sentence } from '../types'
 
 const props = defineProps<{
@@ -24,6 +26,9 @@ const props = defineProps<{
   sentenceId?: number
   /** 序号，让组件知道「换题了」（同一 sense 连练两句时也要重开） */
   serial?: number
+  /** 外壳预取好的题（坑 78：快速翻页时再现场出题 = 每页都先亮一个「出题…」
+   *  空壳。给了它就直接用，不走 makeQuestion；reload(force) 可绕过） */
+  question?: Question
 }>()
 
 const emit = defineEmits<{
@@ -58,7 +63,7 @@ function nextText(): string {
 
 const resultText = ref('')
 
-async function load(): Promise<void> {
+async function load(force = false): Promise<void> {
   busy.value = true
   err.value = ''
   q.value = null
@@ -68,7 +73,10 @@ async function load(): Promise<void> {
   resultText.value = ''
   others.value = []
   try {
-    const question = await makeQuestion(props.senseId, props.sentenceId)
+    /* 外壳预取的题直接用（快速翻页不亮空壳）；force（AI 换句后的 reload）
+       必须绕过缓存重新出，不然换完的例句还挂着旧题面 */
+    const question =
+      !force && props.question ? props.question : await makeQuestion(props.senseId, props.sentenceId)
     if (!question) {
       err.value = '这个意思还没有可练的句子'
       return
@@ -85,15 +93,28 @@ async function load(): Promise<void> {
   }
 }
 
-watch(() => [props.senseId, props.serial, props.sentenceId], load, { immediate: true })
+watch(() => [props.senseId, props.serial, props.sentenceId], () => void load(), { immediate: true })
 
-/** 点句子里的词：目标词在**作答前**不响应（点了就等于泄题），
+/* 预取的题可能比组件晚到（首页窗口先挂上、预取还在路上）：
+   到了且自己还没出成题，就换用预取的这道 —— 别让用户盯着「出题…」 */
+watch(
+  () => props.question,
+  (nq) => {
+    if (nq && !q.value && !err.value && !busy.value) void load()
+  },
+)
+
+/** 点句子里的词：目标词在**作答前**不开查义（点了就等于泄题），
+ *  但不能装死 —— 明说什么时候能点（用户反馈过「点了没反应」）。
  *  其它词随时可点 —— 读到不认识的字，应该能立刻查、立刻加进词库。 */
 function onPick(w: string): void {
   const q0 = q.value
   if (!q0) return
   const target = (q0.sentence.form || q0.sense.word).toLowerCase()
-  if (!submitted.value && w.toLowerCase() === target) return
+  if (!submitted.value && w.toLowerCase() === target) {
+    toast('先作答 —— 答完再看这个词', 1900, true)
+    return
+  }
   emit('pick', w)
 }
 
@@ -122,7 +143,7 @@ function choose(opt: string): void {
   void save(isRight(opt) ? 'CORRECT' : 'WRONG')
 }
 
-defineExpose({ reveal, save, reload: load })
+defineExpose({ reveal, save, reload: () => load(true) })
 </script>
 
 <template>
@@ -135,25 +156,46 @@ defineExpose({ reveal, save, reload: load })
         <button class="w" type="button" @click="emit('word', q.sense.word)">
           {{ q.sense.word }}
         </button>
+        <!-- 喇叭只读词，不读释义 —— 作答前听到意思等于泄题，发音不会 -->
+        <button v-if="speechOn" class="say" type="button" aria-label="朗读单词" @click="speakEn(q.sense.word)">
+          <van-icon name="volume-o" />
+        </button>
         <span v-if="q.sense.pos" class="pos">{{ q.sense.pos }}</span>
         <span v-if="q.ipa" class="ipa">/{{ q.ipa }}/</span>
       </header>
 
-      <p class="sn">
-        <MarkedText
-          :text="q.sentence.en"
-          :form="q.sentence.form"
-          :span-start="q.sentence.spanStart"
-          :span-len="q.sentence.spanLen"
-          :pickable="props.allowPick"
-          @pick="onPick"
-        />
-      </p>
+      <div class="snrow">
+        <p class="sn">
+          <MarkedText
+            :text="q.sentence.en"
+            :form="q.sentence.form"
+            :span-start="q.sentence.spanStart"
+            :span-len="q.sentence.spanLen"
+            :pickable="props.allowPick"
+            @pick="onPick"
+          />
+        </p>
+        <button v-if="speechOn" class="say sn-say" type="button" aria-label="朗读例句" @click="speakEn(q.sentence.en)">
+          <van-icon name="volume-o" />
+        </button>
+      </div>
 
       <!-- 还没出选项（hideActions 时交给外壳的固定底栏） -->
       <div v-if="!revealed && !submitted && !props.hideActions" class="acts">
         <van-button block round @click="save('PENDING')">我不会</van-button>
         <van-button type="primary" block round @click="reveal">显示选项</van-button>
+      </div>
+
+      <!-- hideActions（首页屏一）：底栏按钮离句子一屏远，句子下面补一个
+           轻量入口 —— 与背单词页同一个「点击空白处显示选项」的样子。
+           封装在这里而不是首页手写，谁用 QuestionBox 谁就有。 -->
+      <div
+        v-else-if="!revealed && !submitted"
+        class="blank"
+        role="button"
+        @click="reveal"
+      >
+        — 点击空白处显示选项 —
       </div>
 
       <!-- 选项 -->
@@ -236,10 +278,59 @@ defineExpose({ reveal, save, reload: load })
   color: var(--wb-ink);
 }
 
+.snrow {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.snrow .sn {
+  flex: 1;
+  min-width: 0;
+}
+
+.say {
+  border: 0;
+  background: transparent;
+  color: var(--wb-ink-3);
+  font-size: 17px;
+  padding: 2px 4px;
+  cursor: pointer;
+}
+
+.say:active {
+  color: var(--wb-primary);
+}
+
+.sn-say {
+  /* 跟例句第一行对齐，句子多长喇叭都钉在右上 */
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+
 .acts {
   display: flex;
   gap: 10px;
   margin-top: 16px;
+}
+
+/* 与 TrainPage .blank 同一个样子（虚线框 + 灰字）——
+   两个页面长得像的入口，行为也必须一样（点下去都是 reveal） */
+.blank {
+  margin-top: 14px;
+  background: var(--wb-card);
+  border: 1.5px dashed var(--wb-line);
+  border-radius: var(--wb-radius);
+  padding: 14px;
+  text-align: center;
+  color: var(--wb-ink-3);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.blank:active {
+  border-color: var(--wb-primary);
+  color: var(--wb-primary);
 }
 
 .opts {

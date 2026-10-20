@@ -426,6 +426,13 @@ async function onMerge(targetId: string): Promise<void> {
   toWordPage()
 }
 
+/** 拆分弹窗：整行点击 = 勾/取消（checkbox 自己的点击走 @click.stop，不会双触发） */
+function toggleMove(id: number): void {
+  const i = moveIds.value.indexOf(id)
+  if (i >= 0) moveIds.value.splice(i, 1)
+  else moveIds.value.push(id)
+}
+
 /** 拆分：新义项的释义在这里填（原来是一个 prompt() 弹窗）。 */
 function onSplit(): void {
   if (!sense.value) return
@@ -724,8 +731,16 @@ function onDelete(): void {
           勾上要<b>挪走</b>的句子，剩下的留在原义项。熟练度不复制 —— 新义项从零开始。
         </p>
         <van-checkbox-group v-model="moveIds">
-          <div v-for="(s, i) in sents" :key="s.id" class="pick">
-            <van-checkbox :name="s.id!" shape="square" />
+          <!-- 整行都能点（原来只有巴掌大的 checkbox 能点，cursor:pointer 是谎话）；
+               勾上的行给底色，一眼看清「哪些要挪走」 -->
+          <div
+            v-for="(s, i) in sents"
+            :key="s.id"
+            class="pick"
+            :class="{ on: moveIds.includes(s.id!) }"
+            @click="toggleMove(s.id!)"
+          >
+            <van-checkbox :name="s.id!" shape="square" @click.stop />
             <span class="n">{{ i + 1 }}</span>
             <span class="g">{{ s.en }}</span>
           </div>
@@ -1099,13 +1114,25 @@ function onDelete(): void {
 
 .pick {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 9px;
   padding: 11px 12px;
   border-radius: 11px;
   background: var(--wb-card);
   margin-bottom: 8px;
   cursor: pointer;
+  border: 1.5px solid transparent;
+}
+
+/* 勾上的行：紫边淡底，「哪些要挪走」不用逐个看 checkbox */
+.pick.on {
+  border-color: var(--wb-primary);
+  background: rgba(79, 70, 229, 0.05);
+}
+
+.pick .van-checkbox {
+  flex: 0 0 auto;
+  margin-top: 2px;
 }
 
 /* 序号牌：与单词页同一个样子（圆形浅底 + 等宽数字），
@@ -1124,14 +1151,27 @@ function onDelete(): void {
   flex: 0 0 auto;
 }
 
+/* 拆分弹窗里的序号：原来是一粒 11px 灰字，趴在长句边上又像注释又像杂音。
+   升级成和 .slot 同款的圆形序号牌 —— 序号这种东西全 app 一个长相。 */
 .pick .n {
   font-size: 11px;
-  color: var(--wb-ink-3);
+  font-weight: 600;
+  font-family: ui-monospace, monospace;
+  color: var(--wb-ink-2);
+  background: var(--wb-line);
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
   flex: 0 0 auto;
+  margin-top: 1px;
 }
 
 .pick .g {
   font-size: 13.5px;
+  line-height: 1.5;
+  flex: 1;
   min-width: 0;
 }
 

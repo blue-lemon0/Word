@@ -9,7 +9,7 @@ import { computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { incomingFile } from './bridge'
 import { watchKeyboard } from './keyboard'
-import { toastMsg } from './toast'
+import { toastMsg, toastCenter } from './toast'
 
 const route = useRoute()
 const router = useRouter()
@@ -142,7 +142,7 @@ const active = computed(() => activeTab(route.path))
          安全区的实色带。少了它，页面渐变/内容会从状态栏里透出来（露馅）。 -->
     <div class="sb" aria-hidden="true" />
 
-    <div v-if="toastMsg" class="toast">{{ toastMsg }}</div>
+    <div v-if="toastMsg" class="toast" :class="{ center: toastCenter }">{{ toastMsg }}</div>
 </template>
 
 <style scoped>
@@ -224,6 +224,13 @@ const active = computed(() => activeTab(route.path))
   text-align: center;
   pointer-events: none;
   animation: toast-in 0.18s ease;
+}
+
+/* 居中变体：「必须被看见」的提示（toast.ts 第三个参数） */
+.toast.center {
+  bottom: auto;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 
 @keyframes toast-in {
