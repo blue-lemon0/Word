@@ -23,6 +23,7 @@ import AiSheet from '../components/AiSheet.vue'
 import { replaceSentence } from '../ai/actions'
 import { aiReady } from '../ai/config'
 import { describeAiError, type AiResult } from '../ai/types'
+import { autoSpeak } from '../speech'
 import type { Question } from '../quiz'
 import type { Sense, Sentence } from '../types'
 import { allProgress } from '../db'
@@ -246,6 +247,22 @@ function onBoxState(i: number, st: { revealed: boolean; submitted: boolean }): v
     })
   }
 }
+
+/* ── 自动播放（「更多」页总开关）—— 与 TrainPage 同一套时机：
+ *  新卡出现读单词（短、几乎无感），答完读整句（语境强化）。
+ *  回看已答的卡不播：翻旧账时出声只会吓人。
+ *  首页的题是外壳预取（preMade）—— curQ 从 null 变成有值的那一瞬
+ *  就是「这张卡到货」的时刻，watch curQ 天然覆盖「翻到未答新卡」与
+ *  「首张卡异步出完」两种情况。 */
+watch(curQ, (cur) => {
+  if (cur && !boxState.value.submitted) autoSpeak(cur.sense.word)
+})
+watch(
+  () => boxState.value.submitted,
+  (done) => {
+    if (done && curQ.value) autoSpeak(curQ.value.sentence.en)
+  },
+)
 
 function askReveal(): void {
   boxes.get(idx.value)?.reveal()
