@@ -1,7 +1,7 @@
 /** 导入 —— 一套代码吃两种 JSON
  *
  *  ① 管道产物 build/bundle/cards_v2.json（format: "word-bundle"）
- *     —— content-kit pipeline 的批量输出
+ *     —— 原 content-kit pipeline 的批量输出（产线已删除，格式仍支持）
  *
  *  ② AI 产出（format: "word.import"）
  *     —— 用户在意思页点「复制 AI 模板」，粘回来。schema 见

@@ -56,7 +56,7 @@ PORT=8778 WORD_BUNDLE=build/bundle/cards_v2.json WORD_DB=app/state/user_v2.db no
 | `tools/flags.mjs` | 问题句标记关单：标记修复发布后清理 `sentence_flag`（见下） |
 | `tests/` | 旧服务端回归测试；浏览器端的测试在 `web/tests/` |
 
-存储分层（详见 `docs/decisions/D17`）：内容包一次性读内存；`card` 表只是
+存储分层（详见决策 D17，git 历史可查）：内容包一次性读内存；`card` 表只是
 投影，内容包升级即整表重建；`card_state` 是用户进度唯一真相；`review_log`
 只增不改，所有统计从它重算。
 
@@ -91,9 +91,7 @@ node app/tools/progress_io.mjs import progress.json
 （队列实时读表，无需重启）。修复与关单：
 
 ```bash
-# 生成侧拿待修清单（content-kit 只读本库）：
-python content-kit/pipeline/triage_flags.py --json
-# 生成侧改 content-kit/data/sentences/*.tsv → 审计 → 发布重启后：
+# 待修清单交人工或 AI 修（原内容侧 triage_flags.py 已随产线删除）：
 node app/tools/flags.mjs list           # 每条标记标 [待修] / [已修?]
 node app/tools/flags.mjs purge-stale    # 句子原文已随发布消失的，批量关单
 # 只改译文、原文没变的修复，标记仍精确命中，确认后手动关单：

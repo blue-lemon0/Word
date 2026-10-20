@@ -1,6 +1,0 @@
-senseId	pos	glossZh	glossEn	trap	tier	note
-s1	n.	蜂后（蜂群中唯一产卵的雌性）	the only fertile female in a colony of social insects such as bees and ants and termites; its function is to lay eggs	0	T1	英文独有义位 the only fertile female in a colony of social insects。中文词典不收 queen bee，但对理解 s2 的对比有用。
-s2	n.	女王，女君主	a female sovereign ruler	0	T1	a female sovereign ruler。掌权的女性君主。
-s3	n.	王后	the wife or widow of a king	0	T1	the wife or widow of a king。国王的妻子或遗孀 —— 与 s2 语义重叠 0.80 但该拆：线索是 wife/widow of a king vs female sovereign。
-s4	n.	同类之最（拟人化的杰出女性）	something personified as a woman who is considered the best or most important of her kind	0	T1	英文独有义位 something personified as a woman who is considered the best of her kind。如 the queen of jazz。
-s5	vt.	立为女王；做女王		0	T1	[glossEn 空：ECDICT 与 WordNet 均无对应义位] [ZH-FALLBACK 英文零覆盖] 英文 definition 只有名词义位，动词义零覆盖，走补洞。现有 vt.立为女王 / vi.做女王 合并一条 —— 英文侧都是 queen it 同源，判别价值低。

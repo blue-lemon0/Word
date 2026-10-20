@@ -20,7 +20,7 @@ export const BUNDLE_SCHEMA_VERSION = 1;
 export function loadBundle(file = BUNDLE) {
   if (!fs.existsSync(file)) {
     throw new Error(
-      `缺少 bundle: ${file}\n先跑  python content-kit/pipeline/build_bundle.py`);
+      `缺少 bundle: ${file}\n内容产线已删除，现存 bundle 是本机历史产物（git 历史 bfda5d7 之前可找回产线与数据）`);
   }
   const b = JSON.parse(fs.readFileSync(file, 'utf8'));
   // 契约守门：格式不对直接拒绝，不用猜字段。兼容性规则见根 CONTRACT.md。
@@ -30,7 +30,7 @@ export function loadBundle(file = BUNDLE) {
   if (b.schemaVersion !== BUNDLE_SCHEMA_VERSION) {
     throw new Error(
       `bundle schemaVersion ${b.schemaVersion} ≠ 应用支持的 ${BUNDLE_SCHEMA_VERSION}，` +
-      '请更新应用或用匹配版本的 content-kit 重新导出（见 CONTRACT.md）');
+      '请更新应用或用匹配版本的导出工具重新导出（见 CONTRACT.md）');
   }
   return b;
 }
@@ -354,7 +354,7 @@ const P_MASTER_REPS = 6;
 
 /* ─────────────────────────────────────────────────────────
    句子标记：有问题就标一下，可以写句备注。标了就不再出这句。
-   事后跑 scripts/triage_flags.py 拿清单统一改。
+   浏览器端导出的问题句清单交人工或 AI 修（原 triage_flags.py 已随产线删除）。
    ───────────────────────────────────────────────────────── */
 
 /** 标一句有问题。幂等：同一句只记一条，重复标只是更新备注。 */

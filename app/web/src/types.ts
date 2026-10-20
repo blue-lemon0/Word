@@ -29,7 +29,7 @@ export interface Sense {
   note: string
   /** 熟词僻义：词常见但这个意思少见，起始间隔最短（03 §3 TRAP） */
   trap: 0 | 1
-  /** 词频档，来自 content-kit 分层；T3/T4 视为低频（03 §3 RARE） */
+  /** 词频档，来自原内容产线分层（已删除，git 历史可查）；T3/T4 视为低频（03 §3 RARE） */
   tier: Tier
   /** 骨架词标记：只给了一个义项，用到时再补 */
   needsRefine: 0 | 1

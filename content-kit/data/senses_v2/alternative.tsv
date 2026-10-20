@@ -1,4 +1,0 @@
-senseId	pos	glossZh	glossEn	trap	tier	note
-s1	a.	二选一的，必须取舍的	necessitating a choice between mutually exclusive possibilities	0	T1	necessitating a choice between mutually exclusive possibilities。线索：宾语是 energy / fuel 等必须在两者间取舍的东西。an alternative fuel source。
-s2	a.	供选择的；另类的	pertaining to unconventional choices	0	T1	pertaining to unconventional choices。非传统做法的选择，线索是 unconventional/alternative lifestyle 这类搭配。
-s3	n.	供替代的选择（名词）		0	T1	[glossEn 空：ECDICT 与 WordNet 均无对应义位] [ZH-FALLBACK 英文零覆盖] 英文 definition 两条全是形容词，名词义 alternative=可供选择的人/物 零覆盖，走补洞。a viable alternative to public transport。

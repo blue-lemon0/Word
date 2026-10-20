@@ -1,4 +1,0 @@
-senseId	pos	glossZh	glossEn	trap	tier	note
-s1	n.	活动，行动；具体行为	any specific behavior	0	T1	any specific behavior。线索：business / outdoor / research + activity。可数，指具体的一件事。
-s2	n.	（化学）活性	(chemistry) the capacity of a substance to take part in a chemical reaction	0	T1	(chemistry) the capacity of a substance to take part in a chemical reaction。技术义但真实：surface activity / biological activity。现有中文无对应，属新增。
-s3	n.	活跃，活力		0	T1	[glossEn 空：ECDICT 与 WordNet 均无对应义位] [ZH-FALLBACK 英文零覆盖] 英文对应 the state of being active。ECDICT definition 侧漏导，走 fromZh 补洞，glossEn 留空。线索：market activity / outdoor activity（热闹）/ a man of great activity。

@@ -1,7 +1,0 @@
-senseId	pos	glossZh	glossEn	trap	tier	note
-s1	n.	半升音调，升号；升半音的	a musical notation indicating one half step higher than the note named / (of a musical note) raised in pitch by one chromatic semitone	0	T1	[WORDNET 补缺 ECDICT 未收录] a musical notation indicating one half step higher than the note name / (of a musical note) raised in pitch by one chromatic semitone。线索：in F sharp。同概念的名词面与形容词面，合并。
-s2	n.	针；利刃（尖细的针、锋利的刃）	a long thin sewing needle with a sharp point	0	T1	a long thin sewing needle with a sharp point。严格讲该义项指「针」；「利刃」是中文侧近义延伸。
-s3	a.	锋利的，锐利的	having or made by a thin edge or sharp point; suitable for cutting or piercing	0	T1	[WORDNET 补缺 ECDICT 未收录] having or made by a thin edge or sharp point; suitable for cutting or penetrating。线索：knife / edge / angle。本词最常用义，ECDICT definition 漏导。注意首词 synset 从 a.08 起编号，不是 a.01 —— 查名别猜（见 resegment.py --synset）。
-s4	a.	尖锐的，刺痛的	keenly and painfully felt; as if caused by a sharp edge or point	0	T1	keenly and painfully felt; as if caused by a sharp edge or point。线索：pain / ache / pained。
-s5	a.	急剧的，骤然的	very sudden and in great amount or degree	0	T1	[WORDNET 补缺 ECDICT 未收录] very sudden and in great amount or degree。线索：rise / increase / drop。a sharp rise in prices.
-s6	a.	迅速的，有力的；尖刻的	quick and forceful	0	T1	[WORDNET 补缺 ECDICT 未收录] quick and forceful。线索：turn / movement / breath。

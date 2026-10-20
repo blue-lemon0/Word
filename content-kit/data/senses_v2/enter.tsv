@@ -1,4 +1,0 @@
-senseId	pos	glossZh	glossEn	trap	tier	note
-s1	v.	进入；开始（某阶段）；输入	to come or go into	0	T1	to come or go into。**一条边界覆盖三种中文说法**：空间进入（enter the room）、进入阶段（enter a new era）、输入（Enter your name）。这三条英文不区分，靠宾语性质分开 —— 所以合并成一条而不是三条。
-s2	v.	参加，参与；着手	become a participant; be involved in	0	T1	become a participant; be involved in。线索：enter politics / enter into negotiations / enter the discussion。与 s1 分界：宾语是「场所/阶段」还是「事务」。
-s3	v.	上台，登场	come on stage	0	T1	come on stage。现有中文无此义项，属新增。戏剧/表演用语。

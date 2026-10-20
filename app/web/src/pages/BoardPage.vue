@@ -87,13 +87,13 @@ function mastery(p: Progress | undefined): keyof typeof MASTERY_TEXT {
   return masteryOf(p)
 }
 
-/** 导出问题句清单给内容侧（triage_flags.py --from）。 */
+/** 导出问题句清单，交人工或 AI 修。 */
 async function onExportFlags(): Promise<void> {
   if (!flags.value.length) {
     toast('没有标记过任何句子')
     return
   }
-  toast(`已导出 ${await downloadFlags()}，交给内容侧 triage_flags.py --from`)
+  toast(`已导出 ${await downloadFlags()}，交人工或 AI 修`)
 }
 
 /** 关单：内容侧确认修好后清标记。标记长在句子行上，所以只清标记不动例句。 */
@@ -140,11 +140,11 @@ onMounted(load)
         <van-tab name="flagged" :title="`有问题句 ${counts.flagged}`" />
       </van-tabs>
 
-      <!-- 有问题句：整份导出给内容侧 -->
+      <!-- 有问题句：整份导出待修清单 -->
       <template v-if="tab === 'flagged' && flags.length">
         <div class="exp-row">
           <van-button size="small" plain type="primary" @click="onExportFlags">导出清单</van-button>
-          <span class="wb-dim">给内容侧 triage_flags.py --from</span>
+          <span class="wb-dim">交人工或 AI 修</span>
         </div>
         <div v-for="f in flags" :key="f.sentenceId" class="wb-card flag">
           <div class="fh">

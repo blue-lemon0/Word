@@ -1,5 +1,0 @@
-senseId	pos	glossZh	glossEn	trap	tier	note
-s1	n.	人（人类的一员）		0	T1	[glossEn 空：ECDICT 与 WordNet 均无对应义位] [ZH-FALLBACK 英文零覆盖] 英文 a human。WordNet 无名词义项，走 fromZh 补洞，glossEn 留空。判别句：a human being / no human could survive.（注意 human 前不用 an）
-s2	a.	人的，人类的	relating to a person	0	T1	relating to a person。线索：human resources / human rights / human error。**最常用义**。
-s3	a.	有人性的，有人情味的	characteristic of humanity	0	T1	characteristic of humanity。线索：human error（人为失误）/ the human touch。与 s4 分界：s4 指「形似」，本条指「有人味」。
-s4	a.	似人类的，人形的（如机器人）	having human form or attributes as opposed to those of animals or divine beings	0	T1	having human form or attributes as opposed to those of animals。线索：a humanoid robot / human remains.

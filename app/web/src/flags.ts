@@ -1,9 +1,8 @@
 /** 问题句标记 —— 背诵时随手标「这句有问题」，标了当场退出出题池。
  *
- *  闭环的另一半在内容侧：应用里标出来的句子要能变成内容侧的待修清单。
- *  浏览器端的数据在 IndexedDB 里，`content-kit/pipeline/triage_flags.py`
- *  读不到，所以这里把清单**导出成一个 JSON**，由
- *  `python content-kit/pipeline/triage_flags.py --from <file>` 接手。
+ *  闭环的另一半：应用里标出来的句子要能变成一份可交接的待修清单。
+ *  数据在 IndexedDB 里，外部脚本读不到，所以这里把清单**导出成一个 JSON**，
+ *  交人工或 AI 修（原内容侧 triage_flags.py 已随内容产线删除，git 历史可查）。
  *  这一步必须存在，否则「背 → 发现问题 → 修内容」在两端断链。
  *
  *  与旧服务端那一线的一个结构差别：标记**长在句子行上**（`sentences.flagged`），

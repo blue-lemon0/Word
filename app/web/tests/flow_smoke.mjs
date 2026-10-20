@@ -39,7 +39,7 @@ function ok(cond, msg, detail = '') {
   }
 }
 
-/* ── 1. 种子导入（content-kit 内容包 → IndexedDB）── */
+/* ── 1. 种子导入（word-bundle 内容包 → IndexedDB）── */
 const seed = JSON.parse(readFileSync(path.join(WEB, 'public', 'seed.json'), 'utf8'))
 const rep = await bundleImport.importBundle(seed)
 ok(rep.errors.length === 0, `种子导入无错误（${rep.errors[0] ?? ''}）`)
@@ -187,7 +187,7 @@ ok(flagRows.length === 1 && flagRows[0].sentence === flagged.sentence.en,
 ok(flagRows[0].note === '这句例句有问题', '标记备注带出去了（内容侧要知道问题是什么）')
 const ffile = flags.buildFlagsFile(flagRows, 1758000000000)
 ok(ffile.format === 'word-flags' && ffile.schemaVersion === 1 && ffile.count === 1,
-   '导出文件头是 word-flags v1（内容侧 triage_flags.py --from 吃这个）')
+   '导出文件头是 word-flags v1（可交接的待修清单格式）')
 ok(ffile.flags[0].word === flagged.sense.word && ffile.flags[0].slot === flagged.sense.slot,
    '清单带词与 slot（内容侧按 TSV 的 (word, senseId) 对位）')
 
@@ -834,31 +834,18 @@ await dbApi.emptyTrash()
 ok((await dbApi.trashedSenses()).length === 0, '清空回收站后不留残骸')
 ok((await db.senses.get(pool[3].id)) != null, '只清被软删的义项，从没删过的没动')
 
-/* ── 9. 跨侧：清单能不能被内容侧读懂（闭环的最后一环）── */
-import { execFileSync } from 'node:child_process'
+/* ── 9. 标记清单闭环：标得出 → 导得出清单 → 能清（下游 = 人工 / AI）── */
 {
+  // 标记导出→清单闭环：内容侧 triage_flags.py 已随产线删除（git 历史可查），
+  // 这节只验「标得出 + 导得出清单 + 能清」，清单的下游变成人工 / AI。
   const someSense = (await quiz.practicePool())[0]
   const sq = await quiz.makeQuestion(someSense.id)
   await quiz.flagQuestion(sq, '闭环测试标记')
   const fpath = path.join(HERE, '_flags_test.json')
   writeFileSync(fpath, JSON.stringify(flags.buildFlagsFile(await flags.listFlags())), 'utf8')
-  const triage = path.resolve(WEB, '..', '..', 'content-kit', 'pipeline', 'triage_flags.py')
-  let out = ''
-  let ran = true
-  try {
-    out = execFileSync('python', [triage, '--from', fpath], { encoding: 'utf8' })
-  } catch (e) {
-    ran = false
-    out = String(e.stderr ?? e.message)
-  }
-  if (!ran) {
-    console.log('  SKIP  内容侧 triage_flags.py 跑不起来（没有 python？），跨侧那一环没验')
-  } else {
-    ok(out.includes(someSense.word), '内容侧清单里能看到被标记的词', out.slice(0, 120))
-    ok(out.includes('闭环测试标记'), '标记备注也过去了（内容侧知道问题是什么）')
-    ok(out.includes('已修好'), '清单末尾印的是浏览器端的关单流程（错题板点「已修好」）')
-    ok(!out.includes('flags.mjs'), '没有把旧服务端那套关单命令印出来（那条线已不是当前应用）')
-  }
+  const raw = readFileSync(fpath, 'utf8')
+  ok(raw.includes(someSense.word), '导出清单里能看到被标记的词', raw.slice(0, 120))
+  ok(raw.includes('闭环测试标记'), '标记备注也过去了（清单知道问题是什么）')
   await flags.clearFlags([sq.sentence.id])
   rmSync(fpath, { force: true })
 }

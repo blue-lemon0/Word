@@ -1,4 +1,0 @@
-senseId	pos	glossZh	glossEn	trap	tier	note
-s1	n.	上帝；神，诸神	the supernatural being conceived as the perfect and omnipotent and omniscient originator and ruler of the universe; the object of worship in monotheistic religions	0	T1	the supernatural being conceived as the perfect and omnipotent and omniscient being。线索：the God / gods and monsters。专指神或诸神，不指神像。
-s2	n.	（被神化的）伟人；像神一样的人物	a man of such superior qualities that he seems like a deity to other people	0	T1	a man of such superior qualities that he seems like a deity。经典比喻义（he is a god among men）。现有中文无对应，属新增。
-s3	n.	神像，神祇；偶像		0	T1	[glossEn 空：ECDICT 与 WordNet 均无对应义位] [ZH-FALLBACK 英文零覆盖] 英文 a god / the gods 指「被崇拜的神」。走 fromZh 补洞，glossEn 留空。与 s1 分界：s1 是「神本身」，s3 是「神的具体形象/崇拜物」。

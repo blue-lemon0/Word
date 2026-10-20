@@ -1,8 +1,6 @@
 # ─────────────────────────────────────────────────────────────
-# 双子系统 + 交接区：
-#   content-kit/source/  外部快照，不可再生，唯一必须备份的
-#   content-kit/data/    内容真相源，人可读可改，全部入库
-#   build/               交接区（content-kit 导出、app 导入），一条命令重建，永不入库
+# 应用优先：内容产线 content-kit/ 与归档 archive/ 已于 2026-10-20 删除
+# （git 历史 bfda5d7 之前可恢复）。build/ 交接区是历史产物，不入库。
 # 详见仓库根 README.md 与 CONTRACT.md
 # ─────────────────────────────────────────────────────────────
 
@@ -28,7 +26,7 @@ app/android/*.iml
 # 打包脚本会把 web/dist 拷进这里，是产物
 app/android/app/src/main/assets/
 
-# ── 交接产物（content-kit 产出、app 消费；重建：content-kit/pipeline/build_bundle.py）──
+# ── 交接产物（历史产物，产线已删除，不再重建；app 导入用）──
 build/
 
 # ── 打包脚本路径算错时产出的重复副本 ──
@@ -43,7 +41,6 @@ app/app/
 .opencode/package-lock.json
 
 # ── 运行时数据库（app 的学习进度：app/state/user.db，本地状态，不入库）──────
-# 注意：只忽略 db 文件本身。content-kit/data/ 下是内容真相源，必须入库。
 *.db
 *.db-wal
 *.db-shm

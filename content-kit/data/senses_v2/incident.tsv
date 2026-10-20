@@ -1,5 +1,0 @@
-senseId	pos	glossZh	glossEn	trap	tier	note
-s1	n.	事件；一件事（中性）	a single distinct event	0	T1	a single distinct event。线索：a minor / isolated incident / at the scene of the incident。**这个英文词刻意中性** —— 既可指大事也可指小事，中文「事件」听起来偏大，所以 gloss 里注明。
-s2	n.	事变，骚乱	a public disturbance	0	T1	a public disturbance。带社会动荡意味。线索：a racial / border incident。
-s3	a.	（光线）入射的	falling or striking of light rays on something	0	T1	falling or striking of light rays on something。物理/光学义。线索：incident light / incident ray。现有中文无对应，属新增。
-s4	a.	附带的，伴随的（incident to）		0	T1	[glossEn 空：ECDICT 与 WordNet 均无对应义位] [ZH-FALLBACK 英文零覆盖] 英文只存在于固定搭配 incident to sth。走 fromZh 补洞，glossEn 留空。判别句：the risks incident to the job。

@@ -131,7 +131,7 @@ const routes = {
     }
   },
 
-  /** 已标记的问题清单，scripts/triage_flags.py 也读这张表。 */
+  /** 已标记的问题清单（原 scripts/triage_flags.py 读这张表；产线已删除，git 历史可查）。 */
   async '/api/flags'(req, res) {
     json(res, 200, { total: store.flaggedCount(db), flags: store.listFlags(db) });
   },
@@ -157,7 +157,8 @@ const MIME = {
 
 function serveStatic(res, pathname) {
   // UI 现在归属 app：app/web/index.html。其余静态路径（如 /build/bundle/cards.json）
-  // 仍相对仓库根解析，作为 content-kit 产物的只读交接区。
+  // 仍相对仓库根解析，作为内容包产物的只读交接区（内容产线已于 2026-10 删除，
+  // 现存 bundle 是历史产物，git 历史 bfda5d7 之前可找回产线）。
   const rel = pathname === '/' || pathname === '/index.html'
     ? 'app/web/index.html'
     : decodeURIComponent(pathname.replace(/^\/+/, ''));

@@ -1,4 +1,0 @@
-senseId	pos	glossZh	glossEn	trap	tier	note
-s1	n.	机构，机关（政府行政部门）	an administrative unit of government	0	T1	an administrative unit of government。线索：government / federal / regulatory + agency。判别关键：这是政府单位。
-s2	n.	代理机构，经销商，中介	a business that serves other businesses	0	T1	a business that serves other businesses。线索：travel / advertising / employment + agency。判别关键：这是商业公司。
-s3	n.	（抽象）力量，能动性；作用	the state of being in action or exerting power	0	T1	the state of being in action or exerting power。现有中文无对应，属新增。线索：by / through the agency of。较抽象，考试价值低。

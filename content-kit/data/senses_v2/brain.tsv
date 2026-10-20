@@ -1,6 +1,0 @@
-senseId	pos	glossZh	glossEn	trap	tier	note
-s1	n.	脑，大脑	that part of the central nervous system that includes all the higher nervous centers; enclosed within the skull; continuous with the spinal cord	0	T1	that part of the central nervous system that includes all the higher centers。线索：the human brain / brain damage。
-s2	n.	（食用）脑髓	the brain of certain animals used as meat	0	T1	the brain of certain animals used as meat。食物义。线索：brains as a dish。现有中文无对应，属新增。
-s3	n.	智力，头脑（brains）	mental ability	0	T1	mental ability。**高频义项**，但释义只有 2 词被 min_en_words=3 挡掉，本词显式指定保留。用法通常是复数：have brains / a brilliant brain。
-s4	v.	击打头部	hit on the head	0	T1	hit on the head。口语义。现有中文无对应，属新增。判别句：He brained me with a stick.
-s5	v.	打死，砸碎头骨致死	kill by smashing someone's skull	0	T1	[WORDNET 补缺 ECDICT 未收录] kill by smashing someone's skull。补缺层收进。判别句：He brained the guard with a rock.

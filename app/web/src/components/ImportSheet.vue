@@ -71,7 +71,7 @@ async function apply(): Promise<void> {
 <template>
   <Sheet :open="open" :title="`导入 ${word}`" badge="逐条决策" @close="emit('close')">
     <p class="hint">
-      粘 content-kit 的内容包，或 AI 按「复制给 AI」模板返回的 JSON。粘完点「看差异」，
+      粘内容包（word-bundle JSON），或 AI 按「复制给 AI」模板返回的 JSON。粘完点「看差异」，
       <b>不会</b>直接写库。
     </p>
     <van-field

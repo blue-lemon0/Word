@@ -1,4 +1,0 @@
-senseId	pos	glossZh	glossEn	trap	tier	note
-s1	n.	可能性；风险（可能发生的坏事）	a risk involving danger	0	T1	a risk involving danger。线索：the chance of rain / a 50% chance。注意这条是「可能性」不是「机会」，跟 s2 分界：the chance of rain（有下雨的可能）/ a chance to win（获胜的机会）。
-s2	n.	机会		0	T1	[glossEn 空：ECDICT 与 WordNet 均无对应义位] [ZH-FALLBACK 英文零覆盖] 英文对应 opportunity。ECDICT definition 侧漏导，走 fromZh 补洞，glossEn 留空。线索：a / give sb a chance to do sth。这是本词最常用的义。
-s3	v.	偶然，意外；碰巧	be the case by chance	0	T1	be the case by chance。线索：by / on any chance。兼作副词（It happened by chance.）。

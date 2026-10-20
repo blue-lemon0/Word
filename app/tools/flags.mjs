@@ -93,7 +93,7 @@ function cmdList(db, bundle, asJson) {
     console.log('  疑似已修的可清理：node app/tools/flags.mjs purge-stale');
   }
   if (open.length) {
-    console.log('  待修清单（给生成侧）：python content-kit/pipeline/triage_flags.py --json');
+    console.log('  待修清单交人工/AI 修（原 triage_flags.py 已随内容产线删除）');
   }
 }
 

@@ -15,7 +15,7 @@ const REPO = path.resolve(WEB, '..', '..')
 const BUNDLE = path.join(REPO, 'build', 'bundle', 'cards.json')
 
 if (!existsSync(BUNDLE)) {
-  console.log('没有 build/bundle/cards.json —— 先跑 python content-kit/pipeline/build_bundle.py')
+  console.log('没有 build/bundle/cards.json —— 本机历史产物（内容产线已删除，git 历史可查）')
   process.exit(0)
 }
 

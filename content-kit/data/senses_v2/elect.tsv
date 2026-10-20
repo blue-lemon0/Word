@@ -1,6 +1,0 @@
-senseId	pos	glossZh	glossEn	trap	tier	note
-s1	v.	选举，推选	select by a vote for an office or membership	0	T1	select by a vote for an office or membership。线索：elect sb president / be elected to。
-s2	v.	选择，挑选（不必经投票）	choose	0	T1	[WORDNET 补缺 ECDICT 未收录] choose。**本词第二义**，但释义只有 1 词被 min_en_words=3 挡掉，本词显式指定保留。判别句：They elected him chairman.（推选）/ He elected to stay.（选择）
-s3	n.	当选人，当选者		0	T1	[glossEn 空：ECDICT 与 WordNet 均无对应义位] [ZH-FALLBACK 英文零覆盖] 英文 the elect / an elect（当选者集合或单数）。WordNet 无名词义项，走 fromZh 补洞，glossEn 留空。
-s4	a.	选出的；精选的	selected as the best	0	T1	selected as the best。线索：the elect few。形容词面。
-s5	a.	当选的（尚未就职的）	elected but not yet installed in office	0	T1	elected but not yet installed in office。真实且易被忽略的区分：**当选 ≠ 就职**。线索：the president-elect。现有中文无对应，属新增。

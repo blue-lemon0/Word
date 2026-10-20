@@ -1,26 +1,29 @@
-# 子系统契约：content-kit ↔ app
+# 契约：内容包与进度包
 
-本仓库是**单仓双子系统**。两侧不共享代码、不共享数据库，只通过交接区的两类文件对话：
+> **历史文档（2026-10-20 起冻结）**：内容产线 `content-kit/` 已整体删除
+> （git 历史 `bfda5d7` 之前可恢复），本契约保留的原因：`build/bundle/cards.json`
+> 内容包仍是应用的导入格式（词库 → 导入内容包），字段约定照旧有效；
+> §2 的 `progress.json` 属旧服务端那一线，当前应用备份用 `word.backup` v2。
+> 新内容不走产线，靠 AI 生成 + 手动添加。
+
+两侧不共享代码、不共享数据库，只通过交接区的两类文件对话：
 
 ```
-content-kit/                 产内容，不碰任何学习数据
-     │  写出（唯一出口）
-     ▼
-build/bundle/cards.json     内容包：词表 + 义项 + 例句（只读交接区）
+build/bundle/cards.json     内容包：词表 + 义项 + 例句（只读交接区，历史产物）
      │  读入
      ▼
-app/                         背单词应用，持有学习数据 app/state/user.db
+app/                         背单词应用，学习数据在浏览器 IndexedDB
      │  用工具导出 / 导入
      ▼
-progress.json               学习进度包：SRS 状态 + 作答流水 + 标记（备份 / 换机）
+progress.json               学习进度包：SRS 状态 + 作答流水 + 标记（旧服务端线）
 ```
 
 边界铁律：
 
-- **content-kit 不读 user.db**（唯一例外：`triage_flags.py` 只读 `sentence_flag` 来汇总待修句子，不写）。
-- **app 不读 content-kit 的中间产物**，只认 `build/bundle/` 下的 word-bundle 成品
+- **内容产线已删除**（原 `content-kit/` 不读 user.db、不写应用数据的纪律随产线退役）。
+- **app 只认 `build/bundle/` 下的 word-bundle 成品**
   （主包 `cards.json`；验证包如 `cards_v2.json` 用环境变量成对切换，见 app/README「多内容源」）。
-- 交接区文件是机器产物，**手改无效**：内容包由 `content-kit/pipeline/build_bundle.py` 重新生成，进度包由 `app/tools/progress_io.mjs` 导出。
+- 交接区文件是机器产物，**手改无效**（原由 `build_bundle.py` 重新生成，该产线已删除）。
 
 > **范围提醒（2026-10-17 起）**：UI 已经搬到浏览器端（`app/web/`，见 D32），
 > 它照样只吃 `build/bundle/` 的内容包，本契约 §1 照旧适用。
@@ -31,7 +34,7 @@ progress.json               学习进度包：SRS 状态 + 作答流水 + 标记
 
 ## 1. 内容包 `cards.json`（v1）
 
-由 `content-kit/pipeline/build_bundle.py` 写出，app 启动时整包读入内存。
+word-bundle 格式，app 启动时整包读入内存（产线已删除，此格式仍为「导入内容包」的输入）。
 
 ### 1.1 顶层结构
 

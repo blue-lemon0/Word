@@ -1,5 +1,0 @@
-senseId	pos	glossZh	glossEn	trap	tier	note
-s1	n.	引擎，发动机	motor that converts thermal energy to mechanical work	0	T1	motor that converts thermal energy to mechanical work。线索：a car engine / engine failure / search engine。
-s2	n.	（推动）引擎，动力；实现手段	something used to achieve a purpose	0	T1	something used to achieve a purpose。比喻义，实际英语中最常用的一条。线索：the engine of growth / a marketing engine。现有中文无对应，属新增。
-s3	n.	机车（动力装置）		0	T1	[glossEn 空：ECDICT 与 WordNet 均无对应义位] [ZH-FALLBACK 英文零覆盖] 英文 railway / steam engine。WordNet 无此边界，走 fromZh 补洞，glossEn 留空。指机车本身时英文更常用 locomotive。
-s4	n.	军用机械；兵器	an instrument or machine that is used in warfare, such as a battering ram, catapult, artillery piece, etc.	0	T1	an instrument or machine that is used in warfare。罕见。现有中文无对应，属新增。造句须带 war/military 语境。

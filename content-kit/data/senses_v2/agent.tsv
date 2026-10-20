@@ -1,5 +1,0 @@
-senseId	pos	glossZh	glossEn	trap	tier	note
-s1	n.	动因，起作用的人或物（抽象）	an active and efficient cause; capable of producing a certain effect	0	T1	an active and efficient cause; capable of producing a certain effect。线索：the agent of change / a double agent。抽象义。
-s2	n.	代理人，代表（受托行事者）	a representative who acts on behalf of other persons or organizations	0	T1	a representative who acts on behalf of other persons or organizations。线索：a real estate agent / an agent for。现有中文的「政府代表」是这个义位的子类型。
-s3	n.	（起作用的）物质，媒介；试剂	a substance that exerts some force or effect	0	T1	a substance that exerts some force or effect。线索：a chemical / cleaning + agent。区分 s2 看是不是「物质」。
-s4	n.	代理商，经纪人	a businessman who buys or sells for another in exchange for a commission	0	T1	a businessman who buys or sells for another in exchange for a commission。与 s2 分界：是否以营利为目的（commission）。

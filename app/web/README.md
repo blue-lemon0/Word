@@ -29,8 +29,8 @@ npm run test:pwa       # PWA 装配检查（manifest/图标/meta/sw）
 > 曾经写成「dist 存在就跳过」，结果一个已知修复没进包——本机 dev 正常、
 > 手机上复现依旧，排查方向整个跑偏。
 
-首次打开时若库为空，自动灌 `public/seed.json`（content-kit 的
-`cards_v2.json` 副本）—— 走的是和「导入 JSON」**同一条** `importBundle()` 路径，
+首次打开时若库为空，自动灌 `public/seed.json`（历史内容包
+`cards_v2.json` 的副本）—— 走的是和「导入 JSON」**同一条** `importBundle()` 路径，
 所以种子通了 AI 导入就一定通。正式词库在「词库 → 导入内容包」里选
 `build/bundle/cards.json`。
 
@@ -250,7 +250,7 @@ snapshots 导入前的自动快照（只含内容层，保留 10 次）
 
 | 格式 | 是什么 | 谁产出 | 会不会覆盖 |
 |---|---|---|---|
-| `word-bundle` v1 | content-kit 的内容包：多词、`build/bundle/cards.json`（1.4 MB，gitignore，一条命令重建） | `python content-kit/pipeline/build_bundle.py` | 不覆盖。释义不一致只报冲突，本地一个字不动 |
+| `word-bundle` v1 | 内容包：多词、`build/bundle/cards.json`（1.4 MB，gitignore，本机历史产物，产线已删除） | 历史产物（原 `build_bundle.py` 已删） | 不覆盖。释义不一致只报冲突，本地一个字不动 |
 | `word.backup` v2 | 本应用导出的备份（含进度） | 应用内「导出」 | **覆盖**，先弹确认；导入前自动快照 |
 | `word.import` v2 | AI 按「复制给 AI」模板回来的**单个词** | 豆包 / DeepSeek 等 | 逐条决策后才写 |
 
@@ -297,14 +297,13 @@ words:[{word, ipa, hidden, senses:[{sense, sentences}]}], progress, reviews, imp
 ```
 错题板 →「有问题句」tab → 导出清单 → flags_20261017.json（word-flags v1）
     ↓
-python content-kit/pipeline/triage_flags.py --from flags_20261017.json
-    ↓  改 content-kit/data/sentences/<word>.tsv → sentence_audit → build_bundle
+清单交人工或 AI 修（原内容侧 triage_flags.py 已随产线删除，git 历史可查）
     ↓
-应用里重新导入内容包（标记按原文保留），修好的在错题板点「已修好」关单
+应用里重新导入改好的内容（标记按原文保留），修好的在错题板点「已修好」关单
 ```
 
 `word-flags` v1：`{format, schemaVersion:1, exportedAt, count, flags:[{word, slot, gloss, sentence, note}]}`。
-带 `slot` 是因为内容侧的 TSV 按 `(word, senseId)` 组织，浏览器端没有全局 senseId。
+带 `slot` 是因为内容包义项按 `(word, senseId)` 组织，浏览器端没有全局 senseId。
 
 ## 移植一致性：SRS
 
@@ -333,7 +332,7 @@ node app/web/tests/scale_probe.mjs   # 可选：全库规模体检（需要 buil
 
 `flow_smoke` 覆盖：种子导入幂等、span 逐句对齐、增删改义项 id 不变、
 合并并进度、导入对比的默认决策、出题 4 选项、作答流水幂等、标记退池、
-**原文不变的替换后标记仍在**、清单能被内容侧 `triage_flags.py --from` 读懂、
+**原文不变的替换后标记仍在**、清单能导出成 `word-flags` v1 再清掉、
 备份回滚只回内容、回收站。
 
 ## 与旧服务端的关系

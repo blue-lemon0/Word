@@ -1,6 +1,6 @@
 /** 启动引导 —— 首次打开时灌入种子词库
  *
- *  种子是 content-kit pipeline 的真实产物 build/bundle/cards_v2.json，
+ *  种子是内容产线的真实产物 build/bundle/cards_v2.json（产线已删除，git 历史可查），
  *  走的是和 AI 导入**同一条** importBundle() 路径 —— 所以一旦这条路径通了，
  *  AI 补词就一定通。这不是巧合，是刻意的：管道产出和 AI 产出是同一种东西。
  */

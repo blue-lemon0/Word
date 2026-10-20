@@ -1,10 +1,11 @@
 # SQLite 数据模型
 
-> 关联：`02-淘汰与替换.md` §8、`03-记忆曲线与复习.md` §4
-> **D17 起本文是"目标形态"**：实际落地的是 4 表子集，SQL 真相源在
-> [`app/schema.sql`](../../app/schema.sql)，取舍理由与 4 处修正见
-> [`decisions/D17-存储分层.md`](../decisions/D17-存储分层.md)。
-> 下面保留完整设计作为 `02` 句子轮换开工时的路线图。
+> **历史文档（2026-10-20 起冻结）**：本文是旧服务端那一线的"目标形态"设计，
+> 实际落地的是 4 表子集，SQL 真相源在 [`app/schema.sql`](../../app/schema.sql)。
+> 取舍理由见决策 D17（已随产线删除，git 历史可查）。
+> 应用当前的数据层在 `app/web/`（Dexie/IndexedDB，见 DESIGN-词库系统v2.md），
+> 本文档保留作为 SQLite/Room 移植时的参照。
+> 关联：`03-记忆曲线与复习.md` §4（01/02 已删，git 历史可查）。
 > 依据：真实数据探针（旧库 3641 义项 / 16612 句 → DB 4.37MB，建库 1.20s，
 > 五条热查询均 < 2.2ms，外键孤儿 0）。新库句子生成后需重测。
 
@@ -40,9 +41,8 @@
 >
 > 相比下面的完整设计去掉了 `sense` / `sentence`（内容在 `build/bundle/cards.json`，
 > 一次性读进内存）、`new_word` / `user_flag` / `setting`（对应功能未开工）。
-> 三处与本文原文不同：
-> `srs.due_at` 单列（D17 §5.1）、`review_log.attempt_id` 幂等（D17 §5.4）、
-> `v_wrong` 同时查最近两条（D17 §5.3）。
+> 三处与本文原文不同：`srs.due_at` 单列、`review_log.attempt_id` 幂等、
+> `v_wrong` 同时查最近两条（理由见 D17，git 历史可查）。
 
 <details>
 <summary>完整设计（7 表 4 视图，02 句子轮换开工时启用）</summary>
@@ -230,9 +230,8 @@ INSERT OR IGNORE INTO sentence (sense_pk, text, clue, ...) SELECT ... FROM bundl
 **`mastered` / `wrong_n` / 历史 `session_log` 一律不因升级而丢失**——
 前提是 `senseId` 稳定（同词库增量升级）。
 
-> **D16 换源例外**：从考纲词频表换成 ECDICT 属于换库而非升级，
+> **换源例外（D16，git 历史可查）**：从考纲词频表换成 ECDICT 属于换库而非升级，
 > `sense_pk` 全变，此时**不合并、不继承**，直接重建 `user.db`。
-> 详细理由见 `docs/decisions/D16-断舍离.md`。
 
 ---
 
@@ -281,7 +280,7 @@ COMMIT;
 `PRAGMA user_version` 记录版本，升级走 `schema_migrations` 表。
 个人自用，**不做降级迁移**（备份导出即保险）。
 
-> **换库 ≠ 升级。** D16 换源时 `sense_pk` 全变、用户进度无法继承，
+> **换库 ≠ 升级。** 换源（D16）时 `sense_pk` 全变、用户进度无法继承，
 > 此时直接重建 `user.db`（或改用新的文件名并存），不写迁移脚本。
 > schema 版本迁移只针对"同词库加了张表"这类变更。
 
@@ -304,5 +303,5 @@ DB 体积       4.37 MB
 按新库 7884 义项 / 39420 句线性外推：DB ≈ 10.4 MB，各查询仍 < 5 ms。
 **远低于"启动到可练 < 2s"的红线**（规格 §11）。
 
-> 该实测用的是已归档的旧数据（`archive/2026-09-30-pre-ECDICT/old-senses/`
-> 存有义项快照）。新库句子生成后应重跑一次确认。
+> 该实测用的是已删除的旧数据（义项快照在 git 历史
+> `bfda5d7` 之前可查）。新库句子生成后应重跑一次确认。

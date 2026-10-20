@@ -1,7 +1,7 @@
 -- 运行时进度库 user.db 的唯一 schema 真相源。
 -- Node（app/db.mjs，node:sqlite）与将来的 Android（原生 SQLite）跑同一份 SQL。
 --
--- 设计边界（见 docs/decisions/D17-存储分层.md）：
+-- 设计边界（决策 D17，git 历史可查）：
 --   内容（7884 义项 + 句子）**不入库**，它是 build/bundle/cards.json，
 --   一次性读进内存。本库只存「索引投影」+「用户进度」。
 --

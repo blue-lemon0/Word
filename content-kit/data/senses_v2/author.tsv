@@ -1,4 +1,0 @@
-senseId	pos	glossZh	glossEn	trap	tier	note
-s1	n.	作家（著作的作者）		0	T1	[glossEn 空：ECDICT 与 WordNet 均无对应义位] [ZH-FALLBACK 英文零覆盖] WordNet 归在 writer.n.01「writes (books or stories or articles or the like) professionally」，首词非 author 故未被补缺层收录。英文 definition 亦只有 v. 一条。走补洞保留，这是本词最核心的义项。
-s2	n.	创始人		0	T1	[glossEn 空：ECDICT 与 WordNet 均无对应义位] [ZH-FALLBACK 英文零覆盖] WordNet 归在 generator.n.03「someone who originates or causes or initiates something」。同理由排除。指思想/体系/事物的创立者。
-s3	v.	撰写，著作（动词）	be the author of	0	T1	be the author of。唯一的 WordNet 首词义位。

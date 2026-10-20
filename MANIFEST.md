@@ -9,10 +9,10 @@
 图标源文件：`app/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png`（600×600 裁掉四周留白后生成）。
 
 
-单仓双子系统：`content-kit/` 生产词表与例句并烘焙成内容包，
-`app/` 是背单词应用 —— 界面在 `app/web/`（Vue 3 + IndexedDB，离线可用），
-学习进度与内容编辑都在浏览器本地。双方不共享代码/数据库，
-只通过 `build/bundle/cards.json` 对话。
+应用优先：`app/` 是背单词应用 —— 界面在 `app/web/`（Vue 3 + IndexedDB，离线可用），
+学习进度与内容编辑都在浏览器本地。内容靠 **AI 生成 + 手动添加**（AI 助手已渗透
+多个页面），原内容产线 `content-kit/` 与历史归档 `archive/` 已于 **2026-10-20
+整体删除**（git 历史 bfda5d7 之前的任意提交都有全量，可随时恢复）。
 
 ## 跑起来
 
@@ -26,22 +26,10 @@ node app/server.mjs                      # -> http://127.0.0.1:8777
 
 8000 端口上的纯静态服务器**没有** SQLite/SRS 接口，别用那个。
 
-## 双子系统结构
+## 仓库结构
 
 ```
-content-kit/   内容产线（Python）。真相源是人可读的 TSV/YAML
-  spec.yaml                      内容规格：句长区间/每义项句数/超纲词黑名单
-  prompts/                       造句与评审的提示词模板
-  pipeline/                      pick_words / sentence_audit / build_bundle /
-                                 triage_flags / verify_ecdict
-  data/wordlist/senses/          义项（2998 词 / 7884 行） senseId pos glossZh tier trap
-  data/wordlist/kaoyan_dagang_core.tsv   考研大纲核心词与档位
-  data/wordlist/ipa.tsv          音标，按词性
-  data/sentences/                例句（52 词 / 930 句） senseId text clue span translation note source
-  data/senses_v2/ sentences_v2/  WordNet 重切的验证包（义项划分与旧包不同，不可混用）
-  source/ecdict_snapshot.json    外部快照，不可再生 —— 全仓库唯一必须离线备份的东西
-
-build/         派生产物（交接区），整个 gitignore，随时可重建
+build/         派生产物（交接区），整个 gitignore；cards.json 是本机历史产物
   bundle/cards.json              内容包，运行时唯一输入（word-bundle v1，见 CONTRACT.md）
   bundle/cards_v2.json           WordNet 重切验证包（独立锚点体系）
 
@@ -65,25 +53,21 @@ app/           背单词应用
   tests/                         e2e_loop.mjs / verify_srs.py / smoke_http.py（e2e_d16.js 已随旧 UI 退场）
   state/user.db                  旧进度库（运行时生成，不入库，要备份）
 
-scripts/verify_docs.py           跨两侧的结构守卫
-docs/                            设计文档（design/01–05）与决策记录（decisions/）
-archive/                         历史物：不可运行 ETL、已完成词库管线、旧词表、旧文档
+scripts/verify_docs.py           结构守卫
+docs/                            设计文档（design/03、05）与决策记录（decisions/D32+）
 ```
 
-依赖方向：`content-kit → build/bundle ← app`，只向下。`build/` 不含手写内容。
+（content-kit/ 与 archive/ 已删除，原结构见 git 历史 `git show bfda5d7:MANIFEST.md`。）
+
+依赖方向：`内容包 → app`，只向下。`build/` 不含手写内容。
 
 ### 归属规则（都能机械检查，scripts/verify_docs.py 守门）
 
-1. **一个事实只存一处。** 义项只存 `content-kit/data/wordlist/senses/`，
-   例句只存 `content-kit/data/sentences/`。曾经义项同时存在于散 TSV 和
-   `ecdict_senses_b.json`，两个脚本各读一份 —— 已统一到 TSV；那两个中间
-   JSON 已于 2026-10 双子系统拆分时删除。
-2. **派生只向下。** `content-kit/pipeline/` 不读 `app/state/`
-   （`triage_flags.py` 只读问题句标记，是唯一例外）；`build/` 全是产物。
-3. **真相源全是人类可读文本**：TSV / YAML，没有需要手改的大 JSON。
+1. **一个事实只存一处。** 义项只存应用库（IndexedDB，导入走 `importBundle()`）。
+   曾有散 TSV 与中间 JSON 双份的时期，已于 2026-10 统一并随产线删除。
+2. **派生只向下。** 内容包是只读输入，应用数据（内容/进度/历史）在 IndexedDB。
+3. **真相源可读**：内容包 JSON 字段全称，schema 见 CONTRACT.md。
 4. **派生产物全部 gitignore**：`build/`、`app/state/`、`__pycache__/`。
-5. **`content-kit/spec.yaml` 是内容规格**，`sentence_audit.py` 每次运行加载。
-   （2026-10 规格反转：此前真相源是代码常量，make_spec.py 已删除。）
 
 ## 代码分工
 
@@ -99,35 +83,20 @@ archive/                         历史物：不可运行 ETL、已完成词库�
 | `app/schema.sql` | 旧进度库表结构（含 `due_at` / `attempt_id` 不变量） |
 | `app/tools/progress_io.mjs` | 旧进度库的学习进度包导出/导入（CONTRACT.md §2） |
 | `app/tools/flags.mjs` | 问题句标记关单（list/purge-stale/resolve），闭环纠错流程 |
-| `content-kit/pipeline/build_bundle.py` | TSV → `build/bundle/`，纯烘焙零判断 |
-| `content-kit/pipeline/sentence_audit.py` | 句子质检 G1–G7 + SPAN/SID/NOTE/GLOSS，规格读 spec.yaml |
-| `content-kit/pipeline/pick_words.py` | 排出下一批该做哪些词 |
-| `content-kit/pipeline/triage_flags.py` | 汇总应用里被标记的问题句（只读 app 库；浏览器端的标记在 IndexedDB 里，此脚本暂只覆盖旧服务端那一线） |
-| `content-kit/pipeline/verify_ecdict.py` | ECDICT 快照完整性检查 |
-| `scripts/verify_docs.py` | 跨侧结构守卫：布局、数字、契约字段、前端四条设计判断 |
-| `archive/2026-10-retire/scripts/` | 词库/音标管线 5 件**已完成归档**，重跑会覆写入库数据 |
-| `archive/tools/etl-2026-09/` | 4 个**永久不可运行**的 ETL，保留仅为溯源 |
+| `scripts/verify_docs.py` | 结构守卫：布局、契约字段、前端四条设计判断 |
 
 ## 常用命令（均从仓库根运行）
 
 ```bash
-# 内容侧
-python content-kit/pipeline/pick_words.py --n 30 --target 300
-python content-kit/pipeline/sentence_audit.py
-python content-kit/pipeline/sentence_audit.py --fix-spans
-python content-kit/pipeline/build_bundle.py
-python content-kit/pipeline/triage_flags.py
-
 # 应用侧（浏览器端）
 node app/web/tests/srs_parity.mjs    # SRS 移植一致性
 node app/web/tests/flow_smoke.mjs    # 数据层端到端
 
 # 应用侧（旧服务端那一线）
 node app/tests/e2e_loop.mjs
-node app/tests/e2e_d16.js            # 旧单页 UI，已退场，仅参考
 python app/tests/verify_srs.py
 python app/tests/smoke_http.py       # 需先启动 server；会清空它打到的库，勿打日常库
-python scripts/verify_docs.py        # 跨侧结构守卫
+python scripts/verify_docs.py        # 结构守卫
 
 # 旧学习进度备份/换机
 node app/tools/progress_io.mjs export progress.json
@@ -156,14 +125,13 @@ node app/web/tests/audit_drive.mjs
    全部重写，note 释义统一成词库 `glossZh` 原文。现在 930 句 PASS 930。
 2. ~~`spec.yaml` 未被审计脚本加载~~ **已修（2026-10）**。规格反转完成，
    改规格不再碰代码，`make_spec.py` 已删除。
-3. 词库管线已整体归档到 `archive/2026-10-retire/scripts/`（5 件，见该目录
-   ARCHIVE.md）。重跑会覆写已入库的词表 TSV，如需重跑先移回活管线目录。
-4. `archive/tools/etl-2026-09/` 里 4 个脚本**永久不可运行**：输入是仓库外临时
-   CSV，或会就地改写不可再生快照。
-5. ~~根目录文档与 `docs/decisions/` 近重复~~ **已修（2026-10）**。旧版全量
-   台账归档到 `archive/2026-10-retire/`；现行决策只看 `docs/decisions/`。
-6. `civil` 的「市民的 / 公民的」两个义项中文近乎同义，判别价值低，已加入
-   `pick_words.py` 的 `UNSEPARABLE` 表以免再生成。
+3. **内容产线已整体删除（2026-10-20）**：`content-kit/`（产线脚本、TSV 真相源、
+   ECDICT 快照、提示词）与 `archive/`（pre-ECDICT 快照、已完成管线、不可运行
+   ETL、旧决策台账）全删。git 历史 `bfda5d7` 之前的任意提交都有全量，恢复：
+   `git checkout bfda5d7 -- content-kit archive`。
+   产品转向「AI 生成 + 手动添加」，内容侧不再有活跃脚本。
+6. `civil` 的「市民的 / 公民的」两个义项中文近乎同义，判别价值低（原
+   `pick_words.py` 的 `UNSEPARABLE` 表记过一笔；该表已随产线删除，git 历史可查）。
 7. 2026-10 双子系统拆分：原 `scripts/`（内容脚本）、`data/`、`source/`、
    `prompts/` 归入 `content-kit/`；应用件归入 `app/`；内容包字段从单字母
    缩写（w/s/zh/rows/t/k/…）改为全称，并加 `format`/`schemaVersion` 守门，
@@ -176,8 +144,8 @@ node app/web/tests/audit_drive.mjs
    [docs/DESIGN-词库系统v2.md](docs/DESIGN-词库系统v2.md)，台账见
    [app/web/README.md](app/web/README.md)。
 9. **句标记闭环已打通（2026-10-17）**：浏览器端把问题句导出成 `word-flags` v1
-   （错题板 → 导出清单），`triage_flags.py --from` 接这份清单，
-   修好后回错题板点「已修好」关单。内容侧只读那个文件，不碰浏览器数据。
+   （错题板 → 导出清单），交人工或 AI 修（原 `triage_flags.py` 已随产线删除），
+   修好后回错题板点「已修好」关单。
    导入替换例句时按原文保留标记，避免「只改译文」的修复让标记悄悄消失。
 10. **答完能查词 + 可选 AI（2026-10-19）**：
    - 训练页答完这一题后，句子里**每个词**都能点开：浮层看义项（带例句数）、
@@ -217,26 +185,20 @@ node app/web/tests/audit_drive.mjs
 | `app/web/src/importer.ts` | 导入差异与逐条决策 | docs/DESIGN-词库系统v2 §3.2 |
 | `app/schema.sql` | 旧数据模型（含 `due_at` / `attempt_id` 不变量） | `docs/design/05`、CONTRACT.md §2 |
 | `app/db.mjs` | 投影、队列、幂等落库、历史、标记（逻辑移植，SQLite 可换 Room） | `docs/design/05` |
-| `content-kit/data/` | 词表 / 例句 / 规格，原样带走（或经内容包 cards.json 消费） | CONTRACT.md §1 |
 | `app/config/srs_params.tsv` | SRS 参数 | — |
 | `docs/design/03` | 记忆曲线与复习的行为规范 | — |
 
-**不移植：**
+（内容数据不再随移植走：内容靠 AI 生成 + 手动添加，在应用内演进；
+原 `content-kit/data/` 与历史内容包只在 git 历史里。）
 
-- `content-kit/pipeline/` —— Python 内容生产脚手架
-- `content-kit/source/` —— ECDICT 一次性快照
-- `build/` —— 派生产物；Android 侧直接消费内容包或等价打包资源
+**不移植：**
 - `app/server.mjs` `app/db.mjs` `app/tools/` —— 浏览器端的旧服务端那一线，
   只有要保留服务端架构时才需要（内容包托管、句标记关单、进度包）
 
-## 版本快照
-
-- [`docs/notes/版本快照-2026-10-19.md`](docs/notes/版本快照-2026-10-19.md) ——
-  首页两屏定稿这一天的页面清单、入口表、守卫/断言数字，和「下次接着做什么」。
-
 ## 决策记录
 
-`docs/decisions/` D15（词库来源）、D16（断舍离）、D17（存储分层）、
+产线时代的 D15–D31 与旧设计（design/01/02/04）已随产线删除（git 历史可查）。
+现行决策：`docs/decisions/` D32+ ——
 D32（应用搬到浏览器端：技术栈与义项 UUID 锚点）、
 D33（交互保护：例句显式编辑态、确认走自己的弹层、返回语义）、
 D34（固定栏与橡皮筋：要栏不动就得不要橡皮筋，窗口层位移网页管不了）、

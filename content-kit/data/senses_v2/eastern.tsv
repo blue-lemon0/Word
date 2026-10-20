@@ -1,5 +1,0 @@
-senseId	pos	glossZh	glossEn	trap	tier	note
-s1	n.	东方人（the Easterns）		0	T1	[glossEn 空：ECDICT 与 WordNet 均无对应义位] [ZH-FALLBACK 英文零覆盖] 英文 Eastern 作名词。WordNet 无名词义项，走 fromZh 补洞，glossEn 留空。实际英语中很少单独使用。
-s2	n.	东正教徒；东正教（的）		0	T1	[glossEn 空：ECDICT 与 WordNet 均无对应义位] [ZH-FALLBACK 英文零覆盖] 英文 Eastern Orthodox / the Eastern church。走 fromZh 补洞，glossEn 留空。只能作定语。
-s3	a.	东方的；向东的；位于东部的	lying toward or situated in the east / relating to or characteristic of regions of eastern parts of the world	0	T1	lying toward or situated in the east / relating to regions of eastern parts of the world。**小写 eastern**，泛指东方。与 s4 的区别在英文首字母大小写（见 note）。
-s4	a.	（美国）东部的	of or characteristic of eastern regions of the United States	0	T1	of or characteristic of eastern regions of the United States。**首字母大写 Eastern**（the Eastern seaboard / the Eastern Division）。中文无此区分，靠英文大小写辨别 —— 这是本词最容易被忽略的考点。

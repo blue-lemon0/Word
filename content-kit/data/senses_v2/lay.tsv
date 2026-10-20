@@ -1,6 +1,0 @@
-senseId	pos	glossZh	glossEn	trap	tier	note
-s1	v.	放置，平放；铺设	put in a horizontal position	0	T1	put in a horizontal position。线索：lay it on the table / lay the cable。**与 lie（躺）的区别是及物/不及物**：lay 是放，lie 是躺。
-s2	v.	布置，安排；使就位	prepare or position for action or operation	0	T1	prepare or position for action or operation。线索：lay out a plan / lay the groundwork。也有「下蛋」以外的所有「备置」义。
-s3	v.	强加（负担、惩罚）	impose as a duty, burden, or punishment	0	T1	impose as a duty, burden, or punishment。现有中文无此义项，属新增。线索：lay a burden on sb / lay responsibility on。
-s4	v.	下蛋，产卵	lay eggs	0	T1	lay eggs。**释义只有 3 词被 min_en_words=3 挡掉，本词显式指定保留**（第三次：brain.n.02、elect.v.02、lay.v.04）。罕见（现代英语多用 birds lay eggs）。
-s5	a.	外行的，世俗的（非职业的）	not of or from a profession	0	T1	[WORDNET 补缺 ECDICT 未收录] not of or from a profession。形容词义。现有中文无对应，属新增。线索：a lay opinion / lay reader。形容词读 /leɪ/，与动词 lay /leɪ/ 同音但不同义。
