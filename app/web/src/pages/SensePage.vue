@@ -40,7 +40,7 @@ import { aiPrompt } from '../import'
 import { useDragReorder } from '../draglist'
 import { setAvoidTarget } from '../keyboard'
 import { goBack } from '../nav'
-import { speakEn, speechOn, ttsWaiting } from '../speech'
+import { speakEn, speechOn, ttsWaiting, autoSpeak } from '../speech'
 import { toast } from '../toast'
 import { addSentence as aiAddSentence, replaceSentence as aiReplaceSentence } from '../ai/actions'
 import { aiReady } from '../ai/config'
@@ -84,6 +84,12 @@ const sents = ref<Sentence[]>(hit0 ? (sentencesNow(hit0.id) ?? []) : [])
 const siblings = ref<Sense[]>(hit0 ? (sensesOfWordNow(hit0.word) ?? []) : [])
 /** 诊断用：加载失败时把真实原因显示出来，而不是只说「不在了」 */
 const err = ref('')
+
+/* 自动播放：打开/切换义项时读词。读词不读句 —— 这一页的重点是「哪个意思」，
+   句子有每句自己的喇叭，想听哪句点哪句。 */
+watch(word, (w) => {
+  if (w) autoSpeak(w)
+})
 
 const showImport = ref(false)
 const showPrompt = ref(false)
@@ -1070,9 +1076,14 @@ function onDelete(): void {
   opacity: 0.75;
 }
 
-/* 喇叭与 mini 按钮等高对齐（van-button 自带高度，裸按钮要跟它对齐） */
+/* 喇叭与 mini 按钮同高同节奏：van-button mini 高 24px、图标约 14px，
+   裸按钮按它对齐，不然一行里一个大一个小 */
 .ops .wb-say {
   align-self: center;
+  height: 24px;
+  padding: 0 4px;
+  font-size: 14px;
+  line-height: 24px;
 }
 
 .add {

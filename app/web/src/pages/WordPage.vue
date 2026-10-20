@@ -23,7 +23,7 @@ import { addSense, purgeWord, updateWord } from '../edit'
 import { useDragReorder } from '../draglist'
 import { aiPrompt } from '../import'
 import { goBack } from '../nav'
-import { speakEn, speechOn, ttsWaiting } from '../speech'
+import { speakEn, speechOn, ttsWaiting, autoSpeak } from '../speech'
 import { toast } from '../toast'
 import { describeAiError, type AiResult } from '../ai/types'
 import { fillWord, reviewWord } from '../ai/actions'
@@ -184,6 +184,15 @@ async function load(): Promise<void> {
 }
 
 watch(() => props.word, load, { immediate: true })
+
+/* 自动播放：打开词条先听为快（查词场景，听就是目的之一） */
+watch(
+  () => props.word,
+  (w) => {
+    if (w) autoSpeak(w)
+  },
+  { immediate: true },
+)
 
 /* ── 从「点词查义」的浮层过来时带 `?fill=1` ──
  *  那条路上用户点的是「让 AI 补全义项与例句」，导航到这里就该直接开始，
