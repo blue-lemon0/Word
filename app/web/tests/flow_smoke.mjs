@@ -28,7 +28,7 @@ const M = await import(pathToFileURL(out).href)
 /* entry.ts 按命名空间导出：dbApi.db 是那个 Dexie 实例，dbApi.<fn> 是 src/db 里的函数 */
 const dbApi = M.db
 const db = dbApi.db
-const { edit, importer, backup, quiz, bundleImport, flags, lookup, ai, nav, spell } = M
+const { edit, importer, backup, quiz, bundleImport, flags, lookup, ai, nav, spell, marks, parse } = M
 
 let bad = 0
 function ok(cond, msg, detail = '') {
@@ -60,6 +60,104 @@ const badSpan = sents.filter(
 ok(badSpan.length === 0, '所有例句都定位到了目标词', `${badSpan.length} 句没有 span`)
 const formBad = sents.filter((s) => s.form && s.en.slice(s.spanStart, s.spanStart + s.spanLen) !== s.form)
 ok(formBad.length === 0, 'spanStart/spanLen 与 form 逐句对齐（高亮不会打偏）', formBad[0]?.en ?? '')
+
+/* ── 2b. 多词形高亮：marks 协议 ── */
+{
+  const both = marks.locateMarks('Climate changes; the climate changed.', 'climate')
+  ok(both.length === 2 && both[0].form === 'Climate' && both[1].form === 'climate',
+     '同一词形出现多次都会标出来，且保留原句大小写')
+  ok(marks.locateMarks('ago go go.', 'go').length === 2, '整词边界生效：ago 里的 go 不算')
+
+  const multi = marks.marksFromForms('He went, then goes; going.', ['went', 'goes', 'going', 'go'])
+  ok(multi.length === 3 && multi.map((m) => m.form).join('|') === 'went|goes|going',
+     '多个不同词形落成多个区间，按位置排序')
+  const overlap = marks.marksFromForms('going', ['go', 'going'])
+  ok(overlap.length === 1 && overlap[0].form === 'going', '重叠区间保留更长的那个')
+
+  const fixed = marks.normalizeMarks('A went home.', [{ start: 99, len: 4, form: 'went' }])
+  ok(fixed.length === 1 && fixed[0].start === 2 && fixed[0].form === 'went',
+     '坏区间会按 form 重新定位，不把高亮打偏')
+  const legacy = marks.marksOfSentence({ en: 'A went home.', form: 'went', spanStart: 2, spanLen: 4 })
+  ok(legacy.length === 1 && legacy[0].start === 2, '旧 span 数据仍能读出高亮')
+  const mirrored = marks.legacySpanOf(multi)
+  ok(mirrored.spanStart === multi[0].start && mirrored.spanLen === multi[0].len &&
+     mirrored.form === multi[0].form, 'marks[0] 会镜像到旧 span 字段')
+  ok(marks.formsOfSentence({ en: 'He went, then goes; going.', marks: multi }).join('|') === 'went|goes|going',
+     'formsOfSentence 给出去重后的小写词形')
+
+  await edit.purgeWord('zzmarkprobe')
+  const probe = await edit.addWord('zzmarkprobe')
+  const probeEn = 'Zzmarkprobe met zzmarkprobe and zzmarkprobed.'
+  const probeMarks = marks.marksFromForms(probeEn, ['zzmarkprobe', 'zzmarkprobed'])
+  await edit.addSentence(probe.senseId, probe.word, probeEn, '探针句', probeMarks)
+  let row = await db.sentences.where('senseId').equals(probe.senseId).first()
+  ok(row?.marks?.length === 3 && row.spanStart === 0 && row.form === 'Zzmarkprobe',
+     '新例句落库时保留全部 marks，并镜像第一条旧 span', JSON.stringify(row?.marks))
+
+  const rewritten = await edit.replaceSentence(row.id, 'Zzmarkprobe and zzmarkprobed returned.')
+  ok(rewritten?.marks?.length === 2 && rewritten.marks[1].form === 'zzmarkprobed',
+     '手改英文后按旧词形重新定位，高亮不沿用旧区间')
+  const lost = await edit.replaceSentence(row.id, 'Nothing relevant here.')
+  ok(lost?.marks === undefined && lost?.spanStart === -1,
+     '新句找不到目标词时清掉 marks，而不是保留错误高亮')
+  await edit.purgeWord(probe.word)
+  ok((await db.words.get(probe.word)) == null, '高亮探针词已清干净')
+
+  await edit.purgeWord('zzmarkimport')
+  const imported = await bundleImport.importBundle({
+    format: 'word-bundle',
+    cards: [{
+      word: 'zzmarkimport',
+      slot: 1,
+      gloss: '导入探针',
+      sentences: [{
+        text: 'He zzmarkimported it.',
+        highlights: ['zzmarkimported'],
+        translation: '他导入了它。',
+      }],
+    }],
+  })
+  const importedSense = await db.senses.where('word').equals('zzmarkimport').first()
+  const importedRow = importedSense
+    ? await db.sentences.where('senseId').equals(importedSense.id).first()
+    : undefined
+  ok(imported.errors.length === 0 && imported.sentencesAdded === 1 && importedRow?.marks?.length === 1,
+     '导入协议的 highlights 会落成 marks', JSON.stringify(imported.errors))
+  ok(importedRow?.spanStart === 3 && importedRow?.form === 'zzmarkimported',
+     '导入时同步镜像旧 span')
+  await edit.purgeWord('zzmarkimport')
+  ok((await db.words.get('zzmarkimport')) == null, '导入高亮探针词已清干净')
+
+  const bind = {
+    word: 'go',
+    ipa: '',
+    senses: [{ id: 's-go', slot: 1, word: 'go', gloss: '去' }],
+    sentences: [],
+  }
+  const parsed = parse.parseProposals(JSON.stringify({
+    proposals: [{
+      kind: 'sentence.add',
+      slot: 1,
+      en: 'He went home and goes out.',
+      zh: '他回家又出门。',
+      highlights: ['went', 'goes'],
+    }],
+  }), bind)
+  ok(parsed.proposals.length === 1 && parsed.proposals[0].marks?.length === 2 &&
+     parsed.proposals[0].marks[0].form === 'went' &&
+     parsed.proposals[0].marks[1].form === 'goes',
+     'AI highlights 落成多个 marks，不规则词形也能高亮')
+  const rejected = parse.parseProposals(JSON.stringify({
+    proposals: [{
+      kind: 'sentence.add',
+      slot: 1,
+      en: 'Nothing relevant here.',
+      highlights: ['went'],
+    }],
+  }), bind)
+  ok(rejected.proposals.length === 0 && rejected.dropped.length === 1,
+     '声明了 highlights 但一个都对不上时丢句，不静默接受')
+}
 
 /* ── 3. 编辑义项：id 永不变 ── */
 const army = await db.senses.where('word').equals('army').first()
