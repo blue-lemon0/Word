@@ -29,9 +29,22 @@ export const ttsAutoplay = ref(
 )
 watch(ttsAutoplay, (v) => localStorage.setItem(AUTOPLAY_KEY, v ? '1' : '0'))
 
-/** 场景自动播：总开关 + 语音可用才出声。语义等同手动点喇叭，只是替你点。 */
+/** 场景自动播：总开关 + 语音可用才出声。
+ *
+ *  ★ 与手动点喇叭的关键区别：**失败不兜底**（用户拍板）。
+ *    自动播是「顺耳的惊喜」，不是「必须有的反馈」——在线合成不到货
+ *    就安静不出声，绝不让系统机械音自动冒出来吓人。手动点喇叭才是
+ *    「我要听」，那条路才走兜底。
+ */
 export function autoSpeak(text: string): void {
-  if (ttsAutoplay.value && speechOn) speakEn(text)
+  if (!ttsAutoplay.value || !speechOn) return
+  const t = text.trim()
+  if (!t || !onlineAlive()) return
+  stopNeural()
+  ttsWaiting.value = true
+  void speakOnline(t).then(() => {
+    ttsWaiting.value = false
+  })
 }
 
 const RATE = 0.9
