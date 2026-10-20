@@ -1048,7 +1048,19 @@ watch(
         <span v-else>已答 {{ answeredCount }} · 对 {{ stats.correct }} · 错 {{ stats.wrong }}</span>
         </p>
 
-        <div class="qw">{{ q.sense.word }}</div>
+        <div class="qwrow">
+          <div class="qw">{{ q.sense.word }}</div>
+          <button
+            v-if="speechOn"
+            class="wb-say"
+            :class="{ waiting: ttsWaiting }"
+            type="button"
+            aria-label="朗读单词"
+            @click="speakEn(q.sense.word)"
+          >
+            <van-icon name="volume-o" />
+          </button>
+        </div>
         <div class="qtag">
           <span v-if="q.sense.pos">{{ q.sense.pos }}</span>
           <span v-if="q.ipa"> /{{ q.ipa }}/</span>
@@ -1062,20 +1074,33 @@ watch(
              一个入口、不挑时机（答题前答题后都能改）、不限制改什么 ——
              分成「改例句」「改选项」两个入口，等于让人先判断
              「我发现的这个问题属于哪一类」才找得到入口。 -->
-        <div class="qsent">
-          <!-- ★ 答完之后整句才可点：点任何一个词都能查它是什么意思（浮层），
-               想细看再进词条/义项详情；不在库里的词可以当场加入词库。
-               答之前也保持可点，但 onPickToken 只弹一句提示 —— 点了装死
-               会让人以为坏了（查义本身仍锁着，防止「查一下」变成答题）。 -->
-          <MarkedText
-            :text="q.sentence.en"
-            :marks="q.sentence.marks"
-            :form="q.sentence.form"
-            :span-start="q.sentence.spanStart"
-            :span-len="q.sentence.spanLen"
-            pickable
-            @pick="onPickToken"
-          />
+        <div class="qsentrow">
+          <div class="qsent">
+            <!-- ★ 答完之后整句才可点：点任何一个词都能查它是什么意思（浮层），
+                 想细看再进词条/义项详情；不在库里的词可以当场加入词库。
+                 答之前也保持可点，但 onPickToken 只弹一句提示 —— 点了装死
+                 会让人以为坏了（查义本身仍锁着，防止「查一下」变成答题）。 -->
+            <MarkedText
+              :text="q.sentence.en"
+              :marks="q.sentence.marks"
+              :form="q.sentence.form"
+              :span-start="q.sentence.spanStart"
+              :span-len="q.sentence.spanLen"
+              pickable
+              @pick="onPickToken"
+            />
+          </div>
+          <!-- 读句子不泄题（泄题红线是「英文释义」，句子本来就是题干） -->
+          <button
+            v-if="speechOn"
+            class="wb-say"
+            :class="{ waiting: ttsWaiting }"
+            type="button"
+            aria-label="朗读例句"
+            @click="speakEn(q.sentence.en)"
+          >
+            <van-icon name="volume-o" />
+          </button>
         </div>
         <p v-if="submitted" class="peektip">句子里任意一个词都能点开查</p>
 
@@ -1714,6 +1739,14 @@ watch(
   line-height: 1.2;
 }
 
+/* 单词 + 喇叭一行居中（喇叭贴词尾，不另占一行 —— 这一屏本来就紧） */
+.qwrow {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+}
+
 .qtag {
   text-align: center;
   font-size: 12px;
@@ -1732,6 +1765,23 @@ watch(
   font-size: 17px;
   line-height: 1.6;
   margin: 4px 0 8px;
+}
+
+/* 句子 + 喇叭：句子占满余宽保持居中观感，喇叭钉在右侧 */
+.qsentrow {
+  display: flex;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.qsentrow .qsent {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.qsentrow .wb-say {
+  flex: 0 0 auto;
+  margin-top: 2px;
 }
 
 /* 贴着例句右上角的一个小「改」。它安静到不像一个功能 ——
