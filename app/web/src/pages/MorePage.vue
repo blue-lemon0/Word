@@ -16,6 +16,7 @@ import { classifyImport, importBundle, unknownFormatText } from '../import'
 import { pickJsonFile } from '../fileio'
 import { db, emptyTrash, restoreSense, trashedSenses } from '../db'
 import { toast } from '../toast'
+import { speechOn, ttsAutoplay } from '../speech'
 import type { ImportLog, Sense, Snapshot } from '../types'
 
 const router = useRouter()
@@ -265,6 +266,22 @@ onMounted(load)
           class="note"
           title="导入不用挑按钮，它自己认：词库内容包（只加不改已有的）、本应用导出的备份（会覆盖，先问你）、AI 按「复制给 AI」回来的单词（请到那个词的意思页粘贴）。从微信/QQ 里直接点开这个文件也可以。"
         />
+      </van-cell-group>
+
+      <!-- 语音：自动播放总开关。「设置这台设备怎么工作」，
+           与 AI 助手同区；只存本机，不进备份。 -->
+      <van-cell-group v-if="speechOn" inset class="grp">
+        <template #title>
+          <b>语音</b><span class="sub">在线神经音色，听过的句子离线重播</span>
+        </template>
+        <van-cell
+          title="自动播放"
+          label="出题读单词、答完读整句、拼写读单词、扫读浮层读句子"
+        >
+          <template #right-icon>
+            <van-switch v-model="ttsAutoplay" size="20px" />
+          </template>
+        </van-cell>
       </van-cell-group>
 
       <!-- AI 助手（可选）：配置只存本机，不进备份。

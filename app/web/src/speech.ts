@@ -10,12 +10,29 @@
  *
  *  语速固定 0.9：背单词不是听新闻，稍微慢一点才听得清单词边界。
  */
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { nativeBridge } from './bridge'
 import { onlineAlive, speakOnline, stopNeural } from './ai/ttsNeural'
 
 /** 在线合成等待中：喇叭据此变色。true→false 的边沿就是「出声或让位」的时刻。 */
 export const ttsWaiting = ref(false)
+
+/* ── 自动播放 ──
+ *  只存本机不进备份（设备级偏好，同 AI 配置的原则）：
+ *  平板上开着挂耳边，手机上可能嫌吵，不该跟着备份串设备。
+ */
+const AUTOPLAY_KEY = 'wb.tts.autoplay'
+
+/** 自动播放总开关。开着的场景：出题读单词、答完读整句、拼写读单词、扫读浮层读句子。 */
+export const ttsAutoplay = ref(
+  typeof localStorage !== 'undefined' && localStorage.getItem(AUTOPLAY_KEY) === '1',
+)
+watch(ttsAutoplay, (v) => localStorage.setItem(AUTOPLAY_KEY, v ? '1' : '0'))
+
+/** 场景自动播：总开关 + 语音可用才出声。语义等同手动点喇叭，只是替你点。 */
+export function autoSpeak(text: string): void {
+  if (ttsAutoplay.value && speechOn) speakEn(text)
+}
 
 const RATE = 0.9
 

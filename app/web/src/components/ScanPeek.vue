@@ -9,9 +9,9 @@
  *  ★ 为什么用浮层而不是页面：它是一个「看一眼」，看完就回列表继续扫；
  *    跳页会把扫读的节奏打断（而且每跳一次，路由栈就多一格）。
  */
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import MarkedText from './MarkedText.vue'
-import { speakEn, speechOn, ttsWaiting } from '../speech'
+import { autoSpeak, speakEn, speechOn, ttsWaiting } from '../speech'
 import type { ScanItem } from '../quiz'
 
 const props = defineProps<{
@@ -27,6 +27,15 @@ const emit = defineEmits<{
 
 const sense = computed(() => props.item?.sense)
 const sentence = computed(() => props.item?.sentence)
+
+/* 自动播放（「更多」页总开关）：浮层展开 = 用户想「看懂这一句」，
+   听一句是同一个动作的一部分。浮层是看一眼就关的东西，不播单词播整句。 */
+watch(
+  () => props.item,
+  (it) => {
+    if (it) autoSpeak(it.sentence.en)
+  },
+)
 </script>
 
 <template>

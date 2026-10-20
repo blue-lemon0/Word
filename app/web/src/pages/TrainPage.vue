@@ -30,7 +30,7 @@ import {
   type SessionStats,
 } from '../quiz'
 import { toast } from '../toast'
-import { speakEn, speechOn, ttsWaiting } from '../speech'
+import { autoSpeak, speakEn, speechOn, ttsWaiting } from '../speech'
 import { db } from '../db'
 import type { Sentence, Sense } from '../types'
 import QuickEdit from '../components/QuickEdit.vue'
@@ -515,6 +515,23 @@ function scrollChipIntoView(): void {
     el?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' })
   })
 }
+
+/* ── 自动播放（「更多」页总开关）──
+ *  时机的选择：
+ *   · 新题出现读**单词** —— 先闻其声再见其形，选项还没出来，不影响思考；
+ *   · 答完读**整句** —— 对错已落定，整句是语境强化（答前读句也行，
+ *     但句子长、合成慢，答前读会拖住节奏；单词短，几乎无感）；
+ *   · 拼写卡出现读单词 —— 听音拼词本来就是它的玩法。
+ *  回看已答过的题不播（submitted 已 true）：翻旧账时出声只会吓人。 */
+watch(q, (cur) => {
+  if (cur && !submitted.value) autoSpeak(cur.sense.word)
+})
+watch(submitted, (done) => {
+  if (done && q.value) autoSpeak(q.value.sentence.en)
+})
+watch(spellCur, (cur) => {
+  if (cur && phase.value === 'spell') autoSpeak(cur.word)
+})
 
 /** 点空白处才出选项：先给一句句子让人读，再给选项，不然一眼扫过去没在想 */
 function reveal(): void {
