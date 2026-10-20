@@ -226,25 +226,25 @@ onMounted(load)
 </script>
 
 <template>
-  <div class="wb-page">
+  <div class="wb-page more-page">
     <header class="wb-topbar">
       <div class="in"><h1>更多</h1></div>
     </header>
 
-    <div class="wb-wrap">
-      <InstallPrompt variant="full" />
+    <!-- 应用信息固定在顶部，不参与滚动；下面的功能视图放进独立滚动区。 -->
+    <section class="brand">
+      <img class="logo" :src="logoUrl" alt="" width="52" height="52" />
+      <div class="meta">
+        <p class="nm">{{ APP_NAME }}</p>
+        <p class="ver">v{{ APP_VERSION }} · {{ APP_NAME_EN }}</p>
+        <p class="note">进度只在这台手机上，换机前记得导出。</p>
+      </div>
+    </section>
 
-      <!-- 原来这里是一排数字（词 / 意思 / 已掌握 / 缺例句）。
-           那几个数在词库页都有，放在这里只是"顺手看看"，占掉首屏最贵的位置。
-           换成品牌块：名字 + 版本 + 一句数据归属，比四个数字更像一个"关于"。 -->
-      <section class="brand">
-        <img class="logo" :src="logoUrl" alt="" width="52" height="52" />
-        <div class="meta">
-          <p class="nm">{{ APP_NAME }}</p>
-          <p class="ver">v{{ APP_VERSION }} · {{ APP_NAME_EN }}</p>
-          <p class="note">进度只在这台手机上，换机前记得导出。</p>
-        </div>
-      </section>
+    <div class="more-scroll">
+      <div class="wb-wrap">
+        <InstallPrompt variant="full" />
+
 
       <!-- 备份区：导出两种 + 导入一个（导入会自动认出文件是哪一种，见 applyIncoming）
            原来这里是「导入备份」，而内容包另在词库页有个「导入内容包」——
@@ -357,6 +357,7 @@ onMounted(load)
         在这里改过的内容只在这台设备上。记得定期「导出」存一份 ——
         换手机或者重装时，用那份文件就能恢复。
       </p>
+      </div>
     </div>
 
     <ConfirmSheet
@@ -372,16 +373,27 @@ onMounted(load)
 </template>
 
 <style scoped>
-.grp {
-  margin: 16px 0 0;
-}
-
-.grp :deep(.van-cell-group__title) {
-  padding-top: 14px;
-  padding-bottom: 2px;
+/* Vant 把分组标题渲染成卡片外的兄弟节点；这里把它接回白色卡片顶部，
+   让「标题 + 内容」看起来是同一个圆角功能区。 */
+.more-page :deep(.van-cell-group__title--inset) {
   display: flex;
   align-items: baseline;
   gap: 8px;
+  margin: 16px 0 0;
+  padding: 12px 16px 0;
+  background: var(--wb-card);
+  border-radius: var(--wb-radius) var(--wb-radius) 0 0;
+}
+
+.grp {
+  margin: 0 0 16px;
+  border-radius: 0 0 var(--wb-radius) var(--wb-radius);
+}
+
+.more-page :deep(.van-cell-group__title--inset b) {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--wb-ink);
 }
 
 /* 标题后面的说明：并进标题而不是单独占一行。
@@ -460,15 +472,42 @@ onMounted(load)
   background-attachment: local, local;
 }
 
+/* 这一页不滚动文档，只有下方功能视图滚动：
+   应用信息固定在顶栏下面，避免 sticky 在 WebView 里反复重排产生抖动。 */
+.more-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  padding-bottom: 0;
+  overflow: hidden;
+}
+
+.more-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  padding-bottom: calc(
+    var(--wb-tabbar-h) + var(--wb-safe-bottom) + 16px + var(--kb, 0px)
+  );
+}
+
 .brand {
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  padding: 14px;
-  margin-bottom: 12px;
+  flex: 0 0 auto;
+  width: 100%;
+  margin: 0;
+  padding: 10px max(26px, calc((100vw - 680px) / 2 + 26px));
   background: var(--wb-card);
-  border: 1px solid var(--wb-line);
-  border-radius: 16px;
+  border: 0;
+  border-bottom: 1px solid var(--wb-line);
+  border-radius: 0 0 16px 16px;
+  box-shadow: 0 8px 16px rgba(20, 24, 40, 0.06);
 }
 
 .brand .logo {
@@ -480,20 +519,21 @@ onMounted(load)
 }
 
 .brand .nm {
+  margin: 0;
   font-size: 16px;
   font-weight: 650;
   color: var(--wb-ink);
 }
 
 .brand .ver {
-  margin-top: 2px;
+  margin: 2px 0 0;
   font-size: 12px;
   color: var(--wb-ink-3);
   font-variant-numeric: tabular-nums;
 }
 
 .brand .note {
-  margin-top: 6px;
+  margin: 6px 0 0;
   font-size: 11.5px;
   line-height: 1.5;
   color: var(--wb-ink-3);

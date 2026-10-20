@@ -29,6 +29,13 @@ interface NativeBridgeApi {
    */
   httpPost?: (id: string, url: string, headersJson: string, body: string) => void
   /**
+   * 原生发 JSON POST，响应以 **Base64** 回调 `window.__wbHttpBin(id, status, b64)`。
+   *
+   *  httpPost 只能回传 UTF-8 文本，mp3 这类二进制会烂在半路 —— 神经 TTS
+   *  的音频走这一条（见 src/ai/ttsNeural.ts）。
+   */
+  httpPostBin?: (id: string, url: string, headersJson: string, body: string) => void
+  /**
    * 朗读英文（单词 / 例句）。
    *
    *  为什么必须走原生：Android WebView 的 speechSynthesis 经常一个 voice
@@ -38,6 +45,12 @@ interface NativeBridgeApi {
   speak?: (text: string, rate: number) => boolean
   /** 停止当前朗读 */
   stopSpeak?: () => void
+  /**
+   * Edge TTS（微软神经语音，免 key）合成一句话，mp3 以 Base64 回调
+   * `window.__wbEdgeTts(id, status, b64)`（原生协议见 EdgeTts.java，
+   * 页面侧见 src/ai/ttsNeural.ts）。
+   */
+  edgeTts?: (id: string, text: string, voice: string, rate: string) => void
 }
 
 declare global {

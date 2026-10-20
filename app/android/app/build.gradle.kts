@@ -48,4 +48,6 @@ dependencies {
     // 原生桥（NativeBridge）要用 FileProvider / ClipboardManager，
     // 它们在 androidx.core 里；不引这一条编译会直接报找不到符号。
     implementation("androidx.core:core:1.13.1")
+    // Edge TTS 的原生 WebSocket（android 没有公开的 java.net.http.HttpClient）
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 }

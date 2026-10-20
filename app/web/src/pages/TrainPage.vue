@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /** 训练页 —— 交互沿用旧版那一套（设计稿 §10.1），只把数据源换成新内容模型。
  * 四个判断照旧保留：
- *   目标词 <mark> 高亮 / 答案区才给英文释义 / 「我不会」在选项之前 /
+ *   目标词 <mark> 高亮 / 答案区才给英文释义 / 「我不会」在选项前或选项下 /
  *   「这句有问题」随手标，标了不再出现。
  *
  *  队列来源：?solo=<senseId> 是错题板的单挑入口（页内不提供单挑按钮 ——
@@ -531,7 +531,8 @@ async function choose(opt: string): Promise<void> {
 async function giveUp(): Promise<void> {
   if (submitted.value || reviewing.value) return
   submitted.value = true
-  await save('PENDING')
+  // 「我不会」按答错处理：诚实放弃不能比乱蒙更划算
+  await save('WRONG')
 }
 
 async function save(result: 'CORRECT' | 'WRONG' | 'PENDING'): Promise<void> {
@@ -1011,8 +1012,10 @@ watch(
             :class="{
               cur: i === cursor,
               ok: steps[i]?.result === 'CORRECT',
-              no: steps[i]?.result === 'WRONG',
-              skip: steps[i]?.result === 'PENDING',
+              no: steps[i]?.result === 'WRONG' && !!steps[i]?.picked,
+              skip:
+                steps[i]?.result === 'PENDING' ||
+                (steps[i]?.result === 'WRONG' && !steps[i]?.picked),
               todo: !steps[i],
               loop: loopRound > 0 && (needFix[i] ?? 0) > 0,
             }"
@@ -1105,6 +1108,14 @@ watch(
 <span class="key">{{ KEYS[i] }}</span>
               <span class="tx">{{ opt }}</span>
             </button>
+            <button
+              class="skipopt"
+              :class="{ 'skipopt-giveup': !picked }"
+              type="button"
+              disabled
+            >
+              我不会
+            </button>
           </div>
 
           <!-- 解释区：默认只给结论 + 一个「详情」开关。
@@ -1119,7 +1130,9 @@ watch(
                 q.outcome && q.outcome.grade >= 4
                   ? 'ok'
                   : q.outcome && q.outcome.grade === 0
-                    ? 'no'
+                    ? picked
+                      ? 'no'
+                      : 'giveup'
                     : 'sk'
               "
             >
@@ -1179,6 +1192,7 @@ watch(
               <span class="key">{{ KEYS[i] }}</span>
               <span class="tx">{{ opt }}</span>
             </button>
+            <button class="skipopt" type="button" @click="giveUp">我不会</button>
           </div>
         </template>
 
@@ -1673,7 +1687,7 @@ watch(
   flex: 1;
   text-align: center;
   font-size: 13px;
-  color: var(--wb-ink-3);
+  color: var(--wb-ink-2);
 }
 
 .qw {
@@ -1798,6 +1812,46 @@ watch(
   line-height: 1.35;
 }
 
+/* 四个选项下面的长条「我不会」：不参与 ABCD 判分，按 WRONG 记。
+   类名不能叫 .skip —— 进度格已有 .chip.skip。 */
+.skipopt {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 46px;
+  padding: 11px;
+  border: 1.5px dashed #c4c8d3;
+  border-radius: var(--wb-radius);
+  background: #f7f8fb;
+  color: var(--wb-ink-2);
+  font-family: inherit;
+  font-size: 14.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.skipopt:active {
+  border-color: var(--wb-primary);
+  background: #eef0f7;
+  color: var(--wb-primary);
+}
+
+/* 答过之后「我不会」仍留在选项下，保持布局不跳，但不再可点 */
+.skipopt:disabled {
+  cursor: default;
+  opacity: 0.8;
+}
+
+/* 走「我不会」这条路：橙色标出这次诚实放弃，而不是当成某个错选项的红色 */
+.skipopt-giveup {
+  border-color: var(--van-warning-color);
+  background: #fff7e8;
+  color: #8a5a12;
+  opacity: 1;
+}
+
 .blank:active {
   border-color: var(--wb-primary);
   color: var(--wb-primary);
@@ -1907,6 +1961,10 @@ watch(
 
 .exp .st.no {
   color: var(--van-danger-color);
+}
+
+.exp .st.giveup {
+  color: var(--van-warning-color);
 }
 
 .exp .st.sk {

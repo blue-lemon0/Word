@@ -3,7 +3,7 @@
  *
  *  屏一「刷」= 练习页的一题一屏：词 + 音标 + 例句 + 四个选项 → 判分 + 解析，
  *          上下滑换下一题。视觉与交互照背单词页（不另造一套）。
- *          出题源两种：**随机**（原「随便练」）与**按计划**（到期 / 新词 / 在学）。
+ *          这里只做**随机**（原「随便练」）；按计划的一整轮在 /train。
  *  屏二「句子」= 练习页的句子列表（随机），点一行看答案、练这一句。
  *          底部左右两颗按钮：复习（今天剩余）/ 学习（词库），
  *          它们只是把屏一切到对应来源再滑过去 —— 不再跳任何「练习页」。
@@ -30,8 +30,6 @@ import { buildRandomQueue, makeQuestion, practicePool, type ScanItem } from '../
 import { useSnapPager } from '../scroll-pager'
 
 const router = useRouter()
-
-type Mode = 'random' | 'due' | 'new' | 'learning'
 
 /**
  * 两个数：**今天该复习的词数** 与 **待学的词数**。
@@ -75,10 +73,9 @@ async function loadNums(): Promise<void> {
 /* ★ 屏一就是**随机**，且自成一体：
    它不管到期、不管复习计划，也不和「复习/学习」那一轮共享队列。
    两个按钮进的是背单词页（一整轮、有进度格、能回看跳题）。 */
-const mode = ref<Mode>('random')
 const queue = ref<string[]>([])
 const serial = ref(0)
-/* 初始就是 loading（坑 80）：onMounted 必走 setMode，若初始 false，
+/* 初始就是 loading（坑 80）：onMounted 必走 newBatch，若初始 false，
    首帧 DOM 会先摆出一副「空池」形状再被 loading 顶掉 —— 又是一次闪。 */
 const loading = ref(true)
 const done = ref(0)
@@ -86,24 +83,27 @@ const right = ref(0)
 
 const cur = computed(() => queue.value[idx.value] ?? '')
 const total = computed(() => queue.value.length)
-const modeText = computed(() => '随机')
 
-/** 当前题的呈现状态（决定底栏显示哪两个按钮） */
-const boxState = ref<{ revealed: boolean; submitted: boolean }>({ revealed: false, submitted: false })
-
-/** 竖滑一屏一题：页码即 idx，换页即重置作答状态。
+/** 竖滑一屏一题。
  *  keep-alive 回来的位置恢复在 useSnapPager 里（坑 62/71），页面不手写。 */
-const qPager = useSnapPager('y', {
-  max: () => total.value - 1,
-  onPage: () => {
-    boxState.value = { revealed: false, submitted: false }
-  },
-})
+const qPager = useSnapPager('y', { max: () => total.value - 1 })
 const idx = qPager.page
 const qIntent = qPager.intent
 const qVisual = qPager.visual
 const qscroll = qPager.el
 const onQScroll = qPager.onScroll
+
+/** 每一页的呈现状态（决定底栏显示哪两个按钮）。
+ *
+ *  ★ 必须**按页**存，不能只存一份「当前页」：翻回一页已经作答的题时，
+ *    子组件不会重新 emit（它还挂着），只存一份就会被翻页逻辑重置成
+ *    「未作答」—— 底栏显示「显示选项」，点下去反而把底栏清空。
+ *    QuestionBox 每次装载都会报一次状态，所以重挂的页也能对上。
+ */
+const boxStates = reactive(new Map<number, { revealed: boolean; submitted: boolean }>())
+const boxState = computed(
+  () => boxStates.get(idx.value) ?? { revealed: false, submitted: false },
+)
 
 /* ── 题目预取（坑 78）──
    QuestionBox 自己挂载后才 makeQuestion：快速连翻时每一页都先亮「出题…」
@@ -140,12 +140,15 @@ watch(idx, (n) => prefetchAround(n))
 /* 甩动途中预取跟着视线走（坑 81）：落定前 idx 不动，但可视页早已翻远 */
 watch(qVisual, (n) => prefetchAround(n))
 
-async function setMode(_m: Mode = 'random'): Promise<void> {
-  mode.value = 'random'
+async function newBatch(): Promise<void> {
   loading.value = true
+  /* 换一批 = 换一代：键里带 serial，上一批的组件不会被同名键复用，
+     避免「同一个义项恰好落在同一个下标」时沿用上一批的作答状态。 */
+  serial.value++
+  preMade.clear()
+  boxStates.clear()
   try {
     queue.value = await buildRandomQueue(50)
-    preMade.clear()
     /* 第一题**备好再亮屏**：否则用户看到的是「组题… → 出题… → 内容」
        三段跳（坑 78 的另一半 —— 打开 App 那一刻的闪烁）。 */
     await prefetchOne(0)
@@ -154,7 +157,6 @@ async function setMode(_m: Mode = 'random'): Promise<void> {
   }
   prefetchAround(0)
   idx.value = 0
-  serial.value++
   done.value = 0
   right.value = 0
   resultAt.value = {}
@@ -178,10 +180,13 @@ const aiOpen = ref(false)
 const aiBusy = ref(false)
 const aiResult = ref<AiResult | null>(null)
 const aiError = ref('')
+/** AI 换句是从哪一页发起的：换完要重载那一页，不能跟着当前 idx 跑 */
+const aiPage = ref<number | null>(null)
 
-async function aiReplace(): Promise<void> {
-  const q = curQ.value
+async function aiReplaceAt(i: number): Promise<void> {
+  const q = preMade.get(i)
   if (!q) return
+  aiPage.value = i
   aiError.value = ''
   aiResult.value = null
   aiOpen.value = true
@@ -199,33 +204,40 @@ async function aiReplace(): Promise<void> {
 
 function onAiApplied(): void {
   aiOpen.value = false
-  boxes.get(idx.value)?.reload()
+  const page = aiPage.value
+  aiPage.value = null
+  if (page != null) boxes.get(page)?.reload()
 }
 
-/** 当前题的完整对象（改内容、查词都要用它） */
-const curQ = ref<Question | null>(null)
+/** 当前题的完整对象（改内容、查词都要用它）。
+ *
+ *  ★ 从 preMade 派生，不能只在 onLoaded 那一拍写一份 ref：
+ *    窗口 ±3 里的页翻过去时组件并不重挂、也就不会再 emit loaded，
+ *    于是「改例句 / 改释义 / AI 换一句」会对着**上一题的句子**动手。
+ */
+const curQ = computed<Question | null>(() => preMade.get(idx.value) ?? null)
 function onLoaded(i: number, q: Question): void {
   // 组件自己出的题（含 AI 换句后的 reload）也回写进预取缓存 ——
   // 不然往回翻时拿到的还是换句之前的那道旧题
   preMade.set(i, q)
-  if (i === idx.value) curQ.value = q
 }
 
 const edSentence = ref<Sentence | null>(null)
 const edSense = ref<Sense | null>(null)
 
-/** 「有问题？改」：和背单词页同一套 QuickEdit，只是入口更轻 */
-function openFix(what: 'sentence' | 'sense'): void {
-  const q = curQ.value
+/** 「有问题？改」：和背单词页同一套 QuickEdit，只是入口更轻。
+ *  入口绑死页码：翻页后解析里的按钮仍改**它那一页**的句子/释义。 */
+function openFixAt(i: number, what: 'sentence' | 'sense'): void {
+  const q = preMade.get(i)
   if (!q) return
   edSentence.value = what === 'sentence' ? q.sentence : null
   edSense.value = what === 'sense' ? q.sense : null
 }
 
-/** 当前题变了就重置作答状态（在 qPager 的 onPage 里），这里只跟着组件回报 */
+/** 组件回报状态：按页存（翻页不重置，见 boxStates 的注释） */
 function onBoxState(i: number, st: { revealed: boolean; submitted: boolean }): void {
+  boxStates.set(i, st)
   if (i !== idx.value) return
-  boxState.value = st
   // 答完之后内容变长：把这一页滚回顶部，别让人一睁眼只看到 ABCD 和解析
   if (st.submitted) {
     void nextTick(() => {
@@ -240,7 +252,8 @@ function askReveal(): void {
 }
 
 function askGiveUp(): void {
-  boxes.get(idx.value)?.save('PENDING')
+  // 「我不会」按答错处理：诚实放弃不能比乱蒙更划算
+  boxes.get(idx.value)?.save('WRONG')
 }
 
 /** 底栏「下一题」：goBy 基于 intent 累进 —— 连点三下翻三页，
@@ -250,14 +263,30 @@ function goNext(): void {
   qPager.goBy(1)
 }
 
-/** 每题只记一次结果（上下滑来回不会重复计数） */
-const resultAt = ref<Record<number, 'CORRECT' | 'WRONG' | 'PENDING'>>({})
+/** 底栏「上一题」：和背单词页同一个动作。不补这一颗的话，
+ *  答完只能往下走，想回头看刚才那句只能靠手势。 */
+function goPrev(): void {
+  if ((qIntent.value ?? idx.value) <= 0) return
+  qPager.goBy(-1)
+}
 
-function onAnsweredAt(i: number, r: 'CORRECT' | 'WRONG' | 'PENDING'): void {
+/** 每题只记一次结果（上下滑来回不会重复计数）。
+ *  同时存 picked：QuestionBox 重挂时要靠它把「当时选了哪个」还原回来。 */
+const resultAt = ref<
+  Record<
+    number,
+    { result: 'CORRECT' | 'WRONG' | 'PENDING'; picked: string; outcome?: Question['outcome'] }
+  >
+>({})
+
+function onAnsweredAt(
+  i: number,
+  a: { result: 'CORRECT' | 'WRONG' | 'PENDING'; picked: string; outcome?: Question['outcome'] },
+): void {
   if (resultAt.value[i]) return
-  resultAt.value = { ...resultAt.value, [i]: r }
+  resultAt.value = { ...resultAt.value, [i]: a }
   done.value++
-  if (r === 'CORRECT') right.value++
+  if (a.result === 'CORRECT') right.value++
 }
 
 /* ── 屏二：句子列表 ── */
@@ -299,7 +328,7 @@ onActivated(() => {
 
 onMounted(async () => {
   await loadNums()
-  await setMode('random')
+  await newBatch()
 })
 </script>
 
@@ -317,11 +346,11 @@ onMounted(async () => {
       <section class="hpage">
         <div class="qpane">
           <div class="qtop">
-            <span class="qmode">{{ modeText }}</span>
+            <span class="qmode">随机</span>
             <span v-if="total" class="qnum">{{ idx + 1 }} / {{ total }}</span>
             <span v-if="done" class="qres">对 {{ right }} · 已答 {{ done }}</span>
             <span class="wb-sp" />
-            <button class="qmore" type="button" @click="setMode('random')">换一批</button>
+            <button class="qmore" type="button" @click="newBatch">换一批</button>
           </div>
 
           <van-loading v-if="loading" class="qld" color="#4f46e5">组题…</van-loading>
@@ -334,23 +363,43 @@ onMounted(async () => {
                内容到了再跳回底部 = 用户看到的「打开就闪」。loading 只做
                覆盖层，布局从零帧起就是最终形状。 -->
           <div v-show="loading || total > 0" ref="qscroll" class="qscroll" @scroll.passive="onQScroll">
-            <section v-for="(sid, i) in queue" :key="sid + i" class="qpage">
+            <section v-for="(sid, i) in queue" :key="`${serial}-${sid}-${i}`" class="qpage">
               <div class="qpage-in">
                 <div class="qcenter">
                   <QuestionBox
                   v-if="Math.abs(i - idx) <= 3 || (qIntent != null && Math.abs(i - qIntent) <= 3) || Math.abs(i - qVisual) <= 3"
                   :ref="(el) => setBox(i, el)"
                   hide-actions
+                  hide-result
                   allow-pick
                   :sense-id="sid"
                   :serial="i"
                   :question="preMade.get(i)"
+                  :answered="resultAt[i]"
                   @answered="onAnsweredAt(i, $event)"
                   @state="(st) => onBoxState(i, st)"
                   @loaded="(q) => onLoaded(i, q)"
                     @pick="pick"
                     @word="goWord"
-                  />
+                  >
+                    <!-- 改内容按钮放在题目卡片自己的固定底栏里：
+                         和「看其它例句」同一块，不跟着题面/例句滚。 -->
+                    <template #actions>
+                      <div class="qfix">
+                        <button class="qfix-b" type="button" @click="openFixAt(i, 'sentence')">改例句</button>
+                        <button class="qfix-b" type="button" @click="openFixAt(i, 'sense')">改释义</button>
+                        <button
+                          v-if="aiOn"
+                          class="qfix-b"
+                          type="button"
+                          :disabled="aiBusy"
+                          @click="aiReplaceAt(i)"
+                        >
+                          {{ aiBusy ? '换句中…' : 'AI 换一句' }}
+                        </button>
+                      </div>
+                    </template>
+                  </QuestionBox>
                 </div>
               </div>
             </section>
@@ -359,36 +408,40 @@ onMounted(async () => {
           <div v-if="!loading && !cur" class="qempty">
             <p>这组现在没有可练的</p>
             <div class="qempty-btns">
-              <van-button block round type="primary" @click="setMode('random')">换一批</van-button>
+              <van-button block round type="primary" @click="newBatch">换一批</van-button>
               <van-button block round @click="openPlan('new')">去学新词</van-button>
             </div>
           </div>
 
-          <!-- 作答后：这一句/这个意思有问题，就地改（和背单词页同一个 QuickEdit）。
-
-               ★ 不许 v-if 拆掉这一行（坑 74 根治的一半）：它是 .qscroll 的兄弟，
-               出现/消失会让 .qscroll 高变 41px —— 翻页落定那一帧底栏正好切换，
-               容器变高 → snap 页边界整体搬家 → 动画停在已不是 snap 点的旧目标上，
-               真机永久卡在两页之间。容器常挂、visibility 切换，高度就恒定了。 -->
-          <div class="qfix" :class="{ ghost: !boxState.submitted }">
-            <button class="qfix-b" type="button" @click="openFix('sentence')">改例句</button>
-            <button class="qfix-b" type="button" @click="openFix('sense')">改释义</button>
-            <button v-if="aiOn" class="qfix-b" type="button" :disabled="aiBusy" @click="aiReplace">
-              {{ aiBusy ? '换句中…' : 'AI 换一句' }}
-            </button>
-          </div>
-
-          <!-- ★ 「我不会 / 显示选项 / 下一题」固定在底部：
+          <!-- ★ 「我不会 / 显示选项 / 上一题 / 下一题」固定在底部：
                它们是指头的主行动，不能跟着一屏一屏滚走。
-               loading 期间不显示：和首题内容同一帧出现，避免先弹出来再挪位。 -->
+               loading 期间不显示：和首题内容同一帧出现，避免先弹出来再挪位。
+
+               ★ 三个分支必须都有内容（对齐背单词页的底栏）：
+                 只写「未显示选项」和「已作答」两段，中间那段
+                 （选项已展开、还没选）就是一条**空条** —— 用户点了
+                 「显示选项」后底栏凭空消失，而且容器高度 63→12px，
+                 又一次改变 snap 页边界（坑 74 的同一类病）。 -->
           <div v-if="total && !loading" class="qbar">
             <template v-if="!boxState.revealed && !boxState.submitted">
-              <button class="qb" type="button" @click="askGiveUp">我不会</button>
-              <button class="qb primary" type="button" @click="askReveal">显示选项</button>
+              <button class="qbtn" type="button" @click="askGiveUp">我不会</button>
+              <button class="qbtn primary" type="button" @click="askReveal">显示选项</button>
             </template>
-            <button v-else-if="boxState.submitted" class="qb primary wide" type="button" @click="goNext">
-              {{ idx >= total - 1 ? '练完了' : '下一题' }}
-            </button>
+            <template v-else-if="!boxState.submitted">
+              <button class="qbtn" type="button" :disabled="idx === 0" @click="goPrev">上一题</button>
+              <span class="qpick">点上面四个选项作答</span>
+            </template>
+            <template v-else>
+              <button class="qbtn" type="button" :disabled="idx === 0" @click="goPrev">上一题</button>
+              <button
+                class="qbtn primary wide"
+                type="button"
+                :disabled="idx >= total - 1"
+                @click="goNext"
+              >
+                {{ idx >= total - 1 ? '已是最后一题' : '下一题' }}
+              </button>
+            </template>
           </div>
 
         </div>
@@ -625,18 +678,13 @@ onMounted(async () => {
   margin-top: 8px;
 }
 
-/* 改内容：两颗小字按钮，不抢主行动 */
+/* 改内容：固定在卡片底栏里，不占固定底栏 */
 .qfix {
-  flex: 0 0 auto;
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   justify-content: flex-end;
-  padding: 8px 2px 0;
-}
-
-/* 未作答时占位但不可见：保住高度恒定，.qscroll 才不随作答状态伸缩（坑 74） */
-.qfix.ghost {
-  visibility: hidden;
+  padding: 8px 0 0;
 }
 
 .qfix-b {
@@ -646,7 +694,7 @@ onMounted(async () => {
   padding: 6px 10px;
   font-family: inherit;
   font-size: 12px;
-  color: var(--wb-ink-3);
+  color: var(--wb-ink-2);
   cursor: pointer;
 }
 
@@ -654,15 +702,21 @@ onMounted(async () => {
   background: var(--wb-bg);
 }
 
-/* 固定底栏：我不会 / 显示选项 / 下一题 */
+/* 固定底栏：我不会 / 显示选项 / 上一题 / 下一题。
+   ★ 三个分支的高度必须一样（都是同一颗 .qbtn 高 + 同样的 padding），
+     否则每次作答/显示选项都会让 .qscroll 的高度跳一次（坑 74）。
+   ★ 只保留一行主行动；改内容按钮已经放进解析卡片，底栏不再为空行预留高度。 */
 .qbar {
   flex: 0 0 auto;
   display: flex;
   gap: 10px;
-  padding: 8px 0 4px;
+  margin: 0 -18px;
+  padding: 8px 18px 4px;
+  border-top: 1px solid var(--wb-line);
+  background: color-mix(in srgb, var(--wb-bg) 94%, transparent);
 }
 
-.qb {
+.qbtn {
   flex: 0 0 34%;
   padding: 13px 10px;
   border: 1px solid var(--wb-line);
@@ -674,7 +728,12 @@ onMounted(async () => {
   cursor: pointer;
 }
 
-.qb.primary {
+.qbtn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.qbtn.primary {
   flex: 1;
   border-color: var(--wb-primary);
   background: var(--wb-primary);
@@ -682,16 +741,23 @@ onMounted(async () => {
   font-weight: 600;
 }
 
-.qb.wide {
+.qbtn.primary:disabled {
+  opacity: 0.55;
+}
+
+.qbtn.wide {
   flex: 1;
 }
 
-.qhint {
-  flex: 0 0 auto;
-  padding-top: 10px;
-  text-align: center;
-  font-size: 11.5px;
-  color: var(--wb-ink-3);
+/* 选项已展开、等待点选时的说明：占住主按钮的位置，底栏不塌。
+   用 ink-2 而不是 ink-3 —— 真机上 ink-3 太浅，看着像禁用提示。 */
+.qpick {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: var(--wb-ink-2);
 }
 
 .qpage-in {
@@ -699,16 +765,40 @@ onMounted(async () => {
   min-height: 0;
   display: flex;
   flex-direction: column;
-  padding: 0 18px;
-  overflow-y: auto;
+  padding: 4px 18px;
+  /* 页面本身不再滚：题面内部滚，卡片底栏和翻页手势才不会打架 */
+  overflow: hidden;
 }
 
-/* ★ 用「自动外边距」居中，而不是 justify-content: center。
-   后者在内容比容器高时会把顶部裁掉 —— 答完题解析一长，词和例句就被挤到屏幕外，
-   看到的只有 ABCD。auto 外边距的口径是：放得下就居中，放不下就从头开始排。 */
+/* 卡片在这个高度里居中；内容高了就由卡片自己限高、内部滚 */
 .qcenter {
   width: 100%;
-  margin: auto 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+/* 题目卡片：独立类名。
+   以前 QuestionBox 根节点也叫 .qb，和底栏按钮撞名 —— 子组件根节点会吃到
+   父组件的 scoped 样式，于是按钮的 padding / 圆角 / 灰底全漏到了卡片上。
+   现在按钮叫 .qbtn，卡片单独命名并明确给白底。 */
+.qcard {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--wb-card);
+  border: 1px solid var(--wb-line);
+  border-radius: 16px;
+  padding: 14px 12px;
+  box-shadow: 0 1px 2px rgba(31, 35, 51, 0.03);
+}
+
+/* 作答后固定占满卡片高度（最大高度），切换题面/其它例句时卡片不跳大小 */
+.qcard.qcard-full {
+  height: 100%;
 }
 
 /* ── 屏二 ── */

@@ -314,11 +314,16 @@ ok((await db.sentences.get(afterTake[0].sentenceId)).en === flagged.sentence.en,
   ok(!p2.exact && p2.word?.word === 'army', 'armies 命中原形 army（exact=false）')
   ok(p2.lemma === 'army' && p2.token === 'armies', '浮层要能说清「句子里的是 X、原形是 Y」')
 
-  // 未入库：给得出「最像原形」的候选，而且不假装命中
+  // 未入库：不假装命中，也不把规则候选当原形
   const p3 = await lookup.peekWord('blorping')
   ok(!p3.word && p3.senses.length === 0, '库里没有的词不会假装命中')
-  ok(p3.lemma === 'blorp', `未入库时给出候选原形（${p3.lemma}）`)
+  ok(p3.lemma === 'blorping', `未入库时保留原词形，不猜 blorp（${p3.lemma}）`)
   ok(p3.stop === false, '普通生词不是虚词，应该给「加入词库」入口')
+
+  // 回归：minister 不是 minist 的变形；规则候选不得被当成原形
+  const minister = await lookup.peekWord('minister')
+  ok(minister.lemma === 'minister',
+     `minister 不能被 er 规则剥成 minist（${minister.lemma}）`)
 
   // 虚词不给加入入口（否则词库里会多出 the / of 这种垃圾）
   ok((await lookup.peekWord('the')).stop === true, '虚词被识别出来（不提供加入）')

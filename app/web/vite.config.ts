@@ -31,6 +31,15 @@ export default defineConfig({
         secure: true,
         rewrite: (p) => p.replace(/^\/ai/, ''),
       },
+      // 神经 TTS（explore/tts 探索分支）：与 /ai 同一招 —— 桌面 dev 把
+      // 硅基流动的 /v1/audio/speech 同源转出去，绕开 CORS；APK 里走原生桥，
+      // 用不到这个（见 src/ai/ttsNeural.ts）。
+      '/tts': {
+        target: 'https://api.siliconflow.cn',
+        changeOrigin: true,
+        secure: true,
+        rewrite: (p) => p.replace(/^\/tts/, ''),
+      },
     },
   },
   preview: {

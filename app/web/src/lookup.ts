@@ -9,9 +9,9 @@
  *  ★ 为什么规则这么土（剥后缀 + 去双写），不上词形库：
  *    这个词库是**自己产的**（2998 词），词形变化全在前台能看得见的范围内；
  *    第一条策略是「先按原形查」，只有落空了才走规则，而规则算出来的候选
- *    **必须真的在词库里**才会被采用（见 pick）—— 所以规则猜错也不会
- *    把人带到别的词上去，最多是「没找到」。这比引进一份词形词典便宜得多，
- *    而且没有额外真相源要对齐。
+ *    **必须真的在词库里**才会被采用 —— 所以规则猜错也不会把人带到别的词上。
+ *    ★ 没命中时绝不把候选当原形：minister 会命中 er 规则被剥成 minist，
+ *      但 minist 不在库里，也不该被写成「原形」或加进词库。
  *
  *  ★ 停用词不提供「加入词库」：the / of / was 这些加进去只是垃圾。
  *    它们仍然能被点到（否则句子千疮百孔），但浮层里只说「大概不用记」。
@@ -113,7 +113,7 @@ export function guessLemmas(raw: string): string[] {
 export interface PeekResult {
   /** 用户点的那一格（规范化之后） */
   token: string
-  /** 命中的词库词条；没命中时是「最像原形」的那个候选 */
+  /** 命中的词库词条；没命中时就是 token 本身（规则候选只用于查库，不当原形） */
   lemma: string
   /** 原形直接命中（false 说明走了形态还原） */
   exact: boolean
@@ -147,12 +147,12 @@ export async function peekWord(raw: string): Promise<PeekResult> {
   }
   // 单个词可能有另一条路命中：词库里存的就是这个形式（forms/派生词）
   //
-  // ★ 没命中时，候选原形取「第一个派生候选」而不是句子里的形式本身：
-  //   句子里的 ordered / sides / blorping 都是**变形**，直接拿它当词条加进词库，
-  //   词库里就会多出 ordered 这种永远查不全的词。派生候选为空（本来就是原形）
-  //   时才退回 token 本身。
-  const guess = hit ?? candidates[1] ?? candidates[0] ?? token
-  const lemma = guess
+  // ★ 没命中时一律用 token 本身，不拿规则候选当原形。
+  //   规则只能用来「查库」：minister 会被 er 规则剥成 minist，
+  //   但词的真正原形不一定是这样；把猜测写成事实，用户加入词库时
+  //   就会建出一个根本不存在的词，AI 也会顺着这个词继续编。
+  //   宁可让用户加 minister 后自己改，也不静默把 minister 变成 minist。
+  const lemma = hit ?? token
   const word = hit ? byWord.get(hit) : undefined
   const senses = word
     ? (await liveSenses()).filter((s) => s.word === word.word).sort((a, b) => a.slot - b.slot)

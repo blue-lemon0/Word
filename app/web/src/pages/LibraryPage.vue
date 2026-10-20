@@ -240,21 +240,31 @@ const head = computed(() => {
   return c
 })
 
+/**
+ * 搜索 / 维护筛选后的行：**不包含 only 桶选择**。
+ * 筛选按钮上的数字要来自这一层，所以点「在学」不会把其它桶的数字变成 0；
+ * 搜索或维护筛选变化时数字仍会跟着缩小，和列表里真正看到的范围一致。
+ */
+const scopedRows = computed(() => {
+  const s = q.value.trim().toLowerCase()
+  return rows.value.filter((r) => {
+    if (s && !r.word.toLowerCase().includes(s)) return false
+    if (!maintain.value) return true
+    if (mFilter.value === 'rf' && !r.needsRefine) return false
+    // 旧口径：一句都没有**也算缺（占位词的 target 可能为 0）
+    //   写成 r.sentences >= r.target 会把最该补的那批筛掉）
+    if (mFilter.value === 'ns' && r.sentences > 0 && r.sentences >= r.target) return false
+    if (mFilter.value === 'T1' && !r.senses.some((x) => x.tier === 'T1')) return false
+    return true
+  })
+})
+
 /** 每个桶里的词（桶内按「最该复习的在前」） */
 const grouped = computed(() => {
-  const s = q.value.trim().toLowerCase()
   const map = new Map<Bucket, Row[]>()
   for (const b of BUCKETS) map.set(b.key, [])
-  for (const r of rows.value) {
-    if (s && !r.word.toLowerCase().includes(s)) continue
+  for (const r of scopedRows.value) {
     if (only.value && r.bucket !== only.value) continue
-    if (maintain.value) {
-      if (mFilter.value === 'rf' && !r.needsRefine) continue
-      // ★ 口径：**一句都没有**也算缺（占位词的 target 可能是 0，
-      //   写成 r.sentences >= r.target 会把最该补的那批筛掉）
-      if (mFilter.value === 'ns' && r.sentences > 0 && r.sentences >= r.target) continue
-      if (mFilter.value === 'T1' && !r.senses.some((x) => x.tier === 'T1')) continue
-    }
     map.get(r.bucket)!.push(r)
   }
   for (const [k, list] of map) {
@@ -308,6 +318,17 @@ function fmtDue(ts: number): string {
 
 function bucketN(b: Bucket): number {
   return grouped.value.get(b)?.length ?? 0
+}
+
+/** 筛选按钮的数字：只看搜索/维护条件，不看当前选中的桶。 */
+const chipCounts = computed(() => {
+  const c: Record<Bucket, number> = { due: 0, learning: 0, new: 0, mastered: 0, idle: 0 }
+  for (const r of scopedRows.value) c[r.bucket]++
+  return c
+})
+
+function chipN(b: Bucket): number {
+  return chipCounts.value[b]
 }
 
 onMounted(load)
@@ -411,28 +432,32 @@ onMounted(load)
         <span class="go">去补 ›</span>
       </button>
 
-      <van-search v-model="q" placeholder="搜索我的词库" shape="round" class="sbox" />
+      <!-- 搜索 + 学习视角筛选一起吸顶：滚到下面找词时，两行都还在。
+           数字只看搜索/维护条件，不随当前选中的桶变化。 -->
+      <div class="findbar">
+        <van-search v-model="q" placeholder="搜索我的词库" shape="round" class="sbox" />
 
-      <!-- 学习视角的过滤：只留四个，而且都是「我现在想练什么」 -->
-      <div class="chips">
-        <button
-          class="chip"
-          :class="{ on: only === '' }"
-          type="button"
-          @click="only = ''"
-        >
-          全部 {{ rows.length }}
-        </button>
-        <button
-          v-for="b in BUCKETS.slice(0, 3)"
-          :key="b.key"
-          class="chip"
-          :class="{ on: only === b.key, hot: b.key === 'due' && bucketN(b.key) > 0 }"
-          type="button"
-          @click="only = only === b.key ? '' : b.key"
-        >
-          {{ b.title }} {{ bucketN(b.key) }}
-        </button>
+        <!-- 学习视角的过滤：只留四个，而且都是「我现在想练什么」 -->
+        <div class="chips">
+          <button
+            class="chip"
+            :class="{ on: only === '' }"
+            type="button"
+            @click="only = ''"
+          >
+            全部 {{ scopedRows.length }}
+          </button>
+          <button
+            v-for="b in BUCKETS.slice(0, 3)"
+            :key="b.key"
+            class="chip"
+            :class="{ on: only === b.key, hot: b.key === 'due' && chipN(b.key) > 0 }"
+            type="button"
+            @click="only = only === b.key ? '' : b.key"
+          >
+            {{ b.title }} {{ chipN(b.key) }}
+          </button>
+        </div>
       </div>
 
       <van-loading v-if="loading" class="ld" color="#4f46e5">正在读库…</van-loading>
@@ -701,6 +726,31 @@ onMounted(load)
   box-shadow: 0 -10px 0 0 var(--wb-bg);
   --van-search-background: transparent;
   --van-search-content-background: var(--wb-card);
+}
+
+/* 搜索框和筛选按钮一起吸顶。外层负责遮住滚过去的词条，
+   内层搜索框取消自己的 sticky，避免两层各自粘顶。 */
+.findbar {
+  position: sticky;
+  top: calc(var(--wb-sb-h) + 43px);
+  z-index: 12;
+  /* 底部留出内边距，吸顶时才不会让卡片贴着筛选按钮 */
+  padding: 8px 0 8px;
+  margin: -8px 0 6px;
+  background: var(--wb-bg);
+  box-shadow: 0 -10px 0 0 var(--wb-bg);
+}
+
+.findbar .sbox {
+  position: static;
+  padding: 0 0 6px;
+  margin: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.findbar .chips {
+  margin: 0;
 }
 
 .chips {

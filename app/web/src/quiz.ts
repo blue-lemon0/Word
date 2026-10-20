@@ -3,7 +3,7 @@
  *  三条口径都在 docs/DESIGN-词库系统v2.md §10 里：
  *   · 出题范围 = 存活义项 × 到期/新卡；被标记的句子不进池
  *   · 英文释义**只在答题后**出现（出题时露 = 泄题）
- *   · 「我不会」给 PENDING 评级，不是错 —— 与 WRONG 分开记
+ *   · 「我不会」按 WRONG 记 —— 诚实放弃不能比乱蒙更划算
  */
 import { allSentences, allProgress, cachedNow, liveSenses, db } from './db'
 import { applyReview, decayIfIdle, isMastered, type ReviewOutcome } from './srs'

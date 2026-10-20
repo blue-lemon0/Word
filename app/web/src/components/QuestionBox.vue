@@ -19,6 +19,8 @@ import type { Sentence } from '../types'
 const props = defineProps<{
   /** true = 不自带「我不会 / 显示选项」，由外壳固定底栏渲染（首页屏一用） */
   hideActions?: boolean
+  /** true = 卡片底栏不显示「对了/错了 · 下次」结果（首页只要动作，不要状态） */
+  hideResult?: boolean
   /** true = 作答后句子里的词可点开（查义） */
   allowPick?: boolean
   senseId: string
@@ -29,11 +31,23 @@ const props = defineProps<{
   /** 外壳预取好的题（坑 78：快速翻页时再现场出题 = 每页都先亮一个「出题…」
    *  空壳。给了它就直接用，不走 makeQuestion；reload(force) 可绕过） */
   question?: Question
+  /** 外壳记下的作答结果（首页窗口式渲染会卸载远处的页）。
+   *  不传的话，翻远再翻回来这一题会变回「没答过」—— 再点一次就是
+   *  第二次 recordAnswer，SRS 被记两遍，而界面上看不出来。 */
+  answered?: {
+    result: 'CORRECT' | 'WRONG' | 'PENDING'
+    picked: string
+    outcome?: Question['outcome']
+  } | null
 }>()
 
 const emit = defineEmits<{
   (e: 'word', w: string): void
-  (e: 'answered', result: 'CORRECT' | 'WRONG' | 'PENDING'): void
+  (e: 'answered', a: {
+    result: 'CORRECT' | 'WRONG' | 'PENDING'
+    picked: string
+    outcome?: Question['outcome']
+  }): void
   (e: 'loaded', q: Question): void
   /** 状态变化：外壳用它在「我不会/显示选项」与「下一题」之间切换 */
   (e: 'state', s: { revealed: boolean; submitted: boolean }): void
@@ -47,6 +61,9 @@ const q = ref<Question | null>(null)
 const revealed = ref(false)
 const picked = ref('')
 const submitted = ref(false)
+/** 作答后默认停在题面（句子 + 选项），只切换「其它例句」——
+ *  切换是单纯的显示隐藏：例句视图里句子和选项一起收起。 */
+const view = ref<'question' | 'examples'>('question')
 const busy = ref(false)
 const err = ref('')
 const others = ref<Sentence[]>([])
@@ -63,6 +80,13 @@ function nextText(): string {
 
 const resultText = ref('')
 
+function resultTextOf(result: 'CORRECT' | 'WRONG' | 'PENDING'): string {
+  return (
+    (result === 'CORRECT' ? '对了' : result === 'WRONG' ? '错了' : '记成「不会」') +
+    (nextText() ? ` · 下次 ${nextText()}` : '')
+  )
+}
+
 async function load(force = false): Promise<void> {
   busy.value = true
   err.value = ''
@@ -70,6 +94,7 @@ async function load(force = false): Promise<void> {
   revealed.value = false
   picked.value = ''
   submitted.value = false
+  view.value = 'question'
   resultText.value = ''
   others.value = []
   try {
@@ -84,13 +109,24 @@ async function load(force = false): Promise<void> {
     q.value = question
     shownAt.value = performance.now()
     emit('loaded', question)
+    // ★ 外壳说这一页已经答过：把结果装回去（首页翻远再翻回来时组件会重挂）。
+    //   这不只是「看着一样」—— 不恢复的话选项可再点，recordAnswer 会落第二次。
+    const a = props.answered
+    if (a) {
+      if (a.outcome) question.outcome = a.outcome
+      picked.value = a.picked
+      revealed.value = true
+      submitted.value = true
+      resultText.value = resultTextOf(a.result)
+    }
     const all = await db.sentences.where('senseId').equals(question.sense.id).toArray()
-    others.value = all
-      .filter((s) => s.id !== question.sentence.id && !s.flagged && s.zh)
-      .slice(0, 2)
+    others.value = all.filter((s) => s.id !== question.sentence.id && !s.flagged && s.zh)
   } finally {
     busy.value = false
   }
+  // 每次装载都把状态报一次：外壳按页存它，翻回已作答的页时底栏才不会
+  // 退回「我不会 / 显示选项」（那会让底栏出现一个点不动的按钮甚至空条）。
+  emit('state', { revealed: revealed.value, submitted: submitted.value })
 }
 
 watch(() => [props.senseId, props.serial, props.sentenceId], () => void load(), { immediate: true })
@@ -130,11 +166,9 @@ async function save(result: 'CORRECT' | 'WRONG' | 'PENDING'): Promise<void> {
   const elapsed = shownAt.value ? Math.round(performance.now() - shownAt.value) : null
   const { outcome } = await recordAnswer(question, session, 0, result, elapsed)
   question.outcome = outcome
-  resultText.value =
-    (result === 'CORRECT' ? '对了' : result === 'WRONG' ? '错了' : '记成「不会」') +
-    (nextText() ? ` · 下次 ${nextText()}` : '')
-  emit('answered', result)
-  emit('state', { revealed: true, submitted: true })
+  resultText.value = resultTextOf(result)
+  emit('answered', { result, picked: picked.value, outcome })
+  emit('state', { revealed: revealed.value, submitted: true })
 }
 
 function choose(opt: string): void {
@@ -147,7 +181,7 @@ defineExpose({ reveal, save, reload: () => load(true) })
 </script>
 
 <template>
-  <div class="qb">
+  <div class="qcard" :class="{ 'qcard-full': submitted }">
     <van-loading v-if="busy" color="#4f46e5">出题…</van-loading>
     <p v-else-if="err" class="err">{{ err }}</p>
 
@@ -164,78 +198,125 @@ defineExpose({ reveal, save, reload: () => load(true) })
         <span v-if="q.ipa" class="ipa">/{{ q.ipa }}/</span>
       </header>
 
-      <div class="snrow">
-        <p class="sn">
-          <MarkedText
-            :text="q.sentence.en"
-            :form="q.sentence.form"
-            :span-start="q.sentence.spanStart"
-            :span-len="q.sentence.spanLen"
-            :pickable="props.allowPick"
-            @pick="onPick"
-          />
-        </p>
-        <button v-if="speechOn" class="say sn-say" type="button" aria-label="朗读例句" @click="speakEn(q.sentence.en)">
-          <van-icon name="volume-o" />
-        </button>
-      </div>
+      <div class="qbody" :class="{ 'ex-mode': view === 'examples' }">
+        <div class="qflow" :class="{ 'qflow-fill': view === 'examples' }">
+        <!-- 题目视图：句子 + 选项。切到「其它例句」时整块一起隐藏 -->
+        <div v-show="view === 'question'" class="qview-question">
+          <div class="snrow">
+            <p class="sn">
+              <MarkedText
+                :text="q.sentence.en"
+                :form="q.sentence.form"
+                :span-start="q.sentence.spanStart"
+                :span-len="q.sentence.spanLen"
+                :pickable="props.allowPick"
+                @pick="onPick"
+              />
+            </p>
+            <button v-if="speechOn" class="say sn-say" type="button" aria-label="朗读例句" @click="speakEn(q.sentence.en)">
+              <van-icon name="volume-o" />
+            </button>
+          </div>
 
-      <!-- 还没出选项（hideActions 时交给外壳的固定底栏） -->
-      <div v-if="!revealed && !submitted && !props.hideActions" class="acts">
-        <van-button block round @click="save('PENDING')">我不会</van-button>
-        <van-button type="primary" block round @click="reveal">显示选项</van-button>
-      </div>
+          <!-- 还没出选项（hideActions 时交给外壳的固定底栏） -->
+          <div v-if="!revealed && !submitted && !props.hideActions" class="acts">
+            <van-button block round @click="save('WRONG')">我不会</van-button>
+            <van-button type="primary" block round @click="reveal">显示选项</van-button>
+          </div>
 
-      <!-- hideActions（首页屏一）：底栏按钮离句子一屏远，句子下面补一个
-           轻量入口 —— 与背单词页同一个「点击空白处显示选项」的样子。
-           封装在这里而不是首页手写，谁用 QuestionBox 谁就有。 -->
-      <div
-        v-else-if="!revealed && !submitted"
-        class="blank"
-        role="button"
-        @click="reveal"
-      >
-        — 点击空白处显示选项 —
-      </div>
+          <!-- hideActions（首页屏一）：底栏按钮离句子一屏远，句子下面补一个
+               轻量入口 —— 与背单词页同一个「点击空白处显示选项」的样子。
+               封装在这里而不是首页手写，谁用 QuestionBox 谁就有。 -->
+          <div
+            v-else-if="!revealed && !submitted"
+            class="blank"
+            role="button"
+            @click="reveal"
+          >
+            — 点击空白处显示选项 —
+          </div>
 
-      <!-- 选项 -->
-      <div v-else-if="revealed || submitted" class="opts">
-        <button
-          v-for="(opt, i) in q.options"
-          :key="opt + i"
-          class="opt"
-          :class="{
-            right: submitted && isRight(opt),
-            wrong: submitted && opt === picked && !isRight(opt),
-            dim: submitted && !isRight(opt) && opt !== picked,
-          }"
-          type="button"
-          @click="choose(opt)"
-        >
-          <span class="k">{{ KEYS[i] }}</span>
-          <span class="tx">{{ opt }}</span>
-        </button>
-      </div>
+          <div v-else-if="revealed || submitted" class="opts" :class="{ compact: submitted }">
+            <button
+              v-for="(opt, i) in q.options"
+              :key="opt + i"
+              class="opt"
+              :class="{
+                right: submitted && isRight(opt),
+                wrong: submitted && opt === picked && !isRight(opt),
+                dim: submitted && !isRight(opt) && opt !== picked,
+              }"
+              type="button"
+              @click="choose(opt)"
+            >
+              <span class="k">{{ KEYS[i] }}</span>
+              <span class="tx">{{ opt }}</span>
+            </button>
+            <button
+              class="skipopt"
+              :class="{ 'skipopt-giveup': submitted && !picked }"
+              type="button"
+              :disabled="submitted"
+              @click="save('WRONG')"
+            >
+              我不会
+            </button>
+          </div>
+        </div>
 
-      <!-- 答完：结论 + 这一句的解析 -->
-      <template v-if="submitted">
-        <p class="res">{{ resultText }}</p>
-        <div class="x">
-          <p class="x-zh">{{ q.sentence.zh }}</p>
-          <p class="x-g">
-            <span class="x-pos">{{ q.sense.pos || '—' }}</span>
-            {{ q.sense.gloss }}
-          </p>
-          <template v-if="others.length">
-            <p class="x-h">同一个意思的其它例句</p>
-            <div v-for="o in others" :key="o.id" class="x-o">
-              <p class="x-en">{{ o.en }}</p>
-              <p v-if="o.zh" class="x-zh2">{{ o.zh }}</p>
-            </div>
+        <!-- 题面视图默认就显示句子中文与单词释义；
+             切到「其它例句」后只留例句，题目本身的释义/翻译不再重复。 -->
+        <div v-if="submitted" class="x" :class="{ 'x-fill': view === 'examples' }">
+          <template v-if="view === 'question'">
+            <p class="x-zh">{{ q.sentence.zh }}</p>
+            <p class="x-g">
+              <span class="x-pos">{{ q.sense.pos || '—' }}</span>
+              {{ q.sense.gloss }}
+            </p>
           </template>
+          <div v-show="view === 'examples'" class="x-ex">
+            <p class="x-h">
+              <span>例句</span>
+              <span class="x-count">{{ others.length }}</span>
+              <span>条</span>
+            </p>
+            <div class="x-list">
+              <div v-for="o in others" :key="o.id" class="x-o">
+                <p class="x-en">{{ o.en }}</p>
+                <p v-if="o.zh" class="x-zh2">{{ o.zh }}</p>
+              </div>
+              <p v-if="!others.length" class="x-empty">这个意思还没有其它例句</p>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+
+      <!-- 固定底栏：结论 + 切换 + 内容维护按钮。
+           这一条不跟着题面/例句滚动；用户想翻页时从这里起手，
+           不会被内部滚动抢走手势。 -->
+      <div v-if="submitted" class="qfoot">
+        <div
+          v-if="!props.hideResult || others.length"
+          class="resrow"
+          :class="{ 'resrow-right': props.hideResult }"
+        >
+          <p v-if="!props.hideResult" class="res">{{ resultText }}</p>
+          <button
+            v-if="others.length"
+            class="qview-b"
+            type="button"
+            :aria-expanded="view === 'examples'"
+            @click="view = view === 'question' ? 'examples' : 'question'"
+          >
+            {{ view === 'question' ? '看其它例句' : '回题目' }}
+          </button>
+        </div>
+        <div v-if="$slots.actions" class="qfoot-actions">
+          <slot name="actions" />
         </div>
         <slot name="after" />
-      </template>
+      </div>
     </template>
   </div>
 </template>
@@ -308,6 +389,40 @@ defineExpose({ reveal, save, reload: () => load(true) })
   margin-top: 1px;
 }
 
+/* 题面 / 例句的滚动体：卡片定高时只让这块滚，底栏保持不动 */
+.qbody {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.qbody::-webkit-scrollbar {
+  display: none;
+}
+
+/* 例句视图：句子 + 选项已经整块隐藏，这里不再整页滚；
+   只有例句列表自己滚 */
+.qbody.ex-mode {
+  overflow: hidden;
+}
+
+/* 题目内容在卡片里垂直居中；内容比卡片高时自动从顶部开始，交给 qbody 滚 */
+.qflow {
+  margin: auto 0;
+  min-height: 0;
+}
+
+.qflow-fill {
+  flex: 1;
+  margin: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
 .acts {
   display: flex;
   gap: 10px;
@@ -337,7 +452,7 @@ defineExpose({ reveal, save, reload: () => load(true) })
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
-  margin-top: 14px;
+  margin-top: 10px;
 }
 
 .opt {
@@ -354,6 +469,11 @@ defineExpose({ reveal, save, reload: () => load(true) })
   text-align: left;
   color: var(--wb-ink);
   cursor: pointer;
+}
+
+/* 作答后选项已经定性，收紧一点内边距，把高度留给下面的释义/翻译 */
+.opts.compact .opt {
+  padding: 9px 10px;
 }
 
 .opt .k {
@@ -393,29 +513,153 @@ defineExpose({ reveal, save, reload: () => load(true) })
   opacity: 0.55;
 }
 
+/* 四个选项下面的长条「我不会」：是一个作答出口，按 WRONG 记。
+   类名不能叫 .skip —— 训练页的进度格已有 .chip.skip。 */
+.skipopt {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 42px;
+  padding: 9px 12px;
+  border: 1px dashed #d9dce4;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--wb-ink-2);
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.skipopt:active {
+  border-color: var(--wb-primary);
+  background: #f7f8fb;
+  color: var(--wb-primary);
+}
+
+/* 答过之后「我不会」仍留在选项下，保持布局不跳，但不再可点 */
+.skipopt:disabled {
+  cursor: default;
+  opacity: 0.75;
+}
+
+/* 走「我不会」这条路：橙色标出这次诚实放弃，而不是当成某个错选项的红色 */
+.skipopt-giveup {
+  border-color: #e6a23c;
+  background: #fff7e8;
+  color: #8a5a12;
+  font-weight: 600;
+  opacity: 1;
+}
+
+/* 固定底栏：结论 + 切换 + 内容维护按钮。
+   不参与上面的滚动，翻页手势从这里起手不会被内部滚动抢走。 */
+.qfoot {
+  flex: 0 0 auto;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--wb-line);
+  background: var(--wb-card);
+}
+
+.resrow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.resrow-right {
+  justify-content: flex-end;
+}
+
 .res {
-  margin-top: 14px;
+  margin: 0;
   font-size: 14.5px;
   font-weight: 650;
   color: var(--wb-primary);
 }
 
+/* 「看解析 / 回题目」：解析是次级内容，按钮也做小，不抢答题结论 */
+.qview-b {
+  flex: 0 0 auto;
+  padding: 5px 10px;
+  border: 1px solid var(--wb-line);
+  border-radius: 999px;
+  background: var(--wb-card);
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--wb-ink-2);
+  cursor: pointer;
+}
+
+.qview-b:active {
+  background: var(--wb-bg);
+}
+
 .x {
   margin-top: 10px;
-  background: var(--wb-bg);
+  background: var(--wb-card);
   border-radius: 12px;
   padding: 10px 12px;
 }
 
+/* 题目视图里释义/翻译不再套灰卡：选项已经占掉不少高度，
+   去掉这层 padding/底色后，默认就能同时看到释义与翻译。 */
+.x:not(.x-fill) {
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+}
+
+/* 例句视图：这张灰卡吃掉卡片剩余高度，释义钉在上面，
+   例句列表在下面自己滚（卡片有最大高度，整页不跟着长） */
+.x-fill {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.x-ex {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.x-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.x-list::-webkit-scrollbar {
+  display: none;
+}
+
+.x-empty {
+  padding: 8px 0;
+  font-size: 12px;
+  color: var(--wb-ink-3);
+}
+
 .x-zh {
+  margin: 0;
   font-size: 13px;
-  line-height: 1.7;
+  line-height: 1.55;
   color: var(--wb-ink-2);
 }
 
+/* 释义紧跟翻译：默认题面里选项占的地方多，这里不留浏览器默认段距 */
 .x-g {
-  margin-top: 8px;
-  padding-top: 8px;
+  margin: 6px 0 0;
+  padding-top: 6px;
   border-top: 1px dashed var(--wb-line);
   font-size: 14.5px;
   font-weight: 600;
@@ -430,9 +674,27 @@ defineExpose({ reveal, save, reload: () => load(true) })
 }
 
 .x-h {
-  margin: 10px 0 4px;
-  font-size: 11.5px;
+  margin: 0 0 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
   color: var(--wb-ink-3);
+}
+
+.x-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--wb-bg);
+  color: var(--wb-primary);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .x-o {

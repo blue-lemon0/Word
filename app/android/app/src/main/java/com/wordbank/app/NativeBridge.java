@@ -148,6 +148,16 @@ public class NativeBridge {
     }
 
     /**
+     * Edge TTS（微软神经语音，免 key）——合成完把 mp3 以 Base64 回调给页面
+     * {@code window.__wbEdgeTts(id, status, b64)}。协议实现在 {@link EdgeTts}。
+     */
+    @JavascriptInterface
+    public void edgeTts(final String id, final String text,
+                        final String voice, final String rate) {
+        EdgeTts.speak(act, id, text, voice, rate);
+    }
+
+    /**
      * 发一个 JSON POST，把结果回调给页面。
      *
      * <p>★ 为什么这一步必须由原生做（而不是页面里 fetch）：
@@ -211,6 +221,69 @@ public class NativeBridge {
                 activity.evalJs("window.__wbHttp && window.__wbHttp("
                         + MainActivity.jsonString(id) + "," + status + ","
                         + MainActivity.jsonString(text) + ")");
+            }
+        }).start();
+    }
+
+    /**
+     * 发一个 JSON POST，把**二进制**响应以 Base64 回调给页面。
+     *
+     * <p>为什么 {@link #httpPost} 不够用：它把响应按 UTF-8 文本读回来，
+     * mp3 这类二进制会被解析成乱码（非法 UTF-8 序列直接丢成 U+FFFD），
+     * 过不了 String 桥。这里把原始字节先 Base64（NO_WRAP）再回传，
+     * 页面侧 atob 还原。回调
+     * {@code window.__wbHttpBin(id, status, b64)}；status &lt; 0 时 b64
+     * 是错误消息的 Base64（神经 TTS 音频走这条，见 src/ai/ttsNeural.ts）。
+     */
+    @JavascriptInterface
+    public void httpPostBin(final String id, final String url,
+                            final String headersJson, final String body) {
+        final MainActivity activity = act;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                int status = -1;
+                String b64 = "";
+                try {
+                    java.net.HttpURLConnection c =
+                            (java.net.HttpURLConnection) new java.net.URL(url).openConnection();
+                    c.setRequestMethod("POST");
+                    c.setConnectTimeout(20000);
+                    c.setReadTimeout(60000);
+                    c.setDoOutput(true);
+                    c.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+                    if (headersJson != null && headersJson.length() > 0) {
+                        org.json.JSONObject h = new org.json.JSONObject(headersJson);
+                        java.util.Iterator<String> it = h.keys();
+                        while (it.hasNext()) {
+                            String k = it.next();
+                            c.setRequestProperty(k, h.optString(k));
+                        }
+                    }
+                    try (java.io.OutputStream os = c.getOutputStream()) {
+                        os.write(body.getBytes(StandardCharsets.UTF_8));
+                    }
+                    status = c.getResponseCode();
+                    java.io.InputStream is = status >= 400 ? c.getErrorStream() : c.getInputStream();
+                    if (is != null) {
+                        java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
+                        byte[] buf = new byte[8192];
+                        int n;
+                        while ((n = is.read(buf)) > 0) bos.write(buf, 0, n);
+                        is.close();
+                        b64 = android.util.Base64.encodeToString(bos.toByteArray(),
+                                android.util.Base64.NO_WRAP);
+                    }
+                } catch (Exception e) {
+                    status = -1;
+                    String msg = e.getClass().getSimpleName() + ": " + e.getMessage();
+                    b64 = android.util.Base64.encodeToString(
+                            msg.getBytes(StandardCharsets.UTF_8), android.util.Base64.NO_WRAP);
+                    android.util.Log.e("wordbank", "httpPostBin 失败 " + url, e);
+                }
+                activity.evalJs("window.__wbHttpBin && window.__wbHttpBin("
+                        + MainActivity.jsonString(id) + "," + status + ","
+                        + MainActivity.jsonString(b64) + ")");
             }
         }).start();
     }
