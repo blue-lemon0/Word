@@ -16,17 +16,29 @@
 import { db } from './db'
 import { snapshot } from './backup'
 import { addSentenceRow, createSenseRow, ensureWordRow, logImport, runImportTx } from './importWrite'
-import type { Sense, Sentence } from './types'
+import { legacySpanOf, marksFromForms, normalizeMarks } from './marks'
+import type { Sense, Sentence, SentenceMark } from './types'
 
 /* ── 两种输入的宽松形状 ── */
+
+interface RawMark {
+  start?: number
+  len?: number
+  form?: string
+}
 
 interface RawSentence {
   text?: string
   en?: string
+  /** 旧协议：单个词形 + 管道算好的区间；新代码仍兼容 */
   form?: string
   clue?: string
   spanStart?: number
   spanLen?: number
+  /** 新协议：AI 直接给句中所有目标词词形（推荐） */
+  highlights?: string[]
+  /** 新协议：内部区间（管道/导出可带），与 highlights 二选一 */
+  marks?: RawMark[]
   translation?: string
   zh?: string
   note?: string
@@ -123,32 +135,48 @@ export function classifyImport(json: unknown): { kind: ImportKind; format: strin
 /** 认不出来时给用户的一句话：要说他手上这份是什么、期望什么。 */
 export function unknownFormatText(format: string): string {
   const seen = format ? `它的 format 是「${format}」` : '文件里没有 format 字段'
-  return `认不出这份文件（${seen}）。\n支持三种：content-kit 的 cards.json、本应用导出的备份、AI 按「复制给 AI」回来的单个词。`
+  return `认不出这份文件（${seen}）。\n支持三种：word-bundle 内容包（cards.json）、本应用导出的备份、AI 按「复制给 AI」回来的单个词。`
 }
 
 /* ── 例句定位目标词 ── */
 
-function locate(text: string, form: string): { spanStart: number; spanLen: number } {
-  if (!form) return { spanStart: -1, spanLen: 0 }
-  const i = text.toLowerCase().indexOf(form.toLowerCase())
-  if (i >= 0) return { spanStart: i, spanLen: form.length }
-  return { spanStart: -1, spanLen: 0 }
-}
-
 function normalizeSentence(raw: RawSentence, senseId: string, idx: number): Sentence {
   const en = (raw.text ?? raw.en ?? '').trim()
   const form = (raw.form ?? '').trim()
-  // 管道给了 spanStart 就用；AI 漏了就在文本里找一遍
-  const auto = locate(en, form)
-  const hasSpan = typeof raw.spanStart === 'number' && raw.spanStart >= 0
+
+  // 新协议优先：marks（区间） > highlights（词形数组） > 旧 form/span。
+  const typedMarks: SentenceMark[] = (raw.marks ?? [])
+    .map((m) => ({
+      start: Number(m?.start),
+      len: Number(m?.len),
+      form: typeof m?.form === 'string' ? m.form : '',
+    }))
+    .filter((m) => Number.isInteger(m.start) && Number.isInteger(m.len) && m.len > 0 && !!m.form)
+  let marks = normalizeMarks(en, typedMarks)
+  if (!marks.length && Array.isArray(raw.highlights)) {
+    marks = marksFromForms(en, raw.highlights)
+  }
+  if (!marks.length && form) {
+    const hasSpan = typeof raw.spanStart === 'number' && raw.spanStart >= 0
+    if (hasSpan) {
+      marks = normalizeMarks(en, [
+        {
+          start: raw.spanStart as number,
+          len: (raw.spanLen as number) || form.length,
+          form,
+        },
+      ])
+    }
+    if (!marks.length) marks = marksFromForms(en, [form])
+  }
+  const legacy = legacySpanOf(marks)
   return {
     senseId,
     idx,
     en,
     zh: (raw.translation ?? raw.zh ?? '').trim(),
-    spanStart: hasSpan ? (raw.spanStart as number) : auto.spanStart,
-    spanLen: hasSpan ? ((raw.spanLen as number) || form.length) : auto.spanLen,
-    form,
+    marks: marks.length ? marks : undefined,
+    ...legacy,
     clue: (raw.clue ?? '').trim(),
     flagged: 0,
     flagNote: '',
@@ -318,15 +346,17 @@ export function aiPrompt(
   t += `请核验并补全：\n`
   t += `1. 上述中文释义是否准确？不准确请给出更好的。\n`
   t += `2. 为每个意思造 5 个英文例句 + 中文翻译，每句必须能体现该义项的独特用法（能与同词其他义项区分开）。\n`
-  t += `3. 只输出下面这个 JSON，不要任何其他文字。sentences[].form 填例句里实际出现的词形（如 laid/cast），\n`
-  t += `   translation 填整句中文翻译，clue 填句子里能体现该义项的语境线索（clue 要能在句中找到）。\n\n`
+  t += `3. 只输出下面这个 JSON，不要任何其他文字。sentences[].highlights 填句中**所有**目标词词形\n`
+  t += `   （如 goes / went / gone，数组可多项；每个词形都要逐字出现在句子里），\n`
+  t += `   translation 填整句中文翻译，clue 填句子里能体现该义项的语境线索（clue 要能在句中找到）。\n`
+  t += `   不同词性都放在同一个 word 下的不同 sense 里，不要按词性另造单词。\n\n`
   t += `{"word":"${word}","senses":[\n`
   t +=
     senses
       .map(
         (s) =>
           `  {\n    "slot": ${s.slot},\n    "gloss": "...",\n    "glossEn": "...",\n` +
-          `    "note": "...",\n    "sentences": [\n      {"text": "...", "form": "${word}", "clue": "...", "translation": "..."}\n    ]\n  }`,
+          `    "note": "...",\n    "sentences": [\n      {"text": "...", "highlights": ["${word}"], "clue": "...", "translation": "..."}\n    ]\n  }`,
       )
       .join(',\n')
   t += `\n]}`

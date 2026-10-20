@@ -20,6 +20,8 @@ const SYSTEM = `你是英语学习词库的内容审校助手。你只输出严�
 - 释义 gloss 要与词性 pos、英文释义 glossEn 一致；中文要能区分同词的其它义项（近义/重复的要指出）。
 - 例句必须真的用到「这个词的这个义项」，中文翻译要忠实；例句里不该出现目标词的其它义项。
 - 例句用常见词、自然书面英语，12-20 个词，且必须包含目标词或它的屈折形式。
+- 每条例句必须带 highlights 数组：列出句中**所有**属于目标词的词形，包括三单、复数、过去式、过去分词、现在分词，以及 went / made / children 这类不规则变化。每个元素必须逐字出现在 en 里；同一词形只列一次；没有目标词就不要给这句。
+- 目标词是一个词条：不同词性/义项挂在同一个词条下，绝不为了词性另建单词；词形变化只出现在例句的 highlights 里，不另建词条。
 - 宁缺勿滥：只报告**确实有问题**的条目，没问题的不要列。改一条错的，胜过多改十条对的。
 - why 是写给用户看的一句话：**不要出现 sentenceId / slot 这类内部编号**，
   用「原来那句」「第 2 个义项」这样的说法。`
@@ -28,9 +30,9 @@ const SHAPE = `输出 JSON：
 {"note":"整体判断一句话；全部没问题就写 ok","proposals":[
  {"kind":"sense.update","slot":1,"gloss":"……","pos":"v.","note":"……","glossEn":"……","trap":0,"why":"为什么要改"},
  {"kind":"word.update","ipa":"ˈaːmi","why":"为什么要补/改音标"},
- {"kind":"sentence.replace","sentenceId":12,"en":"新英文（含目标词或具屈折形式）","zh":"中文","why":"为什么要换"},
- {"kind":"sentence.add","slot":2,"en":"……","zh":"……","why":"为什么要补"},
- {"kind":"sense.add","gloss":"……","pos":"n.","why":"为什么要加这个义项","sentences":[{"en":"……","zh":"……"}]}
+ {"kind":"sentence.replace","sentenceId":12,"en":"新英文（含目标词或屈折形式）","zh":"中文","highlights":["went"],"why":"为什么要换"},
+  {"kind":"sentence.add","slot":2,"en":"……","zh":"……","highlights":["goes","went"],"why":"为什么要补"},
+  {"kind":"sense.add","gloss":"……","pos":"n.","why":"为什么要加这个义项","sentences":[{"en":"……","zh":"……","highlights":["……"]}]}
 ]}
 字段都可以省略（只写你要改的那个）；slot / sentenceId 必须来自下面给出的编号，不要编。
 "trap" 是熟词僻义标记：0/1。只在「这个词日常最熟的意思是别的、而这个义项生僻」时才给 1，
@@ -83,6 +85,7 @@ export function addSentencePrompt(
 
 只给 slot=${senseSlot} 这个义项补例句：生成 ${howMany} 条候选，场景各不相同，
 每条都必须用上这个词的对应词性/义项，且不要和已有例句相似。全部用 kind="sentence.add"，slot=${senseSlot}。
+每条都要给 highlights（句中实际出现的所有目标词词形，含不规则变化）。
 ${SHAPE}`,
     },
   ]
@@ -98,6 +101,7 @@ export function replaceSentencePrompt(c: WordContext, sentenceId: number, why: s
 
 请**替换** sentenceId=${sentenceId} 这一句${why ? `（问题：${why}）` : ''}：
 新句要教同一个义项，换一个不同的情境与措辞，不要和已有例句相似。只给 1 条，kind="sentence.replace"，sentenceId=${sentenceId}。
+必须给 highlights（句中实际出现的所有目标词词形，含不规则变化）。
 ${SHAPE}`,
     },
   ]
@@ -122,9 +126,11 @@ export function fillWordPrompt(c: WordContext, howManySenses = 3): ChatMessage[]
 1. 给 ${howManySenses} 个以内最常用的义项（按常用度排序）；如果已有占位义项（slot 有编号但 gloss 为空或明显不对），
    用 kind="sense.update" + 那个 slot 直接改写它，不要重复新建；
 2. 其余义项用 kind="sense.add"，并且在**同一条提案里**带上 1-2 条例句：
-   "sentences":[{"en":"……","zh":"……"}] —— 新义项还没有编号，例句必须跟它一起提；
-3. 每条例句都必须真的用上这个词（可以屈折变化），12-20 个词，自然书面英语；
-4. 词条没有音标时，用 kind="word.update" 给一个（英式或美式都可，只写音标本身）。
+   "sentences":[{"en":"……","zh":"……","highlights":["……"]}] —— 新义项还没有编号，例句必须跟它一起提；
+3. 每条例句都必须真的用上这个词（可以屈折变化），12-20 个词，自然书面英语，并给 highlights
+   （句中实际出现的所有目标词词形，含 went / made 这类不规则变化）；
+4. 所有词性都作为**同一个词条**下的不同义项，不要按词性另造词条；词条没有音标时，
+   用 kind="word.update" 给一个（英式或美式都可，只写音标本身）。
 
 ${SHAPE}
 对 kind="sense.add"，例句写在提案的 "sentences" 数组里。`,

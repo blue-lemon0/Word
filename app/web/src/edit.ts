@@ -5,7 +5,14 @@
  *  （这正是旧 schema 用 's1' 当主键时的缺陷，见 types.ts 开头。）
  */
 import { db, ensureProgress, softDeleteSense } from './db'
-import type { Sense, Sentence, Word } from './types'
+import {
+  legacySpanOf,
+  marksForWord,
+  marksFromForms,
+  marksOfSentence,
+  normalizeMarks,
+} from './marks'
+import type { Sense, Sentence, SentenceMark, Word } from './types'
 
 export function uuid(): string {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
@@ -247,22 +254,32 @@ export async function purgeWord(word: string): Promise<void> {
 
 /* ── 例句 ── */
 
-function locate(text: string, form: string): { spanStart: number; spanLen: number } {
-  const i = form ? text.toLowerCase().indexOf(form.toLowerCase()) : -1
-  return i >= 0 ? { spanStart: i, spanLen: form.length } : { spanStart: -1, spanLen: 0 }
-}
-
-export async function addSentence(senseId: string, word: string, en: string, zh = ''): Promise<void> {
+/**
+ * 新增例句。
+ *
+ * `marks` 是 AI 给的词形数组落成的区间；没给时退回「按词条原形 + 规则屈折」
+ * 找（手动添加的旧路径）。无论走哪条，落库时都会同时写 marks 和旧的
+ * spanStart/spanLen/form，旧页面/旧备份仍能读。
+ */
+export async function addSentence(
+  senseId: string,
+  word: string,
+  en: string,
+  zh = '',
+  marks?: readonly SentenceMark[],
+): Promise<void> {
   const count = await db.sentences.where('senseId').equals(senseId).count()
-  const span = locate(en, word)
+  const text = en.trim()
+  let clean = marks?.length ? normalizeMarks(text, marks) : []
+  if (!clean.length) clean = marksForWord(text, word)
+  const legacy = legacySpanOf(clean)
   const s: Sentence = {
     senseId,
     idx: count,
-    en: en.trim(),
+    en: text,
     zh: zh.trim(),
-    spanStart: span.spanStart,
-    spanLen: span.spanLen,
-    form: span.spanStart >= 0 ? word : '',
+    marks: clean.length ? clean : undefined,
+    ...legacy,
     clue: '',
     flagged: 0,
     flagNote: '',
@@ -279,26 +296,36 @@ export async function updateSentence(id: number, patch: Partial<Sentence>): Prom
  *
  *  ★ 必须**重算高亮区间**：换了句子之后旧的 spanStart 指向的是别的词，
  *    训练页的高亮会打在错误的位置上 —— 那等于告诉用户错误的答案位置，
- *    比不高亮糟得多。重算的顺序：
- *      1. 旧的目标词形态（form）还在新句子里 → 用它；
- *      2. 否则用词条原形（AI 常常换用它的屈折形式）；
+ *    比不高亮糟得多。优先级：
+ *      1. AI 这次给的 marks（能认出 irregular：go → went）；
+ *      2. 旧的目标词形态 + 词条原形在新句子里重新找（规则屈折也认）；
  *      3. 都找不到 → spanStart=-1（`MarkedText` 会退回不高亮，句子仍然可读）。
  */
-export async function replaceSentence(id: number, en: string, zh?: string): Promise<void> {
+export async function replaceSentence(
+  id: number,
+  en: string,
+  zh?: string,
+  marks?: readonly SentenceMark[],
+): Promise<Sentence | undefined> {
   const sen = await db.sentences.get(id)
   if (!sen) return
   const text = en.trim()
   if (!text) return
   const sense = await db.senses.get(sen.senseId)
-  let span = locate(text, sen.form)
-  if (span.spanStart < 0 && sense) span = locate(text, sense.word)
-  await db.sentences.update(id, {
+  let clean = marks?.length ? normalizeMarks(text, marks) : []
+  if (!clean.length) {
+    const oldForms = marksOfSentence(sen).map((m) => m.form)
+    clean = marksFromForms(text, oldForms)
+  }
+  if (!clean.length && sense) clean = marksForWord(text, sense.word)
+  const patch: Partial<Sentence> = {
     en: text,
     zh: (zh ?? sen.zh).trim(),
-    spanStart: span.spanStart,
-    spanLen: span.spanLen,
-    form: span.spanStart >= 0 ? text.slice(span.spanStart, span.spanStart + span.spanLen) : '',
-  })
+    marks: clean.length ? clean : undefined,
+    ...legacySpanOf(clean),
+  }
+  await db.sentences.update(id, patch)
+  return { ...sen, ...patch }
 }
 
 export async function deleteSentence(id: number): Promise<void> {

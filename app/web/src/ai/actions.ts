@@ -40,7 +40,7 @@ async function rowsOf(word: string): Promise<Rows> {
  *    换了个更强的模型、或者改了输出约束，旧缓存里的结果就不再代表现在的质量 ——
  *    这时候必须能把旧缓存整体作废，而不是靠「内容刚好变了」去碰运气。
  */
-const PROMPT_VERSION = 'v1'
+const PROMPT_VERSION = 'v2'
 
 function contextOf(r: Rows): WordContext {
   // ★ 例句不能全带上：一个词 4 个义项 × 5 句就是 20 句，光输入就要两三千 token，

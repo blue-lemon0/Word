@@ -11,8 +11,9 @@
 import { ref, watch } from 'vue'
 import MarkedText from './MarkedText.vue'
 import { db } from '../db'
+import { formsOfSentence } from '../marks'
 import { makeQuestion, newSessionId, recordAnswer, type Question } from '../quiz'
-import { speakEn, speechOn } from '../speech'
+import { speakEn, speechOn, ttsWaiting } from '../speech'
 import { toast } from '../toast'
 import type { Sentence } from '../types'
 
@@ -146,12 +147,15 @@ watch(
 function onPick(w: string): void {
   const q0 = q.value
   if (!q0) return
-  const target = (q0.sentence.form || q0.sense.word).toLowerCase()
-  if (!submitted.value && w.toLowerCase() === target) {
+  const forms = formsOfSentence(q0.sentence, q0.sense.word)
+  const isTarget = forms.includes(w.toLowerCase())
+  if (!submitted.value && isTarget) {
     toast('先作答 —— 答完再看这个词', 1900, true)
     return
   }
-  emit('pick', w)
+  // 句中 goal / goals / went 都是同一个词条；点高亮词形时按词条原形去查，
+  // 否则 went 会被当成一个未入库的新词。
+  emit('pick', isTarget ? q0.sense.word : w)
 }
 
 function reveal(): void {
@@ -191,7 +195,7 @@ defineExpose({ reveal, save, reload: () => load(true) })
           {{ q.sense.word }}
         </button>
         <!-- 喇叭只读词，不读释义 —— 作答前听到意思等于泄题，发音不会 -->
-        <button v-if="speechOn" class="say" type="button" aria-label="朗读单词" @click="speakEn(q.sense.word)">
+        <button v-if="speechOn" class="say" :class="{ waiting: ttsWaiting }" type="button" aria-label="朗读单词" @click="speakEn(q.sense.word)">
           <van-icon name="volume-o" />
         </button>
         <span v-if="q.sense.pos" class="pos">{{ q.sense.pos }}</span>
@@ -206,6 +210,7 @@ defineExpose({ reveal, save, reload: () => load(true) })
             <p class="sn">
               <MarkedText
                 :text="q.sentence.en"
+                :marks="q.sentence.marks"
                 :form="q.sentence.form"
                 :span-start="q.sentence.spanStart"
                 :span-len="q.sentence.spanLen"
@@ -213,7 +218,7 @@ defineExpose({ reveal, save, reload: () => load(true) })
                 @pick="onPick"
               />
             </p>
-            <button v-if="speechOn" class="say sn-say" type="button" aria-label="朗读例句" @click="speakEn(q.sentence.en)">
+            <button v-if="speechOn" class="say sn-say" :class="{ waiting: ttsWaiting }" type="button" aria-label="朗读例句" @click="speakEn(q.sentence.en)">
               <van-icon name="volume-o" />
             </button>
           </div>
@@ -381,6 +386,22 @@ defineExpose({ reveal, save, reload: () => load(true) })
 
 .say:active {
   color: var(--wb-primary);
+}
+
+/* 在线合成等待中：主题色 + 呼吸脉冲，告诉用户「在路上了，别狂点」 */
+.say.waiting {
+  color: var(--wb-primary);
+  animation: say-wait 1s ease-in-out infinite;
+}
+
+@keyframes say-wait {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
 }
 
 .sn-say {

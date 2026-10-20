@@ -1068,6 +1068,7 @@ watch(
                会让人以为坏了（查义本身仍锁着，防止「查一下」变成答题）。 -->
           <MarkedText
             :text="q.sentence.en"
+            :marks="q.sentence.marks"
             :form="q.sentence.form"
             :span-start="q.sentence.spanStart"
             :span-len="q.sentence.spanLen"

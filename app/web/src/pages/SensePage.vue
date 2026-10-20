@@ -30,6 +30,7 @@ import {
   deleteSentence,
   mergeSenses,
   reorderSentences,
+  replaceSentence,
   resetProgress,
   splitSense,
   updateSentence,
@@ -347,11 +348,18 @@ function onDragStart(s: Sentence, ev: PointerEvent): void {
  *  去顶一个已经不在这一页的元素。 */
 onBeforeUnmount(() => setAvoidTarget(null))
 
-function blurSentence(s: Sentence, field: 'en' | 'zh', ev: Event): void {
+async function blurSentence(s: Sentence, field: 'en' | 'zh', ev: Event): Promise<void> {
   // 不在编辑态的失焦一律不写库：否则长按选词时随手点一下页面就能改内容
   if (!isEditing(s)) return
   const val = (ev.target as HTMLElement).innerText.trim()
-  if (val !== s[field]) updateSentence(s.id!, { [field]: val })
+  if (val === s[field]) return
+  if (field === 'en') {
+    const next = await replaceSentence(s.id!, val)
+    if (next) Object.assign(s, next)
+  } else {
+    await updateSentence(s.id!, { zh: val })
+    s.zh = val
+  }
 }
 
 function onDelSentence(s: Sentence): void {
@@ -627,7 +635,13 @@ function onDelete(): void {
                 spellcheck="false"
                 @blur="blurSentence(s, 'en', $event)"
               >
-                <MarkedText :text="s.en" :form="s.form" :span-start="s.spanStart" :span-len="s.spanLen" />
+                <MarkedText
+                  :text="s.en"
+                  :marks="s.marks"
+                  :form="s.form"
+                  :span-start="s.spanStart"
+                  :span-len="s.spanLen"
+                />
               </div>
               <div
                 class="zh"

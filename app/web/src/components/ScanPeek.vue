@@ -49,6 +49,7 @@ const sentence = computed(() => props.item?.sentence)
       <div class="s-en">
         <MarkedText
           :text="sentence.en"
+          :marks="sentence.marks"
           :form="sentence.form"
           :span-start="sentence.spanStart"
           :span-len="sentence.spanLen"

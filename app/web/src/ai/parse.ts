@@ -9,7 +9,8 @@
  *    目标词，那种句子进了库就是一张永远答不对的卡。
  */
 import { guessLemmas } from '../lookup'
-import type { Sense, Sentence } from '../types'
+import { marksForWord, marksFromForms } from '../marks'
+import type { Sense, Sentence, SentenceMark } from '../types'
 import { AiError, type Proposal } from './types'
 
 export interface Bind {
@@ -31,8 +32,10 @@ interface RawProposal {
   en?: string
   zh?: string
   why?: string
+  /** 句中属于目标词的所有词形（AI 输出；落库时算成 marks） */
+  highlights?: unknown
   /** sense.add 自带的例句（新义项没有编号，例句只能跟义项一起提） */
-  sentences?: { en?: string; zh?: string }[]
+  sentences?: { en?: string; zh?: string; highlights?: unknown }[]
   /** sense.update：熟词僻义 */
   trap?: number | boolean
   /** word.update：音标 */
@@ -60,7 +63,8 @@ export function extractJson(text: string): { note?: string; proposals?: RawPropo
   throw new AiError('parse', '回复里找不到合法 JSON')
 }
 
-/** 句子里是否真的出现了这个词（认屈折形式：goal → goals） */
+/** 句子里是否真的出现了这个词（规则能认出的屈折形式）。保留给旧调用/测试；
+ *  新的 AI 句子以 `highlights` 为准，因为规则认不出 went / made 这类不规则变化。 */
 export function sentenceHasWord(en: string, word: string): boolean {
   const w = word.toLowerCase()
   const toks = en.toLowerCase().match(/[a-z']+/g) ?? []
@@ -70,6 +74,22 @@ export function sentenceHasWord(en: string, word: string): boolean {
 const s = (v: unknown): string => (typeof v === 'string' ? v.trim() : '')
 const n = (v: unknown): number | undefined =>
   typeof v === 'number' && Number.isFinite(v) ? v : undefined
+
+/**
+ * 从 AI 的 highlights 落成高亮区间。
+ * - 有 highlights：必须至少有一项能在句中找到，否则这句丢掉（AI 说了高亮却对不上，不可信）。
+ * - 没有 highlights：兼容旧响应，按词条原形 + 规则屈折找；不规则变化会找不到而丢掉。
+ */
+function marksOf(en: string, rawHighlights: unknown, word: string): {
+  marks: SentenceMark[]
+  hasHighlights: boolean
+} {
+  const hasHighlights = Array.isArray(rawHighlights)
+  const marks = hasHighlights
+    ? marksFromForms(en, rawHighlights.filter((x): x is string => typeof x === 'string'))
+    : marksForWord(en, word)
+  return { marks, hasHighlights }
+}
 
 export function parseProposals(
   text: string,
@@ -134,8 +154,13 @@ export function parseProposals(
         dropped.push(`sentence.replace sentenceId=${sen.id} 没有给新句子`)
         continue
       }
-      if (!sentenceHasWord(en, bind.word)) {
-        dropped.push(`新句子里找不到「${bind.word}」`)
+      const { marks, hasHighlights } = marksOf(en, p.highlights, bind.word)
+      if (!marks.length) {
+        dropped.push(
+          hasHighlights
+            ? `换句的高亮词形在句子里找不到（「${bind.word}」）`
+            : `新句子里找不到「${bind.word}」（也没给可用的 highlights）`,
+        )
         continue
       }
       const key = `r:${sen.id}:${en}`
@@ -148,6 +173,7 @@ export function parseProposals(
         label: `s${bySlot.get(bind.senses.find((x) => x.id === sen.senseId)?.slot ?? -1)?.slot ?? '?'} 第 ${sen.idx + 1} 句`,
         en,
         zh: s(p.zh) || sen.zh,
+        marks,
         why: s(p.why),
       })
     } else if (kind === 'sentence.add') {
@@ -161,8 +187,13 @@ export function parseProposals(
         dropped.push(`sentence.add slot=${sense.slot} 没有给句子`)
         continue
       }
-      if (!sentenceHasWord(en, bind.word)) {
-        dropped.push(`新句子里找不到「${bind.word}」`)
+      const { marks, hasHighlights } = marksOf(en, p.highlights, bind.word)
+      if (!marks.length) {
+        dropped.push(
+          hasHighlights
+            ? `补句的高亮词形在句子里找不到（「${bind.word}」）`
+            : `新句子里找不到「${bind.word}」（也没给可用的 highlights）`,
+        )
         continue
       }
       const key = `a:${sense.id}:${en}`
@@ -175,6 +206,7 @@ export function parseProposals(
         label: `s${sense.slot} · ${sense.gloss || '（空释义）'}`,
         en,
         zh: s(p.zh),
+        marks,
         why: s(p.why),
       })
     } else if (kind === 'sense.add') {
@@ -183,20 +215,25 @@ export function parseProposals(
         dropped.push('sense.add 没有给释义')
         continue
       }
-      // 新义项自带的例句：逐条过「必须含目标词」这道门槛，最多留 2 条。
+      // 新义项自带的例句：逐条过「高亮词形必须真的在句子里」这道门槛，最多留 2 条。
       // 模型偶尔会把某句写得漂亮但里面没有目标词 —— 那种句子进库就是一张
       // 永远答不对的卡（与 sentence.add 同一条判据）。
       const rawSents = Array.isArray(p.sentences) ? p.sentences : []
-      const sentences: { en: string; zh?: string }[] = []
+      const sentences: { en: string; zh?: string; marks: SentenceMark[] }[] = []
       for (const rs of rawSents.slice(0, 3)) {
         const en = s(rs?.en)
         if (!en) continue
-        if (!sentenceHasWord(en, bind.word)) {
-          dropped.push(`新义项「${gloss}」的一句例句里找不到「${bind.word}」`)
+        const { marks, hasHighlights } = marksOf(en, rs?.highlights, bind.word)
+        if (!marks.length) {
+          dropped.push(
+            hasHighlights
+              ? `新义项「${gloss}」的一句例句高亮词形对不上`
+              : `新义项「${gloss}」的一句例句里找不到「${bind.word}」（也没给可用的 highlights）`,
+          )
           continue
         }
         if (sentences.some((x) => x.en === en)) continue
-        sentences.push({ en, zh: s(rs?.zh) || undefined })
+        sentences.push({ en, zh: s(rs?.zh) || undefined, marks })
         if (sentences.length >= 2) break
       }
       const key = `n:${gloss}:${s(p.pos)}`

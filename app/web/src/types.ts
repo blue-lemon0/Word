@@ -39,6 +39,15 @@ export interface Sense {
   updatedAt: number
 }
 
+/** 例句里的一处高亮：目标词在句中的字符区间与表面形式。 */
+export interface SentenceMark {
+  /** UTF-16 字符下标，对应 Sentence.en */
+  start: number
+  len: number
+  /** 句中实际出现的词形（如 went / studies），不是固定原形 */
+  form: string
+}
+
 /** 例句 */
 export interface Sentence {
   id?: number
@@ -46,9 +55,17 @@ export interface Sentence {
   idx: number
   en: string
   zh: string
-  /** 句中目标词所在的字符区间 —— 训练页据此高亮（sentence.clue 是给用户的提示语） */
+  /**
+   * 目标词在这句里的**所有**出现位置（数组）。
+   * AI 生成的句子由 highlights 数组落成这个字段；同句可有多个不同词形。
+   * 旧数据没有这个字段时，用下面的 spanStart/spanLen/form 兜底。
+   */
+  marks?: SentenceMark[]
+  /** @deprecated 旧数据兼容；新数据是 marks[0] 的镜像 */
   spanStart: number
+  /** @deprecated 旧数据兼容；新数据是 marks[0] 的镜像 */
   spanLen: number
+  /** @deprecated 旧数据兼容；新数据是 marks[0].form 的镜像 */
   form: string
   clue: string
   /** 「这句有问题」，标记后不再出题 */

@@ -10,17 +10,28 @@
  */
 import { db, ensureProgress } from './db'
 import { normalizeSlots, uuid } from './edit'
+import { legacySpanOf, marksFromForms, normalizeMarks } from './marks'
 import { flagIndexByText, reapplyFlags } from './flags'
 import { snapshot } from './backup'
 import { logImport, runImportTx } from './importWrite'
-import type { Sense, Sentence } from './types'
+import type { Sense, Sentence, SentenceMark } from './types'
 
 /* ── 宽松输入形状：管道包与 AI 产出都吃 ── */
+
+interface RawMark {
+  start?: number
+  len?: number
+  form?: string
+}
 
 interface RawSentence {
   text?: string
   en?: string
+  /** 旧协议：单形态 */
   form?: string
+  /** 新协议：AI 给的句中所有目标词词形 */
+  highlights?: string[]
+  marks?: RawMark[]
   clue?: string
   translation?: string
   zh?: string
@@ -45,6 +56,7 @@ export interface IncomingSentence {
   en: string
   zh: string
   form: string
+  marks: SentenceMark[]
   clue: string
   note: string
 }
@@ -115,10 +127,23 @@ const slotOf = (raw: RawSense, i: number): number =>
   raw.slot ?? (Number(String(raw.senseId ?? '').replace(/\D/g, '')) || i + 1)
 
 function normSentence(raw: RawSentence, word: string): IncomingSentence {
+  const en = (raw.text ?? raw.en ?? '').trim()
+  const form = (raw.form ?? '').trim() || word
+  const typed: SentenceMark[] = (raw.marks ?? [])
+    .map((m) => ({
+      start: Number(m?.start),
+      len: Number(m?.len),
+      form: typeof m?.form === 'string' ? m.form : '',
+    }))
+    .filter((m) => Number.isInteger(m.start) && Number.isInteger(m.len) && m.len > 0 && !!m.form)
+  let marks = normalizeMarks(en, typed)
+  if (!marks.length && Array.isArray(raw.highlights)) marks = marksFromForms(en, raw.highlights)
+  if (!marks.length && form) marks = marksFromForms(en, [form])
   return {
-    en: (raw.text ?? raw.en ?? '').trim(),
+    en,
     zh: (raw.translation ?? raw.zh ?? '').trim(),
-    form: (raw.form ?? word).trim(),
+    form: marks[0]?.form ?? form,
+    marks,
     clue: (raw.clue ?? '').trim(),
     note: (raw.note ?? '').trim(),
   }
@@ -321,16 +346,15 @@ async function writeSentences(
   for (let i = 0; i < list.length; i++) {
     const s = list[i]
     if (!s.en) continue
-    const form = s.form || word
-    const at = s.en.toLowerCase().indexOf(form.toLowerCase())
+    const marks = s.marks.length ? s.marks : marksFromForms(s.en, [s.form || word])
+    const legacy = legacySpanOf(marks)
     await db.sentences.add({
       senseId,
       idx: startIdx + i,
       en: s.en,
       zh: s.zh,
-      spanStart: at >= 0 ? at : -1,
-      spanLen: at >= 0 ? form.length : 0,
-      form: at >= 0 ? form : '',
+      marks: marks.length ? marks : undefined,
+      ...legacy,
       clue: s.clue,
       flagged: 0,
       flagNote: '',

@@ -72,6 +72,7 @@ onMounted(load)
         <span class="tx">
           <MarkedText
             :text="it.sentence.en"
+            :marks="it.sentence.marks"
             :form="it.sentence.form"
             :span-start="it.sentence.spanStart"
             :span-len="it.sentence.spanLen"

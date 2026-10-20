@@ -1,17 +1,19 @@
 <script setup lang="ts">
-/** 例句渲染：把目标词那一段包进 <mark>。
+/** 例句渲染：把目标词在句中的**所有**出现位置包进 <mark>。
  *
- *  span 来自 content-kit 审计脚本的机械定位（sentence_audit.py --fix-spans
- *  可重算），AI 导入的句子则在 import.ts 里现算。两处都保证
- *  text.slice(spanStart, spanStart+spanLen) === form；这里仍做一次校验，
- *  对不上就退回「按 form 找一遍」，找不到就整句不高亮 —— 宁可不高亮，
+ *  marks 是 AI highlights 数组落成的区间（可能多个词形/多次出现）；旧数据
+ *  没有 marks 时回退到 spanStart/spanLen/form。两处都校验「切出来的文本
+ *  真的是 form」，对不上就按 form 重找，找不到就整句不高亮 —— 宁可不高亮，
  *  也不能把高亮打到别的词上（训练时那等于告诉用户错误的答案位置）。
  */
 import { computed } from 'vue'
+import { marksOfSentence } from '../marks'
+import type { SentenceMark } from '../types'
 
 const props = withDefaults(
   defineProps<{
     text: string
+    marks?: SentenceMark[]
     form?: string
     spanStart?: number
     spanLen?: number
@@ -23,27 +25,28 @@ const props = withDefaults(
 
 const emit = defineEmits<{ (e: 'pick', word: string): void }>()
 
-const parts = computed(() => {
-  let start = props.spanStart
-  let len = props.spanLen
-  const ok =
-    start >= 0 && len > 0 && props.text.slice(start, start + len).toLowerCase() === props.form.toLowerCase()
-  if (!ok && props.form) {
-    const i = props.text.toLowerCase().indexOf(props.form.toLowerCase())
-    if (i >= 0) {
-      start = i
-      len = props.form.length
-    } else {
-      start = -1
-      len = 0
-    }
+const hits = computed(() =>
+  marksOfSentence({
+    en: props.text,
+    marks: props.marks,
+    form: props.form,
+    spanStart: props.spanStart,
+    spanLen: props.spanLen,
+  }),
+)
+
+const segments = computed(() => {
+  const list = hits.value
+  if (!list.length) return null
+  const out: { text: string; hit: boolean }[] = []
+  let at = 0
+  for (const m of list) {
+    if (m.start > at) out.push({ text: props.text.slice(at, m.start), hit: false })
+    out.push({ text: props.text.slice(m.start, m.start + m.len), hit: true })
+    at = m.start + m.len
   }
-  if (start < 0) return null
-  return {
-    before: props.text.slice(0, start),
-    hit: props.text.slice(start, start + len),
-    after: props.text.slice(start + len),
-  }
+  if (at < props.text.length) out.push({ text: props.text.slice(at), hit: false })
+  return out
 })
 
 const tokens = computed(() =>
@@ -52,11 +55,13 @@ const tokens = computed(() =>
     : null,
 )
 
+const hitForms = computed(() => new Set(hits.value.map((m) => m.form.toLowerCase())))
+
 /** 可点模式下某个词是不是目标词 —— 高亮和「顺藤摸瓜」要各管各的：
- *  高亮告诉眼睛「看这里」，点击是去那个词的词条。所以两者都要认 form。 */
+ *  高亮告诉眼睛「看这里」，点击是去那个词的词条。所以两者都要认高亮词形。 */
 function isHit(tok: string): boolean {
-  if (!props.form) return false
-  return tok.toLowerCase().replace(/[^a-z0-9'-]/g, '') === props.form.toLowerCase()
+  const w = tok.toLowerCase().replace(/[^a-z0-9'-]/g, '')
+  return !!w && hitForms.value.has(w)
 }
 
 function onPickToken(tok: string): void {
@@ -86,8 +91,11 @@ function onPickToken(tok: string): void {
       >{{ tok }}</span
     >
     </span>
-    <template v-else-if="parts">
-      {{ parts.before }}<mark>{{ parts.hit }}</mark>{{ parts.after }}
+    <template v-else-if="segments">
+      <template v-for="(seg, i) in segments" :key="i">
+        <mark v-if="seg.hit">{{ seg.text }}</mark>
+        <template v-else>{{ seg.text }}</template>
+      </template>
     </template>
     <template v-else>{{ text }}</template>
   </span>

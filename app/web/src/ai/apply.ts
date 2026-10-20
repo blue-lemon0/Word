@@ -38,7 +38,7 @@ export async function applyOne(p: Proposal): Promise<string> {
       return `改了 s${p.slot} 的释义`
     }
     case 'sentence.replace': {
-      await replaceSentenceEdit(p.sentenceId, p.en, p.zh)
+      await replaceSentenceEdit(p.sentenceId, p.en, p.zh, p.marks)
       return '换了一条例句'
     }
     case 'word.update': {
@@ -48,7 +48,7 @@ export async function applyOne(p: Proposal): Promise<string> {
     case 'sentence.add': {
       const sense = await db.senses.get(p.senseId)
       if (!sense) throw new Error('义项不存在')
-      await addSentenceEdit(p.senseId, sense.word, p.en, p.zh ?? '')
+      await addSentenceEdit(p.senseId, sense.word, p.en, p.zh ?? '', p.marks)
       return `给 s${sense.slot} 补了一句`
     }
     case 'sense.add': {
@@ -56,7 +56,7 @@ export async function applyOne(p: Proposal): Promise<string> {
       if (p.pos) await updateSense(id, { pos: p.pos })
       // 新义项自带的例句：现在它才有 id，能挂上去了
       for (const s of p.sentences ?? []) {
-        await addSentenceEdit(id, p.word, s.en, s.zh ?? '')
+        await addSentenceEdit(id, p.word, s.en, s.zh ?? '', s.marks)
       }
       const n = p.sentences?.length ?? 0
       return `新增了义项：${p.gloss}${n ? `（含 ${n} 句例句）` : ''}`

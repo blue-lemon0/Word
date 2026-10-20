@@ -5,7 +5,7 @@
  *  provider（DeepSeek / 别的兼容接口）与传输方式（fetch / 原生桥）
  *  都在下面一层解决，这里一个字都不提。
  */
-import type { Sense, Sentence } from '../types'
+import type { Sense, Sentence, SentenceMark } from '../types'
 
 export type AiActionKind = 'reviewWord' | 'addSentence' | 'replaceSentence' | 'fillWord'
 
@@ -45,6 +45,8 @@ export type Proposal =
       label: string
       en: string
       zh?: string
+      /** AI highlights 数组落成的所有高亮区间（可多个词形/多次出现） */
+      marks: SentenceMark[]
       why?: string
     }
   | {
@@ -54,6 +56,7 @@ export type Proposal =
       label: string
       en: string
       zh?: string
+      marks: SentenceMark[]
       why?: string
     }
   | {
@@ -67,7 +70,7 @@ export type Proposal =
        *  ★ 为什么例句必须**跟着义项一起提**：义项还没落库时它没有 id/slot，
        *    单独一条 `sentence.add` 无从绑定（parse 会把它丢掉）。
        *    所以「新建义项 + 它的例句」是一个原子提案：要么一起进，要么都不进。 */
-      sentences?: { en: string; zh?: string }[]
+      sentences?: { en: string; zh?: string; marks: SentenceMark[] }[]
     }
 
 /** 调用统计：只用来告诉用户「这次花了多少」，不做计费 */
