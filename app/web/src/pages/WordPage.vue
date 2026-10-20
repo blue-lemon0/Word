@@ -23,6 +23,7 @@ import { addSense, purgeWord, updateWord } from '../edit'
 import { useDragReorder } from '../draglist'
 import { aiPrompt } from '../import'
 import { goBack } from '../nav'
+import { speakEn, speechOn, ttsWaiting } from '../speech'
 import { toast } from '../toast'
 import { describeAiError, type AiResult } from '../ai/types'
 import { fillWord, reviewWord } from '../ai/actions'
@@ -334,7 +335,19 @@ function onAsk(): void {
 
       <template v-else>
       <section class="wb-card head">
-        <div class="big">{{ props.word }}</div>
+        <div class="bigrow">
+          <div class="big">{{ props.word }}</div>
+          <button
+            v-if="speechOn"
+            class="wb-say"
+            :class="{ waiting: ttsWaiting }"
+            type="button"
+            aria-label="朗读单词"
+            @click="speakEn(props.word)"
+          >
+            <van-icon name="volume-o" />
+          </button>
+        </div>
         <!-- 音标可点即改：这是**唯一**能修音标的地方。
              为什么需要它：AI 之前会自作主张改写已有音标（把 /ˈæspɛkt/ 改成丢了重音的
              /æspekt/），现在我们只允许它补缺；但「补错了/想自己填」总得有个入口。
@@ -488,6 +501,12 @@ function onAsk(): void {
 </template>
 
 <style scoped>
+.head .bigrow {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
 .head .big {
   font-size: 26px;
   font-weight: 700;

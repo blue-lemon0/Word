@@ -365,3 +365,33 @@ mark {
     max-width: 900px;
   }
 }
+
+/* 朗读喇叭（全局，QuestionBox 之外的页面统一用它）：
+   平时灰色不抢戏；等待在线合成时主题色呼吸 —— 「在路上了，别狂点」。 */
+.wb-say {
+  border: 0;
+  background: transparent;
+  color: var(--wb-ink-3);
+  font-size: 17px;
+  padding: 2px 4px;
+  cursor: pointer;
+}
+
+.wb-say:active {
+  color: var(--wb-primary);
+}
+
+.wb-say.waiting {
+  color: var(--wb-primary);
+  animation: wb-say-wait 1s ease-in-out infinite;
+}
+
+@keyframes wb-say-wait {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}

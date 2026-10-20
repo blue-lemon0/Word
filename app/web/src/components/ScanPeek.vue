@@ -11,6 +11,7 @@
  */
 import { computed } from 'vue'
 import MarkedText from './MarkedText.vue'
+import { speakEn, speechOn, ttsWaiting } from '../speech'
 import type { ScanItem } from '../quiz'
 
 const props = defineProps<{
@@ -45,17 +46,30 @@ const sentence = computed(() => props.item?.sentence)
         <span class="n">{{ total }} 句</span>
       </header>
 
-      <!-- 这句：英文高亮目标词 + 中文翻译 -->
-      <div class="s-en">
-        <MarkedText
-          :text="sentence.en"
-          :marks="sentence.marks"
-          :form="sentence.form"
-          :span-start="sentence.spanStart"
-          :span-len="sentence.spanLen"
-          pickable
-          @pick="emit('word', $event)"
-        />
+      <!-- 这句：英文高亮目标词 + 中文翻译。喇叭读整句 —— 这里是「查」，
+           答案都摊开了，听句子不涉泄题。 -->
+      <div class="s-enrow">
+        <div class="s-en">
+          <MarkedText
+            :text="sentence.en"
+            :marks="sentence.marks"
+            :form="sentence.form"
+            :span-start="sentence.spanStart"
+            :span-len="sentence.spanLen"
+            pickable
+            @pick="emit('word', $event)"
+          />
+        </div>
+        <button
+          v-if="speechOn"
+          class="wb-say"
+          :class="{ waiting: ttsWaiting }"
+          type="button"
+          aria-label="朗读例句"
+          @click="speakEn(sentence.en)"
+        >
+          <van-icon name="volume-o" />
+        </button>
       </div>
       <p v-if="sentence.zh" class="s-zh">{{ sentence.zh }}</p>
 
@@ -102,6 +116,22 @@ const sentence = computed(() => props.item?.sentence)
 .hd .n {
   font-size: 11.5px;
   color: var(--wb-ink-3);
+}
+
+.s-enrow {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.s-enrow .s-en {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.s-enrow .wb-say {
+  flex: 0 0 auto;
+  margin-top: 1px;
 }
 
 .s-en {

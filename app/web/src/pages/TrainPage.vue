@@ -30,6 +30,7 @@ import {
   type SessionStats,
 } from '../quiz'
 import { toast } from '../toast'
+import { speakEn, speechOn, ttsWaiting } from '../speech'
 import { db } from '../db'
 import type { Sentence, Sense } from '../types'
 import QuickEdit from '../components/QuickEdit.vue'
@@ -1319,6 +1320,17 @@ watch(
           <div class="sp-card">
             <p v-if="spellCur?.pos" class="sp-pos">{{ spellCur.pos }}</p>
             <p class="sp-gloss">{{ spellCur?.gloss }}</p>
+            <!-- 听音拼词是经典玩法：喇叭读的是单词本身，不碰释义，不泄题 -->
+            <button
+              v-if="speechOn && spellCur"
+              class="wb-say sp-say"
+              :class="{ waiting: ttsWaiting }"
+              type="button"
+              aria-label="朗读单词"
+              @click="speakEn(spellCur.word)"
+            >
+              <van-icon name="volume-o" /> 听一听
+            </button>
             <!-- 长度是免费的底牌，一直亮着；「提示」才翻首字母 -->
             <p class="sp-hint" :class="{ on: spellHint }">
               {{ spellHint ? spellHintText : `${spellCur?.word.length ?? 0} 个字母` }}
@@ -2259,6 +2271,12 @@ watch(
   line-height: 1.5;
   font-weight: 650;
   color: var(--wb-ink);
+}
+
+/* 拼写卡的喇叭带文字「听一听」，比纯图标小一号 */
+.sp-say {
+  margin-top: 8px;
+  font-size: 13px;
 }
 
 .sp-hint {

@@ -40,6 +40,7 @@ import { aiPrompt } from '../import'
 import { useDragReorder } from '../draglist'
 import { setAvoidTarget } from '../keyboard'
 import { goBack } from '../nav'
+import { speakEn, speechOn, ttsWaiting } from '../speech'
 import { toast } from '../toast'
 import { addSentence as aiAddSentence, replaceSentence as aiReplaceSentence } from '../ai/actions'
 import { aiReady } from '../ai/config'
@@ -654,6 +655,16 @@ function onDelete(): void {
                 {{ s.zh }}
               </div>
               <div class="ops">
+                <button
+                  v-if="speechOn"
+                  class="wb-say"
+                  :class="{ waiting: ttsWaiting }"
+                  type="button"
+                  aria-label="朗读例句"
+                  @click="speakEn(s.en)"
+                >
+                  <van-icon name="volume-o" />
+                </button>
                 <van-button size="mini" plain :type="s.flagged ? 'warning' : 'default'" @click="onFlag(s)">
                   {{ s.flagged ? '★ 有问题' : '☆ 标记' }}
                 </van-button>
@@ -1057,6 +1068,11 @@ function onDelete(): void {
   margin-top: 8px;
   flex-wrap: wrap;
   opacity: 0.75;
+}
+
+/* 喇叭与 mini 按钮等高对齐（van-button 自带高度，裸按钮要跟它对齐） */
+.ops .wb-say {
+  align-self: center;
 }
 
 .add {

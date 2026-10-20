@@ -16,6 +16,7 @@ import { dueText, repsText } from '../composables'
 import { allProgress, allSentences, liveSenses } from '../db'
 import BackBtn from '../components/BackBtn.vue'
 import { goBack } from '../nav'
+import { speakEn, speechOn, ttsWaiting } from '../speech'
 import { clearFlags, downloadFlags, listFlags, type FlagRow } from '../flags'
 import { toast } from '../toast'
 import type { Progress, Sense, Sentence } from '../types'
@@ -167,7 +168,17 @@ onMounted(load)
       <div v-for="r in shown" v-else :key="r.sense.id" class="wb-card item" @click="router.push(`/sense/${r.sense.id}`)">
         <div class="fh">
           <b class="w">{{ r.sense.word }}</b>
-          
+          <button
+            v-if="speechOn"
+            class="wb-say"
+            :class="{ waiting: ttsWaiting }"
+            type="button"
+            aria-label="朗读单词"
+            @click.stop="speakEn(r.sense.word)"
+          >
+            <van-icon name="volume-o" />
+          </button>
+
           <van-tag v-if="r.sense.pos" plain round>{{ r.sense.pos }}</van-tag>
           <span class="wb-sp" />
           <van-tag plain round :type="MASTERY_TYPE[mastery(r.prog)]">
