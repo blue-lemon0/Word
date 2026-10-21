@@ -23,6 +23,10 @@ app/android/app/build/
 app/android/local.properties
 app/android/.idea/
 app/android/*.iml
+# release 签名：密钥与密码只在本机，绝不入库
+app/android/keystore.properties
+*.jks
+*.p12
 # 打包脚本会把 web/dist 拷进这里，是产物
 app/android/app/src/main/assets/
 
@@ -50,3 +54,6 @@ app/app/
 # 当时只挡了 app/android/.idea/ —— 于是 `git add -A` 把本机配置扫进了提交。
 .idea/
 *.iml
+# 本机工具配置，不入库
+.opencode/
+.vscode/

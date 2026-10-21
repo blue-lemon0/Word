@@ -1,5 +1,5 @@
 // 最小学习循环的端到端验收。
-//   node scripts/e2e_loop.mjs
+//   node app/tests/e2e_loop.mjs
 //
 // 覆盖：进度持久化、到期判定、幂等、事务原子性、SRS 数值（与 verify_srs.py 对齐）。
 // 用临时 db，不碰 app/state/user.db。

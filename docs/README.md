@@ -8,7 +8,6 @@
 | 文档 | 作用 |
 | --- | --- |
 | [design/03-记忆曲线与复习.md](design/03-记忆曲线与复习.md) | SRS 行为规范：S/D 分离、TRAP 短间隔、90 天掌握门槛（已实现） |
-| [design/05-数据模型-SQLite.md](design/05-数据模型-SQLite.md) | 旧进度库目标模型；落地为 4 表，SQL 在 `app/schema.sql`（已实现） |
 | [DESIGN-词库系统v2.md](DESIGN-词库系统v2.md) | 应用搬到浏览器端的设计：Vue 3 + Dexie、义项 UUID 锚点（已实现） |
 | [AI-操作手机闭环.md](AI-操作手机闭环.md) | AI 助手在手机上的操作闭环 |
 
@@ -23,6 +22,14 @@
 - **D41** 词库按学习进度组织 · **D42** 加词一步到能背 · **D43** 训练页返回栈
 - **D44** 首页随手背一句 · **D46** 练习是浮层 · **D47** 练习是首页的副页
 - **D50** 首页两屏定稿 · **D51** 冗余判定标准 · **D52** 拼写加练 · **D53** 更名与图标
+
+## 历史参考
+
+- [design/05-数据模型-SQLite.md](design/05-数据模型-SQLite.md) — 旧进度库目标模型（已冻结）；SQL 真相源在 `app/schema.sql`，仅作 SQLite/Room 移植参照
+
+## 发布
+
+- [RELEASE-SIGNING.md](RELEASE-SIGNING.md) — Android 正式包签名、产物与发布前检查
 
 ## 笔记（docs/notes/）
 

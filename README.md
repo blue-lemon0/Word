@@ -27,9 +27,10 @@ cd app/web
 npm install
 npm run dev               # -> http://127.0.0.1:5180/
 npm run apk               # 构建 + 自检 + 装到真机（需 adb + JDK）
+npm run apk:release       # 签名 APK + AAB（本机需配置 keystore，见 docs/RELEASE-SIGNING.md）
 ```
 
-首次打开自动灌 `public/seed.json`（66 词）；正式词库在应用内
+首次打开自动灌 `public/seed.json`（18 词 / 66 义项）；正式词库在应用内
 「词库 → 导入内容包」选 `build/bundle/cards.json`（7884 卡，本机历史产物）。
 
 ## 目录导航

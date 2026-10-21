@@ -927,11 +927,13 @@ interaction = [
      and _re.search(r"rows\.senses\.every\(\(s\) => !s\.gloss\.trim\(\)\)", _ai_src("actions.ts")) is not None
      and _re.search(r"const hollow = computed", word) is not None
      and "runFill(" in word),
-    # 新义项没有 id/slot，所以它的例句必须**跟着义项一起提**，落库时再挂上去。
-    # 分成两条提案的话，parse 绑不到 slot，例句会被丢掉 —— 而且不报错。
-    ("新义项自带的例句跟义项一起提、一起落库",
+    # 义项没有 id/slot（新义项）或要替换旧句（占位义项 update）时，例句都必须
+    # **跟着义项一起提**，落库时再挂上去。分成两条提案的话，parse 绑不到 slot，
+    # 例句会被静默丢掉。补全现在走 update/add 两条路，所以两处都要带 sentences。
+    ("义项自带的例句跟义项一起提、一起落库",
      "sentences?: { en: string; zh?: string; marks: SentenceMark[] }[]" in _ai_src("types.ts")
-     and _re.search(r"rawSents\.slice\(0, 3\)", _ai_src("parse.ts")) is not None
+     and "function readSentences(" in _ai_src("parse.ts")
+     and _ai_src("parse.ts").count("const sentences = readSentences(") >= 2
      and _re.search(r"for \(const s of p\.sentences", _ai_src("apply.ts")) is not None),
 
     # ── 用到的 Vant 组件必须注册过（坑 52 的同族）──

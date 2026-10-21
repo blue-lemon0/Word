@@ -1,6 +1,6 @@
 /** SRS —— 从 app/srs.mjs 逐函数移植，公式与参数一字不改。
  *
- *  为什么不重新实现：`srs.mjs` 是 `scripts/verify_srs.py` 的参照对象，
+ *  为什么不重新实现：`srs.mjs` 是 `app/tests/verify_srs.py` 的参照对象，
  *  两边比对黄金向量；`app/state/*.db` 里的历史进度是按这套公式算出来的。
  *  移植版必须与它**数值完全一致**，否则旧进度接不上、复习间隔会突变。
  *

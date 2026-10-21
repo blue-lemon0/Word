@@ -7,8 +7,8 @@ Vue 3 + TypeScript + Vant，数据落 **IndexedDB**（Dexie），不依赖 Node 
 内容模型与交互取舍见
 [`docs/DESIGN-词库系统v2.md`](../../docs/DESIGN-词库系统v2.md)。
 
-取代了原来的单文件原型 `app/web/index.html`（原型存档在 `prototype-v2/3/4.html`，
-定稿是 **v4**）。SRS 引擎仍在 [`app/srs.mjs`](../srs.mjs) 里当参照，
+取代了原来的单文件原型 `app/web/index.html`（现存原型是 `prototype-v4.html`
+和 `proto.js`，定稿是 **v4**）。SRS 引擎仍在 [`app/srs.mjs`](../srs.mjs) 里当参照，
 浏览器版是逐函数移植，见下文「移植一致性」。
 
 ## 跑起来
@@ -40,7 +40,7 @@ npm run test:pwa       # PWA 装配检查（manifest/图标/meta/sw）
 
 | | Android | iPhone |
 |---|---|---|
-| **A. APK（推荐）** | `npm run apk` —— 连 USB 自动装，桌面出现「词库」图标 | 做不了 APK，走 B |
+| **A. APK（推荐）** | `npm run apk` —— 连 USB 自动装，桌面出现「极简单词」图标 | 做不了 APK，走 B |
 | **B. PWA** | 浏览器打开 HTTPS 地址 → 添加到主屏幕 | **只能用这条**：Safari 打开 → 分享 → 添加到主屏幕 |
 
 ### A. Android 壳（`npm run apk`）
@@ -48,6 +48,7 @@ npm run test:pwa       # PWA 装配检查（manifest/图标/meta/sw）
 ```bash
 npm run apk                    # 构建 + 装到已连接的手机
 npm run apk -- --no-install    # 只出包：app/android/app/build/outputs/apk/debug/app-debug.apk
+npm run apk:release            # 签名 APK + AAB，默认不安装
 ```
 
 要装的只有两个东西：Android SDK 的 `platform-tools`（adb）和一个 JDK
@@ -58,15 +59,18 @@ vite build → dist 拷进 app/android/app/src/main/assets → 图标各密度
             → gradle assembleDebug → adb install
 ```
 
-产物约 1.7 MB。**壳里只有 WebView + 一层 assets 映射**：
+正式包走 `gradle assembleRelease` / `bundleRelease`，签名配置和密钥保管见
+[`docs/RELEASE-SIGNING.md`](../../docs/RELEASE-SIGNING.md)。debug 包约 4 MB，
+release 开 R8 后约 0.9 MB。**壳里只有 WebView + 一层 assets 映射**：
 
 - `MainActivity.java` 用 `WebViewAssetLoader` 把 assets 挂在虚拟域名
   `https://appassets.androidplatform.net/` 下 —— **必须是 https**，
   否则 service worker、`crypto.randomUUID`、IndexedDB 都不工作。
 - `ServiceWorkerControllerCompat` 必须设上：SW 自己发的请求走不到
   assets 映射，离线能力会坏。
-- APK 里**不放词库**。首次打开灌 `seed.json`，正式词库在应用内导入。
-  所以 APK 一直是 1.7 MB，加多少词都不变大。
+- APK 里**不放完整词库**。首次打开灌 `seed.json`（约 25 KB 种子），正式词库
+  在应用内导入。所以安装包大小基本固定（debug 约 4 MB，release 约 0.9 MB），
+  加多少词都不变大。
 
 ### B. PWA（iPhone 只能走这条）
 

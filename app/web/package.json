@@ -14,6 +14,7 @@
     "test": "node tests/srs_parity.mjs && node tests/flow_smoke.mjs",
     "test:pwa": "npm run build && node tests/pwa_check.mjs",
     "apk": "node scripts/build_apk.mjs",
+    "apk:release": "node scripts/build_apk.mjs --release --aab",
     "serve:dist": "vite preview --host"
   },
   "dependencies": {

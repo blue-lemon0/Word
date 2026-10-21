@@ -1,8 +1,8 @@
 // SRS 引擎 —— 03-记忆曲线与复习.md 的可执行版本。
 //
 // 公式与参数分离：参数全部读 app/config/srs_params.tsv，代码里没有魔法数。
-// scripts/verify_srs.py 是同一批公式的 Python 参考实现，
-// scripts/e2e_loop.mjs 会逐个比对两边的输出（黄金向量），
+// app/tests/verify_srs.py 是同一批公式的 Python 参考实现，
+// app/tests/e2e_loop.mjs 会逐个比对两边的输出（黄金向量），
 // 所以将来移植到 Kotlin 时有一份可对照的数值基准。
 
 import fs from 'node:fs';

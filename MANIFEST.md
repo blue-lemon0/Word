@@ -39,12 +39,16 @@ app/           背单词应用
     src/srs.ts                   app/srs.mjs 的逐函数移植（数值必须一致，有测试）
     src/quiz.ts importer.ts      出题与导入对比；import.ts 吃两种 JSON
     src/backup.ts                word.backup v2 导出/恢复 + 自动快照回滚
+    src/sentence-health.ts       单句义项的健康线（每义项 2 句）
     src/pages/                   首页 单词页 意思页 词库 训练 错题板 更多
+    src/components/              QuestionBox / ScanList / BatchSentencesSheet 等共用组件
     public/seed.json             首次启动的种子（cards_v2.json 副本）
     tests/                       srs_parity / flow_smoke / schema_upgrade / perf_probe / pwa_check / cdp / screencast_frames / overscroll_probe
-    prototype-v2/3/4.html        设计原型，定稿是 v4（UI 照它做的）
+    prototype-v4.html + proto.js 设计原型，定稿是 v4（UI 照它做的）
     DEBUG-RUNBOOK.md             真机排查手册（崩溃/卡死/日志/CDP 的坑）
   android/                      Android 壳（WebView + assets 映射），`npm run apk` 一条命令打包安装
+    keystore.properties.example  release 签名配置模板（真实 properties / keystore 不入库）
+    app/proguard-rules.pro       release R8 规则（保留 @JavascriptInterface 桥方法）
   server.mjs db.mjs srs.mjs      旧服务端骨架：HTTP / 内容包守门与投影 / SRS 参照实现
   schema.sql                     旧进度库 schema 真相源
   config/srs_params.tsv          SRS 参数唯一真相源（web 侧 JSON 由它生成）
@@ -168,8 +172,21 @@ node app/web/tests/audit_drive.mjs
    直接让 AI 换掉这句）、整词审查/补全（D38，词条页）、整库体检（D40，更多 → AI 体检）。
    体检是二级页：逐词串行、逐词确认、随时能停；**进度就是缓存**，
    跑过的词再跑 0 花费；排序是「需精修 > 缺音标 > 例句少」。
-   为此提议类型扩到五种：改释义（含熟词僻义 `trap`）、补音标（`word.update`）、
-   补例句（跟义项一起提）、换例句、加义项/例句。
+    为此提议类型扩到五种：改释义（含熟词僻义 `trap`）、补音标（`word.update`）、
+    补例句（跟义项一起提）、换例句、加义项/例句。
+12. **单句义项批量补句（2026-10-21）**：词库页「补例句」只扫当前单句义项，
+    每个义项补到 2 句（`sentence-health.ts` 是唯一判定口径）；一条提案里
+    `sense.update` 也带 `sentences[]`，任一义项不够就整份拒绝（全有或全无）。
+    预览可取消整组、可中途停止，已应用的保留；每组的成功/失败都汇总。
+13. **训练页返回保进度 + 释义显式编辑（2026-10-21）**：从词条/意思详情返回
+    训练页时用 `fromDetail` 跳过 query watcher，保留 `queue/steps/cursor`，
+    不再重置整轮；中文释义默认只读，点右侧铅笔才进入编辑，完成或失焦保存。
+14. **正式包签名演练（2026-10-21）**：release 签名从
+    `app/android/keystore.properties` 读取，真实密钥与密码在仓库外；
+    `npm run apk:release` 产出签名 APK + AAB，默认不安装。release 开 R8，
+    `proguard-rules.pro` 显式保留 `NativeBridge` 的 `@JavascriptInterface` 方法。
+    发布前必须先定最终项目名/应用名/`applicationId`，详见
+    [docs/RELEASE-SIGNING.md](docs/RELEASE-SIGNING.md)。
 
 ## 移植清单（→ Kotlin/Android）
 

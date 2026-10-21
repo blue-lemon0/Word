@@ -1,17 +1,18 @@
 /** 一条命令：构建前端 → 打进 APK → 装到已连接的手机。
  *
- *      npm run apk              构建 + 安装
- *      npm run apk -- --no-install   只出包不装
+ *      npm run apk                     debug：构建 + 安装
+ *      npm run apk -- --no-install     debug：只出包不装
+ *      npm run apk:release             release：签名 APK + AAB，不自动安装
  *
- *  产物在 app/android/app/build/outputs/apk/debug/app-debug.apk，
- *  也可以直接拷到手机上点开装（debug 包允许未知来源）。
+ *  debug 产物在 app/android/app/build/outputs/apk/debug/app-debug.apk；
+ *  release 产物在 app/android/app/build/outputs/apk/release/ 和 bundle/release/。
  *
  *  它做的事（顺序不能换）：
  *    1. vite build（没有 dist 才跑）
  *    2. dist → app/android/app/src/main/assets（先清空，避免残留上个版本）
  *    3. 图标各密度
- *    4. gradle assembleDebug
- *    5. adb install
+ *    4. gradle assembleDebug / assembleRelease（release 另出 AAB）
+ *    5. debug 包 adb install（release 需显式 --install）
  *
  *  第 2 步为什么先清空：APK 里装的是**上个版本的页面**这种错，只有
  *  「换手机后打开发现功能不对、重新装就好了」的诡异现象，因为漏删的文件
@@ -68,7 +69,9 @@ const SDK = process.env.ANDROID_HOME ?? 'D:/software/Android/Sdk'
 const JDK = process.env.JAVA_HOME ?? 'D:/software/Android/Android Studio/jbr'
 const ADB = path.join(SDK, 'platform-tools', 'adb.exe')
 
-const install = !process.argv.includes('--no-install')
+const release = process.argv.includes('--release')
+const buildAab = release && process.argv.includes('--aab')
+const install = !process.argv.includes('--no-install') && (!release || process.argv.includes('--install'))
 const log = (m) => console.log(`· ${m}`)
 
 function walk(dir) {
@@ -99,6 +102,20 @@ function findGradle() {
   const local = path.join(ANDROID, 'gradlew.bat')
   if (existsSync(local)) return local
   throw new Error('找不到 gradle：装过 Android Studio 的机器上，wrapper 缓存里通常有')
+}
+
+function findBuildTool(name) {
+  const root = path.join(SDK, 'build-tools')
+  if (!existsSync(root)) return null
+  const dirs = readdirSync(root)
+    .filter((d) => statSync(path.join(root, d)).isDirectory())
+    .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+    .reverse()
+  for (const d of dirs) {
+    const file = path.join(root, d, name)
+    if (existsSync(file)) return file
+  }
+  return null
 }
 
 /* 1. 前端产物：**每次都重新构建**，不因为 dist 存在就跳过。
@@ -140,18 +157,53 @@ for (const [dir, px] of [
 log('图标 5 档已生成')
 
 /* 4. gradle */
+if (release && !existsSync(path.join(ANDROID, 'keystore.properties'))) {
+  throw new Error(
+    'release 构建缺少 app/android/keystore.properties。\n' +
+      '  参考 app/android/keystore.properties.example 配置签名密钥。',
+  )
+}
 const gradle = findGradle()
-execFileSync(`"${gradle}" assembleDebug --console=plain`, {
+const task = release ? 'assembleRelease' : 'assembleDebug'
+execFileSync(`"${gradle}" ${task} --console=plain`, {
   cwd: ANDROID,
   stdio: 'inherit',
   shell: true,
   env: { ...process.env, JAVA_HOME: JDK, ANDROID_HOME: SDK, ANDROID_SDK_ROOT: SDK },
 })
-const apkDir = path.join(ANDROID, 'app', 'build', 'outputs', 'apk', 'debug')
+const apkDir = path.join(ANDROID, 'app', 'build', 'outputs', 'apk', release ? 'release' : 'debug')
 const apks = existsSync(apkDir) ? readdirSync(apkDir).filter((f) => f.endsWith('.apk')) : []
 if (!apks.length) throw new Error('gradle 跑完了但没找到 APK')
-const apk = path.join(apkDir, apks[0])
+const apk = path.join(apkDir, apks.find((f) => f === `app-${release ? 'release' : 'debug'}.apk`) ?? apks[0])
 log(`APK：${apk}（${(statSync(apk).size / 1024).toFixed(0)} KB）`)
+
+if (release) {
+  const apksigner = findBuildTool('apksigner.bat')
+  if (!apksigner) throw new Error('找不到 apksigner：检查 Android SDK build-tools')
+  log('验证 APK 签名')
+  execFileSync(apksigner, ['verify', '--print-certs', apk], {
+    stdio: 'inherit',
+    shell: true,
+    env: { ...process.env, JAVA_HOME: JDK },
+  })
+}
+
+let aab = null
+if (buildAab) {
+  execFileSync(`"${gradle}" bundleRelease --console=plain`, {
+    cwd: ANDROID,
+    stdio: 'inherit',
+    shell: true,
+    env: { ...process.env, JAVA_HOME: JDK, ANDROID_HOME: SDK, ANDROID_SDK_ROOT: SDK },
+  })
+  aab = path.join(ANDROID, 'app', 'build', 'outputs', 'bundle', 'release', 'app-release.aab')
+  if (!existsSync(aab)) throw new Error('gradle 跑完了但没找到 AAB')
+  const jarsigner = path.join(JDK, 'bin', 'jarsigner.exe')
+  log('验证 AAB 签名')
+  execFileSync(jarsigner, ['-verify', aab], { stdio: 'pipe' })
+  log('AAB 签名校验通过（jarsigner 的 JAR 一致性警告属正常）')
+  log(`AAB：${aab}（${(statSync(aab).size / 1024).toFixed(0)} KB）`)
+}
 
 /* 4b. 自检：APK 里真的装进了刚构建出来的那份 dist 吗？
  *
@@ -184,7 +236,7 @@ if (apkHtml && bundleName) {
 
 /* 5. 装到手机 */
 if (!install) {
-  log('--no-install，跳过安装')
+  log(release ? 'release 包不自动安装（需要时显式加 --install）' : '--no-install，跳过安装')
   process.exit(0)
 }
 if (!existsSync(ADB)) {
@@ -208,5 +260,5 @@ for (const r of ready) {
   log(`安装到 ${serial}`)
   execFileSync(ADB, ['-s', serial, 'install', '-r', '-d', apk], { stdio: 'inherit' })
 }
-log('装好了：桌面上的图标叫「极简单词」，包名 com.wordbank.app.debug')
+log(`装好了：桌面上的图标叫「极简单词」，包名 ${release ? 'com.wordbank.app' : 'com.wordbank.app.debug'}`)
 log('★ 换手机/重装前记得在「更多 → 导出」备份 —— 学习进度存在手机本地，重装会没')

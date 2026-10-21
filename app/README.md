@@ -110,17 +110,14 @@ node app/web/tests/srs_parity.mjs   # 浏览器版 SRS 与 app/srs.mjs 逐格比
 node app/web/tests/flow_smoke.mjs    # 数据层端到端（fake-indexeddb + esbuild）
 ```
 
-旧服务端那一线：
+旧服务端那一线（旧单页 UI 的 `e2e_d16.js` 已随 UI 退场删除，不再列出）：
 
 ```bash
 node app/tests/e2e_loop.mjs     # SRS 数值、事务、幂等、持久化（纯 Node）
 python app/tests/verify_srs.py  # SRS 参数推演基准
-node app/tests/e2e_d16.js       # 旧单页 UI 端到端（jsdom；那份 UI 已退场）
 python app/tests/smoke_http.py  # HTTP 冒烟，需先启动 server
 ```
 
-- `e2e_d16.js` 需要 jsdom：运行前把 jsdom 的安装目录加入 `NODE_PATH`。
-  它测的是已被 Vue 应用取代的那份单页 UI，只作历史参考。
 - **`smoke_http.py` 会重建它打到的库、清空进度**——日常有学习进度时不要
   打到主库；要跑就给服务配临时库（如 `WORD_DB=app/state/test.db`）再跑。
 - 改内容侧后从仓库根跑 `python scripts/verify_docs.py`，它会同时校验
