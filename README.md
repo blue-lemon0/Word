@@ -50,6 +50,44 @@ word.backup v2               学习进度与内容备份包
 | [CONTRACT.md](CONTRACT.md) | 内容包 v1 / 进度包格式约定 |
 | [MANIFEST.md](MANIFEST.md) | 全仓文件台账、已知缺口、移植 Kotlin/Android 清单 |
 
+## 技术栈与架构
+
+**前端（唯一 UI 与运行时）**
+
+- Vue 3 + Vite + TypeScript，Vant 组件库；Dexie 封 IndexedDB 做本地存储
+- 无后端依赖：内容包（JSON）导入后全部离线，进度库与内容包一一隔离
+- 自研翻页封装 `useSnapPager`：落定模型统一管程序化翻页与滚动恢复，
+  所有页面禁止旁路 `scrollBy/scrollTo`（有机械守卫检查）
+
+**Android 壳（WebView + 原生桥）**
+
+- WebView 加载打包进 assets 的前端，`@JavascriptInterface` 双向桥：
+  系统 TTS / 文件读写 / HTTP（含二进制 Base64 回传）
+- release 开 R8，`proguard-rules.pro` 显式保留桥方法
+
+**语音（Edge TTS 免 key）**
+
+- 原生层 OkHttp WebSocket 直连微软「大声朗读」通道；2026 新 v2 DRM 签名
+  （CS64 + 变形 SHA-256）逐字移植自 edge-tts 7.3.1，黄金向量对拍验证
+- 前端调度：在线合成 + IndexedDB 音频缓存（同句重播零延迟零花费）；
+  「能等就等」、连续失败 3 次熔断；自动播放失败静默，
+  系统 TTS 只在手动点喇叭时兜底
+
+**SRS 间隔重复**
+
+- 公式与参数分离：参数唯一真相源是 TSV，JS/Python 双实现黄金向量对拍，
+  是将来移植 Kotlin 的数值基准
+
+**AI 助手（可选，默认关闭）**
+
+- 配置只存本机不进备份；提议-预览-确认三段式落库；
+  AI 代码集中在 `src/ai/`，有守卫断言不越界
+
+**质量保障**
+
+- `verify_docs.py` 162 项机械守卫：文件布局、文档计数、交互契约（如翻页禁令）
+- e2e 78 项 + SRS 数值对齐 + flow smoke + vue-tsc，全绿才许提交
+
 ## 回归（改动后从仓库根执行）
 
 ```bash
