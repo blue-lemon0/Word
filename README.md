@@ -103,7 +103,5 @@ python app/tests/verify_srs.py                  # SRS 参数基准
 
 ## 说明
 
-- 原内容产线 `content-kit/` 与历史归档 `archive/` 已于 2026-10-20 整体删除 ——
-  git 历史（`bfda5d7` 之前的任意提交）就是归档。
 - 签名密钥（`*.jks` / `keystore.properties`）只在本机，绝不入库；模板见
   `app/android/keystore.properties.example`。
