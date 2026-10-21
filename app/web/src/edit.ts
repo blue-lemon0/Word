@@ -215,6 +215,7 @@ export async function mergeSenses(keepId: string, dropId: string): Promise<void>
         // 两边都在等复习时，先到期的那条先生效
         dueAt: a.dueAt && b.dueAt ? Math.min(a.dueAt, b.dueAt) : a.dueAt || b.dueAt,
         lastReview: Math.max(a.lastReview ?? 0, b.lastReview ?? 0) || null,
+        lastSentenceId: b.lastSentenceId ?? a.lastSentenceId,
       })
     }
     await db.progress.delete(dropId)

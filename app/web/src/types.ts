@@ -96,6 +96,8 @@ export interface Progress {
    * ★ 它不改 S/D/reps：排期是**意图**，不是学习记录 —— 答完照样走 SRS。
    */
   pinAt?: number
+  /** 上次作答用过的例句 id：下次同义项出题优先避开，避免连续背同一句 */
+  lastSentenceId?: number
 }
 
 /** 一次作答流水（只增不改） */

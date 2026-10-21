@@ -1,9 +1,11 @@
 <script setup lang="ts">
 /** 意思页 —— 编辑都在这一层。
  *
- *  三条交互准则：
- *   · 义项本身的字段就地编辑：点字即改，失焦才落库，不跳页
- *   · **例句反过来要显式进编辑态**：手指一碰就改的代价太高（见 editingId）
+ *  交互准则：
+ *   · 中文释义默认只读，点右侧「编辑」才进编辑态：手机上看起来像正文的内容，
+ *     不能指望用户猜到它能改
+ *   · 英文释义/备注仍可就地编辑：点字即改，失焦才落库，不跳页
+ *   · **例句也要显式进编辑态**：手指一碰就改的代价太高（见 editingId）
  *   · 不给「练这个意思」按钮：知道要练哪个意思，选题就成了送分
  *   · 义项操作（合并/拆分/删除）直接摆在卡片上，不藏进二级菜单
  */
@@ -46,11 +48,15 @@ import { addSentence as aiAddSentence, replaceSentence as aiReplaceSentence } fr
 import { aiReady } from '../ai/config'
 import { describeAiError, type AiResult } from '../ai/types'
 import AiSheet from '../components/AiSheet.vue'
+import {
+  hasTooFewSentences,
+  MIN_SENTENCES_PER_SENSE,
+  SENTENCES_PER_SENSE,
+  usableSentenceCount,
+} from '../sentence-health'
 import type { Progress, Sense, Sentence } from '../types'
 
-/** 每个义项的例句目标数，与 content-kit/spec.yaml 的 sentences_per_sense 对齐。
- *  app 不读那份 YAML（那是内容产线的规格），改这里只改显示口径。 */
-const TARGET = 5
+const TARGET = SENTENCES_PER_SENSE
 
 const POS_LIST = ['', 'n.', 'v.', 'a.', 'adj.', 'adv.', 'vi.', 'vt.', 'prep.', 'conj.', 'pron.', 'num.']
 const TIERS = [
@@ -80,6 +86,7 @@ const sense = ref<Sense | null>(hit0 ?? null)
 const word = ref(hit0?.word ?? '')
 const prog = ref<Progress | undefined>()
 const sents = ref<Sentence[]>(hit0 ? (sentencesNow(hit0.id) ?? []) : [])
+const usableCount = computed(() => usableSentenceCount(sents.value, props.id))
 /** 同词的其他义项 —— 宽屏上做左侧切换栏（省掉来回跳页） */
 const siblings = ref<Sense[]>(hit0 ? (sensesOfWordNow(hit0.word) ?? []) : [])
 /** 诊断用：加载失败时把真实原因显示出来，而不是只说「不在了」 */
@@ -212,9 +219,51 @@ async function onRestore(): Promise<void> {
   await load()
 }
 
-watch(() => props.id, load, { immediate: true })
+/* ── 中文释义：默认只读，显式点「编辑」 ──
+ *
+ *  ★ 移动端没有 hover。整块释义挂 contenteditable、不给按钮时，它看起来
+ *    和正文完全一样 —— 用户遇到过 AI 改不对、想手动改，却找了半天才发现
+ *    这里能点。所以入口必须是一个写着「编辑」的按钮，而不是隐藏的双击/长按。
+ *
+ *  ★ 编辑中把光标放到末尾，点「完成」或在别处失焦落库。 */
+const editingGloss = ref(false)
+const glossBox = ref<HTMLElement | null>(null)
 
-/* ── 就地编辑：失焦才落库 ── */
+function onGlossEdit(): void {
+  editingGloss.value = true
+  void nextTick(() => {
+    const el = glossBox.value
+    el?.focus()
+    if (!el) return
+    const sel = window.getSelection()
+    const range = document.createRange()
+    range.selectNodeContents(el)
+    range.collapse(false)
+    sel?.removeAllRanges()
+    sel?.addRange(range)
+  })
+}
+
+async function finishGloss(s: Sense, ev?: Event): Promise<void> {
+  if (!editingGloss.value) return
+  const el = ev ? (ev.target as HTMLElement) : glossBox.value
+  const val = (el?.innerText ?? '').trim()
+  editingGloss.value = false
+  if (val === s.gloss) return
+  s.gloss = val
+  await updateSense(s.id, { gloss: val })
+}
+
+watch(
+  () => props.id,
+  () => {
+    editingGloss.value = false
+    void load()
+  },
+  { immediate: true },
+)
+
+/* ── 其它字段就地编辑：失焦才落库 ── */
 
 function blurTo(s: Sense, field: keyof Sense, ev: Event): void {
   const val = (ev.target as HTMLElement).innerText.trim()
@@ -569,14 +618,35 @@ function onDelete(): void {
             </van-tag>
           </div>
 
-          <div
-            class="gloss wb-edit"
-            contenteditable="true"
-            spellcheck="false"
-            data-ph="中文释义"
-            @blur="blurTo(sense, 'gloss', $event)"
-          >
-            {{ sense.gloss }}
+          <div class="glossrow">
+            <div v-if="!editingGloss" class="gloss" :class="{ empty: !sense.gloss }">
+              {{ sense.gloss || '（空释义，点编辑补上）' }}
+            </div>
+            <div
+              v-else
+              ref="glossBox"
+              class="gloss wb-edit"
+              contenteditable="true"
+              spellcheck="false"
+              data-ph="中文释义"
+              @blur="finishGloss(sense, $event)"
+            >
+              {{ sense.gloss }}
+            </div>
+            <van-button
+              v-if="!editingGloss"
+              class="gloss-edit"
+              size="small"
+              plain
+              round
+              type="primary"
+              icon="edit"
+              aria-label="编辑中文释义"
+              @click="onGlossEdit"
+            />
+            <span v-else class="gloss-save" @pointerdown.prevent>
+              <van-button size="small" type="primary" @click="finishGloss(sense)">完成</van-button>
+            </span>
           </div>
           <div
             class="glossEn wb-edit"
@@ -612,6 +682,15 @@ function onDelete(): void {
           <span class="wb-sp" />
           <van-button size="mini" plain @click="showPrompt = true">复制给 AI</van-button>
           <van-button size="mini" plain type="primary" @click="showImport = true">导入</van-button>
+        </div>
+
+        <div v-if="hasTooFewSentences(usableCount)" class="sent-warn">
+          <template v-if="usableCount === 0">
+            没有可用例句，这个义项出不了题。至少补 {{ MIN_SENTENCES_PER_SENSE }} 句。
+          </template>
+          <template v-else>
+            只有 1 句可用例句，复习时每次都会是这一句，容易把句子背下来。至少再补 1 句。
+          </template>
         </div>
 
         <div ref="sentBox" class="sentlist">
@@ -957,11 +1036,36 @@ function onDelete(): void {
   border-radius: 8px;
 }
 
+.glossrow {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
 .gloss {
+  flex: 1;
+  min-width: 0;
   font-size: 19px;
   font-weight: 600;
   line-height: 1.45;
   padding: 4px;
+}
+
+.gloss.empty {
+  color: var(--wb-ink-3);
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.gloss-edit {
+  flex: none;
+  margin-top: 2px;
+}
+
+.gloss-save {
+  flex: none;
+  display: inline-flex;
+  margin-top: 2px;
 }
 
 .glossEn {
@@ -1002,6 +1106,16 @@ function onDelete(): void {
 
 .shead b {
   font-size: 14px;
+}
+
+.sent-warn {
+  margin: 0 4px 10px;
+  padding: 9px 11px;
+  border-radius: 10px;
+  background: #fff7e8;
+  color: #8a5a12;
+  font-size: 12.5px;
+  line-height: 1.6;
 }
 
 .sent {

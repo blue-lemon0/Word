@@ -29,6 +29,7 @@ import { describeAiError, type AiResult } from '../ai/types'
 import { fillWord, reviewWord } from '../ai/actions'
 import { aiReady } from '../ai/config'
 import AiSheet from '../components/AiSheet.vue'
+import { hasTooFewSentences } from '../sentence-health'
 import type { Progress, Sense, Word } from '../types'
 import { masteryPercent } from '../types'
 
@@ -136,6 +137,12 @@ async function fillCounts(ids: string[]): Promise<void> {
   sentCount.value = counts
   countsReady.value = true
 }
+
+const hasThinSense = computed(
+  () =>
+    countsReady.value &&
+    senses.value.some((s) => hasTooFewSentences(sentCount.value.get(s.id) ?? 0)),
+)
 
 /** 还在读库。内存里有就首帧直接给完整界面（没有那一帧的空白）。 */
 const loading = ref(!readyFromMemory(props.word))
@@ -374,6 +381,7 @@ function onAsk(): void {
         <div class="tags">
           <van-tag v-if="senses.length" plain round type="primary">{{ senses.length }} 个意思</van-tag>
           <van-tag v-if="senses.some((s) => s.needsRefine)" plain round type="warning">需精修</van-tag>
+          <van-tag v-if="hasThinSense" plain round type="warning">例句不足</van-tag>
           <van-tag v-if="senses.some((s) => s.trap)" plain round type="danger">易错</van-tag>
         </div>
       </section>
@@ -449,7 +457,11 @@ function onAsk(): void {
                    显示一帧再变成真数，又是一次可见的跳变 -->
               <template v-if="countsReady">
                 <span class="dot">·</span>
-                <span>{{ sentCount.get(s.id) ?? 0 }} 句</span>
+                <span
+                  :class="{ thin: hasTooFewSentences(sentCount.get(s.id) ?? 0) }"
+                >{{ sentCount.get(s.id) ?? 0 }} 句</span>
+                <span v-if="(sentCount.get(s.id) ?? 0) === 0" class="thin">练不到</span>
+                <span v-else-if="(sentCount.get(s.id) ?? 0) === 1" class="thin">仅 1 句</span>
               </template>
             </div>
           </div>
@@ -624,6 +636,11 @@ function onAsk(): void {
 
 .dot {
   color: var(--wb-line);
+}
+
+.thin {
+  color: #b26a00;
+  font-weight: 600;
 }
 
 .bar {

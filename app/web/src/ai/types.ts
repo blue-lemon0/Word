@@ -28,6 +28,8 @@ export type Proposal =
        *    所以这一条必须由人看过再应用（见 docs/design/03）。 */
       trap?: 0 | 1
       why?: string
+      /** 补全空壳词时，随义项一起补的例句（占位义项已有 slot/id，可直接挂） */
+      sentences?: { en: string; zh?: string; marks: SentenceMark[] }[]
     }
   | {
       id: string

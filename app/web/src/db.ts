@@ -259,14 +259,14 @@ export function sentencesNow(senseId: string): Sentence[] | undefined {
   return all.filter((s) => s.senseId === senseId).sort((a, b) => a.idx - b.idx)
 }
 
-/** 一次算好几个义项的例句条数（单词页列表要用） */
+/** 一次算好几个义项的可用例句条数（单词页列表要用；flagged 不计） */
 export function sentenceCountsNow(ids: string[]): Map<string, number> | undefined {
   const all = cachedNow<Sentence[]>('sentences')
   if (!all) return undefined
   const want = new Set(ids)
   const m = new Map<string, number>()
   for (const s of all) {
-    if (want.has(s.senseId)) m.set(s.senseId, (m.get(s.senseId) ?? 0) + 1)
+    if (!s.flagged && want.has(s.senseId)) m.set(s.senseId, (m.get(s.senseId) ?? 0) + 1)
   }
   return m
 }

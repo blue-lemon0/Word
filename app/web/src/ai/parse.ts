@@ -91,6 +91,32 @@ function marksOf(en: string, rawHighlights: unknown, word: string): {
   return { marks, hasHighlights }
 }
 
+function readSentences(
+  raw: { en?: string; zh?: string; highlights?: unknown }[],
+  word: string,
+  label: string,
+  dropped: string[],
+): { en: string; zh?: string; marks: SentenceMark[] }[] {
+  const sentences: { en: string; zh?: string; marks: SentenceMark[] }[] = []
+  for (const rs of raw.slice(0, 3)) {
+    const en = s(rs?.en)
+    if (!en) continue
+    const { marks, hasHighlights } = marksOf(en, rs?.highlights, word)
+    if (!marks.length) {
+      dropped.push(
+        hasHighlights
+          ? `${label}的一句例句高亮词形对不上`
+          : `${label}的一句例句里找不到「${word}」（也没给可用的 highlights）`,
+      )
+      continue
+    }
+    if (sentences.some((x) => x.en === en)) continue
+    sentences.push({ en, zh: s(rs?.zh) || undefined, marks })
+    if (sentences.length >= 2) break
+  }
+  return sentences
+}
+
 export function parseProposals(
   text: string,
   bind: Bind,
@@ -127,11 +153,17 @@ export function parseProposals(
         const want = p.trap === true || p.trap === 1 ? 1 : 0
         if (want !== sense.trap) patch.trap = want
       }
-      if (!Object.keys(patch).length) {
+      const sentences = readSentences(
+        Array.isArray(p.sentences) ? p.sentences : [],
+        bind.word,
+        `义项「${sense.gloss || sense.word}」`,
+        dropped,
+      )
+      if (!Object.keys(patch).length && !sentences.length) {
         dropped.push(`sense.update slot=${sense.slot} 没有实际改动`)
         continue
       }
-      const key = `u:${sense.id}:${JSON.stringify(patch)}`
+      const key = `u:${sense.id}:${JSON.stringify(patch)}:${sentences.map((x) => x.en).join('|')}`
       if (dup.has(key)) continue
       dup.add(key)
       out.push({
@@ -141,6 +173,7 @@ export function parseProposals(
         word: sense.word,
         slot: sense.slot,
         why: s(p.why),
+        sentences: sentences.length ? sentences : undefined,
         ...patch,
       } as Proposal)
     } else if (kind === 'sentence.replace') {
@@ -215,27 +248,12 @@ export function parseProposals(
         dropped.push('sense.add 没有给释义')
         continue
       }
-      // 新义项自带的例句：逐条过「高亮词形必须真的在句子里」这道门槛，最多留 2 条。
-      // 模型偶尔会把某句写得漂亮但里面没有目标词 —— 那种句子进库就是一张
-      // 永远答不对的卡（与 sentence.add 同一条判据）。
-      const rawSents = Array.isArray(p.sentences) ? p.sentences : []
-      const sentences: { en: string; zh?: string; marks: SentenceMark[] }[] = []
-      for (const rs of rawSents.slice(0, 3)) {
-        const en = s(rs?.en)
-        if (!en) continue
-        const { marks, hasHighlights } = marksOf(en, rs?.highlights, bind.word)
-        if (!marks.length) {
-          dropped.push(
-            hasHighlights
-              ? `新义项「${gloss}」的一句例句高亮词形对不上`
-              : `新义项「${gloss}」的一句例句里找不到「${bind.word}」（也没给可用的 highlights）`,
-          )
-          continue
-        }
-        if (sentences.some((x) => x.en === en)) continue
-        sentences.push({ en, zh: s(rs?.zh) || undefined, marks })
-        if (sentences.length >= 2) break
-      }
+      const sentences = readSentences(
+        Array.isArray(p.sentences) ? p.sentences : [],
+        bind.word,
+        `新义项「${gloss}」`,
+        dropped,
+      )
       const key = `n:${gloss}:${s(p.pos)}`
       if (dup.has(key)) continue
       dup.add(key)

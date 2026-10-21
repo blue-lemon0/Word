@@ -8,13 +8,14 @@
  *    而不是「每个义项问一次」。这是省钱的主要手段（见 prompts.ts 的约束）。
  */
 import { db, sensesOf } from '../db'
+import { MIN_SENTENCES_PER_SENSE } from '../sentence-health'
 import type { Sense, Sentence } from '../types'
 import { cacheGet, cachePut, hashOf } from './cache'
 import { chat } from './client'
 import { isConfigured, loadConfig } from './config'
 import { parseProposals } from './parse'
 import { addSentencePrompt, fillWordPrompt, replaceSentencePrompt, reviewWordPrompt } from './prompts'
-import { AiError, type AiActionKind, type AiResult, type WordContext } from './types'
+import { AiError, type AiActionKind, type AiResult, type Proposal, type WordContext } from './types'
 
 interface Rows {
   word: string
@@ -40,7 +41,24 @@ async function rowsOf(word: string): Promise<Rows> {
  *    换了个更强的模型、或者改了输出约束，旧缓存里的结果就不再代表现在的质量 ——
  *    这时候必须能把旧缓存整体作废，而不是靠「内容刚好变了」去碰运气。
  */
-const PROMPT_VERSION = 'v2'
+const PROMPT_VERSION = 'v3'
+
+function requireSentencesForEverySense(ps: Proposal[], requiredSlots: number[] = []): string | null {
+  const senses = ps.filter((p) => p.kind === 'sense.add' || p.kind === 'sense.update')
+  if (!senses.length) return 'AI 没有给出任何义项，本次不应用'
+  for (const p of senses) {
+    const n = p.sentences?.length ?? 0
+    if (n >= MIN_SENTENCES_PER_SENSE) continue
+    const label = p.kind === 'sense.add' ? `「${p.gloss}」` : `s${p.slot}`
+    return `AI 只给义项${label}配了 ${n} 句例句；每个义项至少要 ${MIN_SENTENCES_PER_SENSE} 句，本次不应用`
+  }
+  for (const slot of requiredSlots) {
+    if (!senses.some((p) => p.kind === 'sense.update' && p.slot === slot)) {
+      return `AI 没有补全占位义项 s${slot}，本次不应用`
+    }
+  }
+  return null
+}
 
 function contextOf(r: Rows): WordContext {
   // ★ 例句不能全带上：一个词 4 个义项 × 5 句就是 20 句，光输入就要两三千 token，
@@ -104,6 +122,7 @@ async function run(
   rows: Rows,
   messages: { role: 'system' | 'user'; content: string }[],
   extra = '',
+  check?: (proposals: Proposal[]) => string | null,
 ): Promise<AiResult> {
   const cfg = loadConfig()
   if (!isConfigured(cfg)) throw new AiError('no-config', 'AI 还没配置')
@@ -115,6 +134,8 @@ async function run(
   const hit = await cacheGet(key)
   if (hit) {
     const p = parseProposals(hit.payload, bind)
+    const bad = check?.(p.proposals)
+    if (bad) throw new AiError('refused', bad)
     return {
       action,
       proposals: p.proposals,
@@ -125,6 +146,8 @@ async function run(
 
   const reply = await chat(messages, { json: true })
   const p = parseProposals(reply.text, bind)
+  const bad = check?.(p.proposals)
+  if (bad) throw new AiError('refused', bad)
   await cachePut(key, cfg.model, reply.text)
   return {
     action,
@@ -165,12 +188,13 @@ export async function addSentence(senseId: string, howMany = 3): Promise<AiResul
   )
 }
 
-/** 把一个空壳词补成能背的卡（义项 + 每义项 1-2 句例句）。
+/** 把一个空壳词补成能背的卡（义项 + 每义项 2 句例句）。
  *
  *  ★ 这是 D37「顺手加入词库」的收尾动作：占位义项一直留在「需精修」里
  *    不算完成，补上义项和例句才算。
  *  ★ 只对**空壳**用它：有正经释义的词应该走 reviewWord（审查），
- *    否则 AI 会试图重写已经有主的内容。 */
+ *    否则 AI 会试图重写已经有主的内容。
+ *  ★ 全有或全无：每个义项都带够例句才采用，避免“只补了一个义项一句”的半成品。 */
 export async function fillWord(word: string, howManySenses = 3): Promise<AiResult> {
   const rows = await rowsOf(word)
   const hollow = rows.senses.length === 0 && rows.sentences.length === 0
@@ -179,11 +203,13 @@ export async function fillWord(word: string, howManySenses = 3): Promise<AiResul
   if (!hollow) {
     throw new AiError('refused', '这个词已经有释义了；要检查它请用「AI 审查」')
   }
+  const requiredSlots = rows.senses.filter((s) => !s.gloss.trim()).map((s) => s.slot)
   return run(
     'fillWord',
     rows,
     fillWordPrompt(contextOf(rows), howManySenses),
     `fill:${howManySenses}`,
+    (ps) => requireSentencesForEverySense(ps, requiredSlots),
   )
 }
 

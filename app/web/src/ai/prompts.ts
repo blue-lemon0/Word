@@ -11,6 +11,7 @@
  *  ★ 成本控制写在 prompt 里而不是代码里：只列「真有问题」的、最多 6 条、
  *    例句 12-20 词。这些约束省下来的 token 比任何参数调优都多。
  */
+import { MIN_SENTENCES_PER_SENSE } from '../sentence-health'
 import type { ChatMessage } from './client'
 import type { WordContext } from './types'
 
@@ -107,13 +108,13 @@ ${SHAPE}`,
   ]
 }
 
-/** 把一个「空壳词」补成能背的卡：义项 + 每个义项 1-2 句例句。
+/** 把一个「空壳词」补成能背的卡：义项 + 每个义项 2 句例句。
  *
  *  ★ 这个动作为 D37 的「顺手加入词库」收尾：点词 → 不在库里 → 加进来
  *    （占位义项）→ 让 AI 一次补齐。没有它，占位词条会一直躺在「需精修」里。
  *
- *  ★ 为什么例句要挂在 `sense.add` 里面：新义项还没有 id/slot，
- *    单独给 `sentence.add` 无从绑定（见 types.ts 的说明）。
+ *  ★ 例句跟着义项走：新义项还没有 id/slot，单独给 `sentence.add` 无从绑定；
+ *    已有占位义项走 `sense.update`，也要在同一条提案里带例句。
  */
 export function fillWordPrompt(c: WordContext, howManySenses = 3): ChatMessage[] {
   return [
@@ -125,15 +126,19 @@ export function fillWordPrompt(c: WordContext, howManySenses = 3): ChatMessage[]
 这个词在词库里是**空壳**（没有释义，或只有占位义项）。请把它补成能背的卡：
 1. 给 ${howManySenses} 个以内最常用的义项（按常用度排序）；如果已有占位义项（slot 有编号但 gloss 为空或明显不对），
    用 kind="sense.update" + 那个 slot 直接改写它，不要重复新建；
-2. 其余义项用 kind="sense.add"，并且在**同一条提案里**带上 1-2 条例句：
-   "sentences":[{"en":"……","zh":"……","highlights":["……"]}] —— 新义项还没有编号，例句必须跟它一起提；
-3. 每条例句都必须真的用上这个词（可以屈折变化），12-20 个词，自然书面英语，并给 highlights
+2. **每个义项都必须带 ${MIN_SENTENCES_PER_SENSE} 条例句**，写在同一条提案的
+   "sentences":[{"en":"……","zh":"……","highlights":["……"]}, …] 里。
+   kind="sense.add" 和 kind="sense.update" 都一样：新义项还没有编号，占位义项也要一次补全；
+3. 不要只给其中一个义项配例句。**要么所有义项都配齐 ${MIN_SENTENCES_PER_SENSE} 句，要么整份 proposals 返回空数组**，
+   只补一半的结果不会被采用；
+4. 每条例句都必须真的用上这个词（可以屈折变化），12-20 个词，场景各不相同，自然书面英语，并给 highlights
    （句中实际出现的所有目标词词形，含 went / made 这类不规则变化）；
-4. 所有词性都作为**同一个词条**下的不同义项，不要按词性另造词条；词条没有音标时，
+5. 所有词性都作为**同一个词条**下的不同义项，不要按词性另造词条；词条没有音标时，
    用 kind="word.update" 给一个（英式或美式都可，只写音标本身）。
 
 ${SHAPE}
-对 kind="sense.add"，例句写在提案的 "sentences" 数组里。`,
+kind="sense.add" 和 kind="sense.update" 的例句都写在提案的 "sentences" 数组里。例如：
+{"kind":"sense.update","slot":1,"gloss":"……","sentences":[{"en":"……","zh":"……","highlights":["……"]},{"en":"……","zh":"……","highlights":["……"]}]}`,
     },
   ]
 }

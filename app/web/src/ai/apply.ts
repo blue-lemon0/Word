@@ -35,7 +35,11 @@ export async function applyOne(p: Proposal): Promise<string> {
       //   而人已经补完了 —— 那个筛选结果就变成噪音。
       if (p.gloss != null && p.gloss.trim()) patch.needsRefine = 0
       await updateSense(p.senseId, patch as Partial<Sense>)
-      return `改了 s${p.slot} 的释义`
+      for (const s of p.sentences ?? []) {
+        await addSentenceEdit(p.senseId, p.word, s.en, s.zh ?? '', s.marks)
+      }
+      const n = p.sentences?.length ?? 0
+      return `改了 s${p.slot} 的释义${n ? `，补了 ${n} 句例句` : ''}`
     }
     case 'sentence.replace': {
       await replaceSentenceEdit(p.sentenceId, p.en, p.zh, p.marks)

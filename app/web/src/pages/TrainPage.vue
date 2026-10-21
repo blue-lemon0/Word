@@ -718,12 +718,20 @@ function openFixOptions(): void {
  *  我是不是记混了」—— 那需要看完整的一页，所以给跳转。
  *  回来由 keep-alive + onActivated 负责：还在原题，内容是新的。 */
 function goSensePage(): void {
+  if (!submitted.value) {
+    toast('先答完这道题，再看词条/义项')
+    return
+  }
   const id = q.value?.sense.id
   pickBox.value = false
   if (id) void router.push(`/sense/${id}`)
 }
 
 function goWordPage(): void {
+  if (!submitted.value) {
+    toast('先答完这道题，再看词条/义项')
+    return
+  }
   const w = q.value?.sense.word
   pickBox.value = false
   if (w) void router.push(`/word/${encodeURIComponent(w)}`)
@@ -964,9 +972,28 @@ const soloTone = computed(() =>
  *    现在普通进入先给选择；只有从错题板/扫读带 `solo` 进来才直接开练
  *    （那种入口是「指哪打哪」，多问一句是多余的一层）。 */
 watch(() => [route.query.solo, route.query.sent], syncPin, { immediate: true })
+/** 从训练页跳去词条/义项核验过。回来时 query 会变回原值，
+ *  但那不是「换练法」，不能因此重开一轮。 */
+let fromDetail = false
 watch(
   () => [route.query.solo, route.query.sent, route.query.scope],
   () => {
+    // 去词条/义项详情核验时，TrainPage 只是被 keep-alive 停用，
+    // route.query 会变成空。这里若按「用户按了返回」处理，会把整轮进度清掉。
+    if (route.path.startsWith('/word/') || route.path.startsWith('/sense/')) {
+      fromDetail = true
+      return
+    }
+    if (route.path !== '/train') {
+      fromDetail = false
+      if (queue.value.length) backToPicker()
+      return
+    }
+    // 详情页返回：query 恢复成离开前的值，跳过这一次，保留 queue/steps/cursor。
+    if (fromDetail) {
+      fromDetail = false
+      return
+    }
     if (route.query.solo || route.query.scope) {
       void start('due')
       return
@@ -1084,6 +1111,10 @@ watch(
           <span v-if="q.sense.tier"> {{ q.sense.tier }}</span>
           <span v-if="q.sense.trap"> · 易错</span>
           <span v-if="!q.isDue" class="fresh"> · 新卡</span>
+          <span v-if="submitted" class="qlinks">
+            <button class="qnav" type="button" @click="goWordPage">词条 ›</button>
+            <button class="qnav" type="button" @click="goSensePage">义项 ›</button>
+          </span>
         </div>
 
         <!-- 例句本身不再单独挂「改」：下面一个「有问题？改」把例句、本题意思、
@@ -1446,16 +1477,19 @@ watch(
           <span class="gl">例句：{{ s.en }}</span>
           <span class="go">改</span>
         </button>
-        <button
-          v-for="s in fixSenses"
-          :key="'m' + s.id"
-          class="pickrow"
-          type="button"
-          @click="editSenseNow(s.id)"
-        >
-          <span class="gl">意思：{{ s.gloss }}</span>
-          <span class="go">改</span>
-        </button>
+        <template v-if="submitted">
+          <button
+            v-for="s in fixSenses"
+            :key="'m' + s.id"
+            class="pickrow"
+            type="button"
+            @click="editSenseNow(s.id)"
+          >
+            <span class="gl">意思：{{ s.gloss }}</span>
+            <span class="go">改</span>
+          </button>
+        </template>
+        <p v-else class="wb-dim">作答后才能改这个意思，避免提前看到答案。</p>
         <p v-if="!fixSenses.length && !fixSents.length" class="wb-dim">这道题没有可改的内容。</p>
 
         <!-- 「改」和「去看看」是两件事，各走各的：
@@ -1478,15 +1512,17 @@ watch(
           <span class="go">AI</span>
         </button>
 
-        <div class="psep" />
-        <button class="pickrow nav" type="button" @click="goSensePage">
-          <span class="gl">看看这个意思的详情</span>
-          <span class="go">›</span>
-        </button>
-        <button class="pickrow nav" type="button" @click="goWordPage">
-          <span class="gl">看看这个词</span>
-          <span class="go">›</span>
-        </button>
+        <template v-if="submitted">
+          <div class="psep" />
+          <button class="pickrow nav" type="button" @click="goSensePage">
+            <span class="gl">看看这个意思的详情</span>
+            <span class="go">›</span>
+          </button>
+          <button class="pickrow nav" type="button" @click="goWordPage">
+            <span class="gl">看看这个词</span>
+            <span class="go">›</span>
+          </button>
+        </template>
       </div>
     </van-popup>
 
@@ -1774,6 +1810,32 @@ watch(
 
 .qtag .fresh {
   color: var(--wb-primary);
+}
+
+/* 题面直达词条/义项：核验「这句是不是有问题」不该先退出训练再翻词库。 */
+.qlinks {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: 6px;
+  padding-left: 6px;
+  border-left: 1px solid var(--wb-line);
+  vertical-align: baseline;
+}
+
+.qnav {
+  border: 0;
+  background: transparent;
+  padding: 0 3px;
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--wb-primary);
+  cursor: pointer;
+}
+
+.qnav:active {
+  opacity: 0.55;
 }
 
 .qsent {

@@ -46,6 +46,20 @@ ok(rep.errors.length === 0, `种子导入无错误（${rep.errors[0] ?? ''}）`)
 ok(rep.wordsAdded === seed.stats.words, `词数 ${rep.wordsAdded} = ${seed.stats.words}`)
 ok(rep.sensesAdded === seed.stats.senses, `义项数 ${rep.sensesAdded} = ${seed.stats.senses}`)
 ok(rep.sentencesAdded === seed.stats.sentences, `例句数 ${rep.sentencesAdded} = ${seed.stats.sentences}`)
+{
+  const health = M.sentenceHealth
+  const counts = health.usableSentenceCounts([
+    { senseId: 'a', flagged: 0 },
+    { senseId: 'a', flagged: 1 },
+    { senseId: 'a', flagged: 0 },
+    { senseId: 'b', flagged: 0 },
+  ])
+  ok(health.MIN_SENTENCES_PER_SENSE === 2, '例句健康线是 2 句（1 句和 0 句都算不足）')
+  ok(counts.get('a') === 2 && counts.get('b') === 1,
+     '可练例句计数跳过 flagged 句，单句义项能被识别')
+  ok(health.hasTooFewSentences(0) && health.hasTooFewSentences(1) && !health.hasTooFewSentences(2),
+     '0/1 句判为不足，2 句通过')
+}
 ok((await db.progress.count()) === seed.stats.senses, '每个新义项都建了进度行（否则 SRS 无从起步）')
 
 const again = await bundleImport.importBundle(seed)
@@ -277,6 +291,29 @@ for (const s of allSentences) {
   if (mine.length && mine.every((x) => x.flagged) && poolIds.has(s.id)) leaked.push(s.word)
 }
 ok(leaked.length === 0, '全是问题句的义项不留在池里', emptySenses.join(',') + ' → ' + leaked.join(','))
+
+/* 6.05 防连续重复：同一个义项有 2 句时，作答后下一题必须换另一句 */
+{
+  const W = 'zzzrotate'
+  const { senseId } = await edit.addWord(W)
+  await edit.updateSense(senseId, { gloss: '轮换测试', pos: 'n.' })
+  await edit.addSentence(senseId, W, `The first ${W} is here.`)
+  await edit.addSentence(senseId, W, `The second ${W} is there.`)
+  const seen = []
+  for (let i = 0; i < 5; i++) {
+    const q = await quiz.makeQuestion(senseId)
+    seen.push(q.sentence.id)
+    await quiz.recordAnswer(q, quiz.newSessionId(), i, 'CORRECT', 500)
+  }
+  ok(seen.every((id, i) => i === 0 || id !== seen[i - 1]),
+     '同一义项连续两题不会出同一句', seen.join(','))
+  ok(new Set(seen).size === 2, '两句交替出现，没有丢掉任何一句')
+  ok((await db.progress.get(senseId)).lastSentenceId === seen[seen.length - 1],
+     '作答后记住上一句（下次出题据此避让）')
+  const pinned = await quiz.makeQuestion(senseId, seen[0])
+  ok(pinned.sentence.id === seen[0], '显式钉住某句时仍然优先用它（回看不被避让逻辑改题）')
+  await edit.purgeWord(W)
+}
 
 /* ── 6.1 问题句闭环：标记 → 导出 → 关单 ── */
 const flagRows = await flags.listFlags()
@@ -579,7 +616,7 @@ ok((await db.sentences.get(afterTake[0].sentenceId)).en === flagged.sentence.en,
   await ai.reviewWord(W)
   ok(calls > beforeCalls, '内容变了就不再用旧缓存（重新问一次）')
 
-  // 7) 空壳词「AI 补全」：义项 + 例句一起提（新义项没有 slot，例句必须跟义项走）
+  // 7) 空壳词「AI 补全」：每个义项都必须带例句；占位义项用 update，新义项用 add
   const F = 'zzzfill'
   const pend = await edit.addPendingWord(F)
   ok((await db.senses.get(pend.senseId)).gloss === '', '先有一个空壳词条（占位义项）')
@@ -593,15 +630,26 @@ ok((await db.sentences.get(afterTake[0].sentenceId)).en === flagged.sentence.en,
           choices: [{ message: { content: JSON.stringify({
             note: '补好了',
             proposals: [
-              { kind: 'sense.update', slot: 1, gloss: '填充出来的释义', pos: 'n.', why: '占位义项' },
+              {
+                kind: 'sense.update',
+                slot: 1,
+                gloss: '填充出来的释义',
+                pos: 'n.',
+                why: '占位义项',
+                sentences: [
+                  { en: `This ${F} is useful.`, zh: '这个填充词很有用。' },
+                  { en: `We need a ${F} here.`, zh: '我们这里需要一个填充词。' },
+                ],
+              },
               {
                 kind: 'sense.add',
                 gloss: '第二个意思',
                 pos: 'v.',
                 why: '常用义项',
                 sentences: [
-                  { en: `They ${F} the box every day.`, zh: '他们每天这样处理箱子。' },
                   { en: 'Nothing relevant here.', zh: '不含目标词，应被丢弃' },
+                  { en: `They ${F} the box every day.`, zh: '他们每天这样处理箱子。' },
+                  { en: `She will ${F} the plan tomorrow.`, zh: '她明天会调整计划。' },
                 ],
               },
             ],
@@ -613,18 +661,22 @@ ok((await db.sentences.get(afterTake[0].sentenceId)).en === flagged.sentence.en,
   const rf = await ai.fillWord(F, 3)
   ok(rf.action === 'fillWord', '动作标记是 fillWord（界面据此换标题）')
   ok(rf.proposals.length === 2, `两条提案：改占位义项 + 新增义项（实际 ${rf.proposals.length}）`)
+  const updProp = rf.proposals.find((p) => p.kind === 'sense.update')
+  ok(updProp?.sentences?.length === 2, '占位义项也带上了 2 句例句')
   const addedProp = rf.proposals.find((p) => p.kind === 'sense.add')
-  ok(addedProp?.sentences?.length === 1, '新义项只留下含目标词的那 1 句（幻觉句被丢）')
+  ok(addedProp?.sentences?.length === 2, '新义项保留 2 句含目标词的例句（幻觉句被丢）')
   ok(rf.note.includes('不可用'), '丢掉的句子有交代', rf.note)
 
   await ai.applyAll(rf.proposals)
   const s1After = await db.senses.get(pend.senseId)
   ok(s1After.gloss === '填充出来的释义' && s1After.needsRefine === 0,
      '占位义项被改写，且「需精修」标记跟着摘掉（补完就不该再挂在待办里）')
+  ok((await db.sentences.where('senseId').equals(pend.senseId).toArray()).length === 2,
+     'update 提案里带的例句也跟着占位义项落库')
   const filled = (await db.senses.where('word').equals(F).toArray()).find((s) => s.gloss === '第二个意思')
   ok(!!filled, '新义项建出来了')
   const fSents = await db.sentences.where('senseId').equals(filled.id).toArray()
-  ok(fSents.length === 1, '例句跟着新义项一起落库（没有 id/slot 时只能这么提）')
+  ok(fSents.length === 2, '新义项的 2 句例句一起落库（没有 id/slot 时只能这么提）')
   ok(fSents[0].form === F && fSents[0].spanStart >= 0, '落库时算好了高亮区间')
 
   // 7b) 「新词 + 补音标」在同一批里：词条还不存在时音标不能被 update 的静默 no-op 吞掉
@@ -639,7 +691,7 @@ ok((await db.sentences.get(afterTake[0].sentenceId)).en === flagged.sentence.en,
             note: 'ok',
             proposals: [
               { kind: 'word.update', ipa: 'ˈnjuː', why: '缺音标' },
-              { kind: 'sense.add', gloss: '新的意思', pos: 'adj.', why: '常用义项', sentences: [{ en: `A ${N} idea.`, zh: '一个新想法。' }] },
+              { kind: 'sense.add', gloss: '新的意思', pos: 'adj.', why: '常用义项', sentences: [{ en: `A ${N} idea.`, zh: '一个新想法。' }, { en: `This ${N} plan works.`, zh: '这个新计划行得通。' }] },
             ],
           }) } }],
         }),
@@ -653,6 +705,52 @@ ok((await db.sentences.get(afterTake[0].sentenceId)).en === flagged.sentence.en,
      '同批里的音标没有丢（词条不存在时 updateWord 要建出来，不能是空操作）',
      newWord ? newWord.ipa : 'no word')
   await edit.purgeWord(N)
+
+  // 7c) 任一义项缺例句 → 整份拒绝，不写入（“要么都补，要么都不补”）
+  const B = 'zzzbad'
+  const badPend = await edit.addPendingWord(B)
+  ai.__setTransportForTest({
+    name: 'fake5',
+    async postJson() {
+      return {
+        status: 200,
+        body: JSON.stringify({
+          choices: [{ message: { content: JSON.stringify({
+            note: '补了一半',
+            proposals: [
+              {
+                kind: 'sense.update',
+                slot: 1,
+                gloss: '只配一句',
+                sentences: [{ en: `A ${B} thing.`, zh: '一个坏例子。' }],
+              },
+              {
+                kind: 'sense.add',
+                gloss: '另一个意思',
+                sentences: [
+                  { en: `Another ${B} thing.`, zh: '另一个。' },
+                  { en: `The ${B} works.`, zh: '这个能用。' },
+                ],
+              },
+            ],
+          }) } }],
+        }),
+      }
+    },
+  })
+  let partial = null
+  try {
+    await ai.fillWord(B, 3)
+  } catch (e) {
+    partial = e
+  }
+  ok(partial?.kind === 'refused' && /至少要 2 句/.test(partial.message),
+     '任一义项只有 1 句时整份拒绝，并说清最低句数', partial?.message)
+  ok((await db.senses.get(badPend.senseId)).gloss === '',
+     '被拒绝的补全不会改写占位义项（没有半成品落库）')
+  ok((await db.sentences.where('senseId').equals(badPend.senseId).toArray()).length === 0,
+     '被拒绝的补全不会写入任何例句')
+  await edit.purgeWord(B)
 
   // 有释义的词不许再「补全」：那会重写已经有主的内容
   let refused = null

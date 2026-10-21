@@ -189,10 +189,12 @@ export async function makeQuestion(senseId: string, pinSentence?: number): Promi
     .filter((s) => !s.flagged)
   if (!sents.length) return null
   const pinned = pinSentence == null ? undefined : sents.find((s) => s.id === pinSentence)
-  const sentence = pinned ?? sents[Math.floor(Math.random() * sents.length)]
+  const p = await db.progress.get(senseId)
+  const fresh = sents.filter((s) => s.id !== p?.lastSentenceId)
+  const pool = fresh.length ? fresh : sents
+  const sentence = pinned ?? pool[Math.floor(Math.random() * pool.length)]
   if (!sentence) return null
   const w = await db.words.get(sense.word)
-  const p = await db.progress.get(senseId)
   const now = Math.floor(Date.now() / 1000)
 
   const options = await buildOptions(sense, sense.gloss)
@@ -419,6 +421,7 @@ export async function recordAnswer(
       pendingN: outcome.pendingN,
       mastered: justMastered ? 1 : 0,
       rusty: 0,
+      lastSentenceId: q.sentence.id,
     })
     const log: ReviewLog = {
       sessionId,
@@ -459,6 +462,7 @@ export async function markMastered(senseId: string): Promise<void> {
     pendingN: 0,
     mastered: 1,
     rusty: 0,
+    lastSentenceId: p?.lastSentenceId,
   })
   toast('已标掌握，不再排期')
 }

@@ -20,9 +20,11 @@ import { useRouter } from 'vue-router'
 import { allProgress, allSentences, allWords, cachedNow, liveSenses } from '../db'
 import { practicePool } from '../quiz'
 import AddWordSheet from '../components/AddWordSheet.vue'
+import BatchSentencesSheet from '../components/BatchSentencesSheet.vue'
+import { SENTENCES_PER_SENSE, usableSentenceCounts } from '../sentence-health'
 import type { Progress, Sense, Sentence, Word } from '../types'
 
-const TARGET = 5
+const TARGET = SENTENCES_PER_SENSE
 const router = useRouter()
 
 /** 「新增词」弹层 */
@@ -42,6 +44,8 @@ interface Row {
   senses: Sense[]
   sentences: number
   target: number
+  /** 只有 1 句可用例句的义项数 */
+  single: number
   /** 该词最该被复习的时刻（秒）；没有进度就是 0 */
   dueAt: number
   /** 桶 */
@@ -71,7 +75,7 @@ const q = ref('')
 const only = ref<Bucket | ''>('')
 /** 维护视角（仓库口径）：默认关掉，展开才看 */
 const maintain = ref(false)
-const mFilter = ref<'rf' | 'ns' | 'T1' | ''>('')
+const mFilter = ref<'rf' | 'ns' | 'one' | 'T1' | ''>('')
 
 const PAGE = 120
 const limit = ref(PAGE)
@@ -91,8 +95,7 @@ function buildRows(
 ): Row[] {
   const ipaOf = new Map(wrows.map((w) => [w.word, w.ipa]))
   const hidden = new Set(wrows.filter((w) => w.hidden).map((w) => w.word))
-  const sentBy = new Map<string, number>()
-  for (const s of srows) sentBy.set(s.senseId, (sentBy.get(s.senseId) ?? 0) + 1)
+  const sentBy = usableSentenceCounts(srows)
   const pmap = new Map<string, Progress>()
   for (const p of prows) pmap.set(p.senseId, p)
 
@@ -109,6 +112,7 @@ function buildRows(
     if (hidden.has(word)) continue
     senses.sort((a, b) => a.slot - b.slot)
     let sentences = 0
+    let single = 0
     let learned = 0
     let due = 0
     let dueAt = 0
@@ -117,7 +121,9 @@ function buildRows(
     let pinAt = 0
     const rank: Record<Bucket, number> = { due: 0, learning: 1, new: 2, mastered: 3, idle: 4 }
     for (const s of senses) {
-      sentences += sentBy.get(s.id) ?? 0
+      const n = sentBy.get(s.id) ?? 0
+      sentences += n
+      if (n === 1) single++
       const p = pmap.get(s.id)
       if (p && p.reps > 0) learned++
       if (p && p.reps > 0 && !p.mastered && p.dueAt <= now) due++
@@ -132,6 +138,7 @@ function buildRows(
       senses,
       sentences,
       target: senses.length * TARGET,
+      single,
       dueAt,
       bucket,
       learned,
@@ -227,7 +234,9 @@ const practisable = ref<{ due: number; new: number }>({ due: 0, new: 0 })
  */
 const stuckList = ref<{ word: string; senses: number }[]>([])
 const stuckWords = computed(() => stuckList.value.length)
+const singleSenses = computed(() => rows.value.reduce((n, r) => n + r.single, 0))
 const stuckOpen = ref(false)
+const batchOpen = ref(false)
 
 function showStuck(): void {
   stuckOpen.value = true
@@ -254,6 +263,7 @@ const scopedRows = computed(() => {
     // 旧口径：一句都没有**也算缺（占位词的 target 可能为 0）
     //   写成 r.sentences >= r.target 会把最该补的那批筛掉）
     if (mFilter.value === 'ns' && r.sentences > 0 && r.sentences >= r.target) return false
+    if (mFilter.value === 'one' && !r.single) return false
     if (mFilter.value === 'T1' && !r.senses.some((x) => x.tier === 'T1')) return false
     return true
   })
@@ -289,7 +299,7 @@ function toggle(b: Bucket): void {
 
 /** 搜索结果、或者选了单一桶时，一律展开（否则「搜了却看不到」） */
 const effectiveCollapsed = computed(() =>
-  q.value.trim() || only.value ? new Set<Bucket>() : collapsed.value,
+  q.value.trim() || only.value || mFilter.value ? new Set<Bucket>() : collapsed.value,
 )
 
 const totalShown = computed(() => {
@@ -381,6 +391,12 @@ onMounted(load)
       @filled="(w) => { showAdd = false; router.push(`/word/${encodeURIComponent(w)}`) }"
     />
 
+    <BatchSentencesSheet
+      :open="batchOpen"
+      @close="batchOpen = false"
+      @changed="load"
+    />
+
     <div class="wb-wrap">
       <!-- 今天：一句话回答「我现在该干什么」 -->
       <section class="today">
@@ -430,6 +446,14 @@ onMounted(load)
           有 <b>{{ stuckWords }}</b> 个词缺例句，练不到
         </span>
         <span class="go">去补 ›</span>
+      </button>
+
+      <button v-if="singleSenses > 0" class="stuck thin" type="button" @click="batchOpen = true">
+        <span class="ico">!</span>
+        <span class="tx">
+          有 <b>{{ singleSenses }}</b> 个义项只有 1 句例句，复习时等于固定一句
+        </span>
+        <span class="go">批量补 ›</span>
       </button>
 
       <!-- 搜索 + 学习视角筛选一起吸顶：滚到下面找词时，两行都还在。
@@ -526,6 +550,7 @@ onMounted(load)
                   </span>
                   <span v-else-if="r.learned">{{ r.learned }}/{{ r.senses.length }} 练过</span>
                   <span v-else>没练过</span>
+                  <span v-if="r.single" class="warn">{{ r.single }} 个意思仅 1 句</span>
                   <span v-if="r.needsRefine" class="warn">待补内容</span>
                 </div>
               </div>
@@ -561,6 +586,7 @@ onMounted(load)
               v-for="f in ([
                 { k: 'rf', t: '需精修' },
                 { k: 'ns', t: '缺例句' },
+                { k: 'one', t: '仅 1 句' },
                 { k: 'T1', t: 'T1 高频' },
               ] as const)"
               :key="f.k"
@@ -682,6 +708,10 @@ onMounted(load)
   font-family: inherit;
   text-align: left;
   cursor: pointer;
+}
+
+.stuck + .stuck {
+  margin-top: -10px;
 }
 
 .stuck .ico {

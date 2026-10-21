@@ -80,8 +80,9 @@ function lineOf(p: Proposal): { label: string; to: string; why: string } {
       return {
         label: `s${p.slot} 释义`,
         to:
-          [p.pos, p.gloss].filter(Boolean).join(' ') ||
-          (p.trap != null ? (p.trap ? '标成「熟词僻义」' : '取消「熟词僻义」') : '（只改备注/英文）'),
+          ([p.pos, p.gloss].filter(Boolean).join(' ') ||
+            (p.trap != null ? (p.trap ? '标成「熟词僻义」' : '取消「熟词僻义」') : '（只改备注/英文）')) +
+          (p.sentences?.length ? `\n＋ ${p.sentences.length} 句例句` : ''),
         why: p.why ?? '',
       }
     case 'word.update':
@@ -199,7 +200,10 @@ async function applyKept(): Promise<void> {
             <!-- 新义项自带的例句：直接把句子摆出来。
                  这一条是「补全一个空壳词」的主内容 —— 只写「＋2 句例句」
                  等于让人盲签：句子是最后要背的东西，必须能先看见。 -->
-            <ul v-if="p.kind === 'sense.add' && p.sentences?.length" class="sents">
+            <ul
+              v-if="(p.kind === 'sense.add' || p.kind === 'sense.update') && p.sentences?.length"
+              class="sents"
+            >
               <li v-for="(s, i) in p.sentences" :key="i">
                 <b>{{ s.en }}</b>
                 <span v-if="s.zh">{{ s.zh }}</span>

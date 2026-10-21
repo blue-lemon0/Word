@@ -12,6 +12,7 @@
  *    互相拖慢。一次一个词、失败等 800ms 再试一次，够用了。
  */
 import { allSentences, allWords, liveSenses } from '../db'
+import { usableSentenceCounts } from '../sentence-health'
 import { reviewSnapshot, reviewWord } from './actions'
 import { cacheGet } from './cache'
 import { AiError, type AiResult } from './types'
@@ -24,6 +25,8 @@ export interface AuditTarget {
   refine: number
   /** 该词还有没有音标（缺音标的也值得跑一遍） */
   hasIpa: boolean
+  /** 只有 1 句可用例句的义项数 */
+  single: number
 }
 
 /** 上次体检时间（只存在本机，用于界面显示「上次是几号」） */
@@ -50,8 +53,7 @@ export async function auditTargets(): Promise<AuditTarget[]> {
   const senses = await liveSenses()
   const sents = await allSentences()
   const byWord = new Map<string, AuditTarget>()
-  const sentCount = new Map<string, number>()
-  for (const s of sents) sentCount.set(s.senseId, (sentCount.get(s.senseId) ?? 0) + 1)
+  const sentCount = usableSentenceCounts(sents)
 
   for (const s of senses) {
     const t = byWord.get(s.word) ?? {
@@ -60,9 +62,12 @@ export async function auditTargets(): Promise<AuditTarget[]> {
       sentences: 0,
       refine: 0,
       hasIpa: true,
+      single: 0,
     }
+    const n = sentCount.get(s.id) ?? 0
     t.senses += 1
-    t.sentences += sentCount.get(s.id) ?? 0
+    t.sentences += n
+    if (n === 1) t.single += 1
     if (s.needsRefine) t.refine += 1
     byWord.set(s.word, t)
   }
@@ -76,6 +81,7 @@ export async function auditTargets(): Promise<AuditTarget[]> {
   list.sort((a, b) => {
     if (a.refine !== b.refine) return b.refine - a.refine
     if (a.hasIpa !== b.hasIpa) return a.hasIpa ? 1 : -1
+    if (a.single !== b.single) return b.single - a.single
     if (a.sentences !== b.sentences) return a.sentences - b.sentences
     return a.word.localeCompare(b.word)
   })
