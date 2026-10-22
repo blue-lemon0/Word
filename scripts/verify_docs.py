@@ -47,7 +47,7 @@ d16 = [
 # D17：最小循环的必备件。**前端只有一份** —— app/web/index.html，
 # 服务端在 app/ 根。曾经另写过一套 app/index.html + app/app.js，
 # 结果是原型被晾在一边、用户看到的是另一个界面。
-APP = ["schema.sql", "srs.mjs", "db.mjs", "server.mjs"]
+APP = ["srs.mjs"]
 for f in APP:
     d16.append(("app/ 有 %s" % f, os.path.exists(os.path.join(PROJ, "app", f))))
 d16 += [
@@ -156,27 +156,15 @@ d16 += [
 d16 += [
     ("SRS 参数文件存在", os.path.exists(os.path.join(
         PROJ, "app", "config", "srs_params.tsv"))),
-    ("有 e2e_loop", os.path.exists(os.path.join(PROJ, "app", "tests", "e2e_loop.mjs"))),
-    ("有 smoke_http", os.path.exists(os.path.join(PROJ, "app", "tests", "smoke_http.py"))),
+    ("SRS 参数基准测试在", os.path.exists(os.path.join(
+        PROJ, "app", "tests", "verify_srs.py"))),
     # 双子系统拆分后的入口文档与契约（2026-10）
     ("根 README 存在", os.path.exists(os.path.join(PROJ, "README.md"))),
-    ("app README 存在", os.path.exists(os.path.join(PROJ, "app", "README.md"))),
+    ("MANIFEST 存在", os.path.exists(os.path.join(PROJ, "MANIFEST.md"))),
     ("CONTRACT.md 存在", os.path.exists(os.path.join(PROJ, "CONTRACT.md"))),
-    ("进度导入导出工具存在", os.path.exists(os.path.join(
-        PROJ, "app", "tools", "progress_io.mjs"))),
-    ("问题句关单工具存在", os.path.exists(os.path.join(
-        PROJ, "app", "tools", "flags.mjs"))),
-    ("server 支持多内容源切换", all(
-        w in io.open(os.path.join(PROJ, "app", "server.mjs"), encoding="utf-8").read()
-        for w in ("WORD_BUNDLE", "WORD_DB", "bundleUrl"))),
     ("ECDICT 切分死产物已清理", all(not os.path.exists(
         os.path.join(PROJ, "build", "intermediate", f))
         for f in ("ecdict_senses_b.json", "ecdict_senses_final.json"))),
-    # schema.sql 里的关键不变量不能被改掉
-    ("schema 有 due_at 列", "due_at" in io.open(
-        os.path.join(PROJ, "app", "schema.sql"), encoding="utf-8").read()),
-    ("schema 有 attempt_id 幂等键", "attempt_id" in io.open(
-        os.path.join(PROJ, "app", "schema.sql"), encoding="utf-8").read()),
 ]
 # SRS 参数必须是代码之外的唯一真相源：verify_srs.py 不得再硬编码 S0/D0
 _vsp = io.open(os.path.join(PROJ, "app", "tests", "verify_srs.py"), encoding="utf-8").read()
@@ -1233,8 +1221,7 @@ for name, ok in interaction:
 print("\n=== 文档里的计数必须等于实际项数 ===")
 _notes_md = _read(os.path.join(PROJ, "docs", "notes", "踩坑记录.md"))
 _manifest_md = _read(os.path.join(PROJ, "MANIFEST.md"))
-_ai_md = _read(os.path.join(PROJ, "docs", "AI-操作手机闭环.md"))
-_notes_readme = _read(os.path.join(PROJ, "docs", "notes", "README.md"))
+_ai_md = _read(os.path.join(PROJ, "docs", "notes", "AI-操作手机闭环.md"))
 _runbook = _read(os.path.join(PROJ, "app", "web", "DEBUG-RUNBOOK.md"))
 _n_pitfalls = len(_documented_pitfalls())
 counts = [
@@ -1242,7 +1229,6 @@ counts = [
     ("MANIFEST 真机守卫项数", _manifest_md, r"「真机交互守卫」里\s*（(\d+) 项）", len(interaction)),
     ("AI 闭环文档踩坑条数", _ai_md, r"(\d+) 条「不报错但结果不对」", _n_pitfalls),
     ("AI 闭环文档守卫项数", _ai_md, r"「真机交互守卫」(\d+) 项", len(interaction)),
-    ("notes/README 守卫项数", _notes_readme, r"（当前 (\d+) 项）", len(interaction)),
     ("DEBUG-RUNBOOK 守卫项数", _runbook, r"「真机交互守卫」一节（(\d+) 项）", len(interaction)),
 ]
 fc = 0

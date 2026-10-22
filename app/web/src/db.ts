@@ -4,7 +4,7 @@
  *  浏览器里没有 node:sqlite，纯前端跑不起来。改用 IndexedDB，
  *  这样 PWA 离线也能用，不需要起 Node 进程。
  *
- *  schema 与 app/schema.sql 对齐，唯一的关键改动：
+ *  schema 与 docs/design/05-数据模型-SQLite.md 对齐，唯一的关键改动：
  *  **progress 主键从 (word, senseId='s1') 换成 senseId(UUID)**。
  *  原因见 types.ts 开头 —— 义项一重排，'s1' 就会指向另一个意思，
  *  进度会静默串到错的义项上。UUID 让插入/删除/重排都不影响已有进度。

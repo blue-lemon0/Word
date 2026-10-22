@@ -42,12 +42,12 @@ word.backup v2               学习进度与内容备份包
 
 | 路径 | 是什么 |
 |---|---|
-| [`app/web/`](app/web/README.md) | 前端（Vue 3 + Dexie/IndexedDB），唯一 UI |
-| [`app/android/`](app/web/README.md#打包-android) | Android 壳（WebView + 原生桥：TTS / 文件 / HTTP） |
-| [`app/`](app/README.md) | 旧服务端骨架与 SRS 参照实现（移植基准） |
+| `app/web/` | 前端（Vue 3 + Dexie/IndexedDB），唯一 UI |
+| `app/android/` | Android 壳（WebView + 原生桥：TTS / 文件 / HTTP） |
+| `app/srs.mjs` + `app/tests/verify_srs.py` | SRS 参照实现与参数基准（移植 Kotlin 的数值基准） |
 | `scripts/verify_docs.py` | 结构守卫：文件布局、文档计数、交互契约机械检查 |
-| [`docs/`](docs/README.md) | 设计文档与决策记录（D32+） |
-| [CONTRACT.md](CONTRACT.md) | 内容包 v1 / 进度包格式约定 |
+| `docs/` | 设计文档与决策记录（D32+） |
+| [CONTRACT.md](CONTRACT.md) | 内容包 v1 格式约定 |
 | [MANIFEST.md](MANIFEST.md) | 全仓文件台账、已知缺口、移植 Kotlin/Android 清单 |
 
 ## 技术栈与架构
@@ -85,21 +85,18 @@ word.backup v2               学习进度与内容备份包
 
 **质量保障**
 
-- `verify_docs.py` 162 项机械守卫：文件布局、文档计数、交互契约（如翻页禁令）
-- e2e 78 项 + SRS 数值对齐 + flow smoke + vue-tsc，全绿才许提交
+- `verify_docs.py` 机械守卫：文件布局、文档计数、交互契约（如翻页禁令）
+- SRS 数值对齐 + flow smoke（185 条行为断言）+ vue-tsc，全绿才许提交
 
 ## 回归（改动后从仓库根执行）
 
 ```bash
-python scripts/verify_docs.py                   # 结构与契约自洽守卫（162 项交互断言）
-node app/tests/e2e_loop.mjs                     # SRS / 事务 / 幂等 / 持久化（78 项）
+python scripts/verify_docs.py                   # 结构与契约自洽守卫
 node app/web/tests/srs_parity.mjs               # SRS 移植一致性
 node app/web/tests/flow_smoke.mjs               # 数据层端到端
 cd app/web && npx vue-tsc --noEmit              # 前端类型检查
 python app/tests/verify_srs.py                  # SRS 参数基准
 ```
-
-`app/tests/smoke_http.py` 会清空被测库，不要对日常使用的 `app/state/user.db` 跑。
 
 ## 说明
 

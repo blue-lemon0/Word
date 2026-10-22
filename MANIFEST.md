@@ -17,14 +17,10 @@
 ## 跑起来
 
 ```bash
-# 应用（当前 UI）
 cd app/web; npm install; npm run dev     # -> http://127.0.0.1:5180/
-
-# 旧服务端骨架（托管交接区 + 跑 tools/ 下的进度与标记工具）
-node app/server.mjs                      # -> http://127.0.0.1:8777
 ```
 
-8000 端口上的纯静态服务器**没有** SQLite/SRS 接口，别用那个。
+应用无后端：数据全在 IndexedDB，离线可用；打 Android 包用 `npm run apk`。
 
 ## 仓库结构
 
@@ -34,7 +30,7 @@ build/         派生产物（交接区），整个 gitignore；cards.json 是�
   bundle/cards_v2.json           WordNet 重切验证包（独立锚点体系）
 
 app/           背单词应用
-  web/                          **当前应用**：Vue 3 + Dexie（界面/数据层/备份），见 web/README.md
+  web/                          **当前应用**：Vue 3 + Dexie（界面/数据层/备份）
     src/types.ts db.ts edit.ts   数据模型与内容编辑（义项 id 是内部 UUID，永不变）
     src/srs.ts                   app/srs.mjs 的逐函数移植（数值必须一致，有测试）
     src/quiz.ts importer.ts      出题与导入对比；import.ts 吃两种 JSON
@@ -49,19 +45,13 @@ app/           背单词应用
   android/                      Android 壳（WebView + assets 映射），`npm run apk` 一条命令打包安装
     keystore.properties.example  release 签名配置模板（真实 properties / keystore 不入库）
     app/proguard-rules.pro       release R8 规则（保留 @JavascriptInterface 桥方法）
-  server.mjs db.mjs srs.mjs      旧服务端骨架：HTTP / 内容包守门与投影 / SRS 参照实现
-  schema.sql                     旧进度库 schema 真相源
+  srs.mjs                        SRS 参照实现（Kotlin 移植的数值基准）
   config/srs_params.tsv          SRS 参数唯一真相源（web 侧 JSON 由它生成）
-  tools/progress_io.mjs          旧进度库的学习进度导出/导入（word-progress v1）
-  tools/flags.mjs                问题句标记关单（list/purge-stale/resolve），闭环纠错流程
-  tests/                         e2e_loop.mjs / verify_srs.py / smoke_http.py（e2e_d16.js 已随旧 UI 退场）
-  state/user.db                  旧进度库（运行时生成，不入库，要备份）
+  tests/verify_srs.py            SRS 参数基准（黄金向量）
 
 scripts/verify_docs.py           结构守卫
 docs/                            设计文档（design/03、05）与决策记录（decisions/D32+）
 ```
-
-（content-kit/ 与 archive/ 已删除，原结构见 git 历史 `git show bfda5d7:MANIFEST.md`。）
 
 依赖方向：`内容包 → app`，只向下。`build/` 不含手写内容。
 
@@ -81,30 +71,16 @@ docs/                            设计文档（design/03、05）与决策记录
 | `app/web/src/srs.ts` | `app/srs.mjs` 的逐函数移植；`tests/srs_parity.mjs` 逐格比对，不一致就红 |
 | `app/web/src/importer.ts` | 导入差异计算（只读）+ 按逐条决策写库；默认保留本地释义 |
 | `app/web/src/flags.ts` | 问题句标记：清单导出（word-flags v1）、关单、导入替换时保留标记 |
-| `app/server.mjs` | 旧服务端骨架：HTTP + API，读内容包、读写 `app/state/user.db`。**不再提供 UI** |
-| `app/db.mjs` | 内容包守门与投影、队列、幂等落库、历史、标记 |
 | `app/srs.mjs` | SRS 引擎（参照实现），读 `app/config/srs_params.tsv` |
-| `app/schema.sql` | 旧进度库表结构（含 `due_at` / `attempt_id` 不变量） |
-| `app/tools/progress_io.mjs` | 旧进度库的学习进度包导出/导入（CONTRACT.md §2） |
-| `app/tools/flags.mjs` | 问题句标记关单（list/purge-stale/resolve），闭环纠错流程 |
 | `scripts/verify_docs.py` | 结构守卫：布局、契约字段、前端四条设计判断 |
 
 ## 常用命令（均从仓库根运行）
 
 ```bash
-# 应用侧（浏览器端）
 node app/web/tests/srs_parity.mjs    # SRS 移植一致性
-node app/web/tests/flow_smoke.mjs    # 数据层端到端
-
-# 应用侧（旧服务端那一线）
-node app/tests/e2e_loop.mjs
-python app/tests/verify_srs.py
-python app/tests/smoke_http.py       # 需先启动 server；会清空它打到的库，勿打日常库
+node app/web/tests/flow_smoke.mjs    # 数据层端到端（185 条行为断言）
+python app/tests/verify_srs.py       # SRS 参数基准
 python scripts/verify_docs.py        # 结构守卫
-
-# 旧学习进度备份/换机
-node app/tools/progress_io.mjs export progress.json
-node app/tools/progress_io.mjs import progress.json
 
 # AI 体检的真机驱动（会花钱：每个词一次真实调用；缓存命中的免费）
 node app/web/tests/audit_drive.mjs
@@ -144,9 +120,9 @@ node app/web/tests/audit_drive.mjs
    （数据落 IndexedDB，离线可用，不再需要 Node 服务）。随之三处变了：
    学习进度锚点从 `word#senseId` 换成**义项内部 UUID**（插删改序义项不再让
    进度错位）；备份格式换成 `word.backup` v2（旧的 `word-progress` v1 不通用）；
-   `app/server.mjs` 退成骨架，只剩交接区托管与工具。设计见
-   [docs/DESIGN-词库系统v2.md](docs/DESIGN-词库系统v2.md)，台账见
-   [app/web/README.md](app/web/README.md)。
+   旧服务端骨架（`server.mjs`/`db.mjs`/`schema.sql`/`tools/`）已于 2026-10-22
+   整体删除，移植所需的数据模型参照收进 `docs/design/05`。
+   现行规格见 [docs/DESIGN-词库系统v2.md](docs/DESIGN-词库系统v2.md)。
 9. **句标记闭环已打通（2026-10-17）**：浏览器端把问题句导出成 `word-flags` v1
    （错题板 → 导出清单），交人工或 AI 修（原 `triage_flags.py` 已随产线删除），
    修好后回错题板点「已修好」关单。
@@ -197,20 +173,15 @@ node app/web/tests/audit_drive.mjs
 | 件 | 说明 | 对照基准 |
 |---|---|---|
 | `app/web/src/srs.ts` | SRS 引擎公式（浏览器版，与 `app/srs.mjs` 逐格等价） | `app/web/tests/srs_parity.mjs` |
-| `app/srs.mjs` | SRS 引擎公式（参照实现） | `app/tests/verify_srs.py` + `e2e_loop.mjs` 黄金向量 |
-| `app/web/src/types.ts` `db.ts` | 内容/状态/历史三层 + **义项 UUID 锚点** | [app/web/README.md](app/web/README.md) |
+| `app/srs.mjs` | SRS 引擎公式（参照实现） | `app/tests/verify_srs.py` 黄金向量 |
+| `app/web/src/types.ts` `db.ts` | 内容/状态/历史三层 + **义项 UUID 锚点** | docs/DESIGN-词库系统v2 |
 | `app/web/src/importer.ts` | 导入差异与逐条决策 | docs/DESIGN-词库系统v2 §3.2 |
-| `app/schema.sql` | 旧数据模型（含 `due_at` / `attempt_id` 不变量） | `docs/design/05`、CONTRACT.md §2 |
-| `app/db.mjs` | 投影、队列、幂等落库、历史、标记（逻辑移植，SQLite 可换 Room） | `docs/design/05` |
+| `docs/design/05` | 进度库目标模型（`due_at` / `attempt_id` 不变量在此） | CONTRACT.md §2 |
 | `app/config/srs_params.tsv` | SRS 参数 | — |
 | `docs/design/03` | 记忆曲线与复习的行为规范 | — |
 
 （内容数据不再随移植走：内容靠 AI 生成 + 手动添加，在应用内演进；
 原 `content-kit/data/` 与历史内容包只在 git 历史里。）
-
-**不移植：**
-- `app/server.mjs` `app/db.mjs` `app/tools/` —— 浏览器端的旧服务端那一线，
-  只有要保留服务端架构时才需要（内容包托管、句标记关单、进度包）
 
 ## 决策记录
 
@@ -231,8 +202,7 @@ D41（词库按学习进度组织：今天一张卡 + 五个桶，桶能直接�
 D42（加一个词一步到「能背」：配了 AI 就生成义项与例句，已在库就给「去这个词」）、
 D43（训练页的返回栈：同一页内部的切换用 replace；扫读点一行先给答案再问练不练）、
 D44（首页 = 随手背一句：卡上直接「点一下看意思」，删掉搜索框与重复的训练入口）、
-D46（练习是浮层不是房间：练一句不跳页；首页内部可横滑）、
-D47（练习就是首页的一个副页：快捷卡就地开练，不跳 /train）。
+D46（练习是浮层不是房间：练一句不跳页；首页内部可横滑）。
 
 真机踩坑与判据在 [`docs/notes/踩坑记录.md`](docs/notes/踩坑记录.md)（82 条），
 其中可机械判定的一部分挂在 `scripts/verify_docs.py` 的「真机交互守卫」里

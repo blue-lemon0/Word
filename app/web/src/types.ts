@@ -1,4 +1,4 @@
-/** 数据模型 —— 全部字段与 app/schema.sql 及 docs/DESIGN-词库系统v2.md §4.1 对齐。
+/** 数据模型 —— 全部字段与 docs/design/05-数据模型-SQLite.md 及 docs/DESIGN-词库系统v2.md §4.1 对齐。
  *
  *  核心约束：`Sense.id` 是内部 UUID，**永不变**；`Sense.slot` 只是显示编号。
  *  学习进度挂 `Sense.id`，所以插入/删除/重排义项都不会让进度错位。
