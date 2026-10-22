@@ -44,11 +44,11 @@ word.backup v2               学习进度与内容备份包
 |---|---|
 | `app/web/` | 前端（Vue 3 + Dexie/IndexedDB），唯一 UI |
 | `app/android/` | Android 壳（WebView + 原生桥：TTS / 文件 / HTTP） |
-| `app/srs.mjs` + `app/tests/verify_srs.py` | SRS 参照实现与参数基准（移植 Kotlin 的数值基准） |
+| `app/srs.mjs` + `app/tests/verify_srs.py` | SRS 参照实现与参数基准 |
 | `scripts/verify_docs.py` | 结构守卫：文件布局、文档计数、交互契约机械检查 |
 | `docs/` | 设计文档与决策记录（D32+） |
 | [CONTRACT.md](CONTRACT.md) | 内容包 v1 格式约定 |
-| [MANIFEST.md](MANIFEST.md) | 全仓文件台账、已知缺口、移植 Kotlin/Android 清单 |
+| [MANIFEST.md](MANIFEST.md) | 全仓文件台账、已知缺口 |
 
 ## 技术栈与架构
 
@@ -75,8 +75,7 @@ word.backup v2               学习进度与内容备份包
 
 **SRS 间隔重复**
 
-- 公式与参数分离：参数唯一真相源是 TSV，JS/Python 双实现黄金向量对拍，
-  是将来移植 Kotlin 的数值基准
+- 公式与参数分离：参数唯一真相源是 TSV，JS/Python 双实现黄金向量对拍
 
 **AI 助手（可选，默认关闭）**
 

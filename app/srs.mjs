@@ -2,8 +2,7 @@
 //
 // 公式与参数分离：参数全部读 app/config/srs_params.tsv，代码里没有魔法数。
 // app/tests/verify_srs.py 是同一批公式的 Python 参考实现（黄金向量），
-// app/web/tests/srs_parity.mjs 逐格比对 web 版 srs.ts 与本文件的输出，
-// 所以将来移植到 Kotlin 时有一份可对照的数值基准。
+// app/web/tests/srs_parity.mjs 逐格比对 web 版 srs.ts 与本文件的输出。
 
 import fs from 'node:fs';
 import path from 'node:path';

@@ -3,8 +3,6 @@
 
 参数不再硬编码在这里 —— 唯一真相源是 app/config/srs_params.tsv，
 与 app/srs.mjs 读的是同一份文件。
-scripts/e2e_loop.mjs 会把本脚本输出的连对 4 次向量逐格比对，
-所以将来移植到 Kotlin 时有一份可对照的数值基准。
 """
 import io, os, sys
 

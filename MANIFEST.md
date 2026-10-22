@@ -45,7 +45,7 @@ app/           背单词应用
   android/                      Android 壳（WebView + assets 映射），`npm run apk` 一条命令打包安装
     keystore.properties.example  release 签名配置模板（真实 properties / keystore 不入库）
     app/proguard-rules.pro       release R8 规则（保留 @JavascriptInterface 桥方法）
-  srs.mjs                        SRS 参照实现（Kotlin 移植的数值基准）
+  srs.mjs                        SRS 参照实现（web 版 srs.ts 的逐格基准）
   config/srs_params.tsv          SRS 参数唯一真相源（web 侧 JSON 由它生成）
   tests/verify_srs.py            SRS 参数基准（黄金向量）
 
@@ -163,25 +163,6 @@ node app/web/tests/audit_drive.mjs
     `proguard-rules.pro` 显式保留 `NativeBridge` 的 `@JavascriptInterface` 方法。
     发布前必须先定最终项目名/应用名/`applicationId`，详见
     [docs/RELEASE-SIGNING.md](docs/RELEASE-SIGNING.md)。
-
-## 移植清单（→ Kotlin/Android）
-
-本仓库是验证场。移植作业范围：
-
-**要移植的本体：**
-
-| 件 | 说明 | 对照基准 |
-|---|---|---|
-| `app/web/src/srs.ts` | SRS 引擎公式（浏览器版，与 `app/srs.mjs` 逐格等价） | `app/web/tests/srs_parity.mjs` |
-| `app/srs.mjs` | SRS 引擎公式（参照实现） | `app/tests/verify_srs.py` 黄金向量 |
-| `app/web/src/types.ts` `db.ts` | 内容/状态/历史三层 + **义项 UUID 锚点** | docs/DESIGN-词库系统v2 |
-| `app/web/src/importer.ts` | 导入差异与逐条决策 | docs/DESIGN-词库系统v2 §3.2 |
-| `docs/design/05` | 进度库目标模型（`due_at` / `attempt_id` 不变量在此） | CONTRACT.md §2 |
-| `app/config/srs_params.tsv` | SRS 参数 | — |
-| `docs/design/03` | 记忆曲线与复习的行为规范 | — |
-
-（内容数据不再随移植走：内容靠 AI 生成 + 手动添加，在应用内演进；
-原 `content-kit/data/` 与历史内容包只在 git 历史里。）
 
 ## 决策记录
 

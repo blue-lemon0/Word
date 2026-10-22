@@ -1,8 +1,7 @@
 # SQLite 数据模型
 
 > 进度库目标模型（4 表子集落地，含 `due_at` / `attempt_id` 不变量）。
-> 浏览器端当前实现是 `app/web/src/db.ts`（Dexie/IndexedDB，见 DESIGN-词库系统v2.md）；
-> 本文是 SQLite/Room 移植时的模型参照。
+> 浏览器端当前实现是 `app/web/src/db.ts`（Dexie/IndexedDB，见 DESIGN-词库系统v2.md）。
 > 关联：`03-记忆曲线与复习.md` §4。
 > 依据：真实数据探针（旧库 3641 义项 / 16612 句 → DB 4.37MB，建库 1.20s，
 > 五条热查询均 < 2.2ms，外键孤儿 0）。新库句子生成后需重测。
