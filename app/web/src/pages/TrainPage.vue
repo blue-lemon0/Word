@@ -23,8 +23,8 @@ defineOptions({ name: 'TrainPage' })
 const route = useRoute()
 const router = useRouter()
 
-/** 从词库的分组点进来时带的 scope（due / new / learning）——
- *  词库页那几个「练这组」按钮走的就是它。 */
+/** 从词库的分组点进来时带的 scope —— 现在只有「未到期」桶的「练这组」
+ *  走这里；due / new 已统一回首页对应 tab（同一套本体，不开第二外壳）。 */
 const scopeQuery = computed<'due' | 'new' | 'learning' | null>(() => {
   const s = route.query.scope
   return s === 'due' || s === 'new' || s === 'learning' ? s : null
@@ -38,7 +38,7 @@ const headerTitle = computed(() => {
     case 'new':
       return '学新词'
     case 'learning':
-      return '在学的'
+      return '未到期'
     default:
       return '练习'
   }

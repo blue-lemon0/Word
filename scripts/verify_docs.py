@@ -1016,7 +1016,7 @@ interaction = [
 
     # ── D41/D42：词库按学习进度组织、加词要一步到「能背」 ──
     # 词库页的五个桶就是「人心里想事情的顺序」；桶键必须和 quiz 的 scope 对得上
-    ("词库按学习状态分桶（到期 / 在学 / 待学 / 已掌握 / 搁置）",
+    ("词库按学习状态分桶（到期 / 未到期 / 待学 / 已掌握 / 搁置）",
      all(("'%s'" % k) in lib for k in ["due", "learning", "new", "mastered", "idle"])
      and _re.search(r"function bucketOf\(", lib) is not None
      and _re.search(r"rank\[b\] < rank\[bucket\]", lib) is not None),
@@ -1120,6 +1120,11 @@ interaction = [
     ("背单词页不再自带选练法与扫读列表",
      "ModePicker" not in _src(os.path.join("pages", "TrainPage.vue"))
      and "<ScanList" not in _src(os.path.join("pages", "TrainPage.vue"))),
+    # 5) 到期/新词只有一个入口：词库页也回首页 tab，不开 /train 第二外壳
+    ("词库页到期/新词入口回首页 tab（与首页同一套本体，不开 /train 第二外壳）",
+     "query: { tab: scope }" in lib
+     and "consumeTabQuery" in home
+     and "route.query.tab" in home),
     # ── D52：拼写加练（可选）── 本体在 TrainSession（/train 与首页 tab 共用）
     ("拼写是可选加练：只在一轮结束后提供，且不写 SRS",
      "spell-offer" in _src(os.path.join("components", "TrainSession.vue"))

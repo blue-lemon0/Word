@@ -16,7 +16,7 @@
  *    把结算屏吞掉。离开首页再回来才重新数。
  */
 import { computed, nextTick, onActivated, onMounted, reactive, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import WordPeek from '../components/WordPeek.vue'
 import QuestionBox from '../components/QuestionBox.vue'
 import ScanCard from '../components/ScanCard.vue'
@@ -112,16 +112,42 @@ function defaultIdx(list: HomeTab[]): number {
    「复习」tab 消失时不能让人留在原地（位置还在、内容换了）—— 退回默认落点；
    还在的 tab 换了下标也要跟着搬过去（不带动画，搬位置不是翻页）。
    flush:post —— 等 tab 页格真正渲染出来再跳，否则容器还是空的，
-   scrollLeft 会被浏览器夹回 0。 */
+   scrollLeft 会被浏览器夹回 0。
+
+   ★ 词库页「复习这 N 个 / 学几个新词」带 ?tab=due|new 进来：优先落指定 tab。
+   首载时 tabs 还没数完，query 由这个 watcher 在 tabs 出现时消费；
+   已在首页（keep-alive）再带 query 进来时，走下面的 query watcher。 */
+const route = useRoute()
+
+/** 消费一次 ?tab=due|new：能落就落，落不了（对应 tab 不存在）也吞掉，不残留 */
+function consumeTabQuery(): boolean {
+  const t = route.query.tab
+  if (t !== 'due' && t !== 'new') return false
+  void router.replace({ query: {} })
+  const i = tabs.value.findIndex((x) => x.id === t)
+  if (i >= 0) goPane(i, false)
+  return true
+}
+
 watch(
   tabs,
   (list, old) => {
     if (!list.length) return
+    if (consumeTabQuery()) return
     const prevId = old?.[pane.value]?.id
     const i = prevId ? list.findIndex((t) => t.id === prevId) : -1
     goPane(i >= 0 ? i : defaultIdx(list), false)
   },
   { flush: 'post' },
+)
+
+/* keep-alive 回首页时 tabs 不会变（watcher 不触发），query 得单独盯 */
+watch(
+  () => route.query.tab,
+  (t) => {
+    if (!t || !tabs.value.length) return
+    consumeTabQuery()
+  },
 )
 
 /** 空态等处的「去学新词」：不再跳路由，切到学习 tab（不在就不该出现这个按钮） */

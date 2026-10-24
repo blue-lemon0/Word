@@ -3,8 +3,8 @@
  *
  *  ★ 判据：打开这一页的人想问的是「我现在该练什么」，不是
  *    「库里有多少个 T1 词、有多少条缺例句」。所以：
- *    · 顶上是**今天**（到期几个、在学几个、待学几个、已掌握几个）+ 一个开练按钮；
- *    · 列表按**学习状态分桶**（到期 / 在学 / 待学 / 已掌握 / 搁置），
+ *    · 顶上是**今天**（到期几个、未到期几个、待学几个、已掌握几个）+ 一个开练按钮；
+ *    · 列表按**学习状态分桶**（到期 / 未到期 / 待学 / 已掌握 / 搁置），
  *      每桶可折叠、可「练这一桶」；
  *    · 仓库口径（需精修 / 缺例句 / T1）降级成「维护」筛选 —— 它们仍然有用，
  *      但那是**内容生产**的视角，不是学习的视角。
@@ -62,7 +62,7 @@ type Bucket = 'due' | 'learning' | 'new' | 'mastered' | 'idle'
 
 const BUCKETS: Array<{ key: Bucket; title: string; hint: string; tone: string }> = [
   { key: 'due', title: '今天到期', hint: '该复习了', tone: 'hot' },
-  { key: 'learning', title: '在学', hint: '还没到期', tone: 'warm' },
+  { key: 'learning', title: '未到期', hint: '练过，在等间隔', tone: 'warm' },
   { key: 'new', title: '待学', hint: '一次都没练过', tone: 'cool' },
   { key: 'mastered', title: '已掌握', hint: '90 天以上', tone: 'ok' },
   { key: 'idle', title: '搁置', hint: '暂时不学', tone: 'mute' },
@@ -242,7 +242,7 @@ function showStuck(): void {
   stuckOpen.value = true
 }
 
-/** 顶上的四个数：今天到期 / 在学 / 待学 / 已掌握（都按**词**算） */
+/** 顶上的四个数：今天到期 / 未到期 / 待学 / 已掌握（都按**词**算） */
 const head = computed(() => {
   const c: Record<Bucket, number> = { due: 0, learning: 0, new: 0, mastered: 0, idle: 0 }
   for (const r of rows.value) c[r.bucket]++
@@ -251,7 +251,7 @@ const head = computed(() => {
 
 /**
  * 搜索 / 维护筛选后的行：**不包含 only 桶选择**。
- * 筛选按钮上的数字要来自这一层，所以点「在学」不会把其它桶的数字变成 0；
+ * 筛选按钮上的数字要来自这一层，所以点「未到期」不会把其它桶的数字变成 0；
  * 搜索或维护筛选变化时数字仍会跟着缩小，和列表里真正看到的范围一致。
  */
 const scopedRows = computed(() => {
@@ -287,7 +287,7 @@ const grouped = computed(() => {
   return map
 })
 
-/** 折叠状态：默认只展开「到期 / 在学 / 待学」—— 已掌握和搁置不该抢注意力 */
+/** 折叠状态：默认只展开「到期 / 未到期 / 待学」—— 已掌握和搁置不该抢注意力 */
 const collapsed = ref<Set<Bucket>>(new Set(['mastered', 'idle']))
 
 function toggle(b: Bucket): void {
@@ -312,9 +312,18 @@ watch([q, only, maintain, mFilter], () => {
   limit.value = PAGE
 })
 
-/** 从某一桶直接开练：词库从「台账」变成「入口」的关键一步 */
+/** 从某一桶直接开练：词库从「台账」变成「入口」的关键一步。
+ *
+ *  ★ 到期 / 新词不再开 /train 独立页 —— 首页的「复习 / 学习」tab 嵌的就是
+ *    同一套 TrainSession、同一个 scope，再开一个带顶栏的独立页就是两个
+ *    入口两套外壳（用户实测点「复习这 N 个」没落到首页复习 tab）。
+ *    统一回首页切 tab；首页没有的桶（未到期）才走 /train。 */
 function drill(scope: Bucket, n: number): void {
   if (!n) return
+  if (scope === 'due' || scope === 'new') {
+    void router.push({ path: '/', query: { tab: scope } })
+    return
+  }
   void router.push({ path: '/train', query: { scope } })
 }
 
@@ -410,7 +419,7 @@ onMounted(load)
           <template v-else>今天没有要复习的</template>
         </p>
         <p class="t-s">
-          在学 {{ head.learning }} · 待学 {{ head.new }}<template
+          未到期 {{ head.learning }} · 待学 {{ head.new }}<template
             v-if="practisable.new < head.new"
           >（{{ practisable.new }} 个有例句）</template> · 已掌握 {{ head.mastered }}
         </p>
