@@ -306,6 +306,23 @@ onMounted(load)
         />
       </van-cell-group>
 
+      <!-- 提示词管理：同样是二级页。它解决的是「改一句 AI 的话要重新装机」，
+           属于「调这台设备怎么工作」，所以放在 AI 设置旁边。 -->
+      <van-cell-group inset class="grp">
+        <template #title>
+          <b>提示词管理</b><span class="sub">改问 AI 的话，保存就生效</span>
+        </template>
+        <div class="acts">
+          <van-button size="small" plain type="primary" @click="router.push('/prompts')">
+            打开
+          </van-button>
+        </div>
+        <van-cell
+          class="note"
+          title="每块都标了用在哪（哪个页面、哪个按钮）。只存本机，不进备份；改错了可以一键恢复默认。"
+        />
+      </van-cell-group>
+
       <!-- 快照 / 导入历史 / 回收站：三个平级的列表，同一个盒子，左右滑动切换。
            它们本来就是一类东西 —— 都是「已经发生过的、会留痕的记录」，
            合成一栏之后页面少两块标题、列表框从 4 个变 1 个，

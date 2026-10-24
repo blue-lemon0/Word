@@ -1534,7 +1534,7 @@ watch(
     />
 
     <!-- 点词查义：答完之后才可能被打开（见 onPickToken 的守卫） -->
-    <WordPeek :show="peekOpen" :token="peekToken" @close="peekOpen = false" />
+    <WordPeek :show="peekOpen" :token="peekToken" :context="q?.sentence.en ?? ''" @close="peekOpen = false" />
 
     <!-- 扫读点中一行：先给「这句什么意思」，再问要不要练 -->
     <ScanPeek

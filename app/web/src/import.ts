@@ -15,6 +15,7 @@
  */
 import { db } from './db'
 import { snapshot } from './backup'
+import { renderPrompt } from './ai/prompt-store'
 import { addSentenceRow, createSenseRow, ensureWordRow, logImport, runImportTx } from './importWrite'
 import { legacySpanOf, marksFromForms, normalizeMarks } from './marks'
 import type { Sense, Sentence, SentenceMark } from './types'
@@ -330,37 +331,36 @@ export async function importBundle(input: unknown): Promise<ImportReport> {
 
 /** 给 AI 看的完整提示词：现有内容 + 要求 + 输出格式。
  *  slot 一并给出，是为了让人和 AI 说的是同一条义项 —— 否则 AI 拆出来的
- *  意思对不上号，导入时就得全靠猜。 */
+ *  意思对不上号，导入时就得全靠猜。
+ *
+ *  ★ 文案本身在 prompt-registry 的 `copyTemplate` 里（可在「提示词管理」改）；
+ *    这里只负责把词条内容填进变量 —— 三段数据（义项列表、编号骨架、单词）
+ *    是代码算的，改模板时不用管它们怎么排。 */
 export function aiPrompt(
   word: string,
   ipa: string,
   senses: Array<{ slot: number; gloss: string; glossEn?: string; note?: string }>,
 ): string {
-  let t = `单词: ${word}\n音标: ${ipa || '（无）'}\n\n`
+  let senseText = ''
   for (const s of senses) {
-    t += `-- 意思 s${s.slot} --\n中文释义: ${s.gloss}\n`
-    if (s.glossEn) t += `英文释义: ${s.glossEn}\n`
-    if (s.note) t += `备注: ${s.note}\n`
-    t += '\n'
+    senseText += `-- 意思 s${s.slot} --\n中文释义: ${s.gloss}\n`
+    if (s.glossEn) senseText += `英文释义: ${s.glossEn}\n`
+    if (s.note) senseText += `备注: ${s.note}\n`
+    senseText += '\n'
   }
-  t += `请核验并补全：\n`
-  t += `1. 上述中文释义是否准确？不准确请给出更好的。\n`
-  t += `2. 为每个意思造 5 个英文例句 + 中文翻译，每句必须能体现该义项的独特用法（能与同词其他义项区分开）。\n`
-  t += `3. 只输出下面这个 JSON，不要任何其他文字。sentences[].highlights 填句中**所有**目标词词形\n`
-  t += `   （如 goes / went / gone，数组可多项；每个词形都要逐字出现在句子里），\n`
-  t += `   translation 填整句中文翻译，clue 填句子里能体现该义项的语境线索（clue 要能在句中找到）。\n`
-  t += `   不同词性都放在同一个 word 下的不同 sense 里，不要按词性另造单词。\n\n`
-  t += `{"word":"${word}","senses":[\n`
-  t +=
-    senses
-      .map(
-        (s) =>
-          `  {\n    "slot": ${s.slot},\n    "gloss": "...",\n    "glossEn": "...",\n` +
-          `    "note": "...",\n    "sentences": [\n      {"text": "...", "highlights": ["${word}"], "clue": "...", "translation": "..."}\n    ]\n  }`,
-      )
-      .join(',\n')
-  t += `\n]}`
-  return t
+  const sensesJson = senses
+    .map(
+      (s) =>
+        `  {\n    "slot": ${s.slot},\n    "gloss": "...",\n    "glossEn": "...",\n` +
+        `    "note": "...",\n    "sentences": [\n      {"text": "...", "highlights": ["${word}"], "clue": "...", "translation": "..."}\n    ]\n  }`,
+    )
+    .join(',\n')
+  return renderPrompt('copyTemplate', {
+    word,
+    ipaLine: ipa || '（无）',
+    senses: senseText,
+    sensesJson,
+  })
 }
 
 /** 复制到剪贴板：优先异步 API，失败退回 execCommand（老 WebView / 非 https）*/

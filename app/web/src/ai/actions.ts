@@ -14,7 +14,8 @@ import { cacheGet, cachePut, hashOf } from './cache'
 import { chat } from './client'
 import { isConfigured, loadConfig } from './config'
 import { parseProposals } from './parse'
-import { addSentencePrompt, fillWordPrompt, replaceSentencePrompt, reviewWordPrompt } from './prompts'
+import { addSentencePrompt, fillWordPrompt, lemmaPrompt, replaceSentencePrompt, reviewWordPrompt } from './prompts'
+import { promptFingerprint } from './prompt-store'
 import { AiError, type AiActionKind, type AiResult, type Proposal, type WordContext } from './types'
 
 interface Rows {
@@ -37,11 +38,15 @@ async function rowsOf(word: string): Promise<Rows> {
 
 /** 提示词版本 —— 改 prompt 的**形状**（不是措辞微调）时手动 +1。
  *
- *  ★ 为什么要有它：缓存键里已经含内容指纹，但它不知道「提示词变了」。
- *    换了个更强的模型、或者改了输出约束，旧缓存里的结果就不再代表现在的质量 ——
- *    这时候必须能把旧缓存整体作废，而不是靠「内容刚好变了」去碰运气。
+ *  ★ 为什么要有它：缓存键里已经含内容指纹和提示词指纹，但前者不知道
+ *    「提示词变了」、后者不知道「解析器变了」。换了个更强的模型、或者改了
+ *    输出约束（parse.ts 能认的字段），旧缓存里的结果就不再代表现在的质量 ——
+ *    这时候必须能把旧缓存整体作废。
+ *
+ *  ★ 日常改提示词**不需要**动它：文本指纹（promptFingerprint）已经进了缓存键，
+ *    用户在「提示词管理」里改完，下一次调用就是新键。
  */
-const PROMPT_VERSION = 'v3'
+const PROMPT_VERSION = 'v4'
 
 function requireSentencesForEverySense(ps: Proposal[], requiredSlots: number[] = []): string | null {
   const senses = ps.filter((p) => p.kind === 'sense.add' || p.kind === 'sense.update')
@@ -112,8 +117,38 @@ export function cacheKeyOf(
   model: string,
   ctx: WordContext,
   extra = '',
+  prompt = '',
 ): string {
-  return hashOf([PROMPT_VERSION, action, model, extra, JSON.stringify(ctx)].join('|'))
+  return hashOf([PROMPT_VERSION, action, model, extra, prompt, JSON.stringify(ctx)].join('|'))
+}
+
+/** 入库前判原形：句子里点到的生词可能是屈折形式（armies / went / studies）。
+ *
+ *  ★ 为什么要问 AI：lookup 的规则只能在**词库里已有**的形式上验证候选；
+ *    未入库的词（正是要加的那些）规则只能瞎猜，went 这类不规则更是认不出。
+ *  ★ 为什么不走 proposals：它不改库，只回答「这个词的原形是什么」。
+ *  ★ 任何失败都返回空串：调用方退回原行为（用句中的形式建词条），
+ *    加个生词不该卡在一次 AI 调用上。
+ */
+export async function resolveLemma(token: string, sentence = ''): Promise<string> {
+  const w = token.trim().toLowerCase()
+  if (!w) return ''
+  const cfg = loadConfig()
+  if (!isConfigured(cfg)) return ''
+  const messages = lemmaPrompt(w, sentence)
+  const key = hashOf([PROMPT_VERSION, 'lemma', cfg.model, promptFingerprint(messages), w, sentence].join('|'))
+  const hit = await cacheGet(key)
+  if (hit) return hit.payload
+  try {
+    const reply = await chat(messages, { json: true, maxTokens: 40, temperature: 0 })
+    const m = /"word"\s*:\s*"([a-z][a-z'’-]{0,29})"/i.exec(reply.text)
+    const base = (m?.[1] ?? '').toLowerCase()
+    if (!base) return ''
+    await cachePut(key, cfg.model, base)
+    return base
+  } catch {
+    return ''
+  }
 }
 
 /** 一次「取缓存 → 调用 → 解析 → 写缓存」。 */
@@ -128,7 +163,7 @@ async function run(
   if (!isConfigured(cfg)) throw new AiError('no-config', 'AI 还没配置')
 
   const ctx = contextOf(rows)
-  const key = cacheKeyOf(action, cfg.model, ctx, extra)
+  const key = cacheKeyOf(action, cfg.model, ctx, extra, promptFingerprint(messages))
   const bind = { word: rows.word, ipa: rows.ipa, senses: rows.senses, sentences: rows.sentences }
 
   const hit = await cacheGet(key)
@@ -158,14 +193,20 @@ async function run(
   }
 }
 
-/** 体检预算预览用：算出「审这个词」的缓存键**和**大概要多少 token。 */
+/** 体检预算预览用：算出「审这个词」的缓存键**和**大概要多少 token。
+ *
+ *  ★ 键必须和 reviewWord 实际调用的一致 —— 包括提示词指纹。
+ *    用户改过提示词之后，旧缓存确实不会再命中，预览也要如实说「还要花钱」。 */
 export async function reviewSnapshot(
   word: string,
 ): Promise<{ key: string; chars: number } | null> {
   const rows = await rowsOf(word)
   if (!rows.senses.length) return null
   const ctx = contextOf(rows)
-  return { key: cacheKeyOf('reviewWord', loadConfig().model, ctx), chars: JSON.stringify(ctx).length }
+  return {
+    key: cacheKeyOf('reviewWord', loadConfig().model, ctx, '', promptFingerprint(reviewWordPrompt(ctx))),
+    chars: JSON.stringify(ctx).length,
+  }
 }
 
 /** 审查一个词：义项与例句的问题，附补充建议。 */

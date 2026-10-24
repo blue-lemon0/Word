@@ -23,12 +23,15 @@ import { peekWord, type PeekResult } from '../lookup'
 import { addPendingWord, pinSense, tomorrowStart, unpinSense } from '../edit'
 import { allProgress } from '../db'
 import { aiReady } from '../ai/config'
+import { resolveLemma } from '../ai/actions'
 import { toast } from '../toast'
 
 const props = defineProps<{
   show: boolean
   /** 用户点的那个词（原样传进来，规范化在这一层做） */
   token: string
+  /** 点这个词时它所在的句子 —— 判原形时给 AI 消歧用（left / saw 这类靠语境才准） */
+  context?: string
 }>()
 const emit = defineEmits<{ (e: 'close'): void }>()
 
@@ -127,10 +130,24 @@ async function add(): Promise<void> {
   if (!p || busy.value || p.stop) return
   busy.value = true
   try {
-    const r = await addPendingWord(p.lemma)
-    toast(r.existed ? `「${r.word}」本来就在词库里` : `已加入词库：${r.word}`)
+    /* 句子里点到的词常常是屈折形式（armies / went），而它不在库时
+       lookup 只能把原样当 lemma。这里让 AI 判一次原形，按原形建词条 ——
+       否则词条、AI 补的义项和例句会一路都以复数/过去时的样子存在。 */
+    let target = p.lemma
+    if (!p.word && aiOn.value) {
+      const base = await resolveLemma(p.token, props.context ?? '')
+      if (base) target = base
+    }
+    const r = await addPendingWord(target)
+    toast(
+      r.existed
+        ? `「${r.word}」本来就在词库里`
+        : target !== p.token
+          ? `已加入词库：${r.word}（原形；句中是 ${p.token}）`
+          : `已加入词库：${r.word}`,
+    )
     justAdded.value = r.word
-    peek.value = await peekWord(p.lemma)
+    peek.value = await peekWord(target)
   } finally {
     busy.value = false
   }

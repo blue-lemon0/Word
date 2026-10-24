@@ -9,6 +9,7 @@ import BoardPage from './pages/BoardPage.vue'
 import TrainPage from './pages/TrainPage.vue'
 import MorePage from './pages/MorePage.vue'
 import AuditPage from './pages/AuditPage.vue'
+import PromptsPage from './pages/PromptsPage.vue'
 import { VANT_COMPONENTS } from './vant'
 import { ensureSeeded } from './seed'
 import { sweepTrash, verifySchema, warmTables } from './db'
@@ -38,6 +39,8 @@ const router = createRouter({
     { path: '/train', name: 'train', component: TrainPage },
     // 体检是二级页（从「更多」进，没有底栏）：它是一次维护动作，不是一个地方
     { path: '/audit', name: 'audit', component: AuditPage },
+    // 提示词管理也是二级页：低频、属于「调这台设备怎么问 AI」
+    { path: '/prompts', name: 'prompts', component: PromptsPage },
     { path: '/more', name: 'more', component: MorePage, meta: { tab: true } },
   ],
 })

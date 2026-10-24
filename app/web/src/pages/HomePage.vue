@@ -503,7 +503,7 @@ onMounted(async () => {
       :total="scanItem?.count ?? 0"
       @close="scanItem = null"
     />
-    <WordPeek :show="peekOpen" :token="peekToken" @close="peekOpen = false" />
+    <WordPeek :show="peekOpen" :token="peekToken" :context="curQ?.sentence.en ?? ''" @close="peekOpen = false" />
     <AiSheet
       :show="aiOpen"
       :result="aiResult"

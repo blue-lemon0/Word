@@ -163,6 +163,13 @@ node app/web/tests/audit_drive.mjs
     `proguard-rules.pro` 显式保留 `NativeBridge` 的 `@JavascriptInterface` 方法。
     发布前必须先定最终项目名/应用名/`applicationId`，详见
     [docs/RELEASE-SIGNING.md](docs/RELEASE-SIGNING.md)。
+15. **提示词可在应用内改（2026-10-22）**：8 块提示词（共用审校规则、输出 JSON 形状、
+    审查 / 补例句 / 换句 / 补全 / 判原形、复制给 AI 的模板）的默认文本与「用在哪」
+    都在 `app/web/src/ai/prompt-registry.ts`；用户改过的版本存在本机
+    `app/web/src/ai/prompt-store.ts`（localStorage，不进备份），界面是
+    更多 → 提示词管理。改完**立即生效**：`prompts.ts` 每次调用现场读模板，
+    缓存键含提示词指纹，旧结果自动不再命中。模板里的 `{{变量}}` 由代码填
+    （词条内容、编号），保存时校验必需变量与未知变量名。
 
 ## 决策记录
 
