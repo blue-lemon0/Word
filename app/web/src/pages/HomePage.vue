@@ -28,6 +28,8 @@ import type { Question } from '../quiz'
 import type { Sense, Sentence } from '../types'
 import { allProgress } from '../db'
 import { buildRandomQueue, makeQuestion, practicePool, type ScanItem } from '../quiz'
+import { forecastDaily, forecastSummary, type ForecastResult } from '../forecast'
+import ForecastBars from '../components/ForecastBars.vue'
 import { useSnapPager } from '../scroll-pager'
 
 const router = useRouter()
@@ -42,6 +44,12 @@ const router = useRouter()
 const dueN = ref(0)
 const wordsN = ref(0)
 
+/* ── 未来 90 天复习量预测（屏二底部，「复习 N」按钮的延伸）──
+   ★ 口径与上面的按钮一致：只数**能练的义项**（practicePool），按词去重。
+     推演规则全在 forecast.ts；这里只负责把行喂进去、把结果摆出来。 */
+const forecast = ref<ForecastResult | null>(null)
+const fcOpen = ref(false)
+
 async function loadNums(): Promise<void> {
   // ★ 用**能练的义项池**（有例句、没被标记）来数，而不是整张 senses 表：
   //   没例句的词进不了出题池，把它们算进「待学」就会出现「显示 1 个、进去 0 题」。
@@ -55,7 +63,9 @@ async function loadNums(): Promise<void> {
     return p.dueAt <= now ? 0 : 1
   }
   const buckets = new Map<string, number>()
+  const wordOf = new Map<string, string>()
   for (const s of senses) {
+    wordOf.set(s.id, s.word)
     const r = rankOf(s.id)
     const cur = buckets.get(s.word)
     if (cur === undefined || r < cur) buckets.set(s.word, r)
@@ -68,6 +78,13 @@ async function loadNums(): Promise<void> {
   }
   dueN.value = due
   wordsN.value = fresh
+
+  forecast.value = forecastDaily(
+    prows.filter((p) => wordOf.has(p.senseId)),
+    now,
+    90,
+    (id) => wordOf.get(id) ?? '',
+  )
 }
 
 /* ── 屏一：一题一屏 ── */
@@ -470,6 +487,16 @@ onMounted(async () => {
           <ScanList @pick="scanItem = $event" />
         </div>
 
+        <!-- 复习量预测：默认收一行摘要，点开看 90 天柱状图。
+             放在按钮上方而不是列表里 —— 它是「计划感」，不该被句子冲走。 -->
+        <div v-if="forecast && forecast.peakDay >= 0" class="fcstrip">
+          <button class="fchead" type="button" @click="fcOpen = !fcOpen">
+            <span>{{ forecastSummary(forecast) }}</span>
+            <span class="fcarrow">{{ fcOpen ? '收起' : '看图' }}</span>
+          </button>
+          <ForecastBars v-if="fcOpen" :data="forecast" />
+        </div>
+
         <!-- 屏二底部：复习 / 学习 两颗大按钮（拇指区，一左一右） -->
         <div class="pads">
           <button
@@ -824,6 +851,33 @@ onMounted(async () => {
   min-height: 0;
   overflow-y: auto;
   padding: 0 14px 10px;
+}
+
+/* 复习量预测条：钉在按钮上方，不跟列表滚 */
+.fcstrip {
+  flex: 0 0 auto;
+  padding: 4px 14px 0;
+}
+
+.fchead {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border: 0;
+  background: transparent;
+  padding: 4px 2px 6px;
+  font-family: inherit;
+  font-size: 11.5px;
+  color: var(--wb-ink-3);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.fchead .fcarrow {
+  flex: 0 0 auto;
+  color: var(--primary);
 }
 
 /* 屏二底部按钮条 */

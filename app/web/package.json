@@ -11,7 +11,7 @@
     "params": "python scripts/params2json.py",
     "icons": "node scripts/make_icons.mjs",
     "icons:android": "node scripts/make_android_icons.mjs",
-    "test": "node tests/srs_parity.mjs && node tests/flow_smoke.mjs",
+    "test": "node tests/srs_parity.mjs && node tests/flow_smoke.mjs && node tests/forecast.mjs",
     "test:pwa": "npm run build && node tests/pwa_check.mjs",
     "apk": "node scripts/build_apk.mjs",
     "apk:release": "node scripts/build_apk.mjs --release --aab",
