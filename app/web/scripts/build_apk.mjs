@@ -84,24 +84,44 @@ function walk(dir) {
   return out
 }
 
-/** 找 gradle：优先用 wrapper 缓存里的发行版（本机装过 Android Studio，缓存里有） */
+/** 找 gradle：用 wrapper 缓存里**版本最高**的发行版。
+ *
+ *  ★ 为什么不能拿到第一个就用：缓存里会同时躺好几个版本（8.11.1 和 9.4.1），
+ *    而 AGP 对 Gradle 有最低版本要求 —— 拿到旧的就是
+ *    "Minimum supported Gradle version is X" 这种构建期报错。
+ *    按目录名里的版本号排序取最高，新装版本自动生效。 */
 function findGradle() {
   const root = path.join(process.env.USERPROFILE, '.gradle', 'wrapper', 'dists')
   if (existsSync(root)) {
+    const candidates = []
     for (const d of readdirSync(root)) {
       const dir = path.join(root, d)
       if (!statSync(dir).isDirectory()) continue
+      const ver = /gradle-(\d+(?:\.\d+)*)-bin/.exec(d)?.[1]
       for (const sub of readdirSync(dir)) {
         const subDir = path.join(dir, sub)
         if (!statSync(subDir).isDirectory()) continue
         const bat = path.join(subDir, d.replace('-bin', ''), 'bin', 'gradle.bat')
-        if (existsSync(bat)) return bat
+        if (existsSync(bat)) candidates.push({ ver: ver ?? '0', bat })
       }
     }
+    candidates.sort((a, b) => compareVer(b.ver, a.ver))
+    if (candidates.length) return candidates[0].bat
   }
   const local = path.join(ANDROID, 'gradlew.bat')
   if (existsSync(local)) return local
   throw new Error('找不到 gradle：装过 Android Studio 的机器上，wrapper 缓存里通常有')
+}
+
+/** 按段比较 "9.4.1" > "8.11.1"（逐段数值比，不是字符串比） */
+function compareVer(a, b) {
+  const pa = a.split('.').map(Number)
+  const pb = b.split('.').map(Number)
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+    const d = (pa[i] ?? 0) - (pb[i] ?? 0)
+    if (d) return d
+  }
+  return 0
 }
 
 function findBuildTool(name) {
