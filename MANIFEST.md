@@ -163,6 +163,14 @@ node app/web/tests/audit_drive.mjs
     `proguard-rules.pro` 显式保留 `NativeBridge` 的 `@JavascriptInterface` 方法。
     发布前必须先定最终项目名/应用名/`applicationId`，详见
     [docs/RELEASE-SIGNING.md](docs/RELEASE-SIGNING.md)。
+    **CI 发版（2026-10-25）**：`.github/workflows/release.yml`，仅手动触发
+    （Actions → Release → Run workflow，填版本号）——何时推新版由人拍板。
+    流水线：npm ci+build → dist 拷 assets（清空前产物、删 sw.js）→
+    secrets 还原签名密钥 → `./gradlew assembleRelease bundleRelease` →
+    创建 tag v<版本> 与 Release 挂 APK+AAB。versionCode 取 run_number
+    （单调递增），versionName 取输入。Gradle Wrapper（9.4.1）因此入库，
+    本地亦可用 `app/android/gradlew.bat`。所需 secrets：
+    `WORDBANK_KEYSTORE_BASE64` / `WORDBANK_KEYSTORE_PASSWORD` / `WORDBANK_KEY_ALIAS`。
 15. **提示词可在应用内改（2026-10-22）**：8 块提示词（共用审校规则、输出 JSON 形状、
     审查 / 补例句 / 换句 / 补全 / 判原形、复制给 AI 的模板）的默认文本与「用在哪」
     都在 `app/web/src/ai/prompt-registry.ts`；用户改过的版本存在本机

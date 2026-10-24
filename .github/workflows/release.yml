@@ -1,0 +1,88 @@
+# 发版流水线：手动触发（什么时候推新版本由人拍板），构建签名 APK + AAB，
+# 创建 GitHub Release 并挂产物。
+#
+# 用法：GitHub → Actions → Release → Run workflow → 填版本号（如 0.3.0）。
+#   · versionCode 自动取 run_number（单调递增即可，不手工维护）
+#   · tag v<version> 与 Release 由流水线创建，本地不用先打 tag
+#
+# 需要的 Secrets（仓库 Settings → Secrets and variables → Actions）：
+#   WORDBANK_KEYSTORE_BASE64   release-keystore.p12 的 base64（一行）
+#   WORDBANK_KEYSTORE_PASSWORD storePassword / keyPassword（当前两者相同）
+#   WORDBANK_KEY_ALIAS         keyAlias（wordbank-release）
+#
+# 不复用本地 scripts/build_apk.mjs 的原因：它带 Windows 专属逻辑
+# （PowerShell 自检、wrapper 缓存里翻 gradle.bat、默认 SDK 路径），
+# CI 上每一步都是标准动作，直接编排反而更短。
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '版本名，如 0.3.0（会创建 tag v<version> 与同名 Release）'
+        required: true
+        type: string
+
+permissions:
+  contents: write # 创建 Release 需要
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: app/web/package-lock.json
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: 构建前端（vue-tsc + vite build）
+        working-directory: app/web
+        run: npm ci && npm run build
+
+      - name: 前端产物拷进 Android assets（与 build_apk.mjs 第 2 步同规则：先清空、删 sw.js）
+        run: |
+          rm -rf app/android/app/src/main/assets
+          mkdir -p app/android/app/src/main/assets
+          cp -r app/web/dist/. app/android/app/src/main/assets/
+          rm -f app/android/app/src/main/assets/sw.js
+
+      - name: 写入 release 签名配置
+        run: |
+          mkdir -p "$HOME/wordbank-release"
+          echo "${{ secrets.WORDBANK_KEYSTORE_BASE64 }}" | base64 -d > "$HOME/wordbank-release/release-keystore.p12"
+          cat > app/android/keystore.properties <<'EOF'
+          storeFile=/home/runner/wordbank-release/release-keystore.p12
+          storePassword=${{ secrets.WORDBANK_KEYSTORE_PASSWORD }}
+          keyAlias=${{ secrets.WORDBANK_KEY_ALIAS }}
+          keyPassword=${{ secrets.WORDBANK_KEYSTORE_PASSWORD }}
+          EOF
+
+      - name: 写入版本号（versionName 取自输入，versionCode 用 run_number 保证单调递增）
+        run: |
+          sed -i 's/versionName = ".*"/versionName = "${{ inputs.version }}"/' app/android/app/build.gradle.kts
+          sed -i 's/versionCode = .*/versionCode = ${{ github.run_number }}/' app/android/app/build.gradle.kts
+
+      - name: Gradle 构建（签名 APK + AAB）
+        working-directory: app/android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease bundleRelease --no-daemon
+
+      - name: 创建 GitHub Release 并挂产物
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ inputs.version }}
+          name: v${{ inputs.version }}
+          files: |
+            app/android/app/build/outputs/apk/release/app-release.apk
+            app/android/app/build/outputs/bundle/release/app-release.aab
