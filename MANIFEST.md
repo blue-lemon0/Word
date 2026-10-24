@@ -37,7 +37,7 @@ app/           背单词应用
     src/backup.ts                word.backup v2 导出/恢复 + 自动快照回滚
     src/sentence-health.ts       单句义项的健康线（每义项 2 句）
     src/pages/                   首页 单词页 意思页 词库 训练 错题板 更多
-    src/components/              QuestionBox / ScanList / BatchSentencesSheet 等共用组件
+    src/components/              QuestionBox / TrainSession（整轮训练本体）/ ScanList 等共用组件
     public/seed.json             首次启动的种子（cards_v2.json 副本）
     tests/                       srs_parity / flow_smoke / schema_upgrade / perf_probe / pwa_check / cdp / screencast_frames / overscroll_probe
     prototype-v4.html + proto.js 设计原型，定稿是 v4（UI 照它做的）
@@ -170,7 +170,7 @@ node app/web/tests/audit_drive.mjs
     更多 → 提示词管理。改完**立即生效**：`prompts.ts` 每次调用现场读模板，
     缓存键含提示词指纹，旧结果自动不再命中。模板里的 `{{变量}}` 由代码填
     （词条内容、编号），保存时校验必需变量与未知变量名。
-16. **90 天复习量预测（2026-10-24）**：首页屏二底部「复习 N」按钮上方有一条
+16. **90 天复习量预测（2026-10-24）**：首页「扫读」tab 底部钉着一条
     预测（默认收起成一行摘要，点开是 90 天柱状图）。推演在
     `app/web/src/forecast.ts`：把每天到期的卡喂给与真实作答同一套
     `applyReview`，按「每天都练、全部普通速度答对」口径滚出下一次到期；
@@ -184,6 +184,14 @@ node app/web/tests/audit_drive.mjs
     参照实现同步，`srs_parity.mjs` 4800 格对拍 + 专项断言看守）。
     配套：首页随机队列把 24 小时内答过的卡排到最后（`buildRandomQueue`），
     刚练过的优先让位；池子不够时按 last_review 从旧到新补足，队列不为空。
+18. **首页 = 平级 tab（2026-10-25）**：背单词本体从 `pages/TrainPage.vue` 抽成
+    `components/TrainSession.vue`，直接嵌进首页「复习 / 学习」tab
+    （与 /train 同一判分链路）；原首页两屏降为「随便刷 / 扫读」两个 tab。
+    默认落点：有到期 → 复习，无到期有待学 → 学习，都没有 → 随便刷；
+    数量为 0 的 tab 整个隐藏，显隐只在进入首页时刷新（打完一轮不立即隐藏，
+    免得吞掉结算屏）。顶部指示器换成胶囊 tab 条，扫读底部两颗大按钮删除
+    （入口已上 tab 条）。`/train` 只剩薄壳：顶栏 + TrainSession，
+    词库「练这组」仍跳它。
 
 ## 决策记录
 
@@ -208,7 +216,7 @@ D46（练习是浮层不是房间：练一句不跳页；首页内部可横滑�
 
 真机踩坑与判据在 [`docs/notes/踩坑记录.md`](docs/notes/踩坑记录.md)（82 条），
 其中可机械判定的一部分挂在 `scripts/verify_docs.py` 的「真机交互守卫」里
-（162 项）：这些坑都不报错，只能靠断言拦住。
+（166 项）：这些坑都不报错，只能靠断言拦住。
 
 守卫的**边界**要说清楚：它判的是源码文本的形状，不是行为。
 所以「某功能有没有生效」只能靠断言结果的测试（本项目已有 185 条，

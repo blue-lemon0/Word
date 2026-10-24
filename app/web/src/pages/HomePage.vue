@@ -1,25 +1,28 @@
 <script setup lang="ts">
-/** 首页 = **两屏**，左右滑。
+/** 首页 = 一排**平级 tab**（顶部小巧胶囊 tab 条 + 左右滑翻页）：
  *
- *  屏一「刷」= 练习页的一题一屏：词 + 音标 + 例句 + 四个选项 → 判分 + 解析，
- *          上下滑换下一题。视觉与交互照背单词页（不另造一套）。
- *          这里只做**随机**（原「随便练」）；按计划的一整轮在 /train。
- *  屏二「句子」= 练习页的句子列表（随机），点一行看答案、练这一句。
- *          底部左右两颗按钮：复习（今天剩余）/ 学习（词库），
- *          它们只是把屏一切到对应来源再滑过去 —— 不再跳任何「练习页」。
+ *  「复习」= 到期队列、「学习」= 新卡队列 —— 都是 TrainSession 整轮本体
+ *          嵌进来（与 /train 同一套判分链路）；数量为 0 的 tab 整个隐藏。
+ *          复习与学习**平级**，不强制谁先谁后（用户拍板：想先学完再复习也行）。
+ *  「随便刷」= 随机一题一屏（上下滑换下一题），判分照旧写进度；
+ *          它自成一体，不与整轮共享队列。
+ *  「扫读」= 句子流 + 90 天复习量预测条。
  *
- *  ★ 本页只管「随机刷 + 扫句子」；「按计划的一整轮」（到期/新词/在学）
- *    在 /train（openPlan 跳过去）。两个入口别混：这里不出现「练法选择」。
+ *  默认落点：有到期 → 复习；无到期有待学 → 学习；都没有 → 随便刷。
+ *
+ *  ★ tab 显隐只在**进入首页时**刷新（onMounted/onActivated 数一次），
+ *    打完一轮不立即刷新 —— 否则「复习」tab 会在结算屏亮着的瞬间整个消失，
+ *    把结算屏吞掉。离开首页再回来才重新数。
  */
 import { computed, nextTick, onActivated, onMounted, reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import ScanList from '../components/ScanList.vue'
 import ScanPeek from '../components/ScanPeek.vue'
-import DrillSheet from '../components/DrillSheet.vue'
 import WordPeek from '../components/WordPeek.vue'
 import QuestionBox from '../components/QuestionBox.vue'
 import QuickEdit from '../components/QuickEdit.vue'
 import AiSheet from '../components/AiSheet.vue'
+import TrainSession from '../components/TrainSession.vue'
 import { replaceSentence } from '../ai/actions'
 import { aiReady } from '../ai/config'
 import { describeAiError, type AiResult } from '../ai/types'
@@ -32,20 +35,41 @@ import { forecastDaily, forecastSummary, type ForecastResult } from '../forecast
 import ForecastBars from '../components/ForecastBars.vue'
 import { useSnapPager } from '../scroll-pager'
 
+defineOptions({ name: 'HomePage' })
+
 const router = useRouter()
 
 /**
- * 两个数：**今天该复习的词数** 与 **待学的词数**。
+ * 两个数：**今天该复习的词数** 与 **待学的词数**，决定「复习 / 学习」tab 显隐
+ * 与 tab 上的小数字。-1 = 还没数完（首帧先不摆 tab，避免「先亮随便刷、
+ * 再跳去复习」的闪）。
  *
- * ★ 它们必须和「点进去那一组」的口径完全一致 —— 数字来自 A、跳转到 B 时，
+ * ★ 口径必须和「点进去那一组」完全一致 —— 数字来自 A、跳转到 B 时，
  *   人看到「21」进去却是空的（这个错踩过）。所以统一按**词**数、按「这个词最紧要
  *   的那个义项的桶」归类，与词库页五个桶同一套口径。
  */
-const dueN = ref(0)
-const wordsN = ref(0)
+const dueN = ref(-1)
+const wordsN = ref(-1)
 
-/* ── 未来 90 天复习量预测（屏二底部，「复习 N」按钮的延伸）──
-   ★ 口径与上面的按钮一致：只数**能练的义项**（practicePool），按词去重。
+interface HomeTab {
+  id: 'due' | 'new' | 'feed' | 'scan'
+  label: string
+  /** tab 名后面跟的小数字（复习/学习才带） */
+  n?: number
+}
+
+/** 平级 tab 清单：复习/学习按数量显隐，随便刷/扫读恒在 */
+const tabs = computed<HomeTab[]>(() => {
+  if (dueN.value < 0 || wordsN.value < 0) return []
+  const list: HomeTab[] = []
+  if (dueN.value > 0) list.push({ id: 'due', label: '复习', n: dueN.value })
+  if (wordsN.value > 0) list.push({ id: 'new', label: '学习', n: wordsN.value })
+  list.push({ id: 'feed', label: '随便刷' }, { id: 'scan', label: '扫读' })
+  return list
+})
+
+/* ── 未来 90 天复习量预测（扫读 tab 底部）──
+   ★ 口径与上面的数字一致：只数**能练的义项**（practicePool），按词去重。
      推演规则全在 forecast.ts；这里只负责把行喂进去、把结果摆出来。 */
 const forecast = ref<ForecastResult | null>(null)
 const fcOpen = ref(false)
@@ -87,10 +111,44 @@ async function loadNums(): Promise<void> {
   )
 }
 
-/* ── 屏一：一题一屏 ── */
-/* ★ 屏一就是**随机**，且自成一体：
-   它不管到期、不管复习计划，也不和「复习/学习」那一轮共享队列。
-   两个按钮进的是背单词页（一整轮、有进度格、能回看跳题）。 */
+/* ── tab 翻页容器（页码↔滚动同步、keep-alive 恢复都在 useSnapPager 里，坑 62/71）── */
+const hPager = useSnapPager('x', { max: () => tabs.value.length - 1 })
+const pane = hPager.page
+const rootEl = hPager.el
+const goPane = hPager.goTo
+const onScrollRoot = hPager.onScroll
+
+/** 默认落点：有到期先复习；没到期有待学就学习；都没有就随便刷 */
+function defaultIdx(list: HomeTab[]): number {
+  const prefer = dueN.value > 0 ? 'due' : wordsN.value > 0 ? 'new' : 'feed'
+  const i = list.findIndex((t) => t.id === prefer)
+  return i >= 0 ? i : 0
+}
+
+/* tab 集合随数量变化时，按 **id** 重映射当前页：
+   「复习」tab 消失时不能让人留在原地（位置还在、内容换了）—— 退回默认落点；
+   还在的 tab 换了下标也要跟着搬过去（不带动画，搬位置不是翻页）。
+   flush:post —— 等 tab 页格真正渲染出来再跳，否则容器还是空的，
+   scrollLeft 会被浏览器夹回 0。 */
+watch(
+  tabs,
+  (list, old) => {
+    if (!list.length) return
+    const prevId = old?.[pane.value]?.id
+    const i = prevId ? list.findIndex((t) => t.id === prevId) : -1
+    goPane(i >= 0 ? i : defaultIdx(list), false)
+  },
+  { flush: 'post' },
+)
+
+/** 空态等处的「去学新词」：不再跳路由，切到学习 tab（不在就不该出现这个按钮） */
+function goTab(id: HomeTab['id']): void {
+  const i = tabs.value.findIndex((t) => t.id === id)
+  if (i >= 0) goPane(i)
+}
+
+/* ── 随便刷：一题一屏（随机）── */
+/* ★ 它不管到期、不管复习计划，也不和「复习/学习」那一轮共享队列。 */
 const queue = ref<string[]>([])
 const serial = ref(0)
 /* 初始就是 loading（坑 80）：onMounted 必走 newBatch，若初始 false，
@@ -191,7 +249,7 @@ function setBox(i: number, el: unknown): void {
   else boxes.delete(i)
 }
 
-/** 把「AI 换一句」也搬到屏一：作答后发现这句不好，当场换（和背单词页同一个动作）。
+/** 把「AI 换一句」也搬到随便刷：作答后发现这句不好，当场换（和背单词页同一个动作）。
  *  换完重新出这一题 —— 不然解析里还挂着旧例句。 */
 const aiOn = aiReady
 const aiOpen = ref(false)
@@ -265,19 +323,19 @@ function onBoxState(i: number, st: { revealed: boolean; submitted: boolean }): v
   }
 }
 
-/* ── 自动播放（「更多」页总开关）—— 与 TrainPage 同一套时机：
+/* ── 自动播放（「更多」页总开关）—— 与 TrainSession 同一套时机：
  *  新卡出现读单词（短、几乎无感），答完读整句（语境强化）。
  *  回看已答的卡不播：翻旧账时出声只会吓人。
- *  首页的题是外壳预取（preMade）—— curQ 从 null 变成有值的那一瞬
- *  就是「这张卡到货」的时刻，watch curQ 天然覆盖「翻到未答新卡」与
- *  「首张卡异步出完」两种情况。 */
+ *  ★ 只有「随便刷」是当前 tab 时才播：复习/学习 tab 里嵌的 TrainSession
+ *    也有自己的自动播放，两边不抢着出声。 */
+const feedActive = computed(() => tabs.value[pane.value]?.id === 'feed')
 watch(curQ, (cur) => {
-  if (cur && !boxState.value.submitted) autoSpeak(cur.sense.word)
+  if (cur && !boxState.value.submitted && feedActive.value) autoSpeak(cur.sense.word)
 })
 watch(
   () => boxState.value.submitted,
   (done) => {
-    if (done && curQ.value) autoSpeak(curQ.value.sentence.en)
+    if (done && curQ.value && feedActive.value) autoSpeak(curQ.value.sentence.en)
   },
 )
 
@@ -323,11 +381,8 @@ function onAnsweredAt(
   if (a.result === 'CORRECT') right.value++
 }
 
-/* ── 屏二：句子列表 ── */
+/* ── 扫读：句子列表 ── */
 const scanItem = ref<ScanItem | null>(null)
-const drillOpen = ref(false)
-const drillSense = ref('')
-const drillSent = ref<number | undefined>(undefined)
 
 /* ── 查词浮层 / 跳转 ── */
 const peekOpen = ref(false)
@@ -342,20 +397,8 @@ function goWord(w: string): void {
   void router.push(`/word/${encodeURIComponent(w)}`)
 }
 
-/* ── 两屏切换（横滑翻页容器：页码↔滚动同步、keep-alive 恢复都在 useSnapPager 里，坑 62/71）── */
-const hPager = useSnapPager('x')
-const pane = hPager.page
-const rootEl = hPager.el
-const goPane = hPager.goTo
-const onScrollRoot = hPager.onScroll
-
-/** 复习 / 学习：**进背单词页**（一整轮、有进度格、能回看跳题）；
- *  屏一留给「随便刷」——那里没有进度条，不该承担一轮复习。 */
-function openPlan(scope: 'due' | 'new' | 'learning'): void {
-  void router.push({ path: '/train', query: { scope } })
-}
-
-/** keep-alive 回来：刷新数字。两个翻页容器的滚动位置由 useSnapPager 各自放回去（坑 62/71）。 */
+/** keep-alive 回来：重新数一次（tab 显隐只在这时刷新，见文件头）。
+ *  两个翻页容器的滚动位置由 useSnapPager 各自放回去（坑 62/71）。 */
 onActivated(() => {
   void loadNums()
 })
@@ -368,19 +411,36 @@ onMounted(async () => {
 
 <template>
   <div class="wb-page home">
-    <!-- 两屏指示：竖着两个点 -->
-      <!-- 两屏指示：顶部居中，带一个半透明底片（压在吸顶标题上也不会糊） -->
-    <div class="dots">
-      <button class="dot" :class="{ on: pane === 0 }" type="button" aria-label="刷题" @click="goPane(0)" />
-      <button class="dot" :class="{ on: pane === 1 }" type="button" aria-label="句子列表" @click="goPane(1)" />
+    <!-- 小巧 tab 条（胶囊分段控件）：absolute 居中压在状态栏下沿；
+         各 tab 页格统一用 padding-top 给它让位 -->
+    <div v-if="tabs.length" class="htabs">
+      <button
+        v-for="(t, i) in tabs"
+        :key="t.id"
+        class="htab"
+        :class="{ on: pane === i }"
+        type="button"
+        @click="goPane(i)"
+      >
+        {{ t.label }}<span v-if="t.n" class="htn">{{ t.n }}</span>
+      </button>
     </div>
 
-    <div ref="rootEl" class="hroot" @scroll.passive="onScrollRoot">
-      <!-- 屏一：一题一屏（照背单词页） -->
-      <section class="hpage">
-        <div class="qpane">
+    <!-- 首帧：数量还没数完，先不摆任何 tab（避免落点跳变闪一下） -->
+    <div v-if="!tabs.length" class="hboot">
+      <van-loading color="#4f46e5" />
+    </div>
+
+    <div v-else ref="rootEl" class="hroot" @scroll.passive="onScrollRoot">
+      <section v-for="(t, i) in tabs" :key="t.id" class="hpage">
+        <!-- 复习 / 学习：整轮训练本体嵌进来（左右滑让位给外层 tab 翻页）；
+             不是当前 tab 的那侧不许出声、不许抢焦点、不许亮固定操作条 -->
+        <TrainSession v-if="t.id === 'due'" scope="due" embedded :active="pane === i" />
+        <TrainSession v-else-if="t.id === 'new'" scope="new" embedded :active="pane === i" />
+
+        <!-- 随便刷：一题一屏（随机） -->
+        <div v-else-if="t.id === 'feed'" class="qpane">
           <div class="qtop">
-            <span class="qmode">随机</span>
             <span v-if="total" class="qnum">{{ idx + 1 }} / {{ total }}</span>
             <span v-if="done" class="qres">对 {{ right }} · 已答 {{ done }}</span>
             <span class="wb-sp" />
@@ -443,7 +503,7 @@ onMounted(async () => {
             <p>这组现在没有可练的</p>
             <div class="qempty-btns">
               <van-button block round type="primary" @click="newBatch">换一批</van-button>
-              <van-button block round @click="openPlan('new')">去学新词</van-button>
+              <van-button v-if="wordsN > 0" block round @click="goTab('new')">去学新词</van-button>
             </div>
           </div>
 
@@ -479,48 +539,23 @@ onMounted(async () => {
           </div>
 
         </div>
-      </section>
 
-      <!-- 屏二：句子列表 + 底部两颗大按钮 -->
-      <section class="hpage">
-        <div class="list-wrap">
-          <ScanList @pick="scanItem = $event" />
-        </div>
+        <!-- 扫读：句子流 + 底部 90 天复习量预测条 -->
+        <template v-else>
+          <div class="list-wrap">
+            <ScanList @pick="scanItem = $event" />
+          </div>
 
-        <!-- 复习量预测：默认收一行摘要，点开看 90 天柱状图。
-             放在按钮上方而不是列表里 —— 它是「计划感」，不该被句子冲走。 -->
-        <div v-if="forecast && forecast.peakDay >= 0" class="fcstrip">
-          <button class="fchead" type="button" @click="fcOpen = !fcOpen">
-            <span>{{ forecastSummary(forecast) }}</span>
-            <span class="fcarrow">{{ fcOpen ? '收起' : '看图' }}</span>
-          </button>
-          <ForecastBars v-if="fcOpen" :data="forecast" />
-        </div>
-
-        <!-- 屏二底部：复习 / 学习 两颗大按钮（拇指区，一左一右） -->
-        <div class="pads">
-          <button
-            class="pad"
-            type="button"
-            :disabled="dueN === 0"
-            :class="{ off: dueN === 0 }"
-            @click="dueN && openPlan('due')"
-          >
-            <b>{{ dueN }}</b>
-            <span>{{ dueN ? '复习 · 今天剩余' : '今天没有到期的' }}</span>
-          </button>
-          <button
-            class="pad study"
-            type="button"
-            :disabled="wordsN === 0"
-            :class="{ off: wordsN === 0 }"
-            @click="wordsN && openPlan('new')"
-          >
-            <b>{{ wordsN }}</b>
-            <span>{{ wordsN ? '学习 · 待学' : '没有待学的词了' }}</span>
-          </button>
-        </div>
-
+          <!-- 复习量预测：默认收一行摘要，点开看 90 天柱状图。
+               钉在列表下方而不是列表里 —— 它是「计划感」，不该被句子冲走。 -->
+          <div v-if="forecast && forecast.peakDay >= 0" class="fcstrip">
+            <button class="fchead" type="button" @click="fcOpen = !fcOpen">
+              <span>{{ forecastSummary(forecast) }}</span>
+              <span class="fcarrow">{{ fcOpen ? '收起' : '看图' }}</span>
+            </button>
+            <ForecastBars v-if="fcOpen" :data="forecast" />
+          </div>
+        </template>
       </section>
     </div>
 
@@ -545,13 +580,6 @@ onMounted(async () => {
       :sense="edSense"
       @saved="() => { edSentence = null; edSense = null; }"
     />
-    <DrillSheet
-      :open="drillOpen"
-      :sense-id="drillSense"
-      :sentence-id="drillSent"
-      @close="drillOpen = false"
-      @word="(w) => { drillOpen = false; goWord(w) }"
-    />
   </div>
 </template>
 
@@ -564,12 +592,16 @@ onMounted(async () => {
     radial-gradient(900px 480px at 12% -8%, #eef2ff 0%, rgba(238, 242, 255, 0) 58%),
     radial-gradient(700px 400px at 100% 4%, #f5f3ff 0%, rgba(245, 243, 255, 0) 55%),
     var(--wb-bg);
-}
-
-/* 页面：两屏占满剩余高度，底部按钮条固定 */
-.home {
   display: flex;
   flex-direction: column;
+}
+
+/* 首帧（数量未出）：轻量居中 loading，一瞬即过 */
+.hboot {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .hroot {
@@ -590,52 +622,69 @@ onMounted(async () => {
 .hpage {
   flex: 0 0 100%;
   height: 100%;
+  box-sizing: border-box;
+  /* 统一给顶部 tab 条让位：各 tab 页格自己不再算状态栏，
+     内层滚动容器（.tsess / .qpane / .list-wrap）都顶满让位后的剩余高度 */
+  padding-top: calc(var(--wb-sb-h) + 42px);
   scroll-snap-align: start;
   scroll-snap-stop: always;
   display: flex;
   flex-direction: column;
 }
 
-/* 指示点：顶部居中 + 背景矩形 */
-.dots {
+/* 小巧 tab 条：胶囊分段控件（替代原来的两个圆点指示器）。
+   absolute 居中压在状态栏下沿，带半透明底片（压在内容上也不糊）。 */
+.htabs {
   position: absolute;
-  top: calc(var(--wb-sb-h) + 2px);
+  top: calc(var(--wb-sb-h) + 4px);
   left: 50%;
   transform: translateX(-50%);
   z-index: 6;
   display: flex;
-  gap: 6px;
-  padding: 4px 8px;
+  gap: 2px;
+  padding: 3px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.86);
   border: 1px solid var(--wb-line);
   backdrop-filter: blur(6px);
 }
 
-.dot {
-  width: 6px;
-  height: 6px;
-  padding: 0;
+.htab {
   border: 0;
-  border-radius: 50%;
-  background: rgba(17, 17, 27, 0.2);
+  background: transparent;
+  border-radius: 999px;
+  padding: 4px 11px;
+  font-family: inherit;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--wb-ink-2);
   cursor: pointer;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.dot.on {
+.htab.on {
   background: var(--wb-primary);
-  width: 16px;
-  border-radius: 3px;
+  color: #fff;
+  font-weight: 600;
 }
 
-/* ── 屏一 ── */
+/* tab 名后面的小数字（复习 12 / 学习 8） */
+.htn {
+  margin-left: 3px;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.8;
+}
+
+/* ── 随便刷 ── */
 .qpane {
   position: relative;
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
-  padding: calc(var(--wb-sb-h) + 26px) 18px 8px;
+  padding: 0 18px 8px;
   overflow: hidden;
 }
 
@@ -670,11 +719,6 @@ onMounted(async () => {
   padding-bottom: 10px;
   font-size: 12.5px;
   color: var(--wb-ink-3);
-}
-
-.qmode {
-  color: var(--wb-ink);
-  font-weight: 650;
 }
 
 .qnum,
@@ -845,7 +889,7 @@ onMounted(async () => {
   height: 100%;
 }
 
-/* ── 屏二 ── */
+/* ── 扫读 ── */
 .list-wrap {
   flex: 1;
   min-height: 0;
@@ -853,10 +897,10 @@ onMounted(async () => {
   padding: 0 14px 10px;
 }
 
-/* 复习量预测条：钉在按钮上方，不跟列表滚 */
+/* 复习量预测条：钉在列表下方，不跟列表滚 */
 .fcstrip {
   flex: 0 0 auto;
-  padding: 4px 14px 0;
+  padding: 4px 14px calc(8px + env(safe-area-inset-bottom, 0px));
 }
 
 .fchead {
@@ -878,64 +922,5 @@ onMounted(async () => {
 .fchead .fcarrow {
   flex: 0 0 auto;
   color: var(--primary);
-}
-
-/* 屏二底部按钮条 */
-.pads {
-  flex: 0 0 auto;
-  display: flex;
-  gap: 10px;
-  padding: 8px 14px calc(8px + env(safe-area-inset-bottom, 0px));
-  background: linear-gradient(to top, var(--wb-bg) 70%, rgba(255, 255, 255, 0));
-  backdrop-filter: blur(6px);
-}
-
-.pad {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1px;
-  padding: 8px 8px;
-  border: 1px solid var(--wb-line);
-  border-radius: 16px;
-  background: var(--wb-card);
-  font-family: inherit;
-  cursor: pointer;
-}
-
-.pad b {
-  font-size: 22px;
-  font-weight: 750;
-  letter-spacing: -0.6px;
-  color: var(--wb-ink);
-  line-height: 1.1;
-}
-
-.pad span {
-  font-size: 12px;
-  color: var(--wb-ink-3);
-}
-
-.pad:active {
-  background: var(--wb-bg);
-}
-
-.pad.off {
-  opacity: 0.55;
-  cursor: default;
-}
-
-.pad.study {
-  background: var(--wb-primary);
-  border-color: var(--wb-primary);
-}
-
-.pad.study b {
-  color: #fff;
-}
-
-.pad.study span {
-  color: rgba(255, 255, 255, 0.85);
 }
 </style>

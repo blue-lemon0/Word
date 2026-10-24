@@ -100,6 +100,17 @@ export function keepVisible(el: Element | null | undefined, delay = 320): void {
       return // 全都在可见区里，一个像素都不动
     }
 
+    // 训练会话是自己的滚动容器（.tsess，/train 薄壳与首页 tab 内嵌都是它）：
+    // window 这时根本不可滚，滚 window 是空操作，必须滚这个容器本身。
+    const scroller = el instanceof HTMLElement ? el.closest('.tsess') : null
+    if (scroller instanceof HTMLElement) {
+      const smax = Math.max(0, scroller.scrollHeight - scroller.clientHeight)
+      const starget = Math.min(Math.max(scroller.scrollTop + delta, 0), smax)
+      if (Math.abs(starget - scroller.scrollTop) < 1) return
+      scroller.scrollTo({ top: starget, behavior: 'smooth' })
+      return
+    }
+
     // 页面能滚的合法区间：键盘弹出后 .wb-page 的 padding-bottom 加了 --kb，
     // 所以最大滚动位置也跟着变大 —— 不夹住就会滚到「文档底」以外。
     const max = Math.max(0, document.documentElement.scrollHeight - window.innerHeight)

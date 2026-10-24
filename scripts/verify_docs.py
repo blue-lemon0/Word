@@ -243,6 +243,8 @@ WEB = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "app", "web
 STYLE = os.path.join(WEB, "src", "style.css")
 HOME = os.path.join(WEB, "src", "pages", "HomePage.vue")
 TRAIN = os.path.join(WEB, "src", "pages", "TrainPage.vue")
+# 训练本体（2026-10-25 起）：/train 薄壳与首页「复习/学习」tab 共用这一份
+TRAINSESS = os.path.join(WEB, "src", "components", "TrainSession.vue")
 SENSE = os.path.join(WEB, "src", "pages", "SensePage.vue")
 WORD = os.path.join(WEB, "src", "pages", "WordPage.vue")
 LIB = os.path.join(WEB, "src", "pages", "LibraryPage.vue")
@@ -285,6 +287,7 @@ def _code(p):
 css = _code(STYLE)
 home = _code(HOME)
 train = _code(TRAIN)
+tsess = _code(TRAINSESS)
 sense = _code(SENSE)
 lib = _code(LIB)
 word = _code(WORD)
@@ -1053,12 +1056,21 @@ interaction = [
      and "makeQuestion(" in _src(os.path.join("components", "QuestionBox.vue"))
      and "recordAnswer(" in _src(os.path.join("components", "QuestionBox.vue"))
      and "<QuestionBox" in _src(os.path.join("components", "DrillSheet.vue"))),
-    # 首页两屏（D48）：屏一竖滑刷句子，屏二句子列表 + 底部两个大按钮
-    ("首页两屏可横滑（x 吸附，两个整屏）",
-     "scroll-snap-type: x mandatory" in home and home.count('class="hpage"') == 2),
-    ("屏一一屏一道题（题目区占满、不被列表挤）",
+    # 首页平级 tab（2026-10-25 改版）：复习/学习 = TrainSession 本体嵌进来，
+    # 随便刷 = 随机一题一屏（竖滑），扫读 = 句子流；顶部是小巧胶囊 tab 条。
+    ("首页平级 tab 横滑（x 吸附，页格随 tab 清单渲染）",
+     "scroll-snap-type: x mandatory" in home and 'v-for="(t, i) in tabs"' in home),
+    ("复习/学习 tab 嵌的就是 TrainSession 本体（同一判分链路）",
+     "<TrainSession" in home and 'scope="due"' in home and 'scope="new"' in home),
+    ("/train 只剩薄壳（顶栏 + TrainSession，练哪一组靠 ?scope=）",
+     "<TrainSession" in train and "wb-topbar" in train),
+    ("顶部是小巧 tab 条（胶囊分段），不再是两个圆点指示器",
+     'class="htabs"' in home and 'class="dots"' not in home),
+    ("扫读底部的「复习/学习」大按钮已删（入口已上 tab 条）",
+     'class="pads"' not in home and "openPlan" not in home),
+    ("随便刷一屏一道题（题目区占满、不被列表挤）",
      ".qpane" in home and "min-height: 0" in home),
-    ("屏一视觉照背单词页（同一个 QuestionBox）",
+    ("随便刷视觉照背单词页（同一个 QuestionBox）",
      "<QuestionBox" in home
      and os.path.exists(os.path.join(WEB, "src", "components", "QuestionBox.vue"))),
     ("首页例句点词开浮层（不跳页）",
@@ -1088,44 +1100,45 @@ interaction = [
     ("错题板只是清单（没有「单挑」这类答题入口）",
      "单挑这个意思" not in _code(os.path.join(WEB, "src", "pages", "BoardPage.vue"))
      and "train?solo" not in _code(os.path.join(WEB, "src", "pages", "BoardPage.vue"))),
-    # 2) 数量为 0 的按钮不跳转
-    ("数量 0 的按钮置灰（首页「复习 · 今天剩余 0」）",
-     re.search(r':disabled="dueN === 0"', home) is not None),
-    # 3) 同一个动作只留一个入口：随机只在首页
-    ("随机入口只有首页屏一（背单词页不再自带随机）",
+    # 2) 数量为 0 的练法不摆出来：tab 整个隐藏（首页「复习/学习」按数量显隐）
+    ("数量为 0 的 tab 整个隐藏（首页「复习/学习」）",
+     "dueN.value > 0" in home and "wordsN.value > 0" in home),
+    # 3) 同一个动作只留一个入口：随机只在首页「随便刷」tab
+    ("随机入口只有首页（训练会话与 /train 薄壳都不自带随机）",
      "buildRandomQueue" in _code(os.path.join(WEB, "src", "pages", "HomePage.vue"))
+     and "buildRandomQueue" not in tsess
      and "buildRandomQueue" not in _code(os.path.join(WEB, "src", "pages", "TrainPage.vue"))),
-    # 4) 一页只管一件事：背单词页不再自带选练法与扫读
+    # 4) 一页只管一件事：/train 薄壳不再自带选练法与扫读
     ("背单词页不再自带选练法与扫读列表",
      "ModePicker" not in _src(os.path.join("pages", "TrainPage.vue"))
      and "<ScanList" not in _src(os.path.join("pages", "TrainPage.vue"))),
-    # ── D52：拼写加练（可选）──
+    # ── D52：拼写加练（可选）── 本体在 TrainSession（/train 与首页 tab 共用）
     ("拼写是可选加练：只在一轮结束后提供，且不写 SRS",
-     "spell-offer" in _src(os.path.join("pages", "TrainPage.vue"))
-     and "startSpell" in _src(os.path.join("pages", "TrainPage.vue"))
+     "spell-offer" in _src(os.path.join("components", "TrainSession.vue"))
+     and "startSpell" in _src(os.path.join("components", "TrainSession.vue"))
      # 拼写整整一段只有一次 recordAnswer（就是答题那条路），说明拼写没写进度
-     and _src(os.path.join("pages", "TrainPage.vue")).count("recordAnswer(") == 1),
+     and _src(os.path.join("components", "TrainSession.vue")).count("recordAnswer(") == 1),
     ("拼写比对口径只有一处（src/spell.ts）",
      os.path.exists(os.path.join(WEB, "src", "spell.ts"))
-     and "spellMatched(" in _src(os.path.join("pages", "TrainPage.vue"))
+     and "spellMatched(" in _src(os.path.join("components", "TrainSession.vue"))
      and "spellMatched(" in _src(os.path.join("spell.ts"))),
     # 错题循环：走到头回到最早那个错的，全对才结算（背单词 / 拼写都是）
     ("背单词有错题循环，且错过的要连对两次",
-     "needFix" in _src(os.path.join("pages", "TrainPage.vue"))
-     and "async function jumpTo(" in _src(os.path.join("pages", "TrainPage.vue"))
+     "needFix" in _src(os.path.join("components", "TrainSession.vue"))
+     and "async function jumpTo(" in _src(os.path.join("components", "TrainSession.vue"))
      # 错一次 → 置 2；答对减一；再错重置
-     and "[at]: 2" in _src(os.path.join("pages", "TrainPage.vue"))),
+     and "[at]: 2" in _src(os.path.join("components", "TrainSession.vue"))),
     ("拼写也要求连对两次（只重拼没连对够的）",
-     "spellNeed" in _src(os.path.join("pages", "TrainPage.vue"))
-     and "spellRound" in _src(os.path.join("pages", "TrainPage.vue"))),
+     "spellNeed" in _src(os.path.join("components", "TrainSession.vue"))
+     and "spellRound" in _src(os.path.join("components", "TrainSession.vue"))),
     # 首页两个数字必须和「点进去那一组」同口径：用能练的池子来数
     ("首页的数字来自能练的池子（与队列同口径）",
      "practicePool()" in _src(os.path.join("pages", "HomePage.vue"))
      and "allWords()" not in _src(os.path.join("pages", "HomePage.vue"))),
     # ── 这一轮：翻页动画、词库吸顶搜索、词库按钮口径 ──
     ("背单词页左右翻页有动画（不是硬切）",
-     "slideFromRight" in _src(os.path.join("pages", "TrainPage.vue"))
-     and "playAnim(" in _src(os.path.join("pages", "TrainPage.vue"))),
+     "slideFromRight" in _src(os.path.join("components", "TrainSession.vue"))
+     and "playAnim(" in _src(os.path.join("components", "TrainSession.vue"))),
     ("词库搜索框吸顶且底色不透明（滚动时不会漏出词条）",
      "position: sticky" in _src(os.path.join("pages", "LibraryPage.vue"))
      and "box-shadow: 0 -10px 0 0 var(--wb-bg)" in _src(os.path.join("pages", "LibraryPage.vue"))),
@@ -1204,8 +1217,8 @@ interaction = [
      in _code(os.path.join(WEB, "src", "pages", "HomePage.vue"))),
     # 坑 82：class="opts done" 撞了结算屏 .done 的 min-height:100dvh-32px ≈ 730px，
     # 选项容器被撑出 530px 空气。答题完成态不需要专门 class。
-    ("TrainPage 选项容器不带 done class（避免撞结算屏 .done 的 min-height）",
-     'class="opts done"' not in _code(os.path.join(WEB, "src", "pages", "TrainPage.vue"))),
+    ("TrainSession 选项容器不带 done class（避免撞结算屏 .done 的 min-height）",
+     'class="opts done"' not in tsess),
 ]
 
 fi = 0
