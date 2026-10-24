@@ -266,8 +266,23 @@ function shuffle<T>(a: T[]): T[] {
  *   增长按「已等待 / 计划间隔」打折（srs.ts 的提前复习折扣）；
  *   isDue=false，所以正确率统计不受影响 —— 「提前复习不计入正确率」
  *   那条口径继续成立。
+ *
+ *  ★ 队列里**混着扫读卡**（抖音信息流式插入位：刷视频时偶尔刷到直播）：
+ *   每 SCAN_WINDOW 题一个窗口，窗口内随机位置插 1 张扫读卡
+ *   （3 句、每句目标词不同，先心猜再翻开自评）。池子太小凑不出整张卡时
+ *   那个窗口就不插 —— 宁可没有，也不给一句的「扫读卡」（一句那是单题）。
+ *   复习/学习那一轮是严肃整轮，不插。
  */
-export async function buildRandomQueue(limit = SESSION_SIZE, only?: string[]): Promise<string[]> {
+
+/** 随便刷队列的一格：单题，或一张扫读卡 */
+export type FeedEntry =
+  | { kind: 'q'; senseId: string }
+  | { kind: 'scan'; items: ScanItem[] }
+
+/** 扫读卡的插入频率：每 10 题一个窗口，窗口内随机位置插 1 张 */
+const SCAN_WINDOW = 10
+
+export async function buildRandomQueue(limit = SESSION_SIZE, only?: string[]): Promise<FeedEntry[]> {
   const [pool, prows] = await Promise.all([practicePool(), allProgress()])
   const cands = only ? pool.filter((s) => only.includes(s.id)) : pool
   /* 24 小时内答过的卡**靠后站**：刚答对就再刷到，既没记忆价值（提前复习折扣
@@ -286,67 +301,65 @@ export async function buildRandomQueue(limit = SESSION_SIZE, only?: string[]): P
     if (out.length >= limit) break
     out.push(s.id)
   }
-  return out
+
+  // 扫读卡插入位：逐窗口推进，窗口内随机落点
+  const cards = await scanCardBatch(Math.floor(out.length / SCAN_WINDOW))
+  const mixed: FeedEntry[] = []
+  let ci = 0
+  for (let w = 0; w * SCAN_WINDOW < out.length; w++) {
+    const chunk: FeedEntry[] = out
+      .slice(w * SCAN_WINDOW, (w + 1) * SCAN_WINDOW)
+      .map((senseId) => ({ kind: 'q' as const, senseId }))
+    const card = cards[ci]
+    if (card) {
+      chunk.splice(Math.floor(Math.random() * (chunk.length + 1)), 0, {
+        kind: 'scan',
+        items: card,
+      })
+      ci++
+    }
+    mixed.push(...chunk)
+  }
+  return mixed
 }
 
-/** 扫读用：一次给一批句子（混词、不排序），供「点哪句猜哪句」。
- *  返回的是**句子**而不是义项 —— 扫读的最小单位就是那一行。 */
+/** 扫读卡用：最小单位是**句子**（带它的义项），不是义项本身。 */
 export interface ScanItem {
   sentence: Sentence
   sense: Sense
-  /** 这个义项一共有几条例句 —— 扫读浮层里要说「N 句」，让人知道后面还有没有 */
-  count: number
 }
 
-export async function scanBatch(
-  limit = 14,
-  only?: string[],
-  skipWord = '',
-): Promise<ScanItem[]> {
-  const [pool, sents] = await Promise.all([practicePool(), allSentences()])
-  const byId = new Map(pool.map((s) => [s.id, s]))
-  const rows = sents.filter(
-    (s) =>
-      !s.flagged &&
-      byId.has(s.senseId) &&
-      (!only || only.includes(s.senseId)) &&
-      byId.get(s.senseId)!.word !== skipWord,
-  )
-  // 同一个词最多连着出 1 句：报纸式浏览的乐趣在于「不断换词」，
-  // 连续三行同一个词会让人觉得卡住了。
-  const out: ScanItem[] = []
-  const seen = new Set<string>()
-  const cnt = new Map<string, number>()
-  for (const s of sents) cnt.set(s.senseId, (cnt.get(s.senseId) ?? 0) + 1)
-  for (const s of shuffle(rows)) {
-    const sense = byId.get(s.senseId)!
-    if (seen.has(sense.word) && out.length < limit) continue
-    seen.add(sense.word)
-    out.push({ sentence: s, sense, count: cnt.get(s.senseId) ?? 1 })
-    if (out.length >= limit) break
+/**
+ * 组 `cards` 张扫读卡：一张卡 = perCard 条例句，**每句目标词不同**
+ * （feedBatch 本身一词一句，切出来的卡天然满足）。
+ * 凑不满一整张的零头直接扔 —— 见 buildRandomQueue 的说明。
+ */
+export async function scanCardBatch(cards: number, perCard = 3): Promise<ScanItem[][]> {
+  if (cards <= 0) return []
+  const items = await feedBatch(cards * perCard)
+  const out: ScanItem[][] = []
+  for (let i = 0; i + perCard <= items.length; i += perCard) {
+    out.push(items.slice(i, i + perCard))
   }
   return out
 }
 
 /**
- * 「刷」的队列：随机但**有偏**。
+ * 扫读卡的句子来源：随机但**有偏**。
  *
  *  ★ 纯随机（每条等概率）在真实词库里会变成「一直在刷待学的生词」——
  *    正在学的那些反而轮不到。所以按状态加权：
  *      到期 3 · 在学 2 · 待学 2 · 已掌握（rusty）1
  *    这仍然是随机，只是偏向「现在更该看」的那些。
- *  ★ 一个词最多出现一次：连续两张同一个词，会让人以为没刷新。
- *  ★ exclude 用来做无限加载 —— 已经刷过的词不再重复出现。
+ *  ★ 一个词最多出现一次：一张卡里两句同一个词，会让人以为没刷新。
+ *  ★ 只要带中文翻译的句子：扫读卡的玩法是「先心猜、翻开对答案」，
+ *    没中文就没法对。
  */
-export async function feedBatch(limit = 8, exclude: string[] = []): Promise<ScanItem[]> {
+export async function feedBatch(limit = 8): Promise<ScanItem[]> {
   const [pool, sents, prows] = await Promise.all([practicePool(), allSentences(), allProgress()])
   const byId = new Map(pool.map((s) => [s.id, s]))
   const pmap = new Map(prows.map((p) => [p.senseId, p]))
   const now = Math.floor(Date.now() / 1000)
-  const skip = new Set(exclude)
-
-  const cnt = new Map<string, number>()
-  for (const s of sents) cnt.set(s.senseId, (cnt.get(s.senseId) ?? 0) + 1)
 
   /** 权重：到期 3、在学 2、待学 2、rusty 的已掌握 1 */
   const weightOf = (senseId: string): number => {
@@ -360,7 +373,7 @@ export async function feedBatch(limit = 8, exclude: string[] = []): Promise<Scan
   const seenWord = new Set<string>()
   for (const s of sents) {
     const sense = byId.get(s.senseId)
-    if (!sense || s.flagged || skip.has(sense.word) || seenWord.has(sense.word)) continue
+    if (!sense || s.flagged || !s.zh || seenWord.has(sense.word)) continue
     const w = weightOf(s.senseId)
     if (w <= 0) continue
     seenWord.add(sense.word)
@@ -379,8 +392,7 @@ export async function feedBatch(limit = 8, exclude: string[] = []): Promise<Scan
     }
     const picked = bag[Math.min(i, bag.length - 1)]
     bag.splice(bag.indexOf(picked), 1)
-    const sense = byId.get(picked.s.senseId)!
-    out.push({ sentence: picked.s, sense, count: cnt.get(sense.id) ?? 1 })
+    out.push({ sentence: picked.s, sense: byId.get(picked.s.senseId)! })
   }
   return out
 }
@@ -456,6 +468,31 @@ export async function recordAnswer(
     await db.reviewLog.put(log)
   })
   return { outcome, justMastered }
+}
+
+/**
+ * 扫读卡的自评落 SRS：勾 = CORRECT、叉 = WRONG，与选项作答同一条链路
+ * （同一个 recordAnswer，同一个提前复习折扣 —— 没到期就打勾，
+ * 增长会被「已等待 / 计划间隔」自动打到接近零，自评不需要额外防刷）。
+ *
+ *  没有选项、没有计时：elapsedMs 传 null（时长只用于快慢分档，自评没这东西）。
+ */
+export async function recordScanVerdict(
+  item: ScanItem,
+  result: 'CORRECT' | 'WRONG',
+  sessionId: string,
+  idx: number,
+): Promise<void> {
+  const now = Math.floor(Date.now() / 1000)
+  const p = await db.progress.get(item.sense.id)
+  const q: Question = {
+    sense: item.sense,
+    ipa: '',
+    sentence: item.sentence,
+    options: [],
+    isDue: isDueNow(p, now),
+  }
+  await recordAnswer(q, sessionId, idx, result, null)
 }
 
 function countStreak(recent: string[]): number {

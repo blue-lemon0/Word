@@ -862,14 +862,27 @@ ok((await db.sentences.get(afterTake[0].sentenceId)).en === flagged.sentence.en,
   await edit.purgeWord(P)
   ok((await db.words.get(P)) == null, '排期探针词已清干净')
 
-  // 12) 扫读条目带「这个义项一共几条例句」—— 浮层里要说「N 句」
-  const scan = await quiz.scanBatch(3)
-  ok(scan.length > 0, `扫读能取到句子（${scan.length} 条）`)
-  const one = scan[0]
-  const realCount = (await db.sentences.where('senseId').equals(one.sense.id).toArray())
-    .filter((s) => !s.flagged).length
-  ok(one.count === realCount, `扫读条目带对了例句条数（${one.count} vs ${realCount}）`)
-  ok(one.sentence.zh !== undefined, '扫读条目带了中文翻译（浮层里要直接给答案）')
+  // 12) 扫读卡：一张 3 句、目标词互不重复、句句带中文（玩法是「先心猜、翻开对答案」）
+  const cards = await quiz.scanCardBatch(2)
+  ok(cards.length > 0 && cards[0].length === 3, `扫读卡一张 3 句（实际 ${cards[0]?.length} 句）`)
+  const cardWords = new Set(cards[0].map((it) => it.sense.word))
+  ok(cardWords.size === cards[0].length, '一张扫读卡里目标词互不重复')
+  ok(cards[0].every((it) => !!it.sentence.zh), '扫读卡每句都带中文翻译（翻开要对答案）')
+
+  // 12b) 随便刷队列里混着扫读卡（每 10 题窗口插 1 张，只插在随便刷；
+  //      不足 10 题一批时不插 —— 本夹具池子小，走的正是这个分支）
+  const rq = await quiz.buildRandomQueue(50)
+  const rScan = rq.filter((e) => e.kind === 'scan')
+  const rQ = rq.filter((e) => e.kind === 'q')
+  ok(rq.length === rQ.length + rScan.length, '队列 = 单题 + 扫读卡')
+  const expectCards = Math.floor(rQ.length / 10)
+  if (expectCards === 0) {
+    ok(rScan.length === 0, `不足 10 题不插扫读卡（${rQ.length} 题 ${rScan.length} 张）`)
+  } else {
+    ok(rScan.length >= 1 && rScan.length <= expectCards,
+       `扫读卡约 1/10 插入（${rScan.length} 张 / ${rQ.length} 题）`)
+    ok(rScan.every((c) => c.items.length === 3), '队列里的扫读卡每张都是 3 句')
+  }
 
   // 13) 返回键：同屏判断只看 path（query/hash 不算「换了一屏」）
   ok(nav.pathOf('/train?scope=due') === '/train', 'pathOf 去掉 query')

@@ -8,8 +8,8 @@
  *    「这句有问题」随手标，标了不再出现。
  *
  *  队列来源只看 props.scope（due / new / learning）。
- *  单挑（?solo=）与扫读点句（?sent=）已退场：错题板不设答题入口（D51），
- *  扫读点一行先看答案（ScanPeek），都不再「指哪打哪」。
+ *  单挑（?solo=）与扫读点句（?sent=）已退场：错题板不设答题入口（D51）；
+ *  独立扫读 tab 也已退场 —— 扫读卡混进随便刷队列（quiz.ts buildRandomQueue）。
  */
 import { computed, nextTick, onActivated, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
@@ -30,7 +30,9 @@ import {
 } from '../quiz'
 import { toast } from '../toast'
 import { autoSpeak, speakEn, speechOn, ttsWaiting } from '../speech'
-import { db } from '../db'
+import { allProgress, db } from '../db'
+import { forecastDaily, forecastSummary, type ForecastResult } from '../forecast'
+import ForecastBars from './ForecastBars.vue'
 import type { Sentence, Sense } from '../types'
 import QuickEdit from './QuickEdit.vue'
 import WordPeek from './WordPeek.vue'
@@ -568,6 +570,28 @@ function finishRound(): void {
   phase.value = 'done'
   lastRound.value = queue.value.slice()
 }
+
+/* ── 90 天复习量预测（结算屏）──
+   「后面还有多少」是打完一轮才会关心的问题 —— 所以它住在结算屏，
+   不占训练中的屏幕。口径照搬 forecast.ts：只数能练的义项（practicePool），
+   按词去重；每次进结算屏重算（刚答完的这轮已经改了进度）。 */
+const forecast = ref<ForecastResult | null>(null)
+const fcOpen = ref(false)
+
+async function loadForecast(): Promise<void> {
+  const [pool, prows] = await Promise.all([practicePool(), allProgress()])
+  const wordOf = new Map(pool.map((s) => [s.id, s.word]))
+  forecast.value = forecastDaily(
+    prows.filter((p) => wordOf.has(p.senseId)),
+    Math.floor(Date.now() / 1000),
+    90,
+    (id) => wordOf.get(id) ?? '',
+  )
+}
+
+watch(phase, (p) => {
+  if (p === 'done') void loadForecast()
+})
 
 /** 「别练它」：这句话有问题而且懒得改/改不了时，
  *  至少让它别再出现在练习里（flagged 的句子会被队列排除）。
@@ -1131,6 +1155,16 @@ watch(
                    而 /home 这种「看起来应该存在」的错字编译器不会拦。 -->
               <van-button block round @click="router.push({ name: 'home' })">回首页</van-button>
             </template>
+          </div>
+
+          <!-- 90 天复习量预测：默认收一行摘要，点开看柱状图。
+               没有排期中的卡（peakDay < 0）时整条不显示。 -->
+          <div v-if="forecast && forecast.peakDay >= 0" class="fcstrip">
+            <button class="fchead" type="button" @click="fcOpen = !fcOpen">
+              <span>{{ forecastSummary(forecast) }}</span>
+              <span class="fcarrow">{{ fcOpen ? '收起' : '看图' }}</span>
+            </button>
+            <ForecastBars v-if="fcOpen" :data="forecast" />
           </div>
         </section>
 
@@ -2256,6 +2290,16 @@ watch(
   padding: 12px 4px 20px;
 }
 
+/* 嵌入首页 tab 时结算屏按**页格**算，不按整屏 100dvh：
+   页格已经扣掉状态栏让位（.hpage 的 padding-top）和 tabbar，再按 dvh 算
+   就会多长出约 90px —— 收起态就要滚，预测条一展开更「高度超过屏幕」
+   （用户真机实测反馈）。收紧间距后收起态正好一屏放下，展开态才滚动。 */
+.tsess.embedded .done {
+  min-height: 0;
+  gap: 14px;
+  padding: 8px 4px 12px;
+}
+
 .done-k {
   margin: 0;
   font-size: 14.5px;
@@ -2332,6 +2376,32 @@ watch(
   height: 50px;
   font-size: 16.5px;
   font-weight: 600;
+}
+
+/* 90 天复习量预测条：收在结算屏底部的一行摘要，点开才是柱状图 */
+.fcstrip {
+  width: 100%;
+}
+
+.fchead {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border: 0;
+  background: transparent;
+  padding: 4px 2px 6px;
+  font-family: inherit;
+  font-size: 11.5px;
+  color: var(--wb-ink-3);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.fchead .fcarrow {
+  flex: 0 0 auto;
+  color: var(--wb-primary);
 }
 
 </style>

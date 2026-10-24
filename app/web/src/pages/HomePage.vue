@@ -5,8 +5,9 @@
  *          嵌进来（与 /train 同一套判分链路）；数量为 0 的 tab 整个隐藏。
  *          复习与学习**平级**，不强制谁先谁后（用户拍板：想先学完再复习也行）。
  *  「随便刷」= 随机一题一屏（上下滑换下一题），判分照旧写进度；
- *          它自成一体，不与整轮共享队列。
- *  「扫读」= 句子流 + 90 天复习量预测条。
+ *          它自成一体，不与整轮共享队列。队列里以约 1/10 的频率混着
+ *          **扫读卡**（3 句、每句目标词不同、先心猜再翻开自评勾叉，
+ *          抖音信息流式插入位）—— 没有独立的扫读 tab。
  *
  *  默认落点：有到期 → 复习；无到期有待学 → 学习；都没有 → 随便刷。
  *
@@ -16,10 +17,9 @@
  */
 import { computed, nextTick, onActivated, onMounted, reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import ScanList from '../components/ScanList.vue'
-import ScanPeek from '../components/ScanPeek.vue'
 import WordPeek from '../components/WordPeek.vue'
 import QuestionBox from '../components/QuestionBox.vue'
+import ScanCard from '../components/ScanCard.vue'
 import QuickEdit from '../components/QuickEdit.vue'
 import AiSheet from '../components/AiSheet.vue'
 import TrainSession from '../components/TrainSession.vue'
@@ -30,9 +30,7 @@ import { autoSpeak } from '../speech'
 import type { Question } from '../quiz'
 import type { Sense, Sentence } from '../types'
 import { allProgress } from '../db'
-import { buildRandomQueue, makeQuestion, practicePool, type ScanItem } from '../quiz'
-import { forecastDaily, forecastSummary, type ForecastResult } from '../forecast'
-import ForecastBars from '../components/ForecastBars.vue'
+import { buildRandomQueue, makeQuestion, practicePool, type FeedEntry } from '../quiz'
 import { useSnapPager } from '../scroll-pager'
 
 defineOptions({ name: 'HomePage' })
@@ -52,27 +50,21 @@ const dueN = ref(-1)
 const wordsN = ref(-1)
 
 interface HomeTab {
-  id: 'due' | 'new' | 'feed' | 'scan'
+  id: 'due' | 'new' | 'feed'
   label: string
   /** tab 名后面跟的小数字（复习/学习才带） */
   n?: number
 }
 
-/** 平级 tab 清单：复习/学习按数量显隐，随便刷/扫读恒在 */
+/** 平级 tab 清单：复习/学习按数量显隐，随便刷恒在 */
 const tabs = computed<HomeTab[]>(() => {
   if (dueN.value < 0 || wordsN.value < 0) return []
   const list: HomeTab[] = []
   if (dueN.value > 0) list.push({ id: 'due', label: '复习', n: dueN.value })
   if (wordsN.value > 0) list.push({ id: 'new', label: '学习', n: wordsN.value })
-  list.push({ id: 'feed', label: '随便刷' }, { id: 'scan', label: '扫读' })
+  list.push({ id: 'feed', label: '随便刷' })
   return list
 })
-
-/* ── 未来 90 天复习量预测（扫读 tab 底部）──
-   ★ 口径与上面的数字一致：只数**能练的义项**（practicePool），按词去重。
-     推演规则全在 forecast.ts；这里只负责把行喂进去、把结果摆出来。 */
-const forecast = ref<ForecastResult | null>(null)
-const fcOpen = ref(false)
 
 async function loadNums(): Promise<void> {
   // ★ 用**能练的义项池**（有例句、没被标记）来数，而不是整张 senses 表：
@@ -87,9 +79,7 @@ async function loadNums(): Promise<void> {
     return p.dueAt <= now ? 0 : 1
   }
   const buckets = new Map<string, number>()
-  const wordOf = new Map<string, string>()
   for (const s of senses) {
-    wordOf.set(s.id, s.word)
     const r = rankOf(s.id)
     const cur = buckets.get(s.word)
     if (cur === undefined || r < cur) buckets.set(s.word, r)
@@ -102,13 +92,6 @@ async function loadNums(): Promise<void> {
   }
   dueN.value = due
   wordsN.value = fresh
-
-  forecast.value = forecastDaily(
-    prows.filter((p) => wordOf.has(p.senseId)),
-    now,
-    90,
-    (id) => wordOf.get(id) ?? '',
-  )
 }
 
 /* ── tab 翻页容器（页码↔滚动同步、keep-alive 恢复都在 useSnapPager 里，坑 62/71）── */
@@ -147,9 +130,9 @@ function goTab(id: HomeTab['id']): void {
   if (i >= 0) goPane(i)
 }
 
-/* ── 随便刷：一题一屏（随机）── */
+/* ── 随便刷：一题一屏（随机），队列里约 1/10 的位置是扫读卡（quiz.ts 组队列时插入）── */
 /* ★ 它不管到期、不管复习计划，也不和「复习/学习」那一轮共享队列。 */
-const queue = ref<string[]>([])
+const queue = ref<FeedEntry[]>([])
 const serial = ref(0)
 /* 初始就是 loading（坑 80）：onMounted 必走 newBatch，若初始 false，
    首帧 DOM 会先摆出一副「空池」形状再被 loading 顶掉 —— 又是一次闪。 */
@@ -157,7 +140,7 @@ const loading = ref(true)
 const done = ref(0)
 const right = ref(0)
 
-const cur = computed(() => queue.value[idx.value] ?? '')
+const cur = computed(() => queue.value[idx.value] ?? null)
 const total = computed(() => queue.value.length)
 
 /** 竖滑一屏一题。
@@ -169,6 +152,16 @@ const qVisual = qPager.visual
 const qscroll = qPager.el
 const onQScroll = qPager.onScroll
 
+/** ★ `.qscroll` 在 tab 的 `v-for` 里，**不能用 `ref="qscroll"`**：Vue 对
+ *  v-for 里的字符串 ref 会按 ref_for 收集成数组，`qPager.el.value` 拿到的是
+ *  `[HTMLElement]` 而不是元素 —— 于是 goTo 里 `e.scrollTo` 是 undefined，
+ *  「下一题」点下去静默无反应；onScroll 里 `e.isConnected` 是 undefined，
+ *  直接早退，滑动也不更新页码（不报错，最难查的那种）。
+ *  函数 ref 直接收单个元素，避开 v-for 的收集行为。 */
+function setQScrollEl(el: unknown): void {
+  qscroll.value = (el as HTMLElement | null) ?? null
+}
+
 /** 每一页的呈现状态（决定底栏显示哪两个按钮）。
  *
  *  ★ 必须**按页**存，不能只存一份「当前页」：翻回一页已经作答的题时，
@@ -177,8 +170,14 @@ const onQScroll = qPager.onScroll
  *    QuestionBox 每次装载都会报一次状态，所以重挂的页也能对上。
  */
 const boxStates = reactive(new Map<number, { revealed: boolean; submitted: boolean }>())
+/* 扫读卡挂载即 revealed（它没有「显示选项」阶段），组件还没报状态的那一瞬
+   用 entry 类型兜底 —— 不然底栏会闪一帧「我不会 / 显示选项」。 */
 const boxState = computed(
-  () => boxStates.get(idx.value) ?? { revealed: false, submitted: false },
+  () =>
+    boxStates.get(idx.value) ??
+    (cur.value?.kind === 'scan'
+      ? { revealed: true, submitted: false }
+      : { revealed: false, submitted: false }),
 )
 
 /* ── 题目预取（坑 78）──
@@ -190,13 +189,16 @@ const preMade = reactive(new Map<number, Question>())
 const preInflight = new Set<number>()
 
 async function prefetchOne(i: number): Promise<void> {
-  const sid = queue.value[i]
-  if (!sid || preMade.has(i) || preInflight.has(i)) return
+  const entry = queue.value[i]
+  // 扫读卡的句子在组队列时就已带全（buildRandomQueue 一次取好），无需预取
+  if (!entry || entry.kind !== 'q' || preMade.has(i) || preInflight.has(i)) return
+  const sid = entry.senseId
   preInflight.add(i)
   try {
     const q = await makeQuestion(sid)
     // 等题途中用户可能已「换一批」—— 下标对不上就扔掉，别把旧批的题塞进新批
-    if (q && queue.value[i] === sid) preMade.set(i, q)
+    const now = queue.value[i]
+    if (q && now && now.kind === 'q' && now.senseId === sid) preMade.set(i, q)
   } finally {
     preInflight.delete(i)
   }
@@ -223,6 +225,7 @@ async function newBatch(): Promise<void> {
   serial.value++
   preMade.clear()
   boxStates.clear()
+  scanMarks.clear()
   try {
     queue.value = await buildRandomQueue(50)
     /* 第一题**备好再亮屏**：否则用户看到的是「组题… → 出题… → 内容」
@@ -241,8 +244,8 @@ async function newBatch(): Promise<void> {
   if (el) el.scrollTop = 0
 }
 
-/** 当前这页题面组件的引用（底栏按钮要指挥它） */
-const boxes = new Map<number, { reveal: () => void; save: (r: 'CORRECT' | 'WRONG' | 'PENDING') => void; reload: () => void }>()
+/** 当前这页题面组件的引用 —— 目前只用来在「AI 换一句」之后让那一页重新出题 */
+const boxes = new Map<number, { reload: () => void }>()
 
 function setBox(i: number, el: unknown): void {
   if (el) boxes.set(i, el as never)
@@ -339,28 +342,8 @@ watch(
   },
 )
 
-function askReveal(): void {
-  boxes.get(idx.value)?.reveal()
-}
-
-function askGiveUp(): void {
-  // 「我不会」按答错处理：诚实放弃不能比乱蒙更划算
-  boxes.get(idx.value)?.save('WRONG')
-}
-
-/** 底栏「下一题」：goBy 基于 intent 累进 —— 连点三下翻三页，
- *  页码等落地才结算（坑 74：动画途中的位置不配改页码）。到底就停 */
-function goNext(): void {
-  if ((qIntent.value ?? idx.value) >= total.value - 1) return
-  qPager.goBy(1)
-}
-
-/** 底栏「上一题」：和背单词页同一个动作。不补这一颗的话，
- *  答完只能往下走，想回头看刚才那句只能靠手势。 */
-function goPrev(): void {
-  if ((qIntent.value ?? idx.value) <= 0) return
-  qPager.goBy(-1)
-}
+/* 底栏取消后不再需要页面去指挥卡片：显示选项、我不会都在 QuestionBox 里，
+   翻页只走竖滑（goBy 的那两个包装已经没有人调了，删掉免得留死代码）。 */
 
 /** 每题只记一次结果（上下滑来回不会重复计数）。
  *  同时存 picked：QuestionBox 重挂时要靠它把「当时选了哪个」还原回来。 */
@@ -381,8 +364,22 @@ function onAnsweredAt(
   if (a.result === 'CORRECT') right.value++
 }
 
-/* ── 扫读：句子列表 ── */
-const scanItem = ref<ScanItem | null>(null)
+/* ── 扫读卡的自评存盘：按页存每一句的勾/叉。
+ *  窗口式渲染会卸载远处的页，翻回来时 ScanCard 靠这份存盘恢复原样 ——
+ *  不恢复的话已评的句又能再点，recordAnswer 会落第二次（SRS 记两遍）。
+ *  与 resultAt 之于 QuestionBox 是同一个坑的同一味药。 */
+const scanMarks = reactive(new Map<number, Array<'CORRECT' | 'WRONG' | null>>())
+
+function onScanVerdict(i: number, v: { index: number; result: 'CORRECT' | 'WRONG' }): void {
+  const entry = queue.value[i]
+  if (!entry || entry.kind !== 'scan') return
+  const arr = scanMarks.get(i) ?? entry.items.map(() => null)
+  if (arr[v.index]) return // 这句已评过（ScanCard 已评锁定不会再 emit，这行是双保险）
+  arr[v.index] = v.result
+  scanMarks.set(i, arr)
+  done.value++
+  if (v.result === 'CORRECT') right.value++
+}
 
 /* ── 查词浮层 / 跳转 ── */
 const peekOpen = ref(false)
@@ -456,17 +453,17 @@ onMounted(async () => {
                它是 flex:1 的撑子，一拆底栏「显示选项」就漂到屏幕中部，
                内容到了再跳回底部 = 用户看到的「打开就闪」。loading 只做
                覆盖层，布局从零帧起就是最终形状。 -->
-          <div v-show="loading || total > 0" ref="qscroll" class="qscroll" @scroll.passive="onQScroll">
-            <section v-for="(sid, i) in queue" :key="`${serial}-${sid}-${i}`" class="qpage">
+          <div v-show="loading || total > 0" :ref="setQScrollEl" class="qscroll" @scroll.passive="onQScroll">
+            <section v-for="(entry, i) in queue" :key="`${serial}-${i}-${entry.kind}`" class="qpage">
               <div class="qpage-in">
                 <div class="qcenter">
+                  <template v-if="Math.abs(i - idx) <= 3 || (qIntent != null && Math.abs(i - qIntent) <= 3) || Math.abs(i - qVisual) <= 3">
                   <QuestionBox
-                  v-if="Math.abs(i - idx) <= 3 || (qIntent != null && Math.abs(i - qIntent) <= 3) || Math.abs(i - qVisual) <= 3"
+                  v-if="entry.kind === 'q'"
                   :ref="(el) => setBox(i, el)"
-                  hide-actions
                   hide-result
                   allow-pick
-                  :sense-id="sid"
+                  :sense-id="entry.senseId"
                   :serial="i"
                   :question="preMade.get(i)"
                   :answered="resultAt[i]"
@@ -494,6 +491,18 @@ onMounted(async () => {
                       </div>
                     </template>
                   </QuestionBox>
+                  <!-- 扫读卡：组队列时已带全数据，没有预取/loaded 那一套；
+                       勾叉自评存盘走 scanMarks（窗口卸载再挂回要恢复原样） -->
+                  <ScanCard
+                    v-else
+                    :items="entry.items"
+                    :marks="scanMarks.get(i)"
+                    @state="(st) => onBoxState(i, st)"
+                    @verdict="(v) => onScanVerdict(i, v)"
+                    @pick="pick"
+                    @word="goWord"
+                  />
+                  </template>
                 </div>
               </div>
             </section>
@@ -507,64 +516,15 @@ onMounted(async () => {
             </div>
           </div>
 
-          <!-- ★ 「我不会 / 显示选项 / 上一题 / 下一题」固定在底部：
-               它们是指头的主行动，不能跟着一屏一屏滚走。
-               loading 期间不显示：和首题内容同一帧出现，避免先弹出来再挪位。
-
-               ★ 三个分支必须都有内容（对齐背单词页的底栏）：
-                 只写「未显示选项」和「已作答」两段，中间那段
-                 （选项已展开、还没选）就是一条**空条** —— 用户点了
-                 「显示选项」后底栏凭空消失，而且容器高度 63→12px，
-                 又一次改变 snap 页边界（坑 74 的同一类病）。 -->
-          <div v-if="total && !loading" class="qbar">
-            <template v-if="!boxState.revealed && !boxState.submitted">
-              <button class="qbtn" type="button" @click="askGiveUp">我不会</button>
-              <button class="qbtn primary" type="button" @click="askReveal">显示选项</button>
-            </template>
-            <template v-else-if="!boxState.submitted">
-              <button class="qbtn" type="button" :disabled="idx === 0" @click="goPrev">上一题</button>
-              <span class="qpick">点上面四个选项作答</span>
-            </template>
-            <template v-else>
-              <button class="qbtn" type="button" :disabled="idx === 0" @click="goPrev">上一题</button>
-              <button
-                class="qbtn primary wide"
-                type="button"
-                :disabled="idx >= total - 1"
-                @click="goNext"
-              >
-                {{ idx >= total - 1 ? '已是最后一题' : '下一题' }}
-              </button>
-            </template>
-          </div>
-
+          <!-- ★ 这里原来有一条固定底栏（我不会 / 显示选项 / 上一题 / 下一题）。
+               用户实测后拍板取消：扫读卡没有「上一题」的概念，固定栏对它是
+               硬凑的；而且底栏高度切换会改页边界（坑 74）。现在所有动作都
+               回到卡片里 —— QuestionBox 自带的「我不会 / 显示选项」就在
+               句子下面，作答后用竖滑翻下一张。 -->
         </div>
-
-        <!-- 扫读：句子流 + 底部 90 天复习量预测条 -->
-        <template v-else>
-          <div class="list-wrap">
-            <ScanList @pick="scanItem = $event" />
-          </div>
-
-          <!-- 复习量预测：默认收一行摘要，点开看 90 天柱状图。
-               钉在列表下方而不是列表里 —— 它是「计划感」，不该被句子冲走。 -->
-          <div v-if="forecast && forecast.peakDay >= 0" class="fcstrip">
-            <button class="fchead" type="button" @click="fcOpen = !fcOpen">
-              <span>{{ forecastSummary(forecast) }}</span>
-              <span class="fcarrow">{{ fcOpen ? '收起' : '看图' }}</span>
-            </button>
-            <ForecastBars v-if="fcOpen" :data="forecast" />
-          </div>
-        </template>
       </section>
     </div>
 
-    <ScanPeek
-      :item="scanItem"
-      @word="(w) => { scanItem = null; pick(w) }"
-      :total="scanItem?.count ?? 0"
-      @close="scanItem = null"
-    />
     <WordPeek :show="peekOpen" :token="peekToken" :context="curQ?.sentence.en ?? ''" @close="peekOpen = false" />
     <AiSheet
       :show="aiOpen"
@@ -621,6 +581,15 @@ onMounted(async () => {
 
 .hpage {
   flex: 0 0 100%;
+  /* ★ 必须显式 min-width:0。
+     flex 项的自动最小尺寸（min-width:auto）会把页格撑到**内容最小宽度**：
+     复习/学习页里嵌的 .wb-wrap 有 max-width:680px，页格就被撑成 680 ——
+     而容器可视宽只有 360。后果是三个联动故障（真机实测）：
+       · 页宽 680 / 步长 360 对不上，scrollLeft 永远落不到页边界（off≥6），
+         pager 的 page 不更新 → **顶部 tab 高亮卡在旧值**；
+       · 一屏里同时露出前一页的尾巴和后一页的开头 → 看着像**重复视图**；
+       · 内容按 680 居中，右半屏被裁掉 → **宽度异常**（句子被切断）。 */
+  min-width: 0;
   height: 100%;
   box-sizing: border-box;
   /* 统一给顶部 tab 条让位：各 tab 页格自己不再算状态栏，
@@ -790,63 +759,8 @@ onMounted(async () => {
   background: var(--wb-bg);
 }
 
-/* 固定底栏：我不会 / 显示选项 / 上一题 / 下一题。
-   ★ 三个分支的高度必须一样（都是同一颗 .qbtn 高 + 同样的 padding），
-     否则每次作答/显示选项都会让 .qscroll 的高度跳一次（坑 74）。
-   ★ 只保留一行主行动；改内容按钮已经放进解析卡片，底栏不再为空行预留高度。 */
-.qbar {
-  flex: 0 0 auto;
-  display: flex;
-  gap: 10px;
-  margin: 0 -18px;
-  padding: 8px 18px 4px;
-  border-top: 1px solid var(--wb-line);
-  background: color-mix(in srgb, var(--wb-bg) 94%, transparent);
-}
-
-.qbtn {
-  flex: 0 0 34%;
-  padding: 13px 10px;
-  border: 1px solid var(--wb-line);
-  border-radius: 14px;
-  background: var(--wb-card);
-  font-family: inherit;
-  font-size: 15px;
-  color: var(--wb-ink);
-  cursor: pointer;
-}
-
-.qbtn:disabled {
-  opacity: 0.45;
-  cursor: default;
-}
-
-.qbtn.primary {
-  flex: 1;
-  border-color: var(--wb-primary);
-  background: var(--wb-primary);
-  color: #fff;
-  font-weight: 600;
-}
-
-.qbtn.primary:disabled {
-  opacity: 0.55;
-}
-
-.qbtn.wide {
-  flex: 1;
-}
-
-/* 选项已展开、等待点选时的说明：占住主按钮的位置，底栏不塌。
-   用 ink-2 而不是 ink-3 —— 真机上 ink-3 太浅，看着像禁用提示。 */
-.qpick {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  color: var(--wb-ink-2);
-}
+/* 底栏已取消（用户拍板：扫读卡下固定栏是多余的），
+   「我不会 / 显示选项」由 QuestionBox 自带、就在卡片里，翻页只走竖滑。 */
 
 .qpage-in {
   flex: 1;
@@ -887,40 +801,5 @@ onMounted(async () => {
 /* 作答后固定占满卡片高度（最大高度），切换题面/其它例句时卡片不跳大小 */
 .qcard.qcard-full {
   height: 100%;
-}
-
-/* ── 扫读 ── */
-.list-wrap {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  padding: 0 14px 10px;
-}
-
-/* 复习量预测条：钉在列表下方，不跟列表滚 */
-.fcstrip {
-  flex: 0 0 auto;
-  padding: 4px 14px calc(8px + env(safe-area-inset-bottom, 0px));
-}
-
-.fchead {
-  display: flex;
-  width: 100%;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  border: 0;
-  background: transparent;
-  padding: 4px 2px 6px;
-  font-family: inherit;
-  font-size: 11.5px;
-  color: var(--wb-ink-3);
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.fchead .fcarrow {
-  flex: 0 0 auto;
-  color: var(--primary);
 }
 </style>

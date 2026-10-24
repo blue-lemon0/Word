@@ -297,7 +297,7 @@ board = _code(BOARD)
 kb = _code(os.path.join(WEB, "src", "keyboard.ts"))
 # 底栏让位写在 App.vue 的 scoped 样式里，不在 style.css —— 别查错文件
 appvue = _code(os.path.join(WEB, "src", "App.vue"))
-scanlist = _src(os.path.join("components", "ScanList.vue"))
+scancard = _src(os.path.join("components", "ScanCard.vue"))
 wordpeek = _src(os.path.join("components", "WordPeek.vue"))
 lookup_ts = _src("lookup.ts")
 
@@ -790,20 +790,28 @@ interaction = [
     ("恰好三个路由声明了 meta.tab",
      _code(os.path.join(WEB, "src", "main.ts")).count("meta: { tab: true }") == 3),
     # 训练从首页进、盖满全屏，所以必须有返回（顶栏箭头 = 系统返回键）
-    ("扫读封装在 ScanList 组件里",
-     _re.search(r"await scanBatch\(BATCH, undefined, skip\.value\)", scanlist) is not None
-     and _re.search(r'<section class="scan">', scanlist) is not None),
-    # 行号/句子共用同一个行高（对齐不靠碰运气）
-    ("扫读行两列共用行高（对齐不靠碰运气）",
-     "--scan-lh" in scanlist
-     and len(_re.findall(r"line-height:\s*var\(--scan-lh\)", scanlist)) == 2),
-    # 「换一批」在标题行：放列表末尾时它的位置 = 列表高度，一换行就跳
-    ("扫读「换一批」在标题行（不随列表高度抖）",
-     _re.search(r'<header class="head">.*?换一批', scanlist, _re.S) is not None
-     and not _re.search(r"\.scanbtns", scanlist)),
-    # 真实语料里的句子不长那样：不挂词性标签（n. / v. / adj.）
-    ("扫读列表不挂词性标签（真实句子不长那样）",
-     not _re.search(r'class="pos"', scanlist) and not _re.search(r"\.pos\s*\{", scanlist)),
+    # ── 扫读卡：混进随便刷队列的插入卡（抖音信息流式），没有独立扫读 tab ──
+    ("随便刷队列里约 1/10 是扫读卡（组队列时按窗口随机插入）",
+     "kind: 'scan'" in _code(os.path.join(WEB, "src", "quiz.ts"))
+     and "SCAN_WINDOW = 10" in _code(os.path.join(WEB, "src", "quiz.ts"))),
+    ("扫读卡自评勾叉落 recordAnswer 链路（recordScanVerdict）",
+     "recordScanVerdict" in scancard
+     and "recordScanVerdict" in _code(os.path.join(WEB, "src", "quiz.ts"))),
+    # 窗口式渲染会卸载远处的页：已评结果外壳按页存盘，重挂恢复，不记两遍 SRS
+    ("扫读卡已评锁定且外壳按页存盘（窗口重挂不记两遍 SRS）",
+     "props.marks" in scancard and "scanMarks" in home),
+    ("独立扫读 tab 已退场（ScanList/ScanPeek 删除，引用清零）",
+     not os.path.exists(os.path.join(WEB, "src", "components", "ScanList.vue"))
+     and not os.path.exists(os.path.join(WEB, "src", "components", "ScanPeek.vue"))
+     and "ScanList" not in home and "ScanPeek" not in home
+     and "id: 'scan'" not in home),
+    # v-for 里的字符串 ref 会被 Vue 收成数组（ref_for）：qPager.el 拿到的不是元素，
+    # goTo 里 e.scrollTo 是 undefined →「下一题」点了没反应，onScroll 里
+    # e.isConnected 是 undefined → 早退，滑动也不换页。全程不报错，只能靠断言拦。
+    ("首页竖滑容器在 tab 的 v-for 里必须用函数 ref（字符串 ref 会被收成数组）",
+     'ref="qscroll"' not in home
+     and ':ref="setQScrollEl"' in home
+     and "qscroll.value = (el as HTMLElement | null) ?? null" in home),
 
     # ── 发现问题要能当场改，而不是「记录一下以后再说」 ──
     # 发现内容有问题的那一瞬间，正是手里有这个具体句子/选项的那一瞬间。
@@ -1057,7 +1065,7 @@ interaction = [
      and "recordAnswer(" in _src(os.path.join("components", "QuestionBox.vue"))
      and "<QuestionBox" in _src(os.path.join("components", "DrillSheet.vue"))),
     # 首页平级 tab（2026-10-25 改版）：复习/学习 = TrainSession 本体嵌进来，
-    # 随便刷 = 随机一题一屏（竖滑），扫读 = 句子流；顶部是小巧胶囊 tab 条。
+    # 随便刷 = 随机一题一屏（竖滑），队列里约 1/10 混扫读卡；顶部是小巧胶囊 tab 条。
     ("首页平级 tab 横滑（x 吸附，页格随 tab 清单渲染）",
      "scroll-snap-type: x mandatory" in home and 'v-for="(t, i) in tabs"' in home),
     ("复习/学习 tab 嵌的就是 TrainSession 本体（同一判分链路）",
@@ -1093,10 +1101,10 @@ interaction = [
      and "<QuestionBox" in home
      and "<QuestionBox" in _src(os.path.join("components", "DrillSheet.vue"))),
     # ── D51：冗余判定标准 ──
-    # 1) 给过答案的地方不设答题入口
-    ("句子浮层不再出题（答案已给，不设答题入口）",
-     "练这一句" not in _code(os.path.join(WEB, "src", "components", "ScanPeek.vue"))
-     and "@drill" not in _code(os.path.join(WEB, "src", "pages", "HomePage.vue"))),
+    # 1) 给过答案的地方不设答题入口：扫读卡翻开后只给自评勾叉，不出选项题
+    ("扫读卡翻开只给自评勾叉（答案已给，不再出选项题）",
+     "recordScanVerdict" in scancard and "makeQuestion" not in scancard
+     and "@drill" not in home),
     ("错题板只是清单（没有「单挑」这类答题入口）",
      "单挑这个意思" not in _code(os.path.join(WEB, "src", "pages", "BoardPage.vue"))
      and "train?solo" not in _code(os.path.join(WEB, "src", "pages", "BoardPage.vue"))),
@@ -1118,6 +1126,9 @@ interaction = [
      and "startSpell" in _src(os.path.join("components", "TrainSession.vue"))
      # 拼写整整一段只有一次 recordAnswer（就是答题那条路），说明拼写没写进度
      and _src(os.path.join("components", "TrainSession.vue")).count("recordAnswer(") == 1),
+    # 90 天复习量预测：住在复习/学习结算屏（打完一轮才关心「后面还有多少」）
+    ("90 天复习量预测在 TrainSession 结算屏（不占训练中的屏幕）",
+     "forecastDaily" in tsess and "ForecastBars" in tsess and "fcstrip" in tsess),
     ("拼写比对口径只有一处（src/spell.ts）",
      os.path.exists(os.path.join(WEB, "src", "spell.ts"))
      and "spellMatched(" in _src(os.path.join("components", "TrainSession.vue"))
@@ -1203,12 +1214,19 @@ interaction = [
     # 坑 80：qscroll 是 flex:1 的撑子，loading 期间拆走它 = 底栏漂到屏幕中部，
     # 内容到达再跳回底部 = 用户看到的「打开就闪」。loading 只能是覆盖层。
     ("首页 qscroll 常挂（v-show 而非 v-else），loading 为绝对定位覆盖层",
-     'v-show="loading || total > 0" ref="qscroll"'
+     'v-show="loading || total > 0" :ref="setQScrollEl"'
      in _code(os.path.join(WEB, "src", "pages", "HomePage.vue"))
      and "position: absolute" in _code(os.path.join(WEB, "src", "pages", "HomePage.vue"))),
-    ("首页底栏 loading 期间不渲染（和首题同帧出现，不先弹出再挪位）",
-     'v-if="total && !loading" class="qbar"'
-     in _code(os.path.join(WEB, "src", "pages", "HomePage.vue"))),
+    # 2026-10-24 用户拍板：随便刷的固定底栏取消（扫读卡下「上一题」是硬凑），
+    # 所有作答动作回到卡片里 —— QuestionBox 自带的「我不会 / 显示选项」。
+    ("首页不再渲染固定底栏（qbar 已删，作答动作全部在卡片内）",
+     'class="qbar"' not in _code(os.path.join(WEB, "src", "pages", "HomePage.vue"))),
+    ("首页的 QuestionBox 不带 hide-actions（卡片内自带 我不会/显示选项）",
+     "hide-actions" not in _code(os.path.join(WEB, "src", "pages", "HomePage.vue"))),
+    # 坑 84：.hpage 是 flex 项，min-width:auto 会把页格撑到内容最小宽度 680，
+    # 与 360 的翻页步长对不上 → 页码不落定（tab 高亮卡住）、一屏露两页。
+    ("首页页格显式 min-width:0（否则被内容最小宽度撑破翻页步长）",
+     "min-width: 0" in _code(os.path.join(WEB, "src", "pages", "HomePage.vue"))),
     # 坑 81：快速连甩时落定页码不动，渲染窗口只锚 page = 窗口外全是空壳。
     ("useSnapPager 暴露 visual（视线页码，随 scroll 更新，不触发 onPage）",
      "visual" in _code(os.path.join(WEB, "src", "scroll-pager.ts"))),
