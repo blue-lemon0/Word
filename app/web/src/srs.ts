@@ -71,6 +71,7 @@ export function applyReview(
   result: 'CORRECT' | 'WRONG' | 'PENDING',
   elapsedMs: number | null,
   nowSec: number,
+  prevDueAtSec: number | null = null,
 ): ReviewOutcome {
   const fresh = st.reps === 0
   const init = classify(card)
@@ -85,7 +86,18 @@ export function applyReview(
   // 同日重复：收益减半（03 §7.2）
   const sameDay =
     !fresh && st.last_review != null && nowSec - st.last_review < P.SAME_DAY_HOURS * 3600
-  const growth = sameDay ? P.SAME_DAY_FACTOR : 1
+  let growth = sameDay ? P.SAME_DAY_FACTOR : 1
+
+  // 提前复习折扣（2026-10-24）：成功提取的加固价值取决于「等了多久」。
+  // 还没到期就答对，只拿到「已等待 / 计划间隔」比例的增长；到期或逾期才满额。
+  // 没有这条，随机队列里一周内反复命中同一张卡可以满额连涨、几天速成「掌握」，
+  // 从未经历长间隔考验 —— 等于允许偷懒。
+  if (!fresh && result === 'CORRECT' && prevDueAtSec != null && st.last_review != null) {
+    const scheduled = prevDueAtSec - st.last_review
+    if (nowSec < prevDueAtSec && scheduled > 0) {
+      growth *= Math.min(1, Math.max(0, (nowSec - st.last_review) / scheduled))
+    }
+  }
 
   let intervalDays: number
   if (grade === P.GRADE_FAST) {

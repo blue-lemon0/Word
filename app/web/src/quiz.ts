@@ -262,13 +262,31 @@ function shuffle<T>(a: T[]): T[] {
  *  而「随便抽一个词的任意一句来猜」本来就是学习的一部分，
  *  只是过去没有入口。
  *
- *  ★ 提前作答仍然照常落 SRS（进度是真的推进了），但 isDue=false，
- *   所以正确率统计不受影响 —— 「提前复习不计入正确率」那条口径继续成立。
+ *  ★ 提前作答仍然照常落 SRS（进度是真的推进了），但没到期就答对，
+ *   增长按「已等待 / 计划间隔」打折（srs.ts 的提前复习折扣）；
+ *   isDue=false，所以正确率统计不受影响 —— 「提前复习不计入正确率」
+ *   那条口径继续成立。
  */
 export async function buildRandomQueue(limit = SESSION_SIZE, only?: string[]): Promise<string[]> {
-  const pool = await practicePool()
+  const [pool, prows] = await Promise.all([practicePool(), allProgress()])
   const cands = only ? pool.filter((s) => only.includes(s.id)) : pool
-  return shuffle(cands).slice(0, limit).map((s) => s.id)
+  /* 24 小时内答过的卡**靠后站**：刚答对就再刷到，既没记忆价值（提前复习折扣
+   * 已经把增长打到接近零），又挤掉别人露脸的机会 —— 用户反馈过「一直在首页刷
+   * 到熟的，真正的复习反而没去」。池子小时（极端：今天全刷过一遍）按
+   * last_review 从旧到新补足，宁可放旧卡也不让队列空着。 */
+  const seenAt = new Map<string, number>()
+  for (const p of prows) if (p.lastReview) seenAt.set(p.senseId, p.lastReview)
+  const cutoff = Math.floor(Date.now() / 1000) - 86400
+  const freshPool = cands.filter((s) => (seenAt.get(s.id) ?? 0) <= cutoff)
+  const stalePool = cands
+    .filter((s) => (seenAt.get(s.id) ?? 0) > cutoff)
+    .sort((a, b) => (seenAt.get(a.id) ?? 0) - (seenAt.get(b.id) ?? 0))
+  const out = shuffle(freshPool).slice(0, limit).map((s) => s.id)
+  for (const s of stalePool) {
+    if (out.length >= limit) break
+    out.push(s.id)
+  }
+  return out
 }
 
 /** 扫读用：一次给一批句子（混词、不排序），供「点哪句猜哪句」。
@@ -395,7 +413,8 @@ export async function recordAnswer(
       }
     : { stability: 0, difficulty: 8, reps: 0, wrong_n: 0, pending_n: 0, last_review: null }
 
-  const outcome = applyReview(st, card, result, elapsedMs, now)
+  // 把上一次的到期日传给公式：没到期就答对，增长按「已等待/计划间隔」打折
+  const outcome = applyReview(st, card, result, elapsedMs, now, prev?.dueAt ?? null)
 
   // 是否掌握：看最近 N 次有效作答的连对（03 §6）
   const recent = (

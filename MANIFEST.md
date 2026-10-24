@@ -177,6 +177,13 @@ node app/web/tests/audit_drive.mjs
     天粒度、不含闲置衰减、按词去重（与首页统计同口径）。图组件
     `app/web/src/components/ForecastBars.vue` 自绘（不引图表库）。
     行为测试在 `app/web/tests/forecast.mjs`（已挂进 `npm test`）。
+17. **提前复习打折（2026-10-24）**：没到期就答对（首页随机刷到），稳定度增长
+    按「已等待时间 / 计划间隔」打折，到期或逾期才满额 —— 否则一周内反复
+    刷到同一张卡可满额连涨、几天速成「掌握」，从未经历长间隔考验。
+    实现在 `applyReview` 的新参数 `prevDueAtSec`（TS 与 `app/srs.mjs`
+    参照实现同步，`srs_parity.mjs` 4800 格对拍 + 专项断言看守）。
+    配套：首页随机队列把 24 小时内答过的卡排到最后（`buildRandomQueue`），
+    刚练过的优先让位；池子不够时按 last_review 从旧到新补足，队列不为空。
 
 ## 决策记录
 

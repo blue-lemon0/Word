@@ -91,7 +91,7 @@ export function gradeFor(P, result, elapsedMs, D) {
  *   第 n 次答对后的 S    = S(n-1) × (1 + ease_factor(D))
  * （verify_srs.py 的连对 4 次表就是这条：2.0 / 4.1 / 8.3 / 16.8）
  */
-export function applyReview(P, st, card, result, elapsedMs, nowSec) {
+export function applyReview(P, st, card, result, elapsedMs, nowSec, prevDueAtSec = null) {
   const fresh = st.reps === 0;
   const init = classify(P, card);
 
@@ -105,7 +105,18 @@ export function applyReview(P, st, card, result, elapsedMs, nowSec) {
   // 同日重复：收益减半（03 §7.2）
   const sameDay = !fresh && st.last_review != null &&
     nowSec - st.last_review < P.SAME_DAY_HOURS * 3600;
-  const growth = sameDay ? P.SAME_DAY_FACTOR : 1;
+  let growth = sameDay ? P.SAME_DAY_FACTOR : 1;
+
+  // 提前复习折扣（2026-10-24）：成功提取的加固价值取决于「等了多久」。
+  // 还没到期就答对，只拿到「已等待 / 计划间隔」比例的增长；到期或逾期才满额。
+  // 没有这条，随机队列里一周内反复命中同一张卡可以满额连涨、几天速成「掌握」，
+  // 从未经历长间隔考验 —— 等于允许偷懒。
+  if (!fresh && result === 'CORRECT' && prevDueAtSec != null && st.last_review != null) {
+    const scheduled = prevDueAtSec - st.last_review;
+    if (nowSec < prevDueAtSec && scheduled > 0) {
+      growth *= Math.min(1, Math.max(0, (nowSec - st.last_review) / scheduled));
+    }
+  }
 
   let intervalDays;
   if (grade === P.GRADE_FAST) {

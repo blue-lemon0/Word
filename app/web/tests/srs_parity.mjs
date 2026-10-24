@@ -57,11 +57,12 @@ for (let c = 0; c < 400; c++) {
   let a = { stability: 0, difficulty: 8, reps: 0, wrong_n: 0, pending_n: 0, last_review: null }
   let b = { stability: 0, difficulty: 8, reps: 0, wrong_n: 0, pending_n: 0, last_review: null }
   let now = 1758000000
+  let prevDue = null // 上一次的到期日：提前复习折扣要靠它算「等了计划的几分之几」
   for (let i = 0; i < 12; i++) {
     const result = RESULTS[Math.floor(rnd() * RESULTS.length)]
     const elapsed = Math.floor(rnd() * 12000)
-    const ra = ref.applyReview(P, a, card, result, elapsed, now)
-    const rb = port.applyReview(b, card, result, elapsed, now)
+    const ra = ref.applyReview(P, a, card, result, elapsed, now, prevDue)
+    const rb = port.applyReview(b, card, result, elapsed, now, prevDue)
     cases++
     for (const k of ['stability', 'difficulty', 'intervalDays', 'grade', 'reps']) {
       if (Math.abs(ra[k] - rb[k]) > 1e-9) {
@@ -98,10 +99,32 @@ for (let c = 0; c < 400; c++) {
       pending_n: rb.pendingN,
       last_review: now,
     }
+    prevDue = ra.dueAt // 下一次作答拿它当「上次排的到期日」
     now += 86400 + Math.floor(rnd() * 40000) // 隔开 >6h，避免同日重复因子干扰比对
   }
 }
 ok(diffs === 0, `${cases} 次作答的 S/D/间隔/评级/类型判定逐格一致`, diffDetail)
+
+/* 3b. 提前复习折扣：同一张卡，等了 2/7 就答对的增长必须严格小于到期满额，
+ *     且折扣比例就是「已等待 / 计划间隔」—— 这是堵「速成掌握」的钉子 */
+{
+  const st = { stability: 5, difficulty: 5, reps: 3, wrong_n: 0, pending_n: 0, last_review: 1758000000 }
+  const card = { is_trap: 0, tier: 'T1', n_senses: 1, sense_id: 's1' }
+  const due = 1758000000 + 7 * 86400
+  const early = 1758000000 + 2 * 86400
+  const e1 = ref.applyReview(P, st, card, 'CORRECT', 99999, early, due)
+  const e2 = port.applyReview(st, card, 'CORRECT', 99999, early, due)
+  const o1 = ref.applyReview(P, st, card, 'CORRECT', 99999, due, due)
+  const o2 = port.applyReview(st, card, 'CORRECT', 99999, due, due)
+  ok(Math.abs(e1.stability - e2.stability) < 1e-9 && Math.abs(o1.stability - o2.stability) < 1e-9,
+     '提前复习：两实现一致')
+  ok(e1.stability < o1.stability - 1e-9, '提前答对的增长 < 到期答对',
+     `提前 S=${e1.stability} vs 到期 S=${o1.stability}`)
+  const ef = ref.easeFactor(P, 5)
+  const expect = 5 * (1 + ef * P.SLOW_FACTOR * (2 / 7))
+  ok(Math.abs(e1.stability - expect) < 1e-9, '折扣比例 = 已等待 / 计划间隔',
+     `期望 ${expect} 实际 ${e1.stability}`)
+}
 
 /* 4. 端点与单调性 */
 ok(Math.abs(port.easeFactor(1) - ref.easeFactor(P, 1)) < 1e-12, 'ease_factor(D=1) 一致')
