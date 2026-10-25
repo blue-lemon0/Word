@@ -1125,6 +1125,13 @@ interaction = [
      "query: { tab: scope }" in lib
      and "consumeTabQuery" in home
      and "route.query.tab" in home),
+    # 6) 回来时正在看的 tab 不被抽走：数量归零（刚打完一轮）也用 pinnedTab
+    #    钉在原位，翻离才拔钉 —— 否则从词条页返回那一刻 tab 消失、keyed 组件树
+    #    换掉，结算屏/没打完的轮被吞，人被甩到默认落点（实测落在「学习」）。
+    ("正在看的 tab 数量归零也钉住不吞（翻离才拔钉）",
+     "const pinnedTab = ref<HomeTab['id'] | null>(null)" in home
+     and "pinnedTab.value = tabs.value[pane.value]?.id" in home
+     and "list.splice(insertAt, 0" in home),
     # ── D52：拼写加练（可选）── 本体在 TrainSession（/train 与首页 tab 共用）
     ("拼写是可选加练：只在一轮结束后提供，且不写 SRS",
      "spell-offer" in _src(os.path.join("components", "TrainSession.vue"))
@@ -1189,6 +1196,22 @@ interaction = [
          for f in os.listdir(os.path.join(WEB, "src", d))
          if f.endswith((".vue", ".ts"))
      )),
+    # ── 坑 86：scrollIntoView 会滚**所有**可滚祖先 —— TrainSession 的 chip 条
+    # 用它把当前 chip 滚到中间，结果把外层横滑容器 .hroot 平滑地拽向自己那页
+    # （首页先落在复习、再动画滑去学习）。嵌套滚动 + 横滑页格的 app 里它
+    # 几乎总是错的：要滚哪个容器就写哪个容器的 scrollLeft/scrollTop。
+    ("页面/组件不用 scrollIntoView（会连外层 tab 容器一起滚）",
+     not any(
+         "scrollIntoView" in _code(os.path.join(WEB, "src", d, f))
+         for d in ("pages", "components")
+         for f in os.listdir(os.path.join(WEB, "src", d))
+         if f.endswith((".vue", ".ts"))
+     )),
+    # ── 坑 87：点 tab 跨页平滑滚动会被 scroll-snap-stop 拦停 + 高亮要跟视线 ──
+    ("首页 tab 点击走 onTab（跨页瞬移）、高亮绑 hVisual 不绑 pane",
+     '@click="onTab(i)"' in home
+     and ':class="{ on: hVisual === i }"' in home
+     and '@click="goPane(i)"' not in home),
 
     # ── 坑 75：var(--primary) 被 8 个组件引用却从未定义 → 主按钮隐形 ──
     # CSS 变量解析失败静默回退 unset，typecheck/lint/DOM 断言全看不见。
@@ -1250,32 +1273,9 @@ for name, ok in interaction:
     if not ok:
         fi += 1
 
-# ── 文档里的计数必须等于实际项数 ──
-# 这些数字以前是手写的，于是必然过期：守卫从 77 项长到 110 项、
-# 踩坑从 53 条长到 56 条，而四份文档还写着旧数字。文档写错的代价不是
-# 「不好看」，而是**下次有人按它判断「一共就这么多坑」**，于是新坑没人找。
-print("\n=== 文档里的计数必须等于实际项数 ===")
-_notes_md = _read(os.path.join(PROJ, "docs", "notes", "踩坑记录.md"))
-_manifest_md = _read(os.path.join(PROJ, "MANIFEST.md"))
-_ai_md = _read(os.path.join(PROJ, "docs", "notes", "AI-操作手机闭环.md"))
-_runbook = _read(os.path.join(PROJ, "app", "web", "DEBUG-RUNBOOK.md"))
-_n_pitfalls = len(_documented_pitfalls())
-counts = [
-    ("MANIFEST 踩坑条数", _manifest_md, r"踩坑记录\.md\)（(\d+) 条）", _n_pitfalls),
-    ("MANIFEST 真机守卫项数", _manifest_md, r"「真机交互守卫」里\s*（(\d+) 项）", len(interaction)),
-    ("AI 闭环文档踩坑条数", _ai_md, r"(\d+) 条「不报错但结果不对」", _n_pitfalls),
-    ("AI 闭环文档守卫项数", _ai_md, r"「真机交互守卫」(\d+) 项", len(interaction)),
-    ("DEBUG-RUNBOOK 守卫项数", _runbook, r"「真机交互守卫」一节（(\d+) 项）", len(interaction)),
-]
-fc = 0
-for _label, _txt, _pat, _actual in counts:
-    _m = re.search(_pat, _txt)
-    _claimed = int(_m.group(1)) if _m else None
-    _ok = _claimed == _actual
-    print("  [%s] %s：文档写 %s，实际 %d"
-          % ("OK " if _ok else "FAIL", _label, _claimed, _actual))
-    if not _ok:
-        fc += 1
+# （曾有一组「文档里的计数必须等于实际项数」断言：要求三份 md 写死守卫项数
+#  与踩坑条数。结果是每加一条坑/守卫就要机械地同步三份文档 —— 用户拍板：
+#  文档不写活计数，这组断言随之撤掉。）
 
 # 迁移类措辞残留
 print("\n=== 迁移措辞残留检查（应为 0 处待办）===")
@@ -1291,10 +1291,10 @@ else:
     print("  [OK ] 无残留待迁移措辞")
 
 # 检查文档里是否残留"7884 义项"但 30 句上限算错
-print("\n总计: D16 检查 %d 项失败 %d；真机交互守卫 %d 项失败 %d；文档计数 %d 项失败 %d"
-      % (len(d16), f16, len(interaction), fi, len(counts), fc))
+print("\n总计: D16 检查 %d 项失败 %d；真机交互守卫 %d 项失败 %d"
+      % (len(d16), f16, len(interaction), fi))
 if fi:
     print("  ↑ 这些坑都不报错，只能靠断言拦住。解释见 docs/notes/踩坑记录.md")
-sys.exit(1 if (f16 or fi or stale or fc) else 0)
+sys.exit(1 if (f16 or fi or stale) else 0)
 
 

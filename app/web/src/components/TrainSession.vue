@@ -414,8 +414,17 @@ async function loadQ(): Promise<void> {
 /** 让当前那张在进度条里可见 —— 20 张挤在一条上，跳转后不滚一下就不知道自己在哪 */
 function scrollChipIntoView(): void {
   requestAnimationFrame(() => {
-    const el = strip.value?.querySelector('.chip.cur')
-    el?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' })
+    const s = strip.value
+    const el = s?.querySelector('.chip.cur')
+    if (!s || !el) return
+    /* ★ 不能用 scrollIntoView：它会滚**所有**可滚祖先 —— 嵌在首页 tab 里时，
+       不在眼前那一侧的会话也会跑这个函数，它的 scrollIntoView 把外层横滑容器
+       .hroot 平滑地拽向自己那页（实测：首页先落在复习、再动画滑去学习）。
+       只滚 chip 条自己：按两框中心差值写 scrollLeft，动画交给 strip 的
+       scroll-behavior:smooth（只影响程序化滚动，触摸滑动不受影响）。 */
+    const sr = s.getBoundingClientRect()
+    const er = el.getBoundingClientRect()
+    s.scrollLeft += (er.left + er.width / 2) - (sr.left + sr.width / 2)
   })
 }
 
@@ -1398,6 +1407,9 @@ watch(
   padding: 6px 0 0;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
+  /* chip 条内的程序化滚动（scrollChipIntoView 写 scrollLeft）平滑滚动；
+     只影响程序化滚动，触摸拖动不受影响 */
+  scroll-behavior: smooth;
 }
 
 .strip::-webkit-scrollbar {

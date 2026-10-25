@@ -13,9 +13,11 @@
  *
  *  ★ tab 显隐只在**进入首页时**刷新（onMounted/onActivated 数一次），
  *    打完一轮不立即刷新 —— 否则「复习」tab 会在结算屏亮着的瞬间整个消失，
- *    把结算屏吞掉。离开首页再回来才重新数。
+ *    把结算屏吞掉。离开首页再回来才重新数；回来时若正在看的那个 tab
+ *    数量已归零，用 pinnedTab 把它钉在原位（翻离才拔钉），避免回来时
+ *    结算屏/没打完的轮被抽走、人被甩到默认落点。
  */
-import { computed, nextTick, onActivated, onMounted, reactive, ref, watch } from 'vue'
+import { computed, nextTick, onActivated, onDeactivated, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import WordPeek from '../components/WordPeek.vue'
 import QuestionBox from '../components/QuestionBox.vue'
@@ -56,13 +58,26 @@ interface HomeTab {
   n?: number
 }
 
-/** 平级 tab 清单：复习/学习按数量显隐，随便刷恒在 */
+/** 离开首页时记下正在看的 tab（onDeactivated 写）。
+ *  回来重新数数时，若这个 tab 的数量已归零（比如刚打完一轮复习），
+ *  照样把它留在原位置 —— 否则回来那一刻 tab 被抽走、keyed 组件树整个换掉，
+ *  结算屏/没打完的轮被吞，人被甩到默认落点（实测：从词条页返回，
+ *  「复习」没了、落在「学习」）。
+ *  一旦翻到别的 tab 钉子就拔掉（下方 watch pane），下次进来按数量正常算。 */
+const pinnedTab = ref<HomeTab['id'] | null>(null)
+
+/** 平级 tab 清单：复习/学习按数量显隐，随便刷恒在；被钉住的 tab 不受数量限制 */
 const tabs = computed<HomeTab[]>(() => {
   if (dueN.value < 0 || wordsN.value < 0) return []
   const list: HomeTab[] = []
   if (dueN.value > 0) list.push({ id: 'due', label: '复习', n: dueN.value })
   if (wordsN.value > 0) list.push({ id: 'new', label: '学习', n: wordsN.value })
   list.push({ id: 'feed', label: '随便刷' })
+  const pin = pinnedTab.value
+  if (pin && pin !== 'feed' && !list.some((t) => t.id === pin)) {
+    const insertAt = pin === 'due' ? 0 : list[0]?.id === 'due' ? 1 : 0
+    list.splice(insertAt, 0, { id: pin, label: pin === 'due' ? '复习' : '学习' })
+  }
   return list
 })
 
@@ -97,6 +112,11 @@ async function loadNums(): Promise<void> {
 /* ── tab 翻页容器（页码↔滚动同步、keep-alive 恢复都在 useSnapPager 里，坑 62/71）── */
 const hPager = useSnapPager('x', { max: () => tabs.value.length - 1 })
 const pane = hPager.page
+/* 高亮跟视线走（坑 87）：滑动翻页途中 pane 只在落定后才更新，连滑两页时
+   高亮会从「复习」直接跳到「随便刷」，人明明看着「学习」从眼前经过。
+   visual 每次滚动事件都按最近页更新，高亮绑它；TrainSession 的 active、
+   发声、焦点这些仍绑落定后的 pane —— 滑动途中两侧都不许醒。 */
+const hVisual = hPager.visual
 const rootEl = hPager.el
 const goPane = hPager.goTo
 const onScrollRoot = hPager.onScroll
@@ -141,6 +161,16 @@ watch(
   { flush: 'post' },
 )
 
+/* 离开首页：钉住正在看的 tab（含义见 pinnedTab 注释）。
+   翻离被钉的 tab = 钉子拔掉：tabs 随即按纯数量重算，空 tab 此刻消失 ——
+   人已经不在它上面，消失是安全的（显隐原则：只许在不看的时候隐去）。 */
+onDeactivated(() => {
+  pinnedTab.value = tabs.value[pane.value]?.id ?? null
+})
+watch(pane, (p) => {
+  if (pinnedTab.value && tabs.value[p]?.id !== pinnedTab.value) pinnedTab.value = null
+})
+
 /* keep-alive 回首页时 tabs 不会变（watcher 不触发），query 得单独盯 */
 watch(
   () => route.query.tab,
@@ -150,10 +180,20 @@ watch(
   },
 )
 
+/** 点 tab 切页：一律瞬移，不动画。
+ *
+ *  ★ 系统平滑滚动在 snap 容器里太慢：相邻页的动画都被拖得手感差，
+ *    跨页还会被 scroll-snap-stop 拦在中间页停一下（坑 87）。
+ *    滑动手势已经给了连续的空间反馈；点按要的是「立刻到」，
+ *    高亮由 hVisual 跟着 scrollLeft 赋值同步跳过去。 */
+function onTab(i: number): void {
+  goPane(i, false)
+}
+
 /** 空态等处的「去学新词」：不再跳路由，切到学习 tab（不在就不该出现这个按钮） */
 function goTab(id: HomeTab['id']): void {
   const i = tabs.value.findIndex((t) => t.id === id)
-  if (i >= 0) goPane(i)
+  if (i >= 0) onTab(i)
 }
 
 /* ── 随便刷：一题一屏（随机），队列里约 1/10 的位置是扫读卡（quiz.ts 组队列时插入）── */
@@ -441,9 +481,9 @@ onMounted(async () => {
         v-for="(t, i) in tabs"
         :key="t.id"
         class="htab"
-        :class="{ on: pane === i }"
+        :class="{ on: hVisual === i }"
         type="button"
-        @click="goPane(i)"
+        @click="onTab(i)"
       >
         {{ t.label }}<span v-if="t.n" class="htn">{{ t.n }}</span>
       </button>

@@ -1,4 +1,4 @@
-# MANIFEST
+﻿# MANIFEST
 
 这个仓库是什么、每个文件是什么、怎么跑起来、去哪改什么。
 **先读 [README.md](README.md) 上手，读本页查台账；两侧交接格式读 [CONTRACT.md](CONTRACT.md)。**
@@ -78,7 +78,7 @@ docs/                            设计文档（design/03、05）与决策记录
 
 ```bash
 node app/web/tests/srs_parity.mjs    # SRS 移植一致性
-node app/web/tests/flow_smoke.mjs    # 数据层端到端（185 条行为断言）
+node app/web/tests/flow_smoke.mjs    # 数据层端到端（行为断言）
 python app/tests/verify_srs.py       # SRS 参数基准
 python scripts/verify_docs.py        # 结构守卫
 
@@ -130,7 +130,7 @@ node app/web/tests/audit_drive.mjs
 10. **答完能查词 + 可选 AI（2026-10-19）**：
    - 训练页答完这一题后，句子里**每个词**都能点开：浮层看义项（带例句数）、
      进义项/词条详情；不在库里的词可当场加入（建词条 + `needsRefine` 占位义项）。
-     答之前不可点 —— 这道题问的就是这个词的意思（D37，查词 5 项守卫 + 13 条断言）。
+     答之前不可点 —— 这道题问的就是这个词的意思（D37，有守卫与断言兜底）。
    - AI 助手（D38）：可选、默认关闭、代码全在 `app/web/src/ai/`，
      只产出提案、落库由人点「应用」（应用前自动存内容快照）。
      四个动作：整词审查、**空壳词补全**（义项 + 例句一起提）、补 3 条候选例句、换掉某一句；
@@ -138,7 +138,7 @@ node app/web/tests/audit_drive.mjs
      手机走原生 `NativeBridge.httpPost`（WebView 的 fetch 会被 CORS 拦），
      结果按「内容指纹 + 模型名」缓存 —— 内容不变不重复花钱。
      Key 存本机 localStorage、**不进备份**；填了 Key 自动开开关，入口可见性用共享的 `aiReady`。
-     守卫 12 项（只在 ai/ 里、只提议不写库、幻觉绑定、缓存键含指纹、Key 不进备份、
+     有守卫兜底（只在 ai/ 里、只提议不写库、幻觉绑定、缓存键含指纹、Key 不进备份、
      原生网络、入口不出现、快照、重算高亮、空壳分流、例句跟义项走、Vant 组件都注册过），
      断言在 `flow_smoke` 里用注入的假传输跑全链路。
      **真机已用真实 key 跑过三条路**：审查（1005 tokens）、换一句（975）、补全（984）。
@@ -242,13 +242,12 @@ D53（更名与图标）、
 D54（只发布 Android：签名 APK + AAB；iOS/桌面/鸿蒙暂停，探索结论留档备查——
 重启前先读该页，别从零再查一遍）。
 
-真机踩坑与判据在 [`docs/notes/踩坑记录.md`](docs/notes/踩坑记录.md)（84 条），
-其中可机械判定的一部分挂在 `scripts/verify_docs.py` 的「真机交互守卫」里
-（171 项）：这些坑都不报错，只能靠断言拦住。
+真机踩坑与判据在 [`docs/notes/踩坑记录.md`](docs/notes/踩坑记录.md)，
+其中可机械判定的一部分挂在 `scripts/verify_docs.py` 的「真机交互守卫」里：
+这些坑都不报错，只能靠断言拦住。
 
 守卫的**边界**要说清楚：它判的是源码文本的形状，不是行为。
-所以「某功能有没有生效」只能靠断言结果的测试（本项目已有 185 条，
-在 `app/web/tests/flow_smoke.mjs`）或真机量测：
+所以「某功能有没有生效」只能靠断言结果的测试（在 `app/web/tests/flow_smoke.mjs`）或真机量测：
 「屏幕上有没有闪」用 CDP `Page.startScreencast` 逐帧抓（坑 42），
 「栏到底动不动」用 `tests/overscroll_probe.mjs`（坑 45 / D34），
 「某功能接上了没有」用 flow_smoke 里的行为断言（坑 52）。

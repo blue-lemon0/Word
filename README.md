@@ -84,8 +84,8 @@ word.backup v2               学习进度与内容备份包
 
 **质量保障**
 
-- `verify_docs.py` 机械守卫：文件布局、文档计数、交互契约（如翻页禁令）
-- SRS 数值对齐 + flow smoke（185 条行为断言）+ vue-tsc，全绿才许提交
+- `verify_docs.py` 机械守卫：文件布局、交互契约（如翻页禁令）
+- SRS 数值对齐 + flow smoke 行为断言 + vue-tsc，全绿才许提交
 
 ## 回归（改动后从仓库根执行）
 
