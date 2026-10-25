@@ -1,84 +1,108 @@
-# 发版流水线：手动触发（什么时候推新版本由人拍板），构建签名 APK + AAB，
-# 创建 GitHub Release 并挂产物。
+# 发版流水线（GitHub Actions）
 #
-# 用法：GitHub → Actions → Release → Run workflow → 填版本号（如 0.3.0）。
-#   · versionCode 自动取 run_number（单调递增即可，不手工维护）
-#   · tag v<version> 与 Release 由流水线创建，本地不用先打 tag
+# 看不懂这份文件时，先记三条：
+#   1. 这台机器是**每次全新开机的 Ubuntu**，跑完就销毁 —— 本地你有的
+#      Node、JDK、Android SDK、签名密钥，它一样都没有，所以每样都得写一遍。
+#   2. 每个 step 就是一处「你本地会敲的命令」，下面的中文注释都标了对应本地做什么。
+#   3. 任意 step 报错，后面的全都不跑 —— 日志里标红那一行就是唯一要修的地方。
 #
-# 需要的 Secrets（仓库 Settings → Secrets and variables → Actions）：
-#   WORDBANK_KEYSTORE_BASE64   release-keystore.p12 的 base64（一行）
-#   WORDBANK_KEYSTORE_PASSWORD storePassword / keyPassword（当前两者相同）
-#   WORDBANK_KEY_ALIAS         keyAlias（wordbank-release）
+# 触发方式：只手动。仓库 → Actions → 左侧「Release」→ Run workflow → 填版本号。
+#   什么时候推新版本由人拍板，不跟 push 联动。
 #
-# 不复用本地 scripts/build_apk.mjs 的原因：它带 Windows 专属逻辑
-# （PowerShell 自检、wrapper 缓存里翻 gradle.bat、默认 SDK 路径），
-# CI 上每一步都是标准动作，直接编排反而更短。
+# 你需要自己做的事只有一件：配 2 个 Secrets
+#   （仓库 → Settings → Secrets and variables → Actions → New repository secret）
+#     WORDBANK_KEYSTORE_BASE64     签名密钥文件的 base64（一行；二进制没法贴进文本框）
+#     WORDBANK_KEYSTORE_PASSWORD   密钥密码（storePassword 与 keyPassword 当前相同）
+#   别名不用配，写死在下面（它不是秘密）。
 name: Release
 
 on:
   workflow_dispatch:
     inputs:
       version:
-        description: '版本名，如 0.3.0（会创建 tag v<version> 与同名 Release）'
+        description: '版本名，如 0.3.0（会自动创建 tag v<version> 和同名 Release）'
         required: true
         type: string
 
+# 建 Release / 打 tag 需要写权限；默认的只读 token 会 403
 permissions:
-  contents: write # 创建 Release 需要
+  contents: write
 
 jobs:
   build:
+    # 临时分配的云虚拟机，跑完销毁。Ubuntu 镜像自带 Android SDK 与命令行工具。
     runs-on: ubuntu-latest
     steps:
+      # 把仓库代码复制到这台机器上（对应本地：代码本来就在你磁盘上）
       - uses: actions/checkout@v4
 
+      # 装 Node 20，并缓存 npm 依赖（对应本地：Node 早就装好了）
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
           cache-dependency-path: app/web/package-lock.json
 
+      # 装 JDK 17，Gradle 跑 Android 插件要用（对应本地：Android Studio 自带 jbr）
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
-      - uses: gradle/actions/setup-gradle@v4
+      # 补齐 SDK 组件。runner 镜像不一定带得最新平台，缺了会在 gradle 那步报
+      # "Failed to find platform android-36"。装过就是空操作。
+      - name: 补齐 Android SDK 组件
+        run: |
+          yes | sdkmanager --licenses > /dev/null || true
+          sdkmanager "platforms;android-36" "build-tools;36.0.0" > /dev/null
 
-      - name: 构建前端（vue-tsc + vite build）
+      # 对应本地：npm run build（vue-tsc 类型检查 + vite 打包到 dist/）
+      - name: 构建前端
         working-directory: app/web
         run: npm ci && npm run build
 
-      - name: 前端产物拷进 Android assets（与 build_apk.mjs 第 2 步同规则：先清空、删 sw.js）
+      # 对应本地：build_apk.mjs 的第 ② 步 —— 先清空再拷，避免残留上个版本的文件；
+      # 删 sw.js，因为 APK 里的 assets 本身就是离线源
+      - name: 前端产物拷进 Android assets
         run: |
           rm -rf app/android/app/src/main/assets
           mkdir -p app/android/app/src/main/assets
           cp -r app/web/dist/. app/android/app/src/main/assets/
           rm -f app/android/app/src/main/assets/sw.js
 
-      - name: 写入 release 签名配置
+      # 对应本地：app/android/keystore.properties 早就存在。
+      # CI 上从 Secrets 还原密钥文件，再生成这份配置。
+      # 注意：下面两个 `secrets.` 的值在日志里会被自动打码，不会被看见。
+      - name: 还原签名密钥并写入配置
         run: |
           mkdir -p "$HOME/wordbank-release"
           echo "${{ secrets.WORDBANK_KEYSTORE_BASE64 }}" | base64 -d > "$HOME/wordbank-release/release-keystore.p12"
           cat > app/android/keystore.properties <<'EOF'
           storeFile=/home/runner/wordbank-release/release-keystore.p12
           storePassword=${{ secrets.WORDBANK_KEYSTORE_PASSWORD }}
-          keyAlias=${{ secrets.WORDBANK_KEY_ALIAS }}
+          keyAlias=wordbank-release
           keyPassword=${{ secrets.WORDBANK_KEYSTORE_PASSWORD }}
           EOF
 
-      - name: 写入版本号（versionName 取自输入，versionCode 用 run_number 保证单调递增）
+      # 对应本地：手工改 build.gradle.kts 里的版本号。
+      # versionName 用你填的版本；versionCode 用 GitHub 的流水号（单调递增，不用记）
+      - name: 写入版本号
         run: |
           sed -i 's/versionName = ".*"/versionName = "${{ inputs.version }}"/' app/android/app/build.gradle.kts
           sed -i 's/versionCode = .*/versionCode = ${{ github.run_number }}/' app/android/app/build.gradle.kts
+          grep -E 'versionCode|versionName' app/android/app/build.gradle.kts
 
-      - name: Gradle 构建（签名 APK + AAB）
+      # 对应本地：build_apk.mjs 的第 ④ 步。签名是自动的 —— 读上面那份 keystore.properties。
+      # 本地还做 apksigner 校验，CI 上签名成功即视为通过（失败会直接让构建挂掉）。
+      - name: Gradle 构建签名 APK 和 AAB
         working-directory: app/android
         run: |
           chmod +x gradlew
           ./gradlew assembleRelease bundleRelease --no-daemon
 
-      - name: 创建 GitHub Release 并挂产物
+      # 对应本地：没有对应动作（本地打包完直接 adb 装手机）。
+      # 这一步把产物挂到仓库的 Releases 页面，任何设备都能下载。
+      - name: 创建 Release 并上传产物
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ inputs.version }}

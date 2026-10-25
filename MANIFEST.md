@@ -169,8 +169,9 @@ node app/web/tests/audit_drive.mjs
     secrets 还原签名密钥 → `./gradlew assembleRelease bundleRelease` →
     创建 tag v<版本> 与 Release 挂 APK+AAB。versionCode 取 run_number
     （单调递增），versionName 取输入。Gradle Wrapper（9.4.1）因此入库，
-    本地亦可用 `app/android/gradlew.bat`。所需 secrets：
-    `WORDBANK_KEYSTORE_BASE64` / `WORDBANK_KEYSTORE_PASSWORD` / `WORDBANK_KEY_ALIAS`。
+    本地亦可用 `app/android/gradlew.bat`。所需 secrets（2 个）：
+    `WORDBANK_KEYSTORE_BASE64` / `WORDBANK_KEYSTORE_PASSWORD`（alias 写死在
+    workflow 里，不再是 secret）。
 15. **提示词可在应用内改（2026-10-22）**：8 块提示词（共用审校规则、输出 JSON 形状、
     审查 / 补例句 / 换句 / 补全 / 判原形、复制给 AI 的模板）的默认文本与「用在哪」
     都在 `app/web/src/ai/prompt-registry.ts`；用户改过的版本存在本机
@@ -237,7 +238,9 @@ D46（练习是浮层不是房间；首页内部可横滑。⚠「浮层」已�
 D50（首页两屏定稿：一屏刷、一屏句子列表。⚠ 已被四 tab 改版取代：扫读列表页已删）、
 D51（冗余判定标准）、
 D52（拼写加练）、
-D53（更名与图标）。
+D53（更名与图标）、
+D54（只发布 Android：签名 APK + AAB；iOS/桌面/鸿蒙暂停，探索结论留档备查——
+重启前先读该页，别从零再查一遍）。
 
 真机踩坑与判据在 [`docs/notes/踩坑记录.md`](docs/notes/踩坑记录.md)（84 条），
 其中可机械判定的一部分挂在 `scripts/verify_docs.py` 的「真机交互守卫」里
