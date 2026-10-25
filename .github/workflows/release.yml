@@ -34,17 +34,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # 把仓库代码复制到这台机器上（对应本地：代码本来就在你磁盘上）
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # 装 Node 20，并缓存 npm 依赖（对应本地：Node 早就装好了）
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 20
           cache: npm
           cache-dependency-path: app/web/package-lock.json
 
       # 装 JDK 17，Gradle 跑 Android 插件要用（对应本地：Android Studio 自带 jbr）
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 17
@@ -108,11 +108,15 @@ jobs:
 
       # 对应本地：没有对应动作（本地打包完直接 adb 装手机）。
       # 这一步把产物挂到仓库的 Releases 页面，任何设备都能下载。
+      # generate_release_notes：让 GitHub 自动按上次 tag 之后的提交生成更新说明
+      # （不写的话 Release 页面只有附件、没有任何说明）。
       - name: 创建 Release 并上传产物
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ inputs.version }}
           name: v${{ inputs.version }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
           files: |
             app/android/app/build/outputs/apk/release/app-release.apk
             app/android/app/build/outputs/bundle/release/app-release.aab
