@@ -50,11 +50,14 @@ jobs:
           java-version: 17
 
       # 补齐 SDK 组件。runner 镜像不一定带得最新平台，缺了会在 gradle 那步报
-      # "Failed to find platform android-36"。装过就是空操作。
+      # "Failed to find platform android-36"。
+      # 为什么要先来一个 action：镜像里的 sdkmanager **不在 PATH 上**
+      # （实测报 command not found），这个 action 会把命令行工具装好、
+      # 接受许可、并把它加进 PATH。
+      - uses: android-actions/setup-android@v3
+
       - name: 补齐 Android SDK 组件
-        run: |
-          yes | sdkmanager --licenses > /dev/null || true
-          sdkmanager "platforms;android-36" "build-tools;36.0.0" > /dev/null
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
 
       # 对应本地：npm run build（vue-tsc 类型检查 + vite 打包到 dist/）
       - name: 构建前端
