@@ -23,6 +23,10 @@ on:
         description: '版本名，如 0.3.0（会自动创建 tag v<version> 和同名 Release）'
         required: true
         type: string
+      notes:
+        description: '更新说明（写给用 App 的人看，会显示在 Release 页面上；可留空）'
+        required: false
+        type: string
 
 # 建 Release / 打 tag 需要写权限；默认的只读 token 会 403
 permissions:
@@ -108,14 +112,15 @@ jobs:
 
       # 对应本地：没有对应动作（本地打包完直接 adb 装手机）。
       # 这一步把产物挂到仓库的 Releases 页面，任何设备都能下载。
-      # generate_release_notes：让 GitHub 自动按上次 tag 之后的提交生成更新说明
-      # （不写的话 Release 页面只有附件、没有任何说明）。
+      # 说明用**你自己填的那句话**（inputs.notes），不用 GitHub 自动生成的
+      # 提交列表 —— 那份是给开发者看的（「ci: action 升到 v5」之类），
+      # 装 App 的人看不懂。留空就只有一个附件、没有正文。
       - name: 创建 Release 并上传产物
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ inputs.version }}
           name: v${{ inputs.version }}
-          generate_release_notes: true
+          body: ${{ inputs.notes }}
           fail_on_unmatched_files: true
           files: |
             app/android/app/build/outputs/apk/release/app-release.apk
