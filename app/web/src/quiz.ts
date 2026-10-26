@@ -141,11 +141,14 @@ function isDueNow(p: Progress | undefined, now: number): boolean {
  */
 export type QueueScope = 'due' | 'new' | 'learning'
 
-export async function buildScopeQueue(
-  scope: QueueScope,
-  limit = SESSION_SIZE,
-  only?: string[],
-): Promise<string[]> {
+/** 把可练池按上面的三口径分桶（组队列与首页 tab 计数共用同一套判定 ——
+ *  两处各写一份迟早漂移：数字说还有 3 张、点进去却是空队）。
+ *  钉住的卡（pinAt<=now，人自己点的「我要练它」）并入 due 排最前。 */
+async function bucketPool(only?: string[]): Promise<{
+  due: string[]
+  fresh: string[]
+  learning: string[]
+}> {
   const pool = await practicePool()
   const cands = only ? pool.filter((s) => only.includes(s.id)) : pool
   const now = Math.floor(Date.now() / 1000)
@@ -171,9 +174,26 @@ export async function buildScopeQueue(
   due.sort((a, b) => a.at - b.at)
   // 「排进明天」的卡也进「今天到期」这一组 —— 它本来就该出现在今天该练的清单里
   const dueIds = [...pinned, ...due.map((d) => d.id).filter((id) => !pinned.includes(id))]
-  if (scope === 'due') return dueIds.slice(0, limit)
-  const q = scope === 'new' ? fresh : learning
+  return { due: dueIds, fresh, learning }
+}
+
+export async function buildScopeQueue(
+  scope: QueueScope,
+  limit = SESSION_SIZE,
+  only?: string[],
+): Promise<string[]> {
+  const b = await bucketPool(only)
+  if (scope === 'due') return b.due.slice(0, limit)
+  const q = scope === 'new' ? b.fresh : b.learning
   return shuffle(q.slice()).slice(0, limit)
+}
+
+/** 各组还剩**几张卡**（义项数，不是词数）—— 首页 tab 的小数字用它。
+ *  与 buildScopeQueue 同源（共用 bucketPool）：tab 说 21、点进去就是 21 张
+ *  的队列，两边永远不会对不上。 */
+export async function scopeCounts(): Promise<{ due: number; fresh: number }> {
+  const b = await bucketPool()
+  return { due: b.due.length, fresh: b.fresh.length }
 }
 
 /** 组一道题：句子随机取，选项 = 正确释义 + 3 个干扰项。

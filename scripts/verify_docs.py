@@ -1128,10 +1128,22 @@ interaction = [
     # 6) 回来时正在看的 tab 不被抽走：数量归零（刚打完一轮）也用 pinnedTab
     #    钉在原位，翻离才拔钉 —— 否则从词条页返回那一刻 tab 消失、keyed 组件树
     #    换掉，结算屏/没打完的轮被吞，人被甩到默认落点（实测落在「学习」）。
+    #    留在首页期间答卡重数、当前 tab 掉到 0 也同样当场钉住。
     ("正在看的 tab 数量归零也钉住不吞（翻离才拔钉）",
      "const pinnedTab = ref<HomeTab['id'] | null>(null)" in home
      and "pinnedTab.value = tabs.value[pane.value]?.id" in home
-     and "list.splice(insertAt, 0" in home),
+     # tabs computed：钉住的 tab 数量归零也照摆，小数字显示 0
+     and "pin === 'due'" in home
+     and "pin === 'new'" in home
+     # loadNums：正在看的 tab 掉到 0 当场钉住
+     and "pinnedTab.value = 'due'" in home
+     and "pinnedTab.value = 'new'" in home),
+    # 6b) 答完一卡实时重数：TrainSession 每落库一条进度就报 progress，
+    #     首页据此重数 tab 数字 —— 否则「复习了半天，数字纹丝未动」。
+    ("答完一卡 tab 数字实时重数（TrainSession 报 progress，首页重数）",
+     "emit('progress')" in tsess
+     and "@progress=\"recount\"" in home
+     and "function recount()" in home),
     # ── D52：拼写加练（可选）── 本体在 TrainSession（/train 与首页 tab 共用）
     ("拼写是可选加练：只在一轮结束后提供，且不写 SRS",
      "spell-offer" in _src(os.path.join("components", "TrainSession.vue"))
@@ -1154,9 +1166,13 @@ interaction = [
     ("拼写也要求连对两次（只重拼没连对够的）",
      "spellNeed" in _src(os.path.join("components", "TrainSession.vue"))
      and "spellRound" in _src(os.path.join("components", "TrainSession.vue"))),
-    # 首页两个数字必须和「点进去那一组」同口径：用能练的池子来数
-    ("首页的数字来自能练的池子（与队列同口径）",
-     "practicePool()" in _src(os.path.join("pages", "HomePage.vue"))
+    # 首页两个数字必须和「点进去那一组」**同源**：tab 数字走 scopeCounts，
+    # 与 buildScopeQueue 共用 bucketPool 同一套分桶判定，两边永不漂移
+    # —— tab 说 21、点进去就是 21 张的队列（口径漂移这个错踩过）。
+    ("首页的数字来自能练的池子（scopeCounts 与 buildScopeQueue 同源 bucketPool）",
+     "scopeCounts()" in _src(os.path.join("pages", "HomePage.vue"))
+     and "async function bucketPool(" in _src("quiz.ts")
+     and "const b = await bucketPool(" in _src("quiz.ts")
      and "allWords()" not in _src(os.path.join("pages", "HomePage.vue"))),
     # ── 这一轮：翻页动画、词库吸顶搜索、词库按钮口径 ──
     ("背单词页左右翻页有动画（不是硬切）",

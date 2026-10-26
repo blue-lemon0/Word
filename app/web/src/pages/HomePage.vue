@@ -11,11 +11,11 @@
  *
  *  默认落点：有到期 → 复习；无到期有待学 → 学习；都没有 → 随便刷。
  *
- *  ★ tab 显隐只在**进入首页时**刷新（onMounted/onActivated 数一次），
- *    打完一轮不立即刷新 —— 否则「复习」tab 会在结算屏亮着的瞬间整个消失，
- *    把结算屏吞掉。离开首页再回来才重新数；回来时若正在看的那个 tab
- *    数量已归零，用 pinnedTab 把它钉在原位（翻离才拔钉），避免回来时
- *    结算屏/没打完的轮被抽走、人被甩到默认落点。
+ *  ★ tab 数字与显隐在两个时机刷新：**进入首页时**（onMounted/onActivated
+ *    数一次），以及**每答完一卡**（TrainSession / 随便刷落库后重数）——
+ *    打到哪数字当场走到哪，不再「复习了半天纹丝未动」。正在看的那个 tab
+ *    数量归零时不消失、钉住显示 0（pinnedTab，翻离才拔钉）—— 否则 tab 会在
+ *    结算屏亮着的瞬间整个被抽走，把结算屏吞掉。
  */
 import { computed, nextTick, onActivated, onDeactivated, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -29,10 +29,8 @@ import { replaceSentence } from '../ai/actions'
 import { aiReady } from '../ai/config'
 import { describeAiError, type AiResult } from '../ai/types'
 import { autoSpeak } from '../speech'
-import type { Question } from '../quiz'
 import type { Sense, Sentence } from '../types'
-import { allProgress } from '../db'
-import { buildRandomQueue, makeQuestion, practicePool, type FeedEntry } from '../quiz'
+import { buildRandomQueue, makeQuestion, scopeCounts, type FeedEntry, type Question } from '../quiz'
 import { useSnapPager } from '../scroll-pager'
 
 defineOptions({ name: 'HomePage' })
@@ -40,13 +38,14 @@ defineOptions({ name: 'HomePage' })
 const router = useRouter()
 
 /**
- * 两个数：**今天该复习的词数** 与 **待学的词数**，决定「复习 / 学习」tab 显隐
- * 与 tab 上的小数字。-1 = 还没数完（首帧先不摆 tab，避免「先亮随便刷、
- * 再跳去复习」的闪）。
+ * 两个数：**今天该复习的卡数** 与 **待学的卡数**（按义项计 = 按卡计），
+ * 决定「复习 / 学习」tab 显隐与 tab 上的小数字。-1 = 还没数完（首帧先不摆
+ * tab，避免「先亮随便刷、再跳去复习」的闪）。
  *
- * ★ 口径必须和「点进去那一组」完全一致 —— 数字来自 A、跳转到 B 时，
- *   人看到「21」进去却是空的（这个错踩过）。所以统一按**词**数、按「这个词最紧要
- *   的那个义项的桶」归类，与词库页五个桶同一套口径。
+ * ★ 口径与「点进去那一组」同源：scopeCounts 与 buildScopeQueue 共用
+ *   bucketPool 同一套判定 —— TrainSession 按义项出卡，数字也按义项数，
+ *   tab 说 21、点进去就是 21 张的队列（口径漂移这个错踩过）。
+ *   词库页五个桶仍按词归——那是台账视角，两边有意不同。
  */
 const dueN = ref(-1)
 const wordsN = ref(-1)
@@ -58,55 +57,43 @@ interface HomeTab {
   n?: number
 }
 
-/** 离开首页时记下正在看的 tab（onDeactivated 写）。
- *  回来重新数数时，若这个 tab 的数量已归零（比如刚打完一轮复习），
- *  照样把它留在原位置 —— 否则回来那一刻 tab 被抽走、keyed 组件树整个换掉，
- *  结算屏/没打完的轮被吞，人被甩到默认落点（实测：从词条页返回，
- *  「复习」没了、落在「学习」）。
- *  一旦翻到别的 tab 钉子就拔掉（下方 watch pane），下次进来按数量正常算。 */
+/** 钉住正在看的 tab。两个来源：
+ *  · 离开首页时（onDeactivated）记下正在看的 tab —— 回来重新数数时，若这个
+ *    tab 的数量已归零（比如刚打完一轮复习），照样把它留在原位置 —— 否则
+ *    回来那一刻 tab 被抽走、keyed 组件树整个换掉，结算屏/没打完的轮被吞，
+ *    人被甩到默认落点（实测：从词条页返回，「复习」没了、落在「学习」）。
+ *  · 留在首页期间答完一卡重数时，正在看的 tab 数量掉到 0 也当场钉住
+ *    （loadNums 里写）—— tab 不许在人眼前消失。
+ *  一旦翻到别的 tab 钉子就拔掉（下方 watch pane），按数量正常显隐。 */
 const pinnedTab = ref<HomeTab['id'] | null>(null)
 
-/** 平级 tab 清单：复习/学习按数量显隐，随便刷恒在；被钉住的 tab 不受数量限制 */
+/** 平级 tab 清单：复习/学习按数量显隐，随便刷恒在；
+ *  被钉住的 tab 数量归零也照摆（小数字显示 0，防吞结算屏） */
 const tabs = computed<HomeTab[]>(() => {
   if (dueN.value < 0 || wordsN.value < 0) return []
-  const list: HomeTab[] = []
-  if (dueN.value > 0) list.push({ id: 'due', label: '复习', n: dueN.value })
-  if (wordsN.value > 0) list.push({ id: 'new', label: '学习', n: wordsN.value })
-  list.push({ id: 'feed', label: '随便刷' })
   const pin = pinnedTab.value
-  if (pin && pin !== 'feed' && !list.some((t) => t.id === pin)) {
-    const insertAt = pin === 'due' ? 0 : list[0]?.id === 'due' ? 1 : 0
-    list.splice(insertAt, 0, { id: pin, label: pin === 'due' ? '复习' : '学习' })
-  }
+  const list: HomeTab[] = []
+  if (dueN.value > 0 || pin === 'due') list.push({ id: 'due', label: '复习', n: dueN.value })
+  if (wordsN.value > 0 || pin === 'new') list.push({ id: 'new', label: '学习', n: wordsN.value })
+  list.push({ id: 'feed', label: '随便刷' })
   return list
 })
 
 async function loadNums(): Promise<void> {
-  // ★ 用**能练的义项池**（有例句、没被标记）来数，而不是整张 senses 表：
-  //   没例句的词进不了出题池，把它们算进「待学」就会出现「显示 1 个、进去 0 题」。
-  const [senses, prows] = await Promise.all([practicePool(), allProgress()])
-  const pmap = new Map(prows.map((p) => [p.senseId, p]))
-  const now = Math.floor(Date.now() / 1000)
-  const rankOf = (senseId: string): number => {
-    const p = pmap.get(senseId)
-    if (!p || p.reps === 0) return 2
-    if (p.mastered && !p.rusty) return 3
-    return p.dueAt <= now ? 0 : 1
-  }
-  const buckets = new Map<string, number>()
-  for (const s of senses) {
-    const r = rankOf(s.id)
-    const cur = buckets.get(s.word)
-    if (cur === undefined || r < cur) buckets.set(s.word, r)
-  }
-  let due = 0
-  let fresh = 0
-  for (const r of buckets.values()) {
-    if (r === 0) due++
-    else if (r === 2) fresh++
-  }
-  dueN.value = due
-  wordsN.value = fresh
+  const c = await scopeCounts()
+  // 正在看的 tab 数量掉到 0：先钉住再写数。tab 不许在人眼前消失 ——
+  // 否则 keyed 组件树整个换掉，结算屏/没打完的轮被吞、人被甩到默认落点。
+  // 翻离它时钉子自动拔掉（pane watcher），tab 随即按数量正常显隐。
+  const curId = tabs.value[pane.value]?.id
+  if (curId === 'due' && c.due === 0) pinnedTab.value = 'due'
+  else if (curId === 'new' && c.fresh === 0) pinnedTab.value = 'new'
+  dueN.value = c.due
+  wordsN.value = c.fresh
+}
+
+/** 落库一条作答/标记后就重数（186 义项规模毫秒级，不必抖机灵做增量） */
+function recount(): void {
+  void loadNums()
 }
 
 /* ── tab 翻页容器（页码↔滚动同步、keep-alive 恢复都在 useSnapPager 里，坑 62/71）── */
@@ -428,6 +415,7 @@ function onAnsweredAt(
   resultAt.value = { ...resultAt.value, [i]: a }
   done.value++
   if (a.result === 'CORRECT') right.value++
+  recount() // 随便刷也写进度 —— 到期/待学数字照实跟着走
 }
 
 /* ── 扫读卡的自评存盘：按页存每一句的勾/叉。
@@ -445,6 +433,7 @@ function onScanVerdict(i: number, v: { index: number; result: 'CORRECT' | 'WRONG
   scanMarks.set(i, arr)
   done.value++
   if (v.result === 'CORRECT') right.value++
+  recount() // 扫读自评同样落库，数字照实跟着走
 }
 
 /* ── 查词浮层 / 跳转 ── */
@@ -460,7 +449,7 @@ function goWord(w: string): void {
   void router.push(`/word/${encodeURIComponent(w)}`)
 }
 
-/** keep-alive 回来：重新数一次（tab 显隐只在这时刷新，见文件头）。
+/** keep-alive 回来：重新数一次（答卡重数之外的第二时机，见文件头）。
  *  两个翻页容器的滚动位置由 useSnapPager 各自放回去（坑 62/71）。 */
 onActivated(() => {
   void loadNums()
@@ -485,7 +474,7 @@ onMounted(async () => {
         type="button"
         @click="onTab(i)"
       >
-        {{ t.label }}<span v-if="t.n" class="htn">{{ t.n }}</span>
+        {{ t.label }}<span v-if="t.n != null" class="htn">{{ t.n }}</span>
       </button>
     </div>
 
@@ -498,8 +487,8 @@ onMounted(async () => {
       <section v-for="(t, i) in tabs" :key="t.id" class="hpage">
         <!-- 复习 / 学习：整轮训练本体嵌进来（左右滑让位给外层 tab 翻页）；
              不是当前 tab 的那侧不许出声、不许抢焦点、不许亮固定操作条 -->
-        <TrainSession v-if="t.id === 'due'" scope="due" embedded :active="pane === i" />
-        <TrainSession v-else-if="t.id === 'new'" scope="new" embedded :active="pane === i" />
+        <TrainSession v-if="t.id === 'due'" scope="due" embedded :active="pane === i" @progress="recount" />
+        <TrainSession v-else-if="t.id === 'new'" scope="new" embedded :active="pane === i" @progress="recount" />
 
         <!-- 随便刷：一题一屏（随机） -->
         <div v-else-if="t.id === 'feed'" class="qpane">

@@ -56,6 +56,11 @@ const props = withDefaults(
 
 const router = useRouter()
 
+/** 每落库一条会影响进度的动作（作答 / 别练它 / 已掌握）就报一次 ——
+ *  首页据此实时重数 tab 数字。之前数字只在进首页时数一次，
+ *  「复习了半天，进度纹丝未动」的困惑就是它。 */
+const emit = defineEmits<{ (e: 'progress'): void }>()
+
 /** 本轮每一张卡的完整快照。
  *
  *  为什么要存快照而不是靠 idx 重算：回看时必须看到**当时那道题原样** ——
@@ -479,6 +484,7 @@ async function save(result: 'CORRECT' | 'WRONG' | 'PENDING'): Promise<void> {
     elapsed,
   )
   question.outcome = outcome
+  emit('progress')
   const s = stats.value
   if (result === 'CORRECT') s.correct++
   else if (result === 'WRONG') s.wrong++
@@ -608,6 +614,7 @@ watch(phase, (p) => {
 async function onFlag(): Promise<void> {
   if (!q.value) return
   await flagQuestion(q.value, flagNote.value)
+  emit('progress') // 这句被标走，可练池可能缩了 —— 数字跟着重数
   flagBox.value = false
   await next()
 }
@@ -750,6 +757,7 @@ onActivated(() => {
 async function onMastered(): Promise<void> {
   if (!q.value) return
   await markMastered(q.value.sense.id)
+  emit('progress') // 掌握的卡退出到期队列 —— 数字跟着重数
   await next()
 }
 
