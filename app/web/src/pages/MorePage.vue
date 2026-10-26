@@ -17,6 +17,7 @@ import { pickJsonFile } from '../fileio'
 import { db, emptyTrash, restoreSense, trashedSenses } from '../db'
 import { toast } from '../toast'
 import { speechOn, ttsAutoplay } from '../speech'
+import { cacheSweep as sweepTtsCache, cacheStat as ttsCacheStat } from '../ai/ttsNeural'
 import type { ImportLog, Sense, Snapshot } from '../types'
 
 const router = useRouter()
@@ -43,7 +44,57 @@ function onAsk(): void {
   void a.run()
 }
 
+/* ── 语音缓存：条数/大小展示 + 清理孤儿音频 ──
+ *  键按文本内容做，换句/删句留下的旧音频不会播错、但也永远不会自己消失。
+ *  这里清的是「文本已不在现行词库」的孤儿 —— **还听得到的音频一条不动**
+ *  （全清等于强迫重新逐句现合成，下载本来就慢，不可接受）。 */
+const ttsCacheLabel = ref('…')
+
+function fmtBytes(n: number): string {
+  return n >= 1024 * 1024 ? `${(n / 1024 / 1024).toFixed(1)} MB` : `${Math.max(1, Math.round(n / 1024))} KB`
+}
+
+async function loadTtsCache(): Promise<void> {
+  const s = await ttsCacheStat()
+  ttsCacheLabel.value = s ? `${s.n} 条 · ${fmtBytes(s.bytes)}` : '统计不了（浏览器限制）'
+}
+
+/** 现行可朗读文本全集：所有词头 + 所有例句（含软删义项的词头 —— 保守少删）。
+ *  与 speakOnline 的键同口径 trim。 */
+async function aliveTtsTexts(): Promise<Set<string>> {
+  const [senses, sents] = await Promise.all([db.senses.toArray(), db.sentences.toArray()])
+  const set = new Set<string>()
+  for (const s of senses) {
+    const t = s.word?.trim()
+    if (t) set.add(t)
+  }
+  for (const x of sents) {
+    const t = x.en?.trim()
+    if (t) set.add(t)
+  }
+  return set
+}
+
+function askClearTtsCache(): void {
+  ask.value = {
+    title: '清理语音缓存',
+    text: `现缓存 ${ttsCacheLabel.value}。只删换句、删句后用不到的旧音频，还听得到的全部保留。`,
+    okText: '清理',
+    danger: true,
+    run: async () => {
+      const n = await sweepTtsCache(await aliveTtsTexts())
+      if (n < 0) {
+        toast('没清成（浏览器限制）')
+      } else {
+        toast(n ? `已清理 ${n} 条旧音频` : '没有要清理的旧音频')
+      }
+      void loadTtsCache()
+    },
+  }
+}
+
 async function load(): Promise<void> {
+  void loadTtsCache()
   snaps.value = await listSnapshots()
   imports.value = (await db.importLog.orderBy('ts').reverse().limit(10).toArray()).filter(
     (r) => r.id != null,
@@ -280,6 +331,13 @@ onMounted(load)
         >
           <template #right-icon>
             <van-switch v-model="ttsAutoplay" size="20px" />
+          </template>
+        </van-cell>
+        <van-cell title="语音缓存" :label="ttsCacheLabel">
+          <template #right-icon>
+            <van-button size="small" plain type="danger" @click="askClearTtsCache">
+              清理
+            </van-button>
           </template>
         </van-cell>
       </van-cell-group>

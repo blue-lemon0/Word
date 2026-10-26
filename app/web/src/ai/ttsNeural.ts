@@ -137,6 +137,114 @@ function cachePut(key: string, blob: Blob): Promise<void> {
   })
 }
 
+/**
+ * 缓存现状（条数 + 字节数），给「更多 → 语音」的清空入口用。
+ * ★ 键按「文本内容」做（见 speakOnline），句子被换掉/删掉后旧音频
+ *   不会被再命中但也**不会被删** —— 它们就是这里的「孤儿」，只占空间不出错。
+ * 尽力而为：读不出来就返回 null，界面显示「未知」，清空照常可点。
+ */
+export function cacheStat(): Promise<{ n: number; bytes: number } | null> {
+  return new Promise((resolve) => {
+    if (typeof indexedDB === 'undefined') {
+      resolve(null)
+      return
+    }
+    try {
+      const req = indexedDB.open(DB_NAME, 1)
+      req.onupgradeneeded = () => {
+        if (!req.result.objectStoreNames.contains(STORE)) req.result.createObjectStore(STORE)
+      }
+      req.onsuccess = () => {
+        const db = req.result
+        try {
+          const cur = db.transaction(STORE).objectStore(STORE).openCursor()
+          let n = 0
+          let bytes = 0
+          cur.onsuccess = () => {
+            const c = cur.result
+            if (!c) {
+              resolve({ n, bytes })
+              return
+            }
+            n++
+            const v = c.value
+            bytes += v instanceof Blob ? v.size : 0
+            c.continue()
+          }
+          cur.onerror = () => resolve(null)
+        } catch {
+          resolve(null)
+        }
+      }
+      req.onerror = () => resolve(null)
+    } catch {
+      resolve(null)
+    }
+  })
+}
+
+/**
+ * 清理孤儿音频。键按「文本内容」做（见 speakOnline），换句/删句后旧音频
+ * 不会被再命中但也**不会被删** —— 这里把不再对应的清出去，**仍会播到的
+ * 一条不动**（全清掉等于强迫把几百句重新各等几秒，不可接受）。
+ * alive = 现行所有可朗读文本（词头 + 例句，已 trim，与键里的 t 同口径）。
+ * 返回删除条数；-1 = 没清成（浏览器限制等），界面如实提示。
+ * 尽力而为模式同 cacheGet/cachePut。
+ */
+export function cacheSweep(alive: Set<string>): Promise<number> {
+  return new Promise((resolve) => {
+    if (typeof indexedDB === 'undefined') {
+      resolve(-1)
+      return
+    }
+    try {
+      const req = indexedDB.open(DB_NAME, 1)
+      req.onupgradeneeded = () => {
+        if (!req.result.objectStoreNames.contains(STORE)) req.result.createObjectStore(STORE)
+      }
+      req.onsuccess = () => {
+        const db2 = req.result
+        try {
+          const tx = db2.transaction(STORE, 'readwrite')
+          const cur = tx.objectStore(STORE).openCursor()
+          let removed = 0
+          cur.onsuccess = () => {
+            const c = cur.result
+            if (!c) return
+            const t = keyText(String(c.key ?? ''))
+            if (t && !alive.has(t)) {
+              c.delete()
+              removed++
+            }
+            c.continue()
+          }
+          tx.oncomplete = () => resolve(removed)
+          tx.onerror = () => resolve(-1)
+          tx.onabort = () => resolve(-1)
+        } catch {
+          resolve(-1)
+        }
+      }
+      req.onerror = () => resolve(-1)
+    } catch {
+      resolve(-1)
+    }
+  })
+}
+
+/** 键 → 朗读文本。键形如 `provider|音色|语速|文本`（见 speakOnline 的两个键），
+ *  从前往后数到第三个 `|`，其后整段是文本 —— 不用 lastIndexOf：
+ *  万一文本里本身含 `|`，从后取会截错。 */
+function keyText(key: string): string {
+  const i1 = key.indexOf('|')
+  if (i1 < 0) return ''
+  const i2 = key.indexOf('|', i1 + 1)
+  if (i2 < 0) return ''
+  const i3 = key.indexOf('|', i2 + 1)
+  if (i3 < 0) return ''
+  return key.slice(i3 + 1).trim()
+}
+
 /* ── 原生二进制通道：id → Promise 接线（模式同 transport.ts 的 waiters 表）──
  *
  *  httpPostBin（硅基流动）与 edgeTts（Edge 原生 WS）共用一张 waiters 表、
