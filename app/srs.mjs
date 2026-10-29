@@ -15,9 +15,9 @@ const PARAMS_TSV = path.join(HERE, 'config', 'srs_params.tsv');
 const NUM_KEYS = new Set([
   'S0_TRAP', 'D0_TRAP', 'S0_MULTI_S1', 'D0_MULTI_S1', 'S0_SINGLE', 'D0_SINGLE',
   'S0_NEW', 'D0_NEW', 'S0_RARE', 'D0_RARE', 'S_MAX', 'S_MIN',
-  'EF_A', 'EF_B', 'EF_MIN', 'GRADE_FAST', 'GRADE_SLOW', 'GRADE_PEND', 'GRADE_WRONG',
-  'FAST_BASE', 'FAST_SLOPE', 'SLOW_FACTOR', 'S_PEND', 'S_WRONG', 'D_WRONG_BUMP',
-  'D_DRIFT', 'INTERVAL_FLOOR', 'DECAY_IDLE_FACTOR', 'DECAY_IDLE',
+  'EF_A', 'EF_B', 'EF_MIN', 'GRADE_CORRECT', 'GRADE_PEND', 'GRADE_WRONG',
+  'OVERDUE_CREDIT', 'S_PEND', 'S_WRONG', 'D_WRONG_BUMP',
+  'D_DRIFT', 'INTERVAL_FLOOR', 'DECAY_IDLE_FACTOR',
   'SAME_DAY_HOURS', 'SAME_DAY_FACTOR',
   'MASTER_S', 'MASTER_REPS', 'MASTER_STREAK',
 ]);
@@ -47,11 +47,6 @@ export function easeFactor(P, D) {
   return clamp(P.EF_A - P.EF_B * (D - 1), P.EF_MIN, P.EF_A);
 }
 
-/** 快答基准时间：答对用时短于它算 GRADE_FAST，否则 GRADE_SLOW。 */
-export function fastThresholdMs(P, D) {
-  return P.FAST_BASE + P.FAST_SLOPE * D;
-}
-
 /**
  * 义项类型 → 初始 S0/D0（03 §3）。
  * 判据只用 bundle 里已有的字段，不额外维护一张类型表。
@@ -72,12 +67,11 @@ export function classify(P, card) {
   return { kind: 'NEW', S0: P.S0_NEW, D0: P.D0_NEW };
 }
 
-export function gradeFor(P, result, elapsedMs, D) {
+/** 作答结果 → 评分档。速度不再参与：答对就是答对。 */
+export function gradeFor(P, result) {
   if (result === 'WRONG') return P.GRADE_WRONG;
   if (result === 'PENDING') return P.GRADE_PEND;
-  return elapsedMs != null && elapsedMs < fastThresholdMs(P, D)
-    ? P.GRADE_FAST
-    : P.GRADE_SLOW;
+  return P.GRADE_CORRECT;
 }
 
 /**
@@ -90,8 +84,12 @@ export function gradeFor(P, result, elapsedMs, D) {
  *   第 n 次答对后的间隔 = S(n-1) × ease_factor(D)
  *   第 n 次答对后的 S    = S(n-1) × (1 + ease_factor(D))
  * （verify_srs.py 的连对 4 次表就是这条：2.0 / 4.1 / 8.3 / 16.8）
+ *
+ * prevDueAtSec 只用于两件事：
+ *   - 没到期就答对：增长按「已等待 / 计划间隔」打折（03 §7.2）；
+ *   - 逾期答对：超计划的部分只认一半，见下面的 OVERDUE_CREDIT。
  */
-export function applyReview(P, st, card, result, elapsedMs, nowSec, prevDueAtSec = null) {
+export function applyReview(P, st, card, result, nowSec, prevDueAtSec = null) {
   const fresh = st.reps === 0;
   const init = classify(P, card);
 
@@ -99,7 +97,7 @@ export function applyReview(P, st, card, result, elapsedMs, nowSec, prevDueAtSec
   let D = fresh ? init.D0 : st.difficulty;
   if (fresh) S = clamp(S, P.S_MIN, P.S_MAX);
 
-  const grade = gradeFor(P, result, elapsedMs, D);
+  const grade = gradeFor(P, result);
   const ef = easeFactor(P, D);
 
   // 同日重复：收益减半（03 §7.2）
@@ -108,23 +106,32 @@ export function applyReview(P, st, card, result, elapsedMs, nowSec, prevDueAtSec
   let growth = sameDay ? P.SAME_DAY_FACTOR : 1;
 
   // 提前复习折扣（2026-10-24）：成功提取的加固价值取决于「等了多久」。
-  // 还没到期就答对，只拿到「已等待 / 计划间隔」比例的增长；到期或逾期才满额。
+  // 还没到期就答对，只拿到「已等待 / 计划间隔」比例的增长；到期才满额。
   // 没有这条，随机队列里一周内反复命中同一张卡可以满额连涨、几天速成「掌握」，
   // 从未经历长间隔考验 —— 等于允许偷懒。
-  if (!fresh && result === 'CORRECT' && prevDueAtSec != null && st.last_review != null) {
+  //
+  // 逾期补偿（2026-10-29）：反过来，真的撑到很晚才答对，也不该白等。
+  // 以「计划间隔 + 0.5 × 超出部分」作为这次成功的有效证据：
+  //   计划 16 天、实际 30 天 → 有效 23 天 → 下次约 23 × (1+ef) 天。
+  // 只用实际时间本身会奖励拖延（拖 3 个月答对就排 9 个月），所以超出部分折半。
+  let baseS = S;
+  if (!fresh && grade === P.GRADE_CORRECT && prevDueAtSec != null && st.last_review != null) {
     const scheduled = prevDueAtSec - st.last_review;
-    if (nowSec < prevDueAtSec && scheduled > 0) {
-      growth *= Math.min(1, Math.max(0, (nowSec - st.last_review) / scheduled));
+    if (scheduled > 0) {
+      const actual = nowSec - st.last_review;
+      if (actual < scheduled) {
+        growth *= Math.min(1, Math.max(0, actual / scheduled));
+      } else if (actual > scheduled) {
+        const effectiveDays = (scheduled + P.OVERDUE_CREDIT * (actual - scheduled)) / 86400;
+        baseS = effectiveDays * (1 + ef * growth) / ef;
+      }
     }
   }
 
   let intervalDays;
-  if (grade === P.GRADE_FAST) {
-    intervalDays = S * ef;
-    S = S * (1 + ef * growth);
-  } else if (grade === P.GRADE_SLOW) {
-    intervalDays = S * ef * P.SLOW_FACTOR;
-    S = S * (1 + ef * P.SLOW_FACTOR * growth);
+  if (grade === P.GRADE_CORRECT) {
+    intervalDays = baseS * ef;
+    S = baseS * (1 + ef * growth);
   } else if (grade === P.GRADE_PEND) {
     S = S * P.S_PEND;
     intervalDays = S;
@@ -141,7 +148,9 @@ export function applyReview(P, st, card, result, elapsedMs, nowSec, prevDueAtSec
   //   以及 §3 表里 D 越大间隔越短的前提正好相反。实现按注解取号：4 - grade。
   D = clamp(D + P.D_DRIFT * (4 - grade), 1, 10);
   S = clamp(S, P.S_MIN, P.S_MAX);
-  intervalDays = Math.max(P.INTERVAL_FLOOR, intervalDays);
+
+  // 90 天封顶：超过它就算「已掌握」，不再把间隔继续吹大（03 §6）。
+  intervalDays = clamp(intervalDays, P.INTERVAL_FLOOR, P.MASTER_S);
 
   const wrongN = st.wrong_n + (result === 'WRONG' ? 1 : 0);
   const pendingN = st.pending_n + (result === 'PENDING' ? 1 : 0);
@@ -163,12 +172,17 @@ export function applyReview(P, st, card, result, elapsedMs, nowSec, prevDueAtSec
 /**
  * 长期不练的衰减（03 §7.1）。读取时惰性计算，不写库——
  * 避免「只是打开了一次应用」就把 S 改小。
+ *
+ * 只标 rusty，不改 S：这张卡还没作答，任何结果都可能。
+ * 逾期答对会按实际间隔补偿；逾期答错/不会本来就会把 S 打回去。
+ * 在作答前先砍 S，等于把「其实还记得」的证据提前毁掉。
  */
 export function decayIfIdle(P, row, nowSec) {
   if (row.last_review == null || row.last_review === 0) return row;
+  if (row.rusty === 1) return row;
   const gapDays = (nowSec - row.last_review) / 86400;
   if (gapDays <= P.DECAY_IDLE_FACTOR * row.stability) return row;
-  return { ...row, stability: Math.max(P.S_MIN, row.stability * P.DECAY_IDLE), rusty: 1 };
+  return { ...row, rusty: 1 };
 }
 
 /** 是否达标掌握（03 §6）。streak 由近 N 次有效作答给出。 */

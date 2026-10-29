@@ -5,7 +5,7 @@
 # 现在：Python（verify_srs.py）与 JS（app/srs.mjs）都读这个文件。
 #
 # 列：key <TAB> value <TAB> 说明
-# 改动这里即可调参，不用改代码。改完重跑 scripts/verify_srs.py 看推演。
+# 改动这里即可调参，不用改代码。改完重跑 app/tests/verify_srs.py 看推演。
 
 # ── 初始参数（按义项类型分 5 档）──────────────────────
 S0_TRAP	0.8	熟词僻义：TRAP 义项，间隔必须最短
@@ -29,34 +29,32 @@ EF_B	0.12	难度惩罚斜率
 EF_MIN	0.35	下限，防止最难词间隔塌成 0
 
 # ── 评分档 ────────────────────────────────────────
-GRADE_FAST	5	答对且快于基准时间
-GRADE_SLOW	4	答对但慢
+GRADE_CORRECT	4	答对（不再区分快慢；速度不参与记忆强度判断）
 GRADE_PEND	2	点「我不会」或超时
 GRADE_WRONG	0	答错
 
-# ── 快答基准：FAST_MS = FAST_BASE + FAST_SLOPE*D ────────
-# ★ D17 新增：03 只写了「快于该难度档基准时间」，没给基准。
-#   取 D=5 → 6.5s、D=8 → 8.9s（读一句 + 在 4 个释义里选一个的手感）
-FAST_BASE	2500	ms
-FAST_SLOPE	800	ms/难度档
+# ── 逾期补偿 ───────────────────────────────────────
+# 逾期答对时，实际撑过的天数才是证据；超出计划的部分只认一半。
+# 有效间隔 = 计划间隔 + OVERDUE_CREDIT * (实际间隔 - 计划间隔)
+OVERDUE_CREDIT	0.50	逾期超出计划部分的可信比例
 
 # ── 变化系数 ───────────────────────────────────────
-SLOW_FACTOR	0.70	慢速答对的增长折扣
 S_PEND	0.80	PENDING 时 S *= 该值
 S_WRONG	0.40	WRONG 时 S *= 该值
 D_WRONG_BUMP	0.80	WRONG 时 D 额外 += 该值
-D_DRIFT	0.35	D += D_DRIFT * (grade - 4)
+D_DRIFT	0.35	D += D_DRIFT * (4 - grade)
 INTERVAL_FLOOR	0.25	天；任何情况的间隔下界（6 小时）
 
 # ── 遗忘衰减 ───────────────────────────────────────
-DECAY_IDLE_FACTOR	3.00	距上次复习 > DECAY_IDLE_FACTOR*S 天
-DECAY_IDLE	0.70	超出后 S *= 该值，并标 rusty
+# 只标 rusty（重新进队列），不改 S：逾期成功本身会按实际间隔补偿，
+# 在作答前先砍 S 会把「其实还记得」的证据提前毁掉。
+DECAY_IDLE_FACTOR	3.00	距上次复习 > DECAY_IDLE_FACTOR*S 天，标 rusty
 
 # ── 同日重复 ───────────────────────────────────────
 SAME_DAY_HOURS	6	距上次复习不足该小时数
 SAME_DAY_FACTOR	0.50	同日重复时 S 的增长折扣
 
 # ── 掌握判定 ───────────────────────────────────────
-MASTER_S	90	天，硬门槛
+MASTER_S	90	天，硬门槛；间隔也封顶在这里
 MASTER_REPS	6	最少复习次数
 MASTER_STREAK	3	近 N 次有效作答须全对

@@ -179,17 +179,27 @@ export async function loadWord(
 
 /* ── 展示口径的小工具（多处复用，判定标准只能有一处）── */
 
-/** 下次复习时间的说法。间隔是「天」，所以 ≤1 天一律说「明天」而不是 0.9 天后。 */
+/** 距下次复习还有多久。要的是「隔多久」，不是「今天 / 明天」这种日历标签。
+ *  < 1 小时按分钟、< 1 天按小时，其余按天；一律保留一位小数。 */
+export function durationText(seconds: number): string {
+  const s = Math.max(0, seconds)
+  if (s < 3600) return `约 ${(s / 60).toFixed(1)} 分钟后`
+  if (s < 86400) return `约 ${(s / 3600).toFixed(1)} 小时后`
+  return `${(s / 86400).toFixed(1)} 天后`
+}
+
+/** 以 dueAt 时间戳算相对时长；now 可注入，便于测试。 */
+export function dueInText(dueAt: number, nowSec: number = Math.floor(Date.now() / 1000)): string {
+  return durationText(dueAt - nowSec)
+}
+
+/** 下次复习时间的说法：未开始 / 已掌握 / 已到期，其余给具体时长。 */
 export function dueText(p?: Progress): string {
   if (!p || p.reps === 0) return '未开始'
   if (p.mastered) return '已掌握'
   const now = Math.floor(Date.now() / 1000)
-  const days = (p.dueAt - now) / 86400
-  if (days <= 0) return '已到期'
-  if (days < 1) return '今天内'
-  if (days < 2) return '明天'
-  if (days < 30) return `${Math.round(days)} 天后`
-  return `${Math.round(days / 30)} 个月后`
+  if (p.dueAt <= now) return '已到期'
+  return dueInText(p.dueAt, now)
 }
 
 export function repsText(p?: Progress): string {

@@ -59,16 +59,12 @@ console.log(`  TSV 独有: ${keys.filter((k) => P_old[k] !== undefined && P_new[
 console.log(`  JSON 独有: ${keys.filter((k) => P_old[k] === undefined && P_new[k] !== undefined).join(',') || '无'}`)
 
 /* ── 3. 纯函数逐点比对 ── */
-console.log('\n=== 2. easeFactor / fastThresholdMs / classify / gradeFor ===')
+console.log('\n=== 2. easeFactor / classify / gradeFor ===')
 let fBad = 0
 for (let d = 0; d <= 12; d += 0.5) {
   if (oldSrs.easeFactor(P_old, d) !== newSrs.easeFactor(d)) {
     fBad++
     fail(`easeFactor(D=${d}): ${oldSrs.easeFactor(P_old, d)} vs ${newSrs.easeFactor(d)}`)
-  }
-  if (oldSrs.fastThresholdMs(P_old, d) !== newSrs.fastThresholdMs(d)) {
-    fBad++
-    fail(`fastThresholdMs(D=${d})`)
   }
 }
 console.log(`  D 取 0~12 步长 0.5，共 ${fBad} 处不一致`)
@@ -94,21 +90,16 @@ for (const c of CARDS) {
 console.log(`  classify 覆盖 ${CARDS.length} 种卡片（${KINDS.join('/')}），累计 ${fBad} 处不一致`)
 
 const RESULTS = ['CORRECT', 'WRONG', 'PENDING']
-const ELAPSEDS = [null, 0, 500, 1200, 3000, 9000, 60000, 999999]
 let gBad = 0
 for (const r of RESULTS) {
-  for (const e of ELAPSEDS) {
-    for (let d = 1; d <= 10; d++) {
-      const a = oldSrs.gradeFor(P_old, r, e, d)
-      const b = newSrs.gradeFor(r, e, d)
-      if (a !== b) {
-        gBad++
-        fail(`gradeFor(${r}, ${e}, D=${d}): ${a} vs ${b}`)
-      }
-    }
+  const a = oldSrs.gradeFor(P_old, r)
+  const b = newSrs.gradeFor(r)
+  if (a !== b) {
+    gBad++
+    fail(`gradeFor(${r}): ${a} vs ${b}`)
   }
 }
-console.log(`  gradeFor 覆盖 ${RESULTS.length}×${ELAPSEDS.length}×10 组合，累计 ${gBad} 处不一致`)
+console.log(`  gradeFor 覆盖 ${RESULTS.length} 种结果，累计 ${gBad} 处不一致`)
 
 /* ── 4. 完整状态轨迹比对（核心）── */
 console.log('\n=== 3. applyReview 随机轨迹：连续 2000 步，每步比对全字段 ===')
@@ -133,17 +124,16 @@ for (let i = 0; i < STEPS; i++) {
   const result = pick(RESULTS)
   // 同日/跨日/长期不练 三种时间跨度都要覆盖
   const gap = pick([600, 3600, 6 * 3600, 20 * 3600, 3 * 86400, 30 * 86400, 400 * 86400])
-  const elapsed = pick(ELAPSEDS)
   t += gap
 
-  const a = oldSrs.applyReview(P_old, stOld, card, result, elapsed, t)
-  const b = newSrs.applyReview(stNew, card, result, elapsed, t)
+  const a = oldSrs.applyReview(P_old, stOld, card, result, t)
+  const b = newSrs.applyReview(stNew, card, result, t)
 
   for (const f of ['stability', 'difficulty', 'intervalDays', 'grade', 'dueAt', 'reps', 'kind', 'sameDay']) {
     if (a[f] !== b[f]) {
       trajBad++
       if (trajBad <= 5) {
-        fail(`第 ${i} 步 ${f}: 旧=${a[f]} 新=${b[f]}  (${card.sense_id} ${result} elapsed=${elapsed})`)
+        fail(`第 ${i} 步 ${f}: 旧=${a[f]} 新=${b[f]}  (${card.sense_id} ${result})`)
       }
     }
   }
@@ -218,7 +208,7 @@ for (const [name, s0, d0] of docVec) {
   for (let i = 0; i < 4; i++) {
     const st = { stability: S, difficulty: d0, reps: 1, wrong_n: 0, pending_n: 0, last_review: START - 86400 }
     const card = { sense_id: 's1', n_senses: 1, is_trap: 0, tier: 'T1' }
-    const r = newSrs.applyReview(st, card, 'CORRECT', 100, START)
+    const r = newSrs.applyReview(st, card, 'CORRECT', START)
     row.push(r.intervalDays)
     S = r.stability
   }

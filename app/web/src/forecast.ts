@@ -6,8 +6,8 @@
  *    每天把到期的卡喂给 applyReview（与真实作答同一套公式），
  *    用算出来的新 dueAt 继续往后滚。
  *
- *  ★ 口径（与用户在界面上确认的一致）：假设每天都练、每张卡都按普通速度答对
- *    （GRADE_SLOW）。这是「理想坚持下的下限」—— 真实只可能更多（答错会提前回炉），
+ *  ★ 口径（与用户在界面上确认的一致）：假设每天都练、每张卡都按时答对。
+ *    这是「理想坚持下的下限」—— 真实只可能更多（答错会提前回炉），
  *    不会更少。也正因为假设固定，同一份进度算两次结果完全一样（可测）。
  *
  *  ★ 两个有意的简化，写在明处：
@@ -103,7 +103,7 @@ export function forecastDaily(
 
       // 答完这一次，滚出下一次到期
       const at = dayStart + d * 86400 + 12 * 3600 // 固定「中午练」，避开日界抖动
-      const out = applyReview(sim.st, DUMMY_CARD, 'CORRECT', null, at)
+      const out = applyReview(sim.st, DUMMY_CARD, 'CORRECT', at)
       const st: SrsState = {
         stability: out.stability,
         difficulty: out.difficulty,

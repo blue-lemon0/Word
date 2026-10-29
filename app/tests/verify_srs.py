@@ -37,10 +37,8 @@ def ease_factor(d, p=P):
 
 def interval_days(S, D, grade, p=P):
     ef = ease_factor(D, p)
-    if grade == p["GRADE_FAST"]:
+    if grade == p["GRADE_CORRECT"]:
         return S * ef
-    if grade == p["GRADE_SLOW"]:
-        return S * ef * p["SLOW_FACTOR"]
     if grade == p["GRADE_PEND"]:
         return S
     return max(p["INTERVAL_FLOOR"], S * p["S_WRONG"])
@@ -72,17 +70,25 @@ init = [("主义 s1", P["S0_MULTI_S1"], P["D0_MULTI_S1"]),
 for name, s0, d0 in init:
     print("  %-8s S0=%.1f D0=%.1f ef=%.2f" % (name, s0, d0, ease_factor(d0)))
 
-print("\n=== 连对 4 次（grade=5, D 固定不漂移）间隔演化 ===")
+print("\n=== 连对 4 次（GRADE_CORRECT=4, D 固定不漂移）间隔演化 ===")
 print("%-8s %7s %8s %8s %8s %8s" % ("类型", "S0", "第1次", "第2次", "第3次", "第4次"))
 vectors = {}
 for name, s0, d0 in init:
     S = s0
     row = []
     for _ in range(4):
-        row.append(interval_days(S, d0, P["GRADE_FAST"]))
+        row.append(interval_days(S, d0, P["GRADE_CORRECT"]))
         S = S * (1 + ease_factor(d0))
     vectors[name] = row
     print("%-8s %7.1f %8.2f %8.2f %8.2f %8.2f" % (name, s0, *row))
+
+print("\n=== 逾期补偿（03 §4.1.2）===")
+print("  有效间隔 = 计划 + %.2f × (实际 - 计划)；下次 = 有效 × (1+ef)"
+      % P["OVERDUE_CREDIT"])
+for scheduled, actual in [(7, 7), (7, 14), (16, 30)]:
+    effective = scheduled + P["OVERDUE_CREDIT"] * (actual - scheduled)
+    print("  计划 %2d 天，实际 %2d 天 → 有效 %5.1f 天 → 下次 %5.1f 天（D=5）"
+          % (scheduled, actual, effective, effective * (1 + ease_factor(5))))
 
 print("\n=== 档间差距（TRAP 应显著低于 s1）===")
 S1, D1 = P["S0_MULTI_S1"], P["D0_MULTI_S1"]
@@ -98,22 +104,22 @@ print("\n=== 掌握门槛 %.0f 天需几次（含难度漂移）===" % P["MASTER
 for name, s0, d0 in init:
     S, D, n = s0, d0, 0
     while S < P["MASTER_S"] and n < 40:
-        iv = interval_days(S, D, P["GRADE_FAST"])
+        iv = interval_days(S, D, P["GRADE_CORRECT"])
         S = S * (1 + ease_factor(D))
-        D = drift_d(D, P["GRADE_FAST"])
+        D = drift_d(D, P["GRADE_CORRECT"])
         n += 1
     print("  %-8s 需连对 %2d 次 (S=%.0f天, D=%.1f)" % (name, n, S, D))
 
 print("\n=== 难度漂移方向（03 §4.2 按注解实现）===")
 base = 5.0
-for label, grade in [("FAST=5", P["GRADE_FAST"]), ("SLOW=4", P["GRADE_SLOW"]),
+for label, grade in [("CORRECT=4", P["GRADE_CORRECT"]),
                      ("PEND=2", P["GRADE_PEND"]), ("WRONG=0", P["GRADE_WRONG"])]:
     d = drift_d(base, grade)
     if grade == P["GRADE_WRONG"]:
         d = drift_d(d, grade)   # WRONG 还有一次 D_WRONG_BUMP
     print("  %-8s D %.1f -> %.2f  (ef %.2f -> %.2f)"
           % (label, base, d, ease_factor(base), ease_factor(d)))
-print("  期望：答得越轻松 D 越低、间隔越长")
+print("  期望：CORRECT 不推高 D；PEND / WRONG 让 D 上升、增长放缓")
 
 print("\n=== 下界检查 ===")
 print("  WRONG 后最小间隔: %.2f 天 (应 >= %.2f)"

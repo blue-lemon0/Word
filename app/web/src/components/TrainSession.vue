@@ -29,6 +29,7 @@ import {
   type SessionStats,
 } from '../quiz'
 import { toast } from '../toast'
+import { dueInText } from '../composables'
 import { autoSpeak, speakEn, speechOn, ttsWaiting } from '../speech'
 import { allProgress, db } from '../db'
 import { forecastDaily, forecastSummary, type ForecastResult } from '../forecast'
@@ -160,9 +161,8 @@ const KEYS = ['A', 'B', 'C', 'D']
 const isRight = (opt: string): boolean => !!q.value && opt === q.value.sense.gloss
 
 const nextDue = computed(() => {
-  const d = q.value?.outcome?.intervalDays
-  if (d == null) return ''
-  return d < 1 ? '今天内' : d < 2 ? '明天' : `${Math.round(d)} 天后`
+  const due = q.value?.outcome?.dueAt
+  return due == null ? '' : dueInText(due)
 })
 
 /** 结果区顶部那行字：回看时要说清这是历史，不然后面紧跟的「下一题」会让人以为答错了重来 */
@@ -174,7 +174,7 @@ const resultText = computed(() => {
 })
 
 /** 刚刚这一轮做过哪些卡 —— 「再来一遍」要用的就是它。
- *  ★ 不能重新按到期去组：刚答过的卡 dueAt 已经挪到明天、reps 也大于 0，
+ *  ★ 不能重新按到期去组：刚答过的卡 dueAt 已经挪到未来、reps 也大于 0，
  *   `buildQueue` 会把它们全都排除掉，于是「再来一轮」等于什么也没发生。
  *   这正是「背完当天就无所事事」的第一个原因。 */
 const lastRound = ref<string[]>([])
@@ -1153,7 +1153,7 @@ watch(
 
           <div class="done-btns">
             <!-- ★ 这里原来是 @click="start"，也就是**按到期重新组一轮**。
-                 刚答过的卡 dueAt 挪到了明天、reps 也大于 0，于是 buildQueue
+                 刚答过的卡 dueAt 挪到了未来、reps 也大于 0，于是 buildQueue
                  把它们全部排除 —— 点了「再来一轮」结果队列是空的，
                  表现就是「按了没反应 / 什么都不变」。
                  「再刷一遍」要的是**重刷刚做完的那批**，所以用 redo。 -->

@@ -11,6 +11,7 @@
 import { ref, watch } from 'vue'
 import MarkedText from './MarkedText.vue'
 import { db } from '../db'
+import { dueInText } from '../composables'
 import { formsOfSentence } from '../marks'
 import { makeQuestion, newSessionId, recordAnswer, type Question } from '../quiz'
 import { speakEn, speechOn, ttsWaiting } from '../speech'
@@ -74,9 +75,8 @@ const shownAt = ref(0)
 const isRight = (opt: string): boolean => !!q.value && opt === q.value.sense.gloss
 
 function nextText(): string {
-  const d = q.value?.outcome?.intervalDays
-  if (d == null) return ''
-  return d < 1 ? '今天内' : d < 2 ? '明天' : `${Math.round(d)} 天后`
+  const due = q.value?.outcome?.dueAt
+  return due == null ? '' : dueInText(due)
 }
 
 const resultText = ref('')

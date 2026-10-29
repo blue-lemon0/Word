@@ -988,8 +988,8 @@ ok((await db.progress.get(q1.sense.id)) != null, '回滚不动学习进度（只
   const decayed = await db.progress.get(stale)
   ok(decayed.rusty === 1, '衰减后 rusty 置 1（不然下次组队列又会被跳过）')
   ok(
-    Math.abs(decayed.stability - 6 * 0.7) < 1e-9,
-    `衰减把 S 乘以 0.7（6 → ${decayed.stability}）`,
+    Math.abs(decayed.stability - 6) < 1e-9,
+    `衰减只标 rusty、不改 S（仍是 ${decayed.stability}；真正的改写留给作答）`,
   )
   ok((await db.progress.get(fresh)).rusty === 0, '没超期的那个不动 rusty')
 

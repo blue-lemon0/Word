@@ -50,7 +50,7 @@ export async function practicePool(): Promise<Sense[]> {
  *  ★ 之前这个函数写好了却从没被调用 —— 于是 `rusty` 永远是 0，
  *   下一行 `if (p.mastered && !p.rusty) return` 恒成立，
  *   **一个词一旦标成「已掌握」就永远不再出现**。
- *   `srs.ts` 里的 `decayIfIdle` 与参数表里的 `DECAY_IDLE` 都是死的。
+ *   `srs.ts` 里的 `decayIfIdle` 与参数表里的 `DECAY_IDLE_FACTOR` 都是死的。
  *
  *  为什么放在「组队列」而不是「启动时全表扫」：
  *  衰减的判据是「闲置多久 vs 当前 S」，判据只在这里被用到；
@@ -73,7 +73,7 @@ async function decayIdle(rows: Progress[], now: number): Promise<Progress[]> {
       now,
     )
     if (d === undefined || d.rusty === p.rusty) continue // 没变化
-    changed.push({ ...p, stability: d.stability, rusty: 1 })
+    changed.push({ ...p, rusty: 1 })
   }
   if (changed.length) {
     await db.transaction('rw', db.progress, async () => {
@@ -445,8 +445,8 @@ export async function recordAnswer(
       }
     : { stability: 0, difficulty: 8, reps: 0, wrong_n: 0, pending_n: 0, last_review: null }
 
-  // 把上一次的到期日传给公式：没到期就答对，增长按「已等待/计划间隔」打折
-  const outcome = applyReview(st, card, result, elapsedMs, now, prev?.dueAt ?? null)
+  // 把上一次的到期日传给公式：没到期按「已等待/计划间隔」打折，逾期按实际间隔补偿
+  const outcome = applyReview(st, card, result, now, prev?.dueAt ?? null)
 
   // 是否掌握：看最近 N 次有效作答的连对（03 §6）
   const recent = (
@@ -495,7 +495,7 @@ export async function recordAnswer(
  * （同一个 recordAnswer，同一个提前复习折扣 —— 没到期就打勾，
  * 增长会被「已等待 / 计划间隔」自动打到接近零，自评不需要额外防刷）。
  *
- *  没有选项、没有计时：elapsedMs 传 null（时长只用于快慢分档，自评没这东西）。
+ *  没有选项、没有计时：elapsedMs 传 null（它只进作答流水，不参与排期）。
  */
 export async function recordScanVerdict(
   item: ScanItem,

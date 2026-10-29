@@ -60,9 +60,8 @@ for (let c = 0; c < 400; c++) {
   let prevDue = null // 上一次的到期日：提前复习折扣要靠它算「等了计划的几分之几」
   for (let i = 0; i < 12; i++) {
     const result = RESULTS[Math.floor(rnd() * RESULTS.length)]
-    const elapsed = Math.floor(rnd() * 12000)
-    const ra = ref.applyReview(P, a, card, result, elapsed, now, prevDue)
-    const rb = port.applyReview(b, card, result, elapsed, now, prevDue)
+    const ra = ref.applyReview(P, a, card, result, now, prevDue)
+    const rb = port.applyReview(b, card, result, now, prevDue)
     cases++
     for (const k of ['stability', 'difficulty', 'intervalDays', 'grade', 'reps']) {
       if (Math.abs(ra[k] - rb[k]) > 1e-9) {
@@ -112,18 +111,37 @@ ok(diffs === 0, `${cases} 次作答的 S/D/间隔/评级/类型判定逐格一�
   const card = { is_trap: 0, tier: 'T1', n_senses: 1, sense_id: 's1' }
   const due = 1758000000 + 7 * 86400
   const early = 1758000000 + 2 * 86400
-  const e1 = ref.applyReview(P, st, card, 'CORRECT', 99999, early, due)
-  const e2 = port.applyReview(st, card, 'CORRECT', 99999, early, due)
-  const o1 = ref.applyReview(P, st, card, 'CORRECT', 99999, due, due)
-  const o2 = port.applyReview(st, card, 'CORRECT', 99999, due, due)
+  const e1 = ref.applyReview(P, st, card, 'CORRECT', early, due)
+  const e2 = port.applyReview(st, card, 'CORRECT', early, due)
+  const o1 = ref.applyReview(P, st, card, 'CORRECT', due, due)
+  const o2 = port.applyReview(st, card, 'CORRECT', due, due)
   ok(Math.abs(e1.stability - e2.stability) < 1e-9 && Math.abs(o1.stability - o2.stability) < 1e-9,
      '提前复习：两实现一致')
   ok(e1.stability < o1.stability - 1e-9, '提前答对的增长 < 到期答对',
      `提前 S=${e1.stability} vs 到期 S=${o1.stability}`)
   const ef = ref.easeFactor(P, 5)
-  const expect = 5 * (1 + ef * P.SLOW_FACTOR * (2 / 7))
+  const expect = 5 * (1 + ef * (2 / 7))
   ok(Math.abs(e1.stability - expect) < 1e-9, '折扣比例 = 已等待 / 计划间隔',
      `期望 ${expect} 实际 ${e1.stability}`)
+}
+
+/* 3c. 逾期补偿：超出计划的部分只认一半，下一档按有效间隔 × (1+ef)。
+ *     计划 16 天、实际 30 天 → 有效 23 天 → 下次 23 × (1+ef)。 */
+{
+  const card = { is_trap: 0, tier: 'T1', n_senses: 1, sense_id: 's1' }
+  const st = { stability: 20, difficulty: 5, reps: 3, wrong_n: 0, pending_n: 0, last_review: 1758000000 }
+  const due = st.last_review + 16 * 86400
+  const late = st.last_review + 30 * 86400
+  const a = ref.applyReview(P, st, card, 'CORRECT', late, due)
+  const b = port.applyReview(st, card, 'CORRECT', late, due)
+  const ef = ref.easeFactor(P, 5)
+  const effective = 16 + P.OVERDUE_CREDIT * (30 - 16)
+  const expect = effective * (1 + ef)
+  ok(Math.abs(a.intervalDays - expect) < 1e-9 && Math.abs(b.intervalDays - expect) < 1e-9,
+     '逾期答对：有效 23 天 → 下次 23×(1+ef)', `期望 ${expect} 实际 ${a.intervalDays}/${b.intervalDays}`)
+  const onTime = ref.applyReview(P, { ...st, last_review: due - 16 * 86400 }, card, 'CORRECT', due, due)
+  ok(a.intervalDays > onTime.intervalDays, '逾期答对的间隔 > 按时答对',
+     `逾期 ${a.intervalDays} vs 按时 ${onTime.intervalDays}`)
 }
 
 /* 4. 端点与单调性 */
