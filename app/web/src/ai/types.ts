@@ -7,7 +7,7 @@
  */
 import type { Sense, Sentence, SentenceMark } from '../types'
 
-export type AiActionKind = 'reviewWord' | 'addSentence' | 'replaceSentence' | 'fillWord'
+export type AiActionKind = 'reviewWord' | 'reviewSense' | 'addSentence' | 'replaceSentence' | 'fillWord'
 
 /** 一次提案：AI 想说「这里应该改成这样」。**它没有写库的能力**，
  *  只能提出；写库由用户点「应用」之后走 `ai/apply.ts` 的普通编辑原语。 */
@@ -100,6 +100,10 @@ export interface WordContext {
   sentences: Pick<Sentence, 'id' | 'senseId' | 'en' | 'zh' | 'form'>[]
   /** 因为太长而没放进提示词的例句数 —— 必须说出来，否则模型会以为「就这几句」 */
   omitted?: number
+  /** 这次只带某个义项的全部例句时，记下它的 slot；用来把上下文写清楚 */
+  focusSlot?: number
+  /** 换句时只把这一句标成「要处理的目标」 */
+  focusSentenceId?: number
 }
 export class AiError extends Error {
   readonly kind: 'no-config' | 'network' | 'http' | 'parse' | 'refused'

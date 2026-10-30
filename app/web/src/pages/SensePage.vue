@@ -44,7 +44,11 @@ import { setAvoidTarget } from '../keyboard'
 import { goBack } from '../nav'
 import { speakEn, speechOn, ttsWaiting, autoSpeak } from '../speech'
 import { toast } from '../toast'
-import { addSentence as aiAddSentence, replaceSentence as aiReplaceSentence } from '../ai/actions'
+import {
+  addSentence as aiAddSentence,
+  replaceSentence as aiReplaceSentence,
+  reviewSense as aiReviewSense,
+} from '../ai/actions'
 import { aiReady } from '../ai/config'
 import { describeAiError, type AiResult } from '../ai/types'
 import AiSheet from '../components/AiSheet.vue'
@@ -100,6 +104,9 @@ watch(word, (w) => {
 
 const showImport = ref(false)
 const showPrompt = ref(false)
+/** 义项审查前的可选补充要求；只对这一次请求生效。 */
+const showAiReview = ref(false)
+const aiNote = ref('')
 const showMerge = ref(false)
 const showSplit = ref(false)
 /** 词性 / 分级的选择弹层（替代 van-dropdown-menu，见模板注释） */
@@ -258,6 +265,8 @@ watch(
   () => props.id,
   () => {
     editingGloss.value = false
+    showAiReview.value = false
+    aiNote.value = ''
     void load()
   },
   { immediate: true },
@@ -342,6 +351,13 @@ function onAiAdd(): void {
   const s = sense.value
   if (!s) return
   void runAi(() => aiAddSentence(s.id, 3))
+}
+
+function onAiReview(): void {
+  const s = sense.value
+  if (!s) return
+  showAiReview.value = false
+  void runAi(() => aiReviewSense(s.id, aiNote.value))
 }
 
 function onAiReplace(sen: Sentence): void {
@@ -680,6 +696,9 @@ function onDelete(): void {
         <div class="shead">
           <b>例句 {{ sents.length }}/{{ TARGET }}</b>
           <span class="wb-sp" />
+          <van-button v-if="aiOn" size="mini" plain type="primary" @click="showAiReview = true">
+            AI 审查
+          </van-button>
           <van-button size="mini" plain @click="showPrompt = true">复制给 AI</van-button>
           <van-button size="mini" plain type="primary" @click="showImport = true">导入</van-button>
         </div>
@@ -910,6 +929,26 @@ function onDelete(): void {
         :text="promptText"
         @close="showPrompt = false"
       />
+      <Sheet :open="showAiReview" title="AI 审查" @close="showAiReview = false">
+        <p class="hint">
+          只审这个意思，它的例句会全部带上；多句犯同一个错时会逐句换掉，不会只补一句。
+        </p>
+        <van-field
+          v-model="aiNote"
+          type="textarea"
+          rows="2"
+          autosize
+          maxlength="120"
+          show-word-limit
+          placeholder="补充要求（可选），例如：这几句都在用名词义，全部换掉"
+        />
+        <template #footer>
+          <div class="addfoot">
+            <van-button size="small" plain @click="showAiReview = false">取消</van-button>
+            <van-button size="small" type="primary" @click="onAiReview">开始审查</van-button>
+          </div>
+        </template>
+      </Sheet>
       <!-- AI 提议：补一句 / 换一句都走这张浮层（同一种「提议」，不分两套 UI） -->
       <AiSheet
         :show="aiOpen"

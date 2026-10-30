@@ -1,7 +1,7 @@
-/** AI 的三个动作 —— 对上层只暴露「审一个词 / 补一句 / 换一句」。
+/** AI 的动作 —— 对上层只暴露「审词 / 审义项 / 补一句 / 换一句 / 补全」。
  *
- *  ★ 三个动作共用一条流水线（取上下文 → 拼提示词 → 查缓存 → 调一次
- *    → 解析成提案 → 写缓存）。新增第四个动作只要写个 prompt 函数，
+ *  ★ 所有动作共用一条流水线（取上下文 → 拼提示词 → 查缓存 → 调一次
+ *    → 解析成提案 → 写缓存）。新增动作只要写个 prompt 函数，
  *    再在下面加一个四行的包装 —— 这是「不专门为某个 AI 设计」的落点。
  *
  *  ★ 每个动作都是**一次请求**：审查整词时把该词的义项与例句一次带上，
@@ -14,7 +14,14 @@ import { cacheGet, cachePut, hashOf } from './cache'
 import { chat } from './client'
 import { isConfigured, loadConfig } from './config'
 import { parseProposals } from './parse'
-import { addSentencePrompt, fillWordPrompt, lemmaPrompt, replaceSentencePrompt, reviewWordPrompt } from './prompts'
+import {
+  addSentencePrompt,
+  fillWordPrompt,
+  lemmaPrompt,
+  replaceSentencePrompt,
+  reviewSensePrompt,
+  reviewWordPrompt,
+} from './prompts'
 import { promptFingerprint } from './prompt-store'
 import { AiError, type AiActionKind, type AiResult, type Proposal, type WordContext } from './types'
 
@@ -65,21 +72,31 @@ function requireSentencesForEverySense(ps: Proposal[], requiredSlots: number[] =
   return null
 }
 
-function contextOf(r: Rows): WordContext {
-  // ★ 例句不能全带上：一个词 4 个义项 × 5 句就是 20 句，光输入就要两三千 token，
-  //   而判断「释义准不准、例句教没教对这个意思」每个义项看 2 句就够。
-  //   省下来的输入 token 是全库体检的主要开销（见 D40 第五节）。
+function contextOf(r: Rows, focusSenseId?: string, focusSentenceId?: number): WordContext {
+  // ★ 整词审查默认每个义项只带 2 句：一个词 4 个义项 × 5 句就是 20 句，
+  //   光输入就要两三千 token。省下来的输入 token 是全库体检的主要开销（见 D40 第五节）。
+  // ★ 针对某个义项的动作（审查/补句/换句）必须看全它自己的例句：
+  //   只带头两句会让 AI 看不到第 3 句以后的问题，甚至看不到要换的那一句，
+  //   于是它只能用「补一句」糊弄过去，或者换出一句同样错的。
+  const focus = focusSenseId ? r.senses.find((s) => s.id === focusSenseId) : undefined
   const perSense = 2
   const picked: WordContext['sentences'] = []
   let omitted = 0
   const seen = new Map<string, number>()
   for (const s of r.sentences) {
-    const n = seen.get(s.senseId) ?? 0
-    if (n >= perSense) {
-      omitted++
-      continue
+    if (focus) {
+      if (s.senseId !== focus.id) {
+        omitted++
+        continue
+      }
+    } else {
+      const n = seen.get(s.senseId) ?? 0
+      if (n >= perSense) {
+        omitted++
+        continue
+      }
+      seen.set(s.senseId, n + 1)
     }
-    seen.set(s.senseId, n + 1)
     picked.push({
       id: s.id as number,
       senseId: s.senseId,
@@ -103,6 +120,8 @@ function contextOf(r: Rows): WordContext {
     })),
     sentences: picked,
     omitted,
+    focusSlot: focus?.slot,
+    focusSentenceId: focus ? focusSentenceId : undefined,
   }
 }
 
@@ -158,11 +177,11 @@ async function run(
   messages: { role: 'system' | 'user'; content: string }[],
   extra = '',
   check?: (proposals: Proposal[]) => string | null,
+  ctx = contextOf(rows),
 ): Promise<AiResult> {
   const cfg = loadConfig()
   if (!isConfigured(cfg)) throw new AiError('no-config', 'AI 还没配置')
 
-  const ctx = contextOf(rows)
   const key = cacheKeyOf(action, cfg.model, ctx, extra, promptFingerprint(messages))
   const bind = { word: rows.word, ipa: rows.ipa, senses: rows.senses, sentences: rows.sentences }
 
@@ -216,16 +235,40 @@ export async function reviewWord(word: string): Promise<AiResult> {
   return run('reviewWord', rows, reviewWordPrompt(contextOf(rows)))
 }
 
+/** 只审一个义项：带全它的例句，专治「同一类错在多句里反复出现」。
+ *
+ *  ★ 和 reviewWord 的区别不只是范围：这里**不截断这个义项的例句**。
+ *    整词审查为了省 token 每义项只看 2 句；多句同错时 AI 看不到后面的，
+ *    只能补一句最新的，前面的错句原样留着。
+ *  ★ note 是用户临时写的一句补充要求，只影响这一次请求（进 prompt 指纹与缓存键）。 */
+export async function reviewSense(senseId: string, note = ''): Promise<AiResult> {
+  const sense = await db.senses.get(senseId)
+  if (!sense) throw new AiError('refused', '这个义项不存在')
+  const rows = await rowsOf(sense.word)
+  const ctx = contextOf(rows, sense.id)
+  return run(
+    'reviewSense',
+    rows,
+    reviewSensePrompt(ctx, sense.slot, note.trim()),
+    `sense:${senseId}`,
+    undefined,
+    ctx,
+  )
+}
+
 /** 给某个义项补几条候选例句。 */
 export async function addSentence(senseId: string, howMany = 3): Promise<AiResult> {
   const sense = await db.senses.get(senseId)
   if (!sense) throw new AiError('refused', '这个义项不存在')
   const rows = await rowsOf(sense.word)
+  const ctx = contextOf(rows, sense.id)
   return run(
     'addSentence',
     rows,
-    addSentencePrompt(contextOf(rows), sense.slot, howMany),
+    addSentencePrompt(ctx, sense.slot, howMany),
     `${senseId}:${howMany}`,
+    undefined,
+    ctx,
   )
 }
 
@@ -261,10 +304,13 @@ export async function replaceSentence(sentenceId: number, why = ''): Promise<AiR
   const sense = await db.senses.get(sen.senseId)
   if (!sense) throw new AiError('refused', '这句例句挂的义项不存在')
   const rows = await rowsOf(sense.word)
+  const ctx = contextOf(rows, sense.id, sentenceId)
   return run(
     'replaceSentence',
     rows,
-    replaceSentencePrompt(contextOf(rows), sentenceId, why),
+    replaceSentencePrompt(ctx, sentenceId, why),
     `sentence:${sentenceId}`,
+    undefined,
+    ctx,
   )
 }

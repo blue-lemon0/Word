@@ -11,7 +11,7 @@
  *
  *  ★ 所有动作都要求返回**同一份 JSON 形状**（`{note, proposals[]}`），
  *    差别只在约束条数。这样解析、缓存、应用、界面全部可以复用一套逻辑，
- *    加第四个动作只是多写一个 prompt 函数。
+ *    加新动作只是多写一个 prompt 函数。
  *
  *  ★ 成本控制写在 prompt 里而不是代码里：只列「真有问题」的、最多 6 条、
  *    例句 12-20 词。这些约束省下来的 token 比任何参数调优都多。
@@ -21,16 +21,46 @@ import type { ChatMessage } from './client'
 import { renderPrompt } from './prompt-store'
 import type { WordContext } from './types'
 
+type CtxSense = WordContext['senses'][number]
+type CtxSentence = WordContext['sentences'][number]
+
+function senseLine(s: CtxSense): string {
+  return `  ${s.slot}. (${s.pos || '?'}) ${s.gloss}${s.glossEn ? ` | en: ${s.glossEn}` : ''}${s.note ? ` | note: ${s.note}` : ''}${s.trap ? ' | [已标熟词僻义]' : ''}`
+}
+
+function sentLine(c: WordContext, s: CtxSentence, marked = false): string {
+  const slot = c.senses.find((x) => x.id === s.senseId)?.slot ?? '?'
+  return `  - sentenceId=${s.id} slot=${slot}: "${s.en}"${s.zh ? ` / "${s.zh}"` : ''}${marked ? '  ← 这次要处理的就是这句' : ''}`
+}
+
 function ctxBody(c: WordContext): string {
-  const senses = c.senses
-    .map((s) => `  ${s.slot}. (${s.pos || '?'}) ${s.gloss}${s.glossEn ? ` | en: ${s.glossEn}` : ''}${s.note ? ` | note: ${s.note}` : ''}${s.trap ? ' | [已标熟词僻义]' : ''}`)
-    .join('\n')
+  const focus = c.focusSlot != null ? c.senses.find((s) => s.slot === c.focusSlot) : undefined
+
+  // 针对某个义项的动作：先把这个义项单独摆出来，再列出它的全部例句。
+  // 只给「一堆义项 + 一堆例句」时，模型容易按最常见的意思造句；
+  // 明确写「只能按这一条、其它义项不要用」，比让它自己从 sentenceId 反推更稳。
+  if (focus) {
+    const others = c.senses.filter((s) => s.id !== focus.id).map(senseLine).join('\n')
+    const sents = c.sentences.length
+      ? c.sentences.map((s) => sentLine(c, s, s.id === c.focusSentenceId)).join('\n')
+      : '  （这个义项还没有例句）'
+    const omitted = c.omitted ? `  （其它义项另有 ${c.omitted} 句例句没列出来）` : ''
+    return `词条：${c.word}${c.ipa ? ` /${c.ipa}/` : '（音标缺失）'}
+当前义项（只能按这一条造句/审查，不要切到其它义项）：
+${senseLine(focus)}
+其它义项（只给释义，造句时不要用它们）：
+${others || '  （没有其它义项）'}
+这个义项的例句（全部列出，sentenceId 是编号）：${omitted}
+${sents}`
+  }
+
+  const senses = c.senses.map(senseLine).join('\n')
   const sents = c.sentences.length
-    ? c.sentences
-        .map((s) => `  - sentenceId=${s.id} slot=${c.senses.find((x) => x.id === s.senseId)?.slot ?? '?'}: "${s.en}"${s.zh ? ` / "${s.zh}"` : ''}`)
-        .join('\n')
+    ? c.sentences.map((s) => sentLine(c, s)).join('\n')
     : '  （这个词还没有例句）'
-  const sentNote = c.omitted ? `  （另外还有 ${c.omitted} 句没列出来，只列了每个义项的头两句）` : ''
+  const sentNote = c.omitted
+    ? `  （另外还有 ${c.omitted} 句没列出来，只列了每个义项的头两句）`
+    : ''
   return `词条：${c.word}${c.ipa ? ` /${c.ipa}/` : '（音标缺失）'}
 义项（slot 是编号）：
 ${senses || '  （还没有义项）'}
@@ -40,7 +70,7 @@ ${sents}`
 
 /** 审查类动作的消息：共用规则当 system，动作模板当 user。
  *
- *  「共用块」的可编辑性靠这一处收口：改 system 块，四个动作一起变。 */
+ *  「共用块」的可编辑性靠这一处收口：改 system 块，所有动作一起变。 */
 function actionMessages(id: string, vars: Record<string, string>): ChatMessage[] {
   return [
     { role: 'system', content: renderPrompt('system', {}) },
@@ -54,6 +84,19 @@ function actionMessages(id: string, vars: Record<string, string>): ChatMessage[]
 /** 审查一个词：义项与例句的错、缺、重复。一次请求覆盖整词（省 token 的关键）。 */
 export function reviewWordPrompt(c: WordContext): ChatMessage[] {
   return actionMessages('reviewWord', { context: ctxBody(c) })
+}
+
+/** 只审一个义项：带全这个义项的例句，允许逐句替换。
+ *
+ *  ★ 为什么单独一个动作：整词审查为了省 token 只带每义项头 2 句，
+ *    多句犯同一个错时 AI 看不到后面的句子；这个动作把目标义项的例句全带上，
+ *    并要求「多句同错就逐句换掉」，而不是补一句新的了事。 */
+export function reviewSensePrompt(c: WordContext, senseSlot: number, note = ''): ChatMessage[] {
+  return actionMessages('reviewSense', {
+    context: ctxBody(c),
+    slot: String(senseSlot),
+    noteLine: note ? `\n用户补充要求：${note}` : '',
+  })
 }
 
 /** 给某个义项补几条新例句（候选，让人挑）。 */

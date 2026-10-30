@@ -42,6 +42,7 @@ const title = computed(() => {
     case 'replaceSentence':
       return 'AI 换这一句'
     case 'reviewWord':
+    case 'reviewSense':
       return 'AI 审查结果'
     case 'fillWord':
       return 'AI 补全这个词'

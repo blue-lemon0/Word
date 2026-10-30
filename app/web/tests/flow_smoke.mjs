@@ -610,6 +610,93 @@ ok((await db.sentences.get(afterTake[0].sentenceId)).en === flagged.sentence.en,
   await ai.applyAll(rRep.proposals)
   ok((await db.sentences.get(sid1)).en === `Every ${W} has a name.`, '换一句落库了')
 
+  // 5b) 义项审查：目标义项的例句必须**全带上**，并且能一次换多句
+  await edit.addSentence(senseId, W, `The ${W} waited by the third door.`)
+  const sid3 = (await db.sentences.where('senseId').equals(senseId).toArray())
+    .find((s) => s.en.includes('third door')).id
+  let addBody = null
+  ai.__setTransportForTest({
+    name: 'fake-add',
+    async postJson(_url, _headers, body) {
+      calls++
+      addBody = JSON.parse(body)
+      return {
+        status: 200,
+        body: JSON.stringify({
+          choices: [{ message: { content: JSON.stringify({
+            note: 'ok',
+            proposals: [{ kind: 'sentence.add', slot: 1, en: `A new ${W} appeared.`, zh: '又一句。', highlights: [W] }],
+          }) } }],
+        }),
+      }
+    },
+  })
+  await ai.addSentence(senseId, 1)
+  const addMsg = addBody?.messages?.[1]?.content ?? ''
+  ok(addMsg.includes('当前义项') && addMsg.includes('third door'),
+     '补例句也带全当前义项的全部例句（不只前两句）')
+  ok(addMsg.includes('不要退回更常见的意思'),
+     '默认补例句提示词要求锁定当前义项')
+
+  let senseBody = null
+  ai.__setTransportForTest({
+    name: 'fake3',
+    async postJson(_url, _headers, body) {
+      calls++
+      senseBody = JSON.parse(body)
+      return {
+        status: 200,
+        body: JSON.stringify({
+          choices: [{ message: { content: JSON.stringify({
+            note: '三句都犯了同一个错',
+            proposals: [
+              { kind: 'sentence.replace', sentenceId: sid1, en: `A fresh ${W} sat by the river.`, zh: '一句新的。', highlights: [W] },
+              { kind: 'sentence.replace', sentenceId: sid3, en: `Another ${W} sat by the window.`, zh: '又一句新的。', highlights: [W] },
+            ],
+          }) } }],
+        }),
+      }
+    },
+  })
+  const rSense = await ai.reviewSense(senseId, '这几句都在用同一个错义，全部换掉')
+  const senseMsg = senseBody?.messages?.[1]?.content ?? ''
+  ok(senseMsg.includes(`The ${W} waited by the third door.`),
+     '义项审查带上了第 3 句（以前只带前两句，AI 看不到它）')
+  ok(senseMsg.includes('当前义项') && senseMsg.includes('其它义项（只给释义'),
+     '义项审查明确标出「当前义项」，并把其它义项隔开（防止串义）')
+  ok(senseMsg.includes('全部换掉'), '用户补充要求进了提示词')
+  ok(rSense.action === 'reviewSense' && rSense.proposals.length === 2,
+     '义项审查可以一次返回多条替换提议')
+  await ai.applyAll(rSense.proposals)
+  ok((await db.sentences.get(sid3)).en === `Another ${W} sat by the window.`,
+     '同一个错误模式出现在多句时，第 3 句也能被一次换掉')
+
+  // 5c) 换第 3 句时，目标句本身必须在上下文里（否则 AI 只能猜）
+  const sid3Text = (await db.sentences.get(sid3)).en
+  let replaceBody = null
+  ai.__setTransportForTest({
+    name: 'fake4',
+    async postJson(_url, _headers, body) {
+      calls++
+      replaceBody = JSON.parse(body)
+      return {
+        status: 200,
+        body: JSON.stringify({
+          choices: [{ message: { content: JSON.stringify({
+            note: 'ok',
+            proposals: [{ kind: 'sentence.replace', sentenceId: sid3, en: `One more ${W} appeared.`, zh: '又来一句。', highlights: [W] }],
+          }) } }],
+        }),
+      }
+    },
+  })
+  await ai.replaceSentence(sid3, '这句不自然')
+  const replaceMsg = replaceBody?.messages?.[1]?.content ?? ''
+  ok(replaceMsg.includes(sid3Text), '换第 3 句时目标句在上下文里，不再让 AI 盲猜')
+  ok(replaceMsg.includes('← 这次要处理的就是这句'), '目标句在上下文里被明确标出来')
+  ok(replaceMsg.includes('不能切到该词的其它义项') && replaceMsg.includes('不要退回更常见的意思'),
+     '默认换句提示词要求锁定当前义项，不能退回常见义项')
+
   // 6) 内容一改，缓存必须失效（否则会拿旧建议改新内容）
   const beforeCalls = calls
   await edit.updateSense(senseId, { gloss: '又改了一次' })
