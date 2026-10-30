@@ -4,6 +4,7 @@
  *    内容（词/义项/例句）与进度（progress）分开存。回滚只回内容，
  *    学习记录原样保留 —— 导入翻车不该把人背过的东西也退回去。
  */
+import { APP_VERSION } from './app-info'
 import { db } from './db'
 import { uuid } from './edit'
 import { exportFile } from './fileio'
@@ -110,7 +111,7 @@ export async function buildBackup(includeProgress = true): Promise<BackupFile> {
     format: 'word.backup',
     schemaVersion: 2,
     exportedAt: new Date().toISOString(),
-    appVersion: '0.2.0',
+    appVersion: APP_VERSION,
     stats: {
       words: words.length,
       senses: senses.length,

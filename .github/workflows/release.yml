@@ -69,7 +69,10 @@ jobs:
       # 对应本地：npm run build（vue-tsc 类型检查 + vite 打包到 dist/）
       - name: 构建前端
         working-directory: app/web
-        run: npm ci && npm run build
+        run: |
+          npm ci
+          npm version "${{ inputs.version }}" --no-git-tag-version --allow-same-version
+          npm run build
 
       # 对应本地：build_apk.mjs 的第 ② 步 —— 先清空再拷，避免残留上个版本的文件；
       # 删 sw.js，因为 APK 里的 assets 本身就是离线源

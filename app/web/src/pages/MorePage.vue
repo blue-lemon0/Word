@@ -3,14 +3,23 @@
  *  分层原则在备份屏最明显：**导出 = 内容 + 进度**，「仅词库」= 只导内容；
  *  回滚只回内容，学习记录不动 —— 导入翻车不该把人背过的也退回去。
  */
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import ConfirmSheet from '../components/ConfirmSheet.vue'
 import InstallPrompt from '../components/InstallPrompt.vue'
+import Sheet from '../components/Sheet.vue'
 import SwipePanels from '../components/SwipePanels.vue'
 import AiSettings from '../components/AiSettings.vue'
 import { incomingFile, nativeBridge } from '../bridge'
 import { APP_NAME, APP_NAME_EN, APP_VERSION } from '../app-info'
+import {
+  checkForUpdate,
+  isDebugApk,
+  openExternal,
+  plainNotes,
+  RELEASE_PAGE,
+  type ReleaseInfo,
+} from '../update'
 import { downloadBackup, importLine, listSnapshots, restoreBackup, rollback } from '../backup'
 import { classifyImport, importBundle, unknownFormatText } from '../import'
 import { pickJsonFile } from '../fileio'
@@ -25,6 +34,56 @@ const logoUrl = new URL('../../public/icon-192.png', import.meta.url).href
 const snaps = ref<Snapshot[]>([])
 const imports = ref<ImportLog[]>([])
 const trash = ref<Sense[]>([])
+
+/* ── 检查更新 ──
+ *  只放在版本行里，不新占一块：这一页已经很长，更新又是低频动作。
+ *  API 失败只把这一行变成「重试」，不弹大块错误，也不影响离线使用。
+ */
+type UpdateState = 'idle' | 'checking' | 'latest' | 'available' | 'error'
+const updateState = ref<UpdateState>('idle')
+const updateInfo = ref<ReleaseInfo | null>(null)
+const updateError = ref('')
+const showUpdate = ref(false)
+const debugApk = isDebugApk()
+
+const updateLabel = computed(() => {
+  if (updateState.value === 'checking') return '检查中…'
+  if (updateState.value === 'latest') return '已是最新'
+  if (updateState.value === 'available') return `有新版本 v${updateInfo.value?.version ?? ''}`
+  if (updateState.value === 'error') return '检查失败，重试'
+  return '检查更新'
+})
+
+const updateNotes = computed(
+  () => plainNotes(updateInfo.value?.notes ?? '') || '这个版本没有写更新说明。',
+)
+
+async function onCheckUpdate(): Promise<void> {
+  if (updateState.value === 'checking') return
+  if (updateState.value === 'available' && updateInfo.value) {
+    showUpdate.value = true
+    return
+  }
+  updateState.value = 'checking'
+  updateInfo.value = null
+  updateError.value = ''
+  const r = await checkForUpdate(APP_VERSION)
+  if (r.kind === 'available') {
+    updateInfo.value = r.release
+    updateState.value = 'available'
+  } else if (r.kind === 'latest') {
+    updateState.value = 'latest'
+  } else {
+    updateState.value = 'error'
+    updateError.value = r.message
+    toast(r.message)
+  }
+}
+
+function onOpenRelease(): void {
+  showUpdate.value = false
+  openExternal(updateInfo.value?.pageUrl || RELEASE_PAGE)
+}
 
 /** 确认弹层 —— 见 ConfirmSheet：原生 confirm() 在 WebView 里是系统对话框，
  *  顶着 "The page at ..." 一行、按钮写着 CANCEL / OK，和这个 app 毫无关系。
@@ -288,7 +347,19 @@ onMounted(load)
       <img class="logo" :src="logoUrl" alt="" width="52" height="52" />
       <div class="meta">
         <p class="nm">{{ APP_NAME }}</p>
-        <p class="ver">v{{ APP_VERSION }} · {{ APP_NAME_EN }}</p>
+        <p class="ver">
+          <span class="en">v{{ APP_VERSION }} · {{ APP_NAME_EN }}</span>
+          <button
+            type="button"
+            class="upd"
+            :class="{ hot: updateState === 'available', err: updateState === 'error' }"
+            :disabled="updateState === 'checking'"
+            :title="updateError"
+            @click="onCheckUpdate"
+          >
+            {{ updateLabel }}
+          </button>
+        </p>
         <p class="note">进度只在这台手机上，换机前记得导出。</p>
       </div>
     </section>
@@ -451,6 +522,26 @@ onMounted(load)
       </p>
       </div>
     </div>
+
+    <Sheet
+      :open="showUpdate"
+      :title="updateInfo ? `发现新版本 v${updateInfo.version}` : '检查更新'"
+      @close="showUpdate = false"
+    >
+      <p class="upd-meta">
+        当前 v{{ APP_VERSION }}
+        <template v-if="updateInfo?.apkSize"> · 新包约 {{ fmtBytes(updateInfo.apkSize) }}</template>
+      </p>
+      <p v-if="debugApk" class="upd-warn">
+        当前是开发版。GitHub 上是正式包，不能直接覆盖安装；正式版用户可以原地升级。
+      </p>
+      <pre class="upd-notes">{{ updateNotes }}</pre>
+      <p class="upd-hint">在发布页下载 APK 后安装。词库和进度都在本机，不会被覆盖。</p>
+      <template #footer>
+        <van-button size="small" plain @click="showUpdate = false">稍后</van-button>
+        <van-button size="small" type="primary" @click="onOpenRelease">打开发布页</van-button>
+      </template>
+    </Sheet>
 
     <ConfirmSheet
       :open="!!ask"
@@ -617,17 +708,91 @@ onMounted(load)
   color: var(--wb-ink);
 }
 
+.brand .meta {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
 .brand .ver {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
   margin: 2px 0 0;
   font-size: 12px;
   color: var(--wb-ink-3);
   font-variant-numeric: tabular-nums;
 }
 
+.brand .ver .en {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 版本行就是检查更新入口：不新占一行、不新加一块 */
+.brand .upd {
+  flex: 0 0 auto;
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-size: 11.5px;
+  color: var(--wb-primary);
+  white-space: nowrap;
+}
+
+.brand .upd:disabled {
+  color: var(--wb-ink-3);
+}
+
+.brand .upd.hot {
+  font-weight: 600;
+}
+
+.brand .upd.err {
+  color: var(--van-danger-color);
+}
+
 .brand .note {
   margin: 6px 0 0;
   font-size: 11.5px;
   line-height: 1.5;
+  color: var(--wb-ink-3);
+}
+
+.upd-meta {
+  margin: 0;
+  font-size: 12px;
+  color: var(--wb-ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.upd-warn {
+  margin: 10px 0 0;
+  padding: 8px 10px;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  background: #fffbeb;
+  color: #92400e;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.upd-notes {
+  margin: 12px 0 0;
+  white-space: pre-wrap;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--wb-ink-2);
+}
+
+.upd-hint {
+  margin: 14px 0 0;
+  font-size: 11.5px;
+  line-height: 1.6;
   color: var(--wb-ink-3);
 }
 

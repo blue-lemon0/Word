@@ -28,7 +28,7 @@ import {
   setPrompt,
   validatePrompt,
 } from '../ai/prompt-store'
-import { copyText } from '../import'
+import { copyToClipboard, readClipboard } from '../fileio'
 import { goBack } from '../nav'
 import { toast } from '../toast'
 
@@ -88,23 +88,23 @@ function revert(): void {
 }
 
 async function copyDraft(): Promise<void> {
-  if (await copyText(draft.value)) toast('已复制')
+  if (await copyToClipboard(draft.value)) toast('已复制')
   else toast('复制失败，请手动选中复制')
 }
 
-/** 读剪贴板在 WebView 里不总是许可；失败时给出可执行的替代（长按粘贴） */
+/** 读剪贴板：装了 APK 时走原生（WebView 的 navigator.clipboard.readText() 不可用） */
 async function pasteDraft(): Promise<void> {
-  try {
-    const t = await navigator.clipboard.readText()
-    if (!t) {
-      toast('剪贴板是空的')
-      return
-    }
-    draft.value = t
-    err.value = ''
-  } catch {
+  const t = await readClipboard()
+  if (t === null) {
     toast('读不到剪贴板，请长按输入框粘贴')
+    return
   }
+  if (!t) {
+    toast('剪贴板是空的')
+    return
+  }
+  draft.value = t
+  err.value = ''
 }
 
 function doResetAll(): void {

@@ -3,7 +3,7 @@
  *  粘到豆包 / DeepSeek 之类，回来的 JSON 走 ImportSheet。
  */
 import Sheet from './Sheet.vue'
-import { copyText } from '../import'
+import { copyToClipboard } from '../fileio'
 import { toast } from '../toast'
 
 const props = defineProps<{ open: boolean; title: string; text: string }>()
@@ -18,7 +18,7 @@ const emit = defineEmits<{ (e: 'close'): void }>()
  *  一收起来这个提示就成了空话。
  */
 async function copy(): Promise<void> {
-  if (await copyText(props.text)) {
+  if (await copyToClipboard(props.text)) {
     emit('close')
     toast('已复制，去问 AI')
   } else {

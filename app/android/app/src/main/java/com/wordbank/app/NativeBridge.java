@@ -35,6 +35,60 @@ public class NativeBridge {
         this.act = act;
     }
 
+    /**
+     * 当前壳的信息。网页侧用它判断 debug 包：debug 和 release 的包名/签名不同，
+     * 不能拿 GitHub 上的 release APK 直接覆盖安装 debug 包。
+     */
+    @JavascriptInterface
+    public String appInfo() {
+        try {
+            android.content.pm.PackageInfo pi = act.getPackageManager()
+                    .getPackageInfo(act.getPackageName(), 0);
+            long code = Build.VERSION.SDK_INT >= Build.VERSION_CODES.P
+                    ? pi.getLongVersionCode()
+                    : pi.versionCode;
+            boolean debug = (act.getApplicationInfo().flags
+                    & android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+            org.json.JSONObject o = new org.json.JSONObject();
+            o.put("packageName", act.getPackageName());
+            o.put("versionName", pi.versionName == null ? "" : pi.versionName);
+            o.put("versionCode", code);
+            o.put("debug", debug);
+            return o.toString();
+        } catch (Exception e) {
+            android.util.Log.e("wordbank", "appInfo 失败", e);
+            return "{}";
+        }
+    }
+
+    /** 用系统浏览器打开外部链接（更新页），避免 WebView 把 GitHub 套在壳里 */
+    @JavascriptInterface
+    public boolean openUrl(final String url) {
+        try {
+            final Uri u = Uri.parse(url);
+            String scheme = u.getScheme();
+            if (!"https".equalsIgnoreCase(scheme) && !"http".equalsIgnoreCase(scheme)) {
+                return false;
+            }
+            act.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        act.startActivity(new Intent(Intent.ACTION_VIEW, u));
+                    } catch (Exception e) {
+                        android.util.Log.e("wordbank", "openUrl 失败", e);
+                        android.widget.Toast.makeText(act, "没有可用的浏览器",
+                                android.widget.Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+            return true;
+        } catch (Exception e) {
+            android.util.Log.e("wordbank", "openUrl 失败", e);
+            return false;
+        }
+    }
+
     /** 分享一个文本文件（导出备份走这条） */
     @JavascriptInterface
     public String shareFile(final String name, final String content, final String label) {
@@ -113,6 +167,25 @@ public class NativeBridge {
         } catch (Exception e) {
             android.util.Log.e("wordbank", "copyText 失败", e);
             return false;
+        }
+    }
+
+    /** 读剪贴板文本 —— WebView 里 navigator.clipboard.readText() 基本不可用：
+     *  浏览器要求 clipboard-read 权限 + 瞬时用户手势，Android WebView 两样都不给，
+     *  调用必然 reject。只能走原生。没有内容时返回空串，读失败返回 null。 */
+    @JavascriptInterface
+    public String readClipboard() {
+        try {
+            ClipboardManager cm =
+                    (ClipboardManager) act.getSystemService(Context.CLIPBOARD_SERVICE);
+            if (cm == null || !cm.hasPrimaryClip()) return "";
+            ClipData clip = cm.getPrimaryClip();
+            if (clip == null || clip.getItemCount() == 0) return "";
+            CharSequence text = clip.getItemAt(0).coerceToText(act);
+            return text == null ? "" : text.toString();
+        } catch (Exception e) {
+            android.util.Log.e("wordbank", "readClipboard 失败", e);
+            return null;
         }
     }
 

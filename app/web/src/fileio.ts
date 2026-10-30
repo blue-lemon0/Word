@@ -150,6 +150,29 @@ export async function copyToClipboard(text: string): Promise<boolean> {
   }
 }
 
+/** 读剪贴板文本。
+ *
+ *  ★ 为什么必须先走原生：浏览器要求 clipboard-read 权限 + 瞬时用户手势，
+ *    Android WebView 里 `navigator.clipboard.readText()` 基本必然 reject ——
+ *    用户看到的就是「读不到剪贴板，请长按输入框粘贴」。原生没有这层限制。
+ *  读不到时返回 null（和「剪贴板为空」区分开）；浏览器里返回空串表示确实为空。
+ */
+export async function readClipboard(): Promise<string | null> {
+  if (nativeBridge?.readClipboard) {
+    try {
+      return nativeBridge.readClipboard()
+    } catch {
+      /* 落到下面 */
+    }
+  }
+  try {
+    if (navigator.clipboard?.readText) return await navigator.clipboard.readText()
+  } catch {
+    /* 落到 null */
+  }
+  return null
+}
+
 /** 把一段文字直接发出去（不是文件）—— 例如「点词库图标装到主屏」的引导。
  *  装了 APK 时也走原生，否则用户根本没法把备份发给自己。 */
 export async function shareText(title: string, text: string): Promise<boolean> {

@@ -12,12 +12,18 @@
 import { ref } from 'vue'
 
 interface NativeBridgeApi {
+  /** 是否开发版、版本名、包名。给「检查更新」判断 debug 包用 */
+  appInfo?: () => string
+  /** 用系统浏览器打开外部链接（GitHub Release 等） */
+  openUrl?: (url: string) => boolean
   /** 弹系统分享面板分享一个文件。返回 'shared' | 'canceled' | 'failed' */
   shareFile: (name: string, content: string, label: string) => Promise<string>
   /** 分享纯文本 */
   shareText: (title: string, text: string) => Promise<boolean>
   /** 复制到剪贴板 */
   copyText: (text: string) => Promise<boolean>
+  /** 读剪贴板文本（WebView 的 navigator.clipboard.readText() 不可用，只能走原生） */
+  readClipboard?: () => string | null
   /** 打开系统分享面板发一个文件（内部用 intent） */
   toast: (msg: string) => void
   /**

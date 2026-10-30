@@ -1151,5 +1151,40 @@ ok((await db.senses.get(pool[3].id)) != null, '只清被软删的义项，从没
   rmSync(fpath, { force: true })
 }
 
+/* ── 9b. 检查更新：版本比较与 Release 解析（不联网）── */
+{
+  const u = M.update
+  ok(u.normalizeVersion('v0.10.0-debug') === '0.10.0', '版本号去掉 v 和 -debug 再比较')
+  ok(u.compareVersions('v0.10.0', '0.9.9') > 0, '0.10.0 比 0.9.9 新（不能按字符串比）')
+  ok(u.compareVersions('0.3.0-debug', '0.3.0') === 0, 'debug 后缀不参与版本比较')
+  ok(u.compareVersions('0.2.0', '0.3.0') < 0, '0.2.0 比 0.3.0 旧')
+
+  const rel = u.parseRelease({
+    tag_name: 'v0.3.0',
+    body: '修了几个问题。',
+    html_url: 'https://github.com/blue-lemon0/Word/releases/tag/v0.3.0',
+    published_at: '2026-10-30T00:00:00Z',
+    assets: [
+      { name: 'app-release.aab', browser_download_url: 'https://example.com/app.aab', size: 1 },
+      { name: 'app-release.apk', browser_download_url: 'https://example.com/app.apk', size: 308 * 1024 },
+    ],
+  })
+  ok(rel?.version === '0.3.0' && rel?.apkSize === 308 * 1024, 'Release 解析出正式版和 APK 大小')
+  ok(rel?.notes === '修了几个问题。', 'Release 说明能显示出来')
+  ok(
+    u.plainNotes('## 本次更新\n- **扫读卡**：`ABC`\n[细节](https://example.com)') ===
+      '本次更新\n· 扫读卡：ABC\n细节',
+    'Release 说明去掉 Markdown 标记再显示',
+  )
+  ok(
+    u.plainNotes('## A\r\n\r\n- **B**') === 'A\n\n· B',
+    'Release 说明的 CRLF 也归一化，不把标题和列表粘在一起',
+  )
+  ok(rel && u.availability(rel, '0.2.0') === 'available', '本机旧 → 有更新')
+  ok(rel && u.availability(rel, '0.3.0') === 'latest', '本机同版本 → 已是最新')
+  ok(u.parseRelease({ tag_name: 'v0.4.0', prerelease: true }) === null, '预发布版不参与更新')
+  ok(u.parseRelease({ tag_name: 'nightly' }) === null, '不是版本号的 tag 直接忽略')
+}
+
 console.log(bad ? `\n${bad} 处失败` : '\n数据层端到端：全绿')
 process.exitCode = bad ? 1 : 0

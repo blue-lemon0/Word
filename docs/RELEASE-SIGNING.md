@@ -8,7 +8,7 @@
 | 项 | 值 |
 |---|---|
 | release applicationId | `com.wordbank.app`（debug 是 `com.wordbank.app.debug`） |
-| versionCode / versionName | `1` / `0.2.0` |
+| versionCode / versionName | `2` / `0.3.0` |
 | minSdk / targetSdk | `24` / `36` |
 | R8 | release 开启，规则在 `app/android/app/proguard-rules.pro` |
 | 签名配置 | 读取 `app/android/keystore.properties`（已 gitignore） |
