@@ -421,41 +421,41 @@ onMounted(load)
       <!-- 今天：一句话回答「我现在该干什么」 -->
       <section class="today">
         <p class="t-h">
-          <template v-if="practisableSenses.due">
-            今天有 <b>{{ practisableSenses.due }}</b> 个义项到期<span class="sub"
-              >（{{ practisableWords.due }} 个词）</span
+          <template v-if="practisableWords.due">
+            今天有 <b>{{ practisableWords.due }}</b> 个词到期<span class="sub"
+              >（{{ practisableSenses.due }} 个义项）</span
             >
           </template>
-          <template v-else-if="practisableSenses.new">
-            今天没有到期的 —— 有 <b>{{ practisableSenses.new }}</b> 个新义项可以学<span
+          <template v-else-if="practisableWords.new">
+            今天没有到期的 —— 有 <b>{{ practisableWords.new }}</b> 个新词可以学<span
               class="sub"
-              >（{{ practisableWords.new }} 个词）</span
+              >（{{ practisableSenses.new }} 个新义项）</span
             >
           </template>
           <template v-else>今天没有要复习的</template>
         </p>
         <p class="t-s">
-          未到期 {{ head.learning }} · 待学 {{ practisableWords.new }} 词 /
-          {{ practisableSenses.new }} 义项 · 已掌握 {{ head.mastered }}
+          未到期 {{ head.learning }} · 待学 {{ practisableWords.new }} 词 ·
+          已掌握 {{ head.mastered }}
         </p>
         <div class="t-acts">
           <van-button
-            v-if="practisableSenses.due"
+            v-if="practisableWords.due"
             type="primary"
             round
             block
-            @click="drill('due', practisableSenses.due)"
+            @click="drill('due', practisableWords.due)"
           >
-            复习这 {{ practisableSenses.due }} 个
+            复习这 {{ practisableWords.due }} 个词
           </van-button>
           <van-button
-            v-else-if="practisableSenses.new"
+            v-else-if="practisableWords.new"
             type="primary"
             round
             block
-            @click="drill('new', practisableSenses.new)"
+            @click="drill('new', practisableWords.new)"
           >
-            学这 {{ practisableSenses.new }} 个
+            学这 {{ practisableWords.new }} 个词
           </van-button>
           <!-- ★ 原来这里是「随便练两句」——随机已经搬到首页屏一了，别再留第二入口 -->
           <van-button v-else plain round block @click="router.push('/')">
