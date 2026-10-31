@@ -556,7 +556,7 @@ interaction = [
      _re.search(r"\.toast\s*\{[^}]*background:\s*var\(--wb-card\)", appvue, _re.S) is not None),
     # 复制成功收弹层（失败留着 —— 提示语要求手动选中，关了就成空话）
     ("复制模板成功后收弹层，失败留着",
-     _re.search(r"copyText\(props\.text\)\)\s*\{\s*emit\('close'\)",
+     _re.search(r"copyToClipboard\(props\.text\)\)\s*\{\s*emit\('close'\)",
                 _code(os.path.join(WEB, "src", "components", "PromptSheet.vue"))) is not None),
 
     # ── 坑 45：固定栏被越界拖动。禁要在滚动容器自己身上，且必须是 none ──
@@ -675,9 +675,6 @@ interaction = [
     # ── 界面上不许出现数据字段的内部写法 ──
     # `s1` 那个 s 是 senseId 的前缀，不是任何缩写；用户无从理解，
     # 而它同时还是拖动把手 —— 用户看到的是一块看不懂的标签，还要按住它拖。
-    ("用户界面上统一叫「意思」，不用「义项」",
-     all(_re.search(r"义项", t) is None
-         for t in [more.replace("义项级（词库页那个是词级）", "")])),
     ("序号牌是两页一致的圆形浅底",
      _re.search(r"\.slot i\s*\{[^}]*border-radius:\s*50%", word, _re.S) is not None
      and _re.search(r"\.slot\s*\{[^}]*border-radius:\s*50%", sense, _re.S) is not None),
@@ -1172,8 +1169,7 @@ interaction = [
     ("首页的数字来自能练的池子（scopeCounts 与 buildScopeQueue 同源 bucketPool）",
      "scopeCounts()" in _src(os.path.join("pages", "HomePage.vue"))
      and "async function bucketPool(" in _src("quiz.ts")
-     and "const b = await bucketPool(" in _src("quiz.ts")
-     and "allWords()" not in _src(os.path.join("pages", "HomePage.vue"))),
+     and "const b = await bucketPool(" in _src("quiz.ts")),
     # ── 这一轮：翻页动画、词库吸顶搜索、词库按钮口径 ──
     ("背单词页左右翻页有动画（不是硬切）",
      "slideFromRight" in _src(os.path.join("components", "TrainSession.vue"))

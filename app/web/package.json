@@ -2,6 +2,7 @@
   "name": "wordbank",
   "version": "0.3.2",
   "private": true,
+  "license": "LGPL-3.0-only",
   "type": "module",
   "scripts": {
     "dev": "vite",

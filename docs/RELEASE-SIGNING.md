@@ -80,9 +80,9 @@ release 和 debug 的包名不同，可以并存在同一台手机上；但两�
   的缓存名；否则新旧 PWA 缓存可能互相覆盖
 - **applicationId 一改就是另一个 app**，已安装用户无法覆盖升级；一旦上架就不能
   再改包名，只能改显示名。签名证书与包名无关，改名后可以继续用同一把密钥。
-- 开源前分开确认：代码 LICENSE、词库/例句内容来源与许可证、`seed.json` 是否可
-  再分发、AI API key 与 `keystore.properties` 不在仓库、README 里的本机绝对路径
-  是否要改成通用说明。
+- 开源许可：代码 **LGPL-3.0-only**（含 Edge TTS 移植）；示例内容 **CC0-1.0**；
+  用户导入内容不随仓库授权。详见 `LICENSE`、`CONTENT-LICENSE.md`、
+  `THIRD_PARTY_NOTICES.md`。
 
 ## 发布前必须确认
 
@@ -90,8 +90,9 @@ release 和 debug 的包名不同，可以并存在同一台手机上；但两�
   `com.wordbank.app` 是占位身份，不要等上架后才发现要改名。
 - **版本号**：每次发布 `versionCode` 必须递增；`versionName` 用语义化版本。
 - **签名备份**：keystore 与密码至少两份加密备份，密码不要只存在聊天记录里。
-- **开源授权**：代码许可证、词库/例句内容来源与许可证要分开确认；不要在没有
-  授权结论前把内容包一起公开。
+- **开源授权**：代码 LGPL-3.0-only、示例内容 CC0-1.0；用户导入内容与第三方内容包
+  不随本项目授权。发布前确认 `LICENSE`、`CONTENT-LICENSE.md`、
+  `THIRD_PARTY_NOTICES.md` 与 `LICENSES/` 都在仓库里。
 - **真机回归**：release 开了 R8，至少验证启动、训练、导入、备份、AI 请求、
   WebView 原生桥和 TTS。`NativeBridge` 的 `@JavascriptInterface` 方法已在
   proguard 里显式保留，不要删那条规则。
