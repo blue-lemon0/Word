@@ -23,6 +23,7 @@ import {
   newSessionId,
   practicePool,
   recordAnswer,
+  scopeRemain,
   tallyAnswer,
   unmarkMastered,
   type Question,
@@ -166,6 +167,20 @@ const masteredFlash = ref('')
  */
 const sessionId = ref('')
 const stats = ref<SessionStats>({ correct: 0, wrong: 0, pending: 0, dueCorrect: 0, dueTotal: 0 })
+/** 当前范围（复习/学习/在学）还剩多少义项、涉及多少词；随作答刷新 */
+const remain = ref<{ senses: number; words: number } | null>(null)
+
+async function refreshRemain(): Promise<void> {
+  if (!props.scope) {
+    remain.value = null
+    return
+  }
+  try {
+    remain.value = await scopeRemain(props.scope)
+  } catch {
+    remain.value = null
+  }
+}
 const root = ref<HTMLElement | null>(null)
 const strip = ref<HTMLElement | null>(null)
 
@@ -334,6 +349,7 @@ async function start(redo = false): Promise<void> {
     : props.scope
       ? await buildScopeQueue(props.scope, sessionSize.value)
       : await buildQueue(sessionSize.value)
+  void refreshRemain()
   steps.value = {}
   asked.value = {}
   needFix.value = {}
@@ -511,6 +527,7 @@ async function save(result: 'CORRECT' | 'WRONG' | 'PENDING'): Promise<void> {
   )
   question.outcome = outcome
   emit('progress')
+  void refreshRemain()
   // 只在第一遍计数：重练是纠错，不能把「对/错」累加到超过本轮题数（见 tallyAnswer）
   tallyAnswer(stats.value, result, loopRound.value === 0, question.isDue)
   if (justMastered) masteredFlash.value = '这个词的意思，掌握了'
@@ -656,6 +673,7 @@ async function onFlag(): Promise<void> {
     needFix.value = fix
   }
   emit('progress') // 可练池可能缩了 —— 数字跟着重数
+  void refreshRemain()
   flagBox.value = false
 
   if (reviewing.value) {
@@ -854,6 +872,7 @@ onActivated(() => {
       }
     }
     await loadQ()
+    void refreshRemain()
   })()
 })
 
@@ -868,6 +887,7 @@ async function onMastered(): Promise<void> {
     delete copy[at]
     masteredAt.value = copy
     emit('progress')
+    void refreshRemain()
     toast('已取消掌握：会重新排期')
     return
   }
@@ -878,6 +898,7 @@ async function onMastered(): Promise<void> {
   delete fix[at]
   needFix.value = fix
   emit('progress')
+  void refreshRemain()
   if (reviewing.value) return
   await next()
 }
@@ -1028,14 +1049,20 @@ watch(
           </button>
         </div>
         <p class="where">
-          <span class="pos">第 <b>{{ cursor + 1 }}</b> / {{ queue.length }} 题</span>
-          <span v-if="modeText" class="rv">· {{ modeText }}</span>
-          <span class="wb-sp" />
-          <template v-if="loopRound > 0">
-            <span class="rv">待重练 {{ needCount }}</span>
+          <span class="side l">对{{ stats.correct }} · 错{{ stats.wrong }}</span>
+          <span class="pos">
+            第<b>{{ cursor + 1 }}</b>/{{ queue.length }}题<template v-if="modeText"
+              ><span class="rv">·{{ modeText }}</span></template
+            >
+          </span>
+          <span v-if="loopRound > 0" class="retry">
+            <span class="rv">待重练{{ needCount }}</span>
             <button class="loop-out" type="button" @click="finishRound">结束</button>
-          </template>
-          <span v-else>对 {{ stats.correct }} · 错 {{ stats.wrong }}</span>
+          </span>
+          <span v-else-if="remain" class="side r">
+            剩{{ remain.senses }}义项/{{ remain.words }}词
+          </span>
+          <span v-else class="side r" />
         </p>
 
         <div class="qwrow">
@@ -1672,19 +1699,43 @@ watch(
 }
 
 .where {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  gap: 5px;
+  column-gap: 6px;
   margin: 4px 0 2px;
-  font-size: 12.5px;
+  font-size: 12px;
   color: var(--wb-ink-3);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .where b {
   color: var(--wb-ink);
 }
 
+.where .side {
+  white-space: nowrap;
+}
+
+.where .side.l {
+  justify-self: start;
+}
+
+.where .side.r {
+  justify-self: end;
+}
+
 .where .pos {
+  justify-self: center;
+  white-space: nowrap;
+}
+
+.where .retry {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 5px;
   white-space: nowrap;
 }
 

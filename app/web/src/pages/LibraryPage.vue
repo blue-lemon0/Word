@@ -188,7 +188,7 @@ async function load(): Promise<void> {
   await refreshPractisable()
 }
 
-/** 出题池里的词各有多少（到期 / 待学）—— 顶部按钮的数字用它 */
+/** 出题池里各有多少 —— due/new 同时给词数和义项数；练习按义项走 */
 async function refreshPractisable(): Promise<void> {
   const [pool, prows] = await Promise.all([practicePool(), allProgress()])
   const pmap = new Map(prows.map((p) => [p.senseId, p]))
@@ -199,19 +199,22 @@ async function refreshPractisable(): Promise<void> {
     if (p.mastered && !p.rusty) return 3
     return p.dueAt <= now ? 0 : 1
   }
-  const buckets = new Map<string, number>()
+  let dueSenses = 0
+  let freshSenses = 0
+  const dueWords = new Set<string>()
+  const freshWords = new Set<string>()
   for (const s of pool) {
     const r = rankOf(s.id)
-    const cur = buckets.get(s.word)
-    if (cur === undefined || r < cur) buckets.set(s.word, r)
+    if (r === 0) {
+      dueSenses++
+      dueWords.add(s.word)
+    } else if (r === 2) {
+      freshSenses++
+      freshWords.add(s.word)
+    }
   }
-  let due = 0
-  let fresh = 0
-  for (const r of buckets.values()) {
-    if (r === 0) due++
-    else if (r === 2) fresh++
-  }
-  practisable.value = { due, new: fresh }
+  practisableSenses.value = { due: dueSenses, new: freshSenses }
+  practisableWords.value = { due: dueWords.size, new: freshWords.size }
 
   // 库里存在、但没有任何可练义项的**词**（全都缺例句 / 被标记）——
   // 这些词点哪儿都练不到，是"卡住"的信号，值得在页面上出现一次
@@ -229,7 +232,10 @@ async function refreshPractisable(): Promise<void> {
  *   但「学几个新词 / 复习这 N 个」承诺的是一次练习 —— 数字必须和出题池一致，
  *   否则就会出现「说有新词可以学，点进去 0 题」。
  */
-const practisable = ref<{ due: number; new: number }>({ due: 0, new: 0 })
+/** 与 practisableSenses 同源，但按**词**数（有该状态义项的词） */
+const practisableWords = ref<{ due: number; new: number }>({ due: 0, new: 0 })
+/** 与 practisableSenses 同源：练习和数字都按义项走 */
+const practisableSenses = ref<{ due: number; new: number }>({ due: 0, new: 0 })
 /**
  * 库里有、但**一个可练义项都没有**的词（缺例句 / 全被标记）。
  *
@@ -415,37 +421,41 @@ onMounted(load)
       <!-- 今天：一句话回答「我现在该干什么」 -->
       <section class="today">
         <p class="t-h">
-          <template v-if="practisable.due">
-            今天有 <b>{{ practisable.due }}</b> 个词到期
+          <template v-if="practisableSenses.due">
+            今天有 <b>{{ practisableSenses.due }}</b> 个义项到期<span class="sub"
+              >（{{ practisableWords.due }} 个词）</span
+            >
           </template>
-          <template v-else-if="practisable.new">
-            今天没有到期的 —— 有 <b>{{ practisable.new }}</b> 个新词可以学
+          <template v-else-if="practisableSenses.new">
+            今天没有到期的 —— 有 <b>{{ practisableSenses.new }}</b> 个新义项可以学<span
+              class="sub"
+              >（{{ practisableWords.new }} 个词）</span
+            >
           </template>
           <template v-else>今天没有要复习的</template>
         </p>
         <p class="t-s">
-          未到期 {{ head.learning }} · 待学 {{ head.new }}<template
-            v-if="practisable.new < head.new"
-          >（{{ practisable.new }} 个有例句）</template> · 已掌握 {{ head.mastered }}
+          未到期 {{ head.learning }} · 待学 {{ practisableWords.new }} 词 /
+          {{ practisableSenses.new }} 义项 · 已掌握 {{ head.mastered }}
         </p>
         <div class="t-acts">
           <van-button
-            v-if="practisable.due"
+            v-if="practisableSenses.due"
             type="primary"
             round
             block
-            @click="drill('due', practisable.due)"
+            @click="drill('due', practisableSenses.due)"
           >
-            复习这 {{ practisable.due }} 个
+            复习这 {{ practisableSenses.due }} 个
           </van-button>
           <van-button
-            v-else-if="practisable.new"
+            v-else-if="practisableSenses.new"
             type="primary"
             round
             block
-            @click="drill('new', practisable.new)"
+            @click="drill('new', practisableSenses.new)"
           >
-            学几个新词
+            学这 {{ practisableSenses.new }} 个
           </van-button>
           <!-- ★ 原来这里是「随便练两句」——随机已经搬到首页屏一了，别再留第二入口 -->
           <van-button v-else plain round block @click="router.push('/')">
@@ -640,6 +650,12 @@ onMounted(load)
 .t-h b {
   color: var(--wb-primary);
   font-size: 19px;
+}
+
+.t-h .sub {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--wb-ink-3);
 }
 
 .t-s {

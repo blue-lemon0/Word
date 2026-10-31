@@ -228,6 +228,22 @@ export async function scopeCounts(): Promise<{ due: number; fresh: number }> {
   return { due: b.due.length, fresh: b.fresh.length }
 }
 
+/** 当前范围内还剩多少义项 / 涉及多少个词 —— 训练页实时进度用。 */
+export async function scopeRemain(
+  scope: QueueScope,
+): Promise<{ senses: number; words: number }> {
+  const b = await bucketPool()
+  const ids = scope === 'due' ? b.due : scope === 'new' ? b.fresh : b.learning
+  const senses = await liveSenses()
+  const wordOf = new Map(senses.map((s) => [s.id, s.word]))
+  const words = new Set<string>()
+  for (const id of ids) {
+    const w = wordOf.get(id)
+    if (w) words.add(w)
+  }
+  return { senses: ids.length, words: words.size }
+}
+
 /** 组一道题：句子随机取，选项 = 正确释义 + 3 个干扰项。
  *  干扰项优先取**同词的其他意思**（这才是真的干扰），不够再从别的词里补。
  *
