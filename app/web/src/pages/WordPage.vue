@@ -115,9 +115,14 @@ const countsReady = ref(false)
 function readyFromMemory(name: string): boolean {
   const sens = sensesOfWordNow(name)
   if (!sens) return false
+  // ★ 词条行也要在内存里。只检查 senses/progress 会漏掉「刚改了 hidden/ipa，
+  //   words 缓存被清掉但义项缓存还在」的情况：这时首帧把 word 设成 undefined，
+  //   load() 又因为返回 true 不再去读库 —— 音标和「不学/恢复学习」一起消失。
+  const w = wordNow(name)
+  if (!w) return false
   const pg = progressNow(sens.map((s) => s.id))
   if (!pg) return false
-  word.value = wordNow(name) ?? undefined
+  word.value = w
   senses.value = sens
   prog.value = pg
   const counts = sentenceCountsNow(sens.map((s) => s.id))
@@ -268,6 +273,21 @@ async function onReorder(from: number, to: number): Promise<void> {
 const senseBox = ref<HTMLElement | null>(null)
 const drag = useDragReorder(senseBox, onReorder)
 
+/** 「不学」：整词暂停复习，但保留词条当词典查。
+ *  只改 words.hidden，不动任何义项和学习进度；恢复后沿用原进度。 */
+async function toggleHidden(): Promise<void> {
+  const w = word.value
+  if (!w) return
+  const next = w.hidden ? 0 : 1
+  await updateWord(w.word, { hidden: next })
+  word.value = { ...w, hidden: next }
+  toast(
+    next
+      ? '已设为不学：不再进复习，搜索和词条照常可查'
+      : '已恢复学习',
+  )
+}
+
 /** 删除这个词：走确认弹层，不用原生 confirm()
  *  （WebView 里弹出来的是系统对话框，顶着 "The page at ..." 一行、
  *   按钮写着 CANCEL / OK，和这个 app 像是两套东西，见 ConfirmSheet）。 */
@@ -383,6 +403,19 @@ function onAsk(): void {
           <van-tag v-if="senses.some((s) => s.needsRefine)" plain round type="warning">需精修</van-tag>
           <van-tag v-if="hasThinSense" plain round type="warning">例句不足</van-tag>
           <van-tag v-if="senses.some((s) => s.trap)" plain round type="danger">易错</van-tag>
+          <van-tag v-if="word?.hidden" plain round type="warning">不学</van-tag>
+          <!-- 「不学」是查词时的高频决定，不该埋在页面最底部；
+               删除仍然留在底部（低频、破坏性，离主内容越远越安全）。 -->
+          <van-button
+            v-if="word"
+            class="notlearn"
+            size="mini"
+            plain
+            :type="word.hidden ? 'warning' : 'default'"
+            @click="toggleHidden"
+          >
+            {{ word.hidden ? '恢复学习' : '不学' }}
+          </van-button>
         </div>
       </section>
 
@@ -450,6 +483,7 @@ function onAsk(): void {
               <van-tag plain round :type="MASTERY_TYPE[mastery(s)]">
                 {{ MASTERY_TEXT[mastery(s)] }}
               </van-tag>
+              <van-tag v-if="prog.get(s.id)?.suspended" plain round type="warning">不学</van-tag>
               <span>{{ repsText(prog.get(s.id)) }}</span>
               <span class="dot">·</span>
               <span>{{ dueText(prog.get(s.id)) }}</span>
@@ -561,6 +595,12 @@ function onAsk(): void {
   gap: 6px;
   margin-top: 10px;
   flex-wrap: wrap;
+  align-items: center;
+}
+
+/* 不学/恢复：放在词条信息这一行，而不是页面最底部的维护动作里 */
+.head .tags .notlearn {
+  margin-left: auto;
 }
 
 .lead {

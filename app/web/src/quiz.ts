@@ -5,7 +5,7 @@
  *   · 英文释义**只在答题后**出现（出题时露 = 泄题）
  *   · 「我不会」按 WRONG 记 —— 诚实放弃不能比乱蒙更划算
  */
-import { allSentences, allProgress, cachedNow, liveSenses, db } from './db'
+import { allSentences, allProgress, allWords, cachedNow, liveSenses, db } from './db'
 import { applyReview, decayIfIdle, isMastered, type ReviewOutcome } from './srs'
 import { toast } from './toast'
 import type { Progress, ReviewLog, Sense, Sentence, SrsCard } from './types'
@@ -32,16 +32,48 @@ export interface SessionStats {
   dueTotal: number
 }
 
+/**
+ * 把一次作答计入本轮统计。
+ *
+ * ★ 只在**第一遍**统计：错题重练是纠错，不是新题。若连重练也计数，
+ *   20 题的一轮会出现「25 对 7 错」这种加起来超过 20 的结算，用户第一反应
+ *   就是数字坏了。结算的对/错/不会必须正好等于「这一轮练完了多少题」。
+ * ★ 到期正确率同理只看第一遍 —— 重练次数不该把分母撑大。
+ */
+export function tallyAnswer(
+  s: SessionStats,
+  result: 'CORRECT' | 'WRONG' | 'PENDING',
+  firstPass: boolean,
+  isDue: boolean,
+): void {
+  if (!firstPass) return
+  if (result === 'CORRECT') s.correct++
+  else if (result === 'WRONG') s.wrong++
+  else s.pending++
+  if (isDue) {
+    s.dueTotal++
+    if (result === 'CORRECT') s.dueCorrect++
+  }
+}
+
 export function newSessionId(): string {
   return `s${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`
 }
 
-/** 存活且有可用例句的义项 = 可练池。 */
+/** 存活且有可用例句的义项 = 可练池。
+ *  「不学」的词整词排除：它在词库里只当词典，不该占任何练习队列/数字。 */
 export async function practicePool(): Promise<Sense[]> {
-  const [senses, sents] = await Promise.all([liveSenses(), allSentences()])
+  const [senses, sents, words, progress] = await Promise.all([
+    liveSenses(),
+    allSentences(),
+    allWords(),
+    allProgress(),
+  ])
+  const hidden = new Set(words.filter((w) => w.hidden).map((w) => w.word))
+  const quiet = new Set(progress.filter((p) => p.suspended).map((p) => p.senseId))
   const ok = new Set<string>()
   for (const s of sents) if (!s.flagged) ok.add(s.senseId)
-  return senses.filter((s) => ok.has(s.id))
+  return senses.filter((s) => ok.has(s.id) && !hidden.has(s.word) && !quiet.has(s.id))
 }
 
 /**
@@ -205,10 +237,12 @@ export async function scopeCounts(): Promise<{ due: number; fresh: number }> {
 export async function makeQuestion(senseId: string, pinSentence?: number): Promise<Question | null> {
   const sense = await db.senses.get(senseId)
   if (!sense) return null
-  const sents = (await db.sentences.where('senseId').equals(senseId).toArray())
-    .filter((s) => !s.flagged)
+  const all = await db.sentences.where('senseId').equals(senseId).toArray()
+  // 显式钉住某句 = 用户/回看点名要这一句：即使它被标了「有问题」也要给。
+  // 否则回看被标记的句子时会换成另一句，取消标记的入口就永远消失。
+  const pinned = pinSentence == null ? undefined : all.find((s) => s.id === pinSentence)
+  const sents = pinned ? [pinned] : all.filter((s) => !s.flagged)
   if (!sents.length) return null
-  const pinned = pinSentence == null ? undefined : sents.find((s) => s.id === pinSentence)
   const p = await db.progress.get(senseId)
   const fresh = sents.filter((s) => s.id !== p?.lastSentenceId)
   const pool = fresh.length ? fresh : sents
@@ -541,6 +575,14 @@ export async function markMastered(senseId: string): Promise<void> {
     lastSentenceId: p?.lastSentenceId,
   })
   toast('已标掌握，不再排期')
+}
+
+/** 取消手动标掌握：**不动学习记录**，只让它重新排期。
+ *  与「清零重学」不同 —— 那个会把 S/D/reps 一起清掉，是另一件事。 */
+export async function unmarkMastered(senseId: string): Promise<void> {
+  const p = await db.progress.get(senseId)
+  if (!p) return
+  await db.progress.put({ ...p, mastered: 0, rusty: 0, dueAt: 0 })
 }
 
 /** 标记「这句有问题」：训练时随手标，之后不再出题，等内容侧修。 */

@@ -65,7 +65,7 @@ const BUCKETS: Array<{ key: Bucket; title: string; hint: string; tone: string }>
   { key: 'learning', title: '未到期', hint: '练过，在等间隔', tone: 'warm' },
   { key: 'new', title: '待学', hint: '一次都没练过', tone: 'cool' },
   { key: 'mastered', title: '已掌握', hint: '90 天以上', tone: 'ok' },
-  { key: 'idle', title: '搁置', hint: '暂时不学', tone: 'mute' },
+  { key: 'idle', title: '不学', hint: '只查词，不复习', tone: 'mute' },
 ]
 
 const rows = ref<Row[]>([])
@@ -109,7 +109,6 @@ function buildRows(
   const now = Math.floor(Date.now() / 1000)
   const list: Row[] = []
   for (const [word, senses] of byWord) {
-    if (hidden.has(word)) continue
     senses.sort((a, b) => a.slot - b.slot)
     let sentences = 0
     let single = 0
@@ -119,6 +118,8 @@ function buildRows(
     /** 一个词有多个义项时，这个词的桶 = 它**最紧要**的那个义项的桶 */
     let bucket: Bucket = 'mastered'
     let pinAt = 0
+    /** 所有义项都设了「不学」的词，整词进最后一个桶 */
+    let allSuspended = true
     const rank: Record<Bucket, number> = { due: 0, learning: 1, new: 2, mastered: 3, idle: 4 }
     for (const s of senses) {
       const n = sentBy.get(s.id) ?? 0
@@ -126,6 +127,9 @@ function buildRows(
       if (n === 1) single++
       const p = pmap.get(s.id)
       if (p && p.reps > 0) learned++
+      // 义项级「不学」：不参与任何桶的紧迫度、到期数、pin
+      if (p?.suspended) continue
+      allSuspended = false
       if (p && p.reps > 0 && !p.mastered && p.dueAt <= now) due++
       if (p?.pinAt && p.pinAt > now && (pinAt === 0 || p.pinAt < pinAt)) pinAt = p.pinAt
       const b = bucketOf(p, now)
@@ -140,7 +144,8 @@ function buildRows(
       target: senses.length * TARGET,
       single,
       dueAt,
-      bucket,
+      // 整词不学（hidden）或所有义项都不学：只进最后一个桶，不再抢复习注意力。
+      bucket: hidden.has(word) || allSuspended ? 'idle' : bucket,
       learned,
       due,
       pinAt,

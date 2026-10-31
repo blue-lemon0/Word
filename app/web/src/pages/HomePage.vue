@@ -33,6 +33,7 @@ import { importSampleSeed } from '../seed'
 import { toast } from '../toast'
 import type { Sense, Sentence } from '../types'
 import { buildRandomQueue, makeQuestion, scopeCounts, type FeedEntry, type Question } from '../quiz'
+import { allWords } from '../db'
 import { useSnapPager } from '../scroll-pager'
 
 defineOptions({ name: 'HomePage' })
@@ -51,6 +52,9 @@ const router = useRouter()
  */
 const dueN = ref(-1)
 const wordsN = ref(-1)
+/** 库里有词，但一个可练的都没有（全设成「不学」或都缺可练例句）。
+ *  空态要和真正的「空库」分开说，否则用户会以为自己的词全丢了。 */
+const hasWords = ref(false)
 
 interface HomeTab {
   id: 'due' | 'new' | 'feed'
@@ -83,6 +87,7 @@ const tabs = computed<HomeTab[]>(() => {
 
 async function loadNums(): Promise<void> {
   const c = await scopeCounts()
+  hasWords.value = (await allWords()).length > 0
   // 正在看的 tab 数量掉到 0：先钉住再写数。tab 不许在人眼前消失 ——
   // 否则 keyed 组件树整个换掉，结算屏/没打完的轮被吞、人被甩到默认落点。
   // 翻离它时钉子自动拔掉（pane watcher），tab 随即按数量正常显隐。
@@ -581,23 +586,36 @@ onMounted(async () => {
 
           <div v-if="!loading && !cur" class="qempty">
             <template v-if="wordsN === 0">
-              <p class="qe-t">词库还是空的</p>
-              <p class="qe-s">用 3 个示例词先走一遍流程，或导入你自己的词库。</p>
-              <div class="qempty-btns">
-                <van-button
-                  block
-                  round
-                  type="primary"
-                  :loading="sampleBusy"
-                  @click="useSampleHere"
-                >
-                  用示例开始
-                </van-button>
-                <van-button block round @click="router.push('/more')">导入词库</van-button>
-                <van-button block round plain @click="router.push('/library')">
-                  去词库自己加词
-                </van-button>
-              </div>
+              <template v-if="hasWords">
+                <p class="qe-t">没有要练的词</p>
+                <p class="qe-s">
+                  词库里的词都被设为「不学」，或还没有可练的例句。可以到词库的「不学」分组恢复。
+                </p>
+                <div class="qempty-btns">
+                  <van-button block round type="primary" @click="router.push('/library')">
+                    去词库看看
+                  </van-button>
+                </div>
+              </template>
+              <template v-else>
+                <p class="qe-t">词库还是空的</p>
+                <p class="qe-s">用 3 个示例词先走一遍流程，或导入你自己的词库。</p>
+                <div class="qempty-btns">
+                  <van-button
+                    block
+                    round
+                    type="primary"
+                    :loading="sampleBusy"
+                    @click="useSampleHere"
+                  >
+                    用示例开始
+                  </van-button>
+                  <van-button block round @click="router.push('/more')">导入词库</van-button>
+                  <van-button block round plain @click="router.push('/library')">
+                    去词库自己加词
+                  </van-button>
+                </div>
+              </template>
             </template>
             <template v-else>
               <p>这组现在没有可练的</p>

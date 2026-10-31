@@ -28,6 +28,7 @@ import { toast } from '../toast'
 import { speechOn, ttsAutoplay } from '../speech'
 import { cacheSweep as sweepTtsCache, cacheStat as ttsCacheStat } from '../ai/ttsNeural'
 import { clearSampleWords, sampleInfo, type SampleInfo } from '../seed'
+import { SESSION_SIZES, sessionSize, setSessionSize } from '../session-size'
 import type { ImportLog, Sense, Snapshot } from '../types'
 
 const router = useRouter()
@@ -433,6 +434,27 @@ onMounted(load)
         <div class="acts">
           <van-button size="small" plain type="danger" @click="askClearSample">
             清空没学的示例词
+          </van-button>
+        </div>
+      </van-cell-group>
+
+      <!-- 学习：每组题量。只影响复习/学习整轮；随便刷是另一套无限流。
+           两档够用，不做自由输入 —— 5 题太碎、50 题一坐半小时，中间没有额外收益。 -->
+      <van-cell-group inset class="grp">
+        <template #title><b>学习</b><span class="sub">即时生效</span></template>
+        <van-cell
+          title="每组题量"
+          label="未开始的轮按新题量重开；已答的题不会丢，到期/待学不够时按实际数量出题"
+        />
+        <div class="acts">
+          <van-button
+            v-for="n in SESSION_SIZES"
+            :key="n"
+            size="small"
+            :type="sessionSize === n ? 'primary' : 'default'"
+            @click="setSessionSize(n)"
+          >
+            {{ n }} 题
           </van-button>
         </div>
       </van-cell-group>

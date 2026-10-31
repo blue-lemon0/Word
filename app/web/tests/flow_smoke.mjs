@@ -1186,5 +1186,79 @@ ok((await db.senses.get(pool[3].id)) != null, '只清被软删的义项，从没
   ok(u.parseRelease({ tag_name: 'nightly' }) === null, '不是版本号的 tag 直接忽略')
 }
 
+/* ── 9c. 结算统计：错题重练不能把对错累加到超过本轮题数 ── */
+{
+  const s = { correct: 0, wrong: 0, pending: 0, dueCorrect: 0, dueTotal: 0 }
+  // 20 题第一遍：13 对 7 错
+  for (let i = 0; i < 13; i++) M.quiz.tallyAnswer(s, 'CORRECT', true, true)
+  for (let i = 0; i < 7; i++) M.quiz.tallyAnswer(s, 'WRONG', true, true)
+  // 7 道错题重练，多轮一共又答对 12 次
+  for (let i = 0; i < 12; i++) M.quiz.tallyAnswer(s, 'CORRECT', false, true)
+  ok(s.correct === 13 && s.wrong === 7 && s.pending === 0,
+     '重练不增加本轮对错（20 题 = 13 对 + 7 错）')
+  ok(s.dueTotal === 20 && s.dueCorrect === 13, '到期正确率只看第一遍，不被重练撑大')
+  ok(s.correct + s.wrong + s.pending === 20, '结算三块加起来正好等于本轮题数')
+}
+
+/* ── 9d. 不学：整词退出练习，但仍可查词典 ── */
+{
+  const sample = (await quiz.practicePool())[0]
+  const word = sample.word
+  await edit.updateWord(word, { hidden: 1 })
+  const hiddenPool = await quiz.practicePool()
+  ok(hiddenPool.every((s) => s.word !== word), '不学的词不进可练池')
+  const hiddenQueue = await quiz.buildQueue(50)
+  ok(!hiddenQueue.includes(sample.id), '不学的词不进训练队列')
+  const peeked = await lookup.peekWord(word)
+  ok(peeked.word?.hidden === 1 && peeked.senses.length > 0, '不学的词仍然查得到、义项都在')
+  await edit.updateWord(word, { hidden: 0 })
+  const backPool = await quiz.practicePool()
+  ok(backPool.some((s) => s.word === word), '恢复学习后回到可练池')
+}
+
+/* ── 9e. 回看被标记的句子：点名要它时必须还给这一句 ── */
+{
+  const s = (await quiz.practicePool())[0]
+  const sent = (await db.sentences.where('senseId').equals(s.id).toArray())[0]
+  await db.sentences.update(sent.id, { flagged: 1 })
+  const q = await quiz.makeQuestion(s.id, sent.id)
+  ok(q?.sentence.id === sent.id, '回看被标记的句子时仍给这一句（否则取消入口会消失）')
+  await db.sentences.update(sent.id, { flagged: 0 })
+}
+
+/* ── 9f. 取消已掌握：保留学习记录，只重新排期 ── */
+{
+  const s = (await quiz.practicePool())[0]
+  await quiz.markMastered(s.id)
+  const marked = await db.progress.get(s.id)
+  ok(marked.mastered === 1, '手动标掌握落库')
+  await quiz.unmarkMastered(s.id)
+  const unmarked = await db.progress.get(s.id)
+  ok(unmarked.mastered === 0 && unmarked.reps === marked.reps, '取消已掌握保留学习记录')
+  ok((await quiz.buildQueue(50)).includes(s.id), '取消已掌握后回到队列')
+}
+
+/* ── 9g. 义项级「不学」：只退出练习，不动学习记录 ── */
+{
+  const s = (await quiz.practicePool())[0]
+  const before = await db.progress.get(s.id)
+  await edit.setSenseSuspended(s.id, 1)
+  ok((await quiz.practicePool()).every((x) => x.id !== s.id), '不学的义项不进可练池')
+  ok(!(await quiz.buildQueue(50)).includes(s.id), '不学的义项不进训练队列')
+  ok((await db.progress.get(s.id))?.reps === (before?.reps ?? 0), '不学不动学习记录')
+  await edit.setSenseSuspended(s.id, 0)
+  ok((await quiz.practicePool()).some((x) => x.id === s.id), '恢复后回到可练池')
+}
+
+/* ── 9h. 一个词的所有义项都不学：整词从可练池消失 ── */
+{
+  const word = (await quiz.practicePool())[0].word
+  const ids = (await db.senses.where('word').equals(word).toArray()).map((s) => s.id)
+  for (const id of ids) await edit.setSenseSuspended(id, 1)
+  ok((await quiz.practicePool()).every((x) => x.word !== word), '全部义项不学的词不进可练池')
+  for (const id of ids) await edit.setSenseSuspended(id, 0)
+  ok((await quiz.practicePool()).some((x) => x.word === word), '恢复义项后词回到可练池')
+}
+
 console.log(bad ? `\n${bad} 处失败` : '\n数据层端到端：全绿')
 process.exitCode = bad ? 1 : 0

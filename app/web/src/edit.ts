@@ -391,6 +391,16 @@ export async function resetProgress(senseId: string): Promise<void> {  await db.
 
 export { softDeleteSense }
 
+/** 义项级「不学」：只写学习状态，不动内容、S/D/reps。
+ *  恢复后沿用原进度；和「清零重学」是两件事。 */
+export async function setSenseSuspended(
+  senseId: string,
+  suspended: 0 | 1,
+): Promise<void> {
+  await ensureProgress(senseId)
+  await db.progress.update(senseId, { suspended })
+}
+
 /* ── 「排进明天练」──
  *
  *  ★ 这是唯一一条「我说了算」的排期通道：SRS 只看 S/D，而人看到生词时的念头是

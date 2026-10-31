@@ -34,10 +34,12 @@ import {
   reorderSentences,
   replaceSentence,
   resetProgress,
+  setSenseSuspended,
   splitSense,
   updateSentence,
   updateSense,
 } from '../edit'
+import { unmarkMastered } from '../quiz'
 import { aiPrompt } from '../import'
 import { useDragReorder } from '../draglist'
 import { setAvoidTarget } from '../keyboard'
@@ -559,6 +561,26 @@ function onResetProgress(): void {
   }
 }
 
+/** 义项级「不学」：只退出练习，释义和例句原样留着。 */
+async function toggleSensePause(): Promise<void> {
+  const s = sense.value
+  if (!s) return
+  const next = prog.value?.suspended ? 0 : 1
+  await setSenseSuspended(s.id, next)
+  toast(next ? '这个意思已设为不学：不进复习，仍可查' : '已恢复学习')
+  await load()
+}
+
+/** 取消「已掌握」：保留学习记录，只让它重新排期。
+ *  和下面「清零重学」不是一件事：那个连 S/reps 一起清。 */
+async function onUnmaster(): Promise<void> {
+  const s = sense.value
+  if (!s) return
+  await unmarkMastered(s.id)
+  toast('已取消掌握，会重新排期')
+  await load()
+}
+
 function onDelete(): void {
   if (!sense.value) return
   ask.value = {
@@ -601,7 +623,8 @@ function onDelete(): void {
         <div class="in">
           <BackBtn @click="goBack(router, `/word/${word}`)" />
           <h1>{{ word }}</h1>
-          <van-tag plain round type="primary">{{ repsText(prog) }} · {{ dueText(prog) }}</van-tag>
+          <van-tag v-if="prog?.suspended" plain round type="warning">不学</van-tag>
+          <van-tag v-else plain round type="primary">{{ repsText(prog) }} · {{ dueText(prog) }}</van-tag>
         </div>
       </header>
 
@@ -688,7 +711,18 @@ function onDelete(): void {
               合并
             </van-button>
             <van-button size="small" plain @click="showSplit = true">拆分</van-button>
-            <van-button size="small" plain @click="onResetProgress">重新学</van-button>
+            <van-button v-if="prog?.mastered" size="small" plain @click="onUnmaster">
+              取消已掌握
+            </van-button>
+            <van-button
+              size="small"
+              plain
+              :type="prog?.suspended ? 'warning' : 'default'"
+              @click="toggleSensePause"
+            >
+              {{ prog?.suspended ? '恢复学习' : '不学' }}
+            </van-button>
+            <van-button size="small" plain @click="onResetProgress">清零重学</van-button>
             <van-button size="small" plain type="danger" @click="onDelete">删除</van-button>
           </van-space>
         </section>

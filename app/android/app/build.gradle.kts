@@ -22,8 +22,8 @@ android {
         // WebViewAssetLoader + ServiceWorkerController 需要 API 24 以上
         minSdk = 24
         targetSdk = 36
-        versionCode = 2
-        versionName = "0.3.0"
+        versionCode = 3
+        versionName = "0.3.1"
     }
 
     // 词库内容在运行时下载/导入，不塞进 APK

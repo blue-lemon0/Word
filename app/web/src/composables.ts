@@ -42,7 +42,6 @@ export function useSearch() {
     const prefix: Word[] = []
     const inner: Word[] = []
     for (const w of all) {
-      if (w.hidden) continue
       const lw = w.word.toLowerCase()
       if (lw.startsWith(s)) prefix.push(w)
       else if (lw.includes(s)) inner.push(w)
@@ -88,7 +87,10 @@ function pickCard(
     else bySense.set(s.senseId, [s])
   }
 
-  const usable = senses.filter((s) => (bySense.get(s.id)?.length ?? 0) > 0)
+  const hidden = new Set(words.filter((w) => w.hidden).map((w) => w.word))
+  const usable = senses.filter(
+    (s) => !hidden.has(s.word) && (bySense.get(s.id)?.length ?? 0) > 0,
+  )
   if (!usable.length) return null
 
   const sense = usable[Math.floor(Math.random() * usable.length)]

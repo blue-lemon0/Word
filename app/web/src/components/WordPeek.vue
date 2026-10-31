@@ -20,7 +20,7 @@
 import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { peekWord, type PeekResult } from '../lookup'
-import { addPendingWord, pinSense, tomorrowStart, unpinSense } from '../edit'
+import { addPendingWord, pinSense, tomorrowStart, unpinSense, updateWord } from '../edit'
 import { allProgress } from '../db'
 import { aiReady } from '../ai/config'
 import { resolveLemma } from '../ai/actions'
@@ -40,11 +40,23 @@ const peek = ref<PeekResult | null>(null)
 const busy = ref(false)
 /** 刚加入词库的那个词 —— 用来把按钮换成「去补义项」 */
 const justAdded = ref('')
+/** 义项级「不学」的 id —— 不能把它们算成「能练」 */
+const suspendedIds = ref<Set<string>>(new Set())
 /** 配了 AI 才承诺「AI 补全」，否则只让人去手改 */
 const aiOn = aiReady
 
 const hasContent = computed(() => !!peek.value?.senses.some((s) => s.gloss.trim()))
 const title = computed(() => peek.value?.word?.word ?? peek.value?.lemma ?? '')
+/** 整词「不学」：只查词，不进复习。浮层里不能再给「排进明天练」。 */
+const shelved = computed(() => peek.value?.word?.hidden === 1)
+
+async function resumeWord(): Promise<void> {
+  const w = peek.value?.word
+  if (!w) return
+  await updateWord(w.word, { hidden: 0 })
+  if (peek.value) peek.value = { ...peek.value, word: { ...w, hidden: 0 } }
+  toast('已恢复学习')
+}
 
 watch(
   [() => props.show, () => props.token],
@@ -52,6 +64,8 @@ watch(
     if (!show || !props.token) return
     justAdded.value = ''
     peek.value = await peekWord(props.token)
+    const rows = await allProgress()
+    suspendedIds.value = new Set(rows.filter((r) => r.suspended).map((r) => r.senseId))
     pinned.value = await pinnedSense()
   },
   { immediate: true },
@@ -81,7 +95,9 @@ async function pinnedSense(): Promise<string> {
 const practisable = computed(() => {
   const p = peek.value
   if (!p) return ''
-  const hit = p.senses.find((s) => (p.sentenceCounts.get(s.id) ?? 0) > 0)
+  const hit = p.senses.find(
+    (s) => !suspendedIds.value.has(s.id) && (p.sentenceCounts.get(s.id) ?? 0) > 0,
+  )
   return hit?.id ?? ''
 })
 
@@ -170,7 +186,7 @@ async function add(): Promise<void> {
           <span v-if="peek.word?.ipa" class="ipa">/{{ peek.word.ipa }}/</span>
         </div>
         <span class="badge" :class="{ off: !peek.word }">
-          {{ peek.word ? '在词库里' : '还没入库' }}
+          {{ peek.word ? (shelved ? '不学' : '在词库里') : '还没入库' }}
         </span>
       </header>
 
@@ -197,12 +213,28 @@ async function add(): Promise<void> {
             <template v-if="s.gloss">{{ s.gloss }}</template>
             <em v-else class="empty">还没有释义</em>
           </span>
+          <span v-if="suspendedIds.has(s.id)" class="susp">不学</span>
           <span class="n">{{ peek.sentenceCounts.get(s.id) ? peek.sentenceCounts.get(s.id) + ' 句' : '暂无例句' }}</span>
           <span class="go">›</span>
         </button>
         <button class="btn ghost" type="button" @click="goWord">看这个词的整页</button>
-        <!-- 排进明天：库里已有的词也能「我要练它」。 -->
-        <button class="btn ghost" type="button" :disabled="!practisable && !pinned" @click="togglePin">
+        <!-- 排进明天：库里已有的词也能「我要练它」。
+             「不学」的词不给这个按钮 —— 排了也不会进队列，等于假承诺。 -->
+        <button
+          v-if="shelved"
+          class="btn ghost"
+          type="button"
+          @click="resumeWord"
+        >
+          恢复学习
+        </button>
+        <button
+          v-else
+          class="btn ghost"
+          type="button"
+          :disabled="!practisable && !pinned"
+          @click="togglePin"
+        >
           {{ pinned ? '取消「明天练」' : '排进明天练' }}
         </button>
       </template>
@@ -343,6 +375,12 @@ async function add(): Promise<void> {
   flex: 0 0 auto;
   font-size: 11.5px;
   color: var(--wb-ink-3);
+}
+
+.row .susp {
+  flex: 0 0 auto;
+  font-size: 11px;
+  color: var(--van-warning-color);
 }
 
 .row .go {

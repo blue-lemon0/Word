@@ -18,13 +18,13 @@ import MarkedText from './MarkedText.vue'
 import {
   buildQueue,
   buildScopeQueue,
-  flagQuestion,
   makeQuestion,
   markMastered,
   newSessionId,
   practicePool,
   recordAnswer,
-  SESSION_SIZE,
+  tallyAnswer,
+  unmarkMastered,
   type Question,
   type SessionStats,
 } from '../quiz'
@@ -33,6 +33,7 @@ import { dueInText } from '../composables'
 import { autoSpeak, speakEn, speechOn, ttsWaiting } from '../speech'
 import { allProgress, db } from '../db'
 import { forecastDaily, forecastSummary, type ForecastResult } from '../forecast'
+import { sessionSize } from '../session-size'
 import ForecastBars from './ForecastBars.vue'
 import type { Sentence, Sense } from '../types'
 import QuickEdit from './QuickEdit.vue'
@@ -73,8 +74,9 @@ interface Step {
   picked: string
   result: 'CORRECT' | 'WRONG' | 'PENDING' | null
   masteredFlash: string
-  /** 到这张为止的累计对错，用于在回看里还原当时的分数 */
-  stats: SessionStats
+  /** 这次作答后的 SRS 结果。回看时内容会从库里重建，但 outcome 只在
+   *  答题那一刻存在 —— 不单独存的话，翻回去就看不到「下次复习」。 */
+  outcome?: Question['outcome']
 }
 
 const queue = ref<string[]>([])
@@ -127,6 +129,13 @@ const reviewing = computed(
 const jumpedAhead = computed(() => !steps.value[cursor.value] && cursor.value < frontier.value)
 const isLast = computed(() => cursor.value >= queue.value.length - 1)
 
+/** 顶部那行只保留「当前模式」一个短标签，别把状态拆成一堆 v-if */
+const modeText = computed(() => {
+  if (reviewing.value) return '回看中'
+  if (jumpedAhead.value && loopRound.value === 0) return '跳过题'
+  return ''
+})
+
 const q = ref<Question | null>(null)
 /** phase 只管「有没有题 / 做没做完一轮」；
  *  选项的显隐看 revealed，作答状态看 submitted。
@@ -141,6 +150,11 @@ const picked = ref('')
 const shownAt = ref(0)
 const flagNote = ref('')
 const flagBox = ref(false)
+/** 本轮里哪些题被标了「这句有问题」——进度格上的小点靠它 */
+const flaggedAt = ref<Record<number, boolean>>({})
+const sentenceFlagged = computed(() => q.value?.sentence.flagged === 1)
+/** 本轮里哪些题被手动标了「已掌握」——回看时用来显示可撤销的状态 */
+const masteredAt = ref<Record<number, boolean>>({})
 /** 解释区详情是否展开。默认折叠，这样四个选项 + 结论仍能一屏放下。 */
 const expOpen = ref(false)
 const masteredFlash = ref('')
@@ -312,14 +326,19 @@ async function start(redo = false): Promise<void> {
   sessionId.value = newSessionId()
   stats.value = { correct: 0, wrong: 0, pending: 0, dueCorrect: 0, dueTotal: 0 }
   spellSummary.value = null // 新一轮的训练结算不该挂着上一轮的拼写小结
+  // 重刷同一批之前按**当前**可练池再筛一次：这期间可能刚设了「不学」
+  // 或删了例句，旧快照里的 id 不能直接复用。
+  if (redo) poolIds = new Set((await practicePool()).map((s) => s.id))
   queue.value = redo
     ? lastRound.value.filter((id) => poolIds.has(id))
     : props.scope
-      ? await buildScopeQueue(props.scope, SESSION_SIZE)
-      : await buildQueue(SESSION_SIZE)
+      ? await buildScopeQueue(props.scope, sessionSize.value)
+      : await buildQueue(sessionSize.value)
   steps.value = {}
   asked.value = {}
   needFix.value = {}
+  flaggedAt.value = {}
+  masteredAt.value = {}
   passQueue.value = []
   passPos.value = 0
   loopRound.value = 0
@@ -379,12 +398,19 @@ async function loadQ(): Promise<void> {
     //   「明明存上了，回头一看还是错的」。往回翻旧题时同理。
     //   要缓存的是**作答结果**（选了哪个、对不对、SRS 状态），不是内容。
     const fresh = await makeQuestion(step.q.sense.id, step.q.sentence.id ?? undefined)
-    if (fresh) step.q = fresh
+    if (fresh) {
+      // 内容用库里的最新版，但「这次作答的结果」要搬回来：
+      // 下次复习时间、对了/错了都来自它，不能让重建把它丢掉。
+      fresh.outcome = step.outcome
+      step.q = fresh
+    }
     q.value = step.q
     picked.value = step.picked
     revealed.value = true
     submitted.value = step.result != null
-    stats.value = { ...step.stats }
+    // 回看时如果这句被标过、或这题刚被手动标掌握，直接把详情展开 ——
+    // 让「★ 有问题 / 已掌握 ✓」和撤销入口看得见。
+    expOpen.value = step.q.sentence.flagged === 1 || masteredAt.value[cursor.value] === true
     masteredFlash.value = step.masteredFlash
     return
   }
@@ -485,23 +511,17 @@ async function save(result: 'CORRECT' | 'WRONG' | 'PENDING'): Promise<void> {
   )
   question.outcome = outcome
   emit('progress')
-  const s = stats.value
-  if (result === 'CORRECT') s.correct++
-  else if (result === 'WRONG') s.wrong++
-  else s.pending++
-  if (question.isDue) {
-    s.dueTotal++
-    if (result === 'CORRECT') s.dueCorrect++
-  }
+  // 只在第一遍计数：重练是纠错，不能把「对/错」累加到超过本轮题数（见 tallyAnswer）
+  tallyAnswer(stats.value, result, loopRound.value === 0, question.isDue)
   if (justMastered) masteredFlash.value = '这个词的意思，掌握了'
 
-  // 存快照：回看时靠它还原当时那道题（选项顺序、选了哪个、当时的分数）
+  // 存快照：回看时靠它还原当时那道题（选项顺序、选了哪个）
   const step: Step = {
     q: question,
     picked: picked.value,
     result,
     masteredFlash: masteredFlash.value,
-    stats: { ...s },
+    outcome,
   }
   steps.value = { ...steps.value, [cursor.value]: step }
 
@@ -557,6 +577,8 @@ async function next(): Promise<void> {
   const pending = Object.keys(needFix.value).map(Number).sort((a, b) => a - b)
   if (pending.length) {
     loopRound.value = 1
+    // 规则只在开始重练时说一次：常驻那一行装不下，也不该天天占着。
+    toast('错题重练：每题连对 2 次才算过')
     await startPass(pending)
     return
   }
@@ -608,16 +630,84 @@ watch(phase, (p) => {
   if (p === 'done') void loadForecast()
 })
 
-/** 「别练它」：这句话有问题而且懒得改/改不了时，
- *  至少让它别再出现在练习里（flagged 的句子会被队列排除）。
- *  这仍然只是止血 —— 真正的解是上面那个「改掉这句」。 */
+/** 「这句有问题」：内容坏了先踢出练习；回看时是开关，可以取消。
+ *
+ *  ★ 两种场景两种行为，但状态是同一份：
+ *    · 答题中：标记后直接下一题 —— 坏例句不值得再占用一次点击；
+ *    · 回看中：原地切换，不跳题 —— 这里的目标是确认/撤销，不是继续答题。
+ *  标记同时从错题重练里摘掉：已经判定内容有问题的句子，这一轮不该再问一次。
+ */
 async function onFlag(): Promise<void> {
-  if (!q.value) return
-  await flagQuestion(q.value, flagNote.value)
-  emit('progress') // 这句被标走，可练池可能缩了 —— 数字跟着重数
+  const qq = q.value
+  if (!qq?.sentence.id) return
+  const flag = qq.sentence.flagged === 1 ? 0 : 1
+  await db.sentences.update(qq.sentence.id, {
+    flagged: flag,
+    flagNote: flag ? flagNote.value.trim() : '',
+  })
+  qq.sentence.flagged = flag
+  const copy = { ...flaggedAt.value }
+  if (flag) copy[cursor.value] = true
+  else delete copy[cursor.value]
+  flaggedAt.value = copy
+  if (flag) {
+    const fix = { ...needFix.value }
+    delete fix[cursor.value]
+    needFix.value = fix
+  }
+  emit('progress') // 可练池可能缩了 —— 数字跟着重数
   flagBox.value = false
+
+  if (reviewing.value) {
+    toast(flag ? '已标记：这句不再出题' : '已取消：这句会回到出题池')
+    return
+  }
+  if (!flag) {
+    toast('已取消标记')
+    return
+  }
+  toast('已标记：这句不再出题')
   await next()
 }
+
+// ── 每组题量 ──
+// 设置页改完不该逼人把旧的一轮刷完：没开始答的轮直接按新题量重开；
+// 已经答过的轮，在不丢已答题的前提下截短；已经答满新题量的轮直接收。
+// 重练阶段不重排（进度格和错题队列都按旧一轮算，中途改会错位）。
+function trimIndexed<T>(obj: Record<number, T>, n: number): Record<number, T> {
+  const out: Record<number, T> = {}
+  for (const [k, v] of Object.entries(obj)) {
+    const i = Number(k)
+    if (i < n) out[i] = v
+  }
+  return out
+}
+
+watch(sessionSize, (n) => {
+  if (phase.value !== 'playing' || !q.value || loopRound.value > 0) return
+  if (answeredCount.value === 0) {
+    void start()
+    return
+  }
+  if (n >= queue.value.length) return
+  const answered = Object.keys(steps.value).map(Number)
+  if (answered.every((i) => i < n)) {
+    queue.value = queue.value.slice(0, n)
+    steps.value = trimIndexed(steps.value, n)
+    asked.value = trimIndexed(asked.value, n)
+    needFix.value = trimIndexed(needFix.value, n)
+    flaggedAt.value = trimIndexed(flaggedAt.value, n)
+    masteredAt.value = trimIndexed(masteredAt.value, n)
+    if (cursor.value >= n) {
+      cursor.value = Math.min(frontier.value, n - 1)
+      void loadQ()
+    }
+    return
+  }
+  // 已经答过的题里有落在新题量之外的：不能裁掉它们，但人已经答够新题量了，
+  // 直接把这一轮收在结算屏，别逼人把原来那 20 题刷完。
+  if (answeredCount.value >= n) finishRound()
+})
 
 // ── 当场改：发现问题的那一屏就是动手的那一屏 ──
 // 不把人送去「词库 → 意思」页重新把这句话找回来。找不回来，坏内容就一直坏。
@@ -751,13 +841,44 @@ async function onAiApplied(): Promise<void> {
  *  状态在 keep-alive 里（/train 壳或首页 tab），回来还在原题、进度不丢；
  *  但**内容**不能沿用内存里那份 —— 用户在那边可能刚改过句子。 */
 onActivated(() => {
-  if (q.value) void loadQ()
+  void (async () => {
+    if (!q.value) return
+    // 还没答过任何一题时，如果队列里的卡已经被设成「不学」/删了例句，
+    // 重新组一轮 —— 否则刚设完不学，回来还会被问同一张卡。
+    // 已经开始答的轮保持原快照，改动下一轮生效（中途换题会让进度格错位）。
+    if (answeredCount.value === 0) {
+      const pool = new Set((await practicePool()).map((s) => s.id))
+      if (queue.value.some((id) => !pool.has(id))) {
+        await start()
+        return
+      }
+    }
+    await loadQ()
+  })()
 })
 
 async function onMastered(): Promise<void> {
-  if (!q.value) return
-  await markMastered(q.value.sense.id)
-  emit('progress') // 掌握的卡退出到期队列 —— 数字跟着重数
+  const qq = q.value
+  if (!qq) return
+  const at = cursor.value
+  // 回看时是开关：已标过再点就是取消。和「这句有问题」同一套交互。
+  if (masteredAt.value[at]) {
+    await unmarkMastered(qq.sense.id)
+    const copy = { ...masteredAt.value }
+    delete copy[at]
+    masteredAt.value = copy
+    emit('progress')
+    toast('已取消掌握：会重新排期')
+    return
+  }
+  await markMastered(qq.sense.id)
+  masteredAt.value = { ...masteredAt.value, [at]: true }
+  // 已经标掌握就不该再进错题重练
+  const fix = { ...needFix.value }
+  delete fix[at]
+  needFix.value = fix
+  emit('progress')
+  if (reviewing.value) return
   await next()
 }
 
@@ -896,6 +1017,8 @@ watch(
                 steps[i]?.result === 'PENDING' ||
                 (steps[i]?.result === 'WRONG' && !steps[i]?.picked),
               todo: !steps[i],
+              flag:
+                flaggedAt[i] === true,
               loop: loopRound > 0 && (needFix[i] ?? 0) > 0,
             }"
             :title="`第 ${i + 1} 题`"
@@ -905,17 +1028,14 @@ watch(
           </button>
         </div>
         <p class="where">
-          第 <b>{{ cursor + 1 }}</b> / {{ queue.length }} 题
-          <span v-if="reviewing" class="rv">· 回看中</span>
-          <span v-else-if="jumpedAhead && loopRound === 0" class="rv">· 跳过题</span>
+          <span class="pos">第 <b>{{ cursor + 1 }}</b> / {{ queue.length }} 题</span>
+          <span v-if="modeText" class="rv">· {{ modeText }}</span>
           <span class="wb-sp" />
-          <span v-if="loopRound > 0" class="rv">
-          · 错题重练 · 还剩 {{ needCount }} 个（每题要连对 2 次）
-        </span>
-        <button v-if="loopRound > 0" class="loop-out" type="button" @click="finishRound">
-          先不练了
-        </button>
-        <span v-else>已答 {{ answeredCount }} · 对 {{ stats.correct }} · 错 {{ stats.wrong }}</span>
+          <template v-if="loopRound > 0">
+            <span class="rv">待重练 {{ needCount }}</span>
+            <button class="loop-out" type="button" @click="finishRound">结束</button>
+          </template>
+          <span v-else>对 {{ stats.correct }} · 错 {{ stats.wrong }}</span>
         </p>
 
         <div class="qwrow">
@@ -1056,12 +1176,27 @@ watch(
               <div v-if="q.sense.note" class="note">{{ q.sense.note }}</div>
               <div v-if="masteredFlash" class="mastered">{{ masteredFlash }}</div>
 
-              <!-- 「别练它 / 已掌握」留在详情里：这两个是**答完之后**对结果的处理，
-                   不是「读到一半发现内容坏了」的补救。
-                   那件事归上面的「改」—— 常驻、贴着句子、不用翻任何东西。 -->
-              <div v-if="!reviewing" class="markrow">
-                <van-button size="small" plain @click="onMastered">已掌握</van-button>
-                <van-button size="small" plain @click="onFlag">别练它</van-button>
+              <!-- 「这句有问题 / 已掌握」：答完之后对结果的处理。
+                   「这句有问题」回看时也在：那是取消标记的唯一入口。
+                   标签用「标记 / ★ 有问题」而不是「别练它」——
+                   它作用在一句例句上，不作用在词或义项上。 -->
+              <div class="markrow">
+                <van-button
+                  size="small"
+                  plain
+                  :type="masteredAt[cursor] ? 'success' : 'default'"
+                  @click="onMastered"
+                >
+                  {{ masteredAt[cursor] ? '已掌握 ✓' : '已掌握' }}
+                </van-button>
+                <van-button
+                  size="small"
+                  plain
+                  :type="sentenceFlagged ? 'warning' : 'default'"
+                  @click="onFlag"
+                >
+                  {{ sentenceFlagged ? '★ 有问题' : '标记' }}
+                </van-button>
               </div>
             </template>
           </div>
@@ -1426,6 +1561,7 @@ watch(
 
 .chip {
   flex: 0 0 auto;
+  position: relative;
   min-width: 26px;
   height: 26px;
   padding: 0 5px;
@@ -1463,6 +1599,19 @@ watch(
   background: #fff7e8;
   border-color: var(--van-warning-color);
   color: #8a5a12;
+}
+
+/* 这句被标过：右上角一个小琥珀点。不改变原有的对/错/不会底色，
+   所以「答得怎么样」和「内容有没有问题」两个信息不会互相覆盖。 */
+.chip.flag::after {
+  content: '';
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--van-warning-color);
 }
 
 /* 当前题：加粗 + 一圈描边，一眼能定位 */
@@ -1533,6 +1682,10 @@ watch(
 
 .where b {
   color: var(--wb-ink);
+}
+
+.where .pos {
+  white-space: nowrap;
 }
 
 .where .rv {
