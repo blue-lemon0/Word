@@ -29,6 +29,8 @@ import { replaceSentence } from '../ai/actions'
 import { aiReady } from '../ai/config'
 import { describeAiError, type AiResult } from '../ai/types'
 import { autoSpeak } from '../speech'
+import { importSampleSeed } from '../seed'
+import { toast } from '../toast'
 import type { Sense, Sentence } from '../types'
 import { buildRandomQueue, makeQuestion, scopeCounts, type FeedEntry, type Question } from '../quiz'
 import { useSnapPager } from '../scroll-pager'
@@ -181,6 +183,20 @@ function onTab(i: number): void {
 function goTab(id: HomeTab['id']): void {
   const i = tabs.value.findIndex((t) => t.id === id)
   if (i >= 0) onTab(i)
+}
+
+/** 空库时直接在这里补示例词 —— 不用先跑去「更多」 */
+const sampleBusy = ref(false)
+async function useSampleHere(): Promise<void> {
+  if (sampleBusy.value) return
+  sampleBusy.value = true
+  try {
+    await importSampleSeed()
+    location.reload()
+  } catch (e) {
+    sampleBusy.value = false
+    toast(`示例词库载入失败：${(e as Error).message}`)
+  }
 }
 
 /* ── 随便刷：一题一屏（随机），队列里约 1/10 的位置是扫读卡（quiz.ts 组队列时插入）── */
@@ -564,11 +580,32 @@ onMounted(async () => {
           </div>
 
           <div v-if="!loading && !cur" class="qempty">
-            <p>这组现在没有可练的</p>
-            <div class="qempty-btns">
-              <van-button block round type="primary" @click="newBatch">换一批</van-button>
-              <van-button v-if="wordsN > 0" block round @click="goTab('new')">去学新词</van-button>
-            </div>
+            <template v-if="wordsN === 0">
+              <p class="qe-t">词库还是空的</p>
+              <p class="qe-s">用 3 个示例词先走一遍流程，或导入你自己的词库。</p>
+              <div class="qempty-btns">
+                <van-button
+                  block
+                  round
+                  type="primary"
+                  :loading="sampleBusy"
+                  @click="useSampleHere"
+                >
+                  用示例开始
+                </van-button>
+                <van-button block round @click="router.push('/more')">导入词库</van-button>
+                <van-button block round plain @click="router.push('/library')">
+                  去词库自己加词
+                </van-button>
+              </div>
+            </template>
+            <template v-else>
+              <p>这组现在没有可练的</p>
+              <div class="qempty-btns">
+                <van-button block round type="primary" @click="newBatch">换一批</van-button>
+                <van-button v-if="wordsN > 0" block round @click="goTab('new')">去学新词</van-button>
+              </div>
+            </template>
           </div>
 
           <!-- ★ 这里原来有一条固定底栏（我不会 / 显示选项 / 上一题 / 下一题）。
@@ -781,6 +818,21 @@ onMounted(async () => {
   text-align: center;
   font-size: 14px;
   color: var(--wb-ink-2);
+}
+
+.qempty .qe-t {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--wb-ink);
+}
+
+.qempty .qe-s {
+  margin: 0 auto -2px;
+  max-width: 20em;
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: var(--wb-ink-3);
 }
 
 .qempty-btns {

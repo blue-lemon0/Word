@@ -27,6 +27,7 @@ import { db, emptyTrash, restoreSense, trashedSenses } from '../db'
 import { toast } from '../toast'
 import { speechOn, ttsAutoplay } from '../speech'
 import { cacheSweep as sweepTtsCache, cacheStat as ttsCacheStat } from '../ai/ttsNeural'
+import { clearSampleWords, sampleInfo, type SampleInfo } from '../seed'
 import type { ImportLog, Sense, Snapshot } from '../types'
 
 const router = useRouter()
@@ -34,6 +35,30 @@ const logoUrl = new URL('../../public/icon-192.png', import.meta.url).href
 const snaps = ref<Snapshot[]>([])
 const imports = ref<ImportLog[]>([])
 const trash = ref<Sense[]>([])
+/** 示例词库现状：只对「本次新装灌进来的示例」有值，老库不显示这一块 */
+const sample = ref<SampleInfo | null>(null)
+
+/** 清掉没学过的示例词；学过的保留，避免一次清理抹掉学习记录 */
+function askClearSample(): void {
+  const s = sample.value
+  if (!s || !s.removable.length) return
+  const keep = s.learned ? `已开始学的 ${s.learned} 个会保留。` : ''
+  ask.value = {
+    title: '清空示例词库？',
+    text: `会删掉 ${s.removable.length} 个没学过的示例词，以及它们的义项和例句。${keep}\n\n清空前会自动存快照，误删可回滚。`,
+    okText: '清空',
+    danger: true,
+    run: async () => {
+      try {
+        const r = await clearSampleWords()
+        toast(r.words ? `已清掉 ${r.words} 个示例词 / ${r.senses} 个义项` : '没有可清的示例词')
+      } catch (e) {
+        toast(`清理失败：${(e as Error).message}`)
+      }
+      await load()
+    },
+  }
+}
 
 /* ── 检查更新 ──
  *  只放在版本行里，不新占一块：这一页已经很长，更新又是低频动作。
@@ -159,6 +184,7 @@ async function load(): Promise<void> {
     (r) => r.id != null,
   ) as ImportLog[]
   trash.value = await trashedSenses()
+  sample.value = await sampleInfo()
 }
 
 function fmt(ts: number): string {
@@ -388,6 +414,27 @@ onMounted(load)
           class="note"
           title="导入不用挑按钮，它自己认：词库内容包（只加不改已有的）、本应用导出的备份（会覆盖，先问你）、AI 按「复制给 AI」回来的单词（请到那个词的意思页粘贴）。从微信/QQ 里直接点开这个文件也可以。"
         />
+      </van-cell-group>
+
+      <!-- 示例词库：只对首启时选择「用示例开始」的用户出现。
+           它是体验用的脚手架，不是用户的词 —— 学过的保留，没学的可以一键清掉。 -->
+      <van-cell-group v-if="sample && sample.removable.length" inset class="grp">
+        <template #title>
+          <b>示例词库</b><span class="sub">用来体验流程，不是你的词</span>
+        </template>
+        <van-cell
+          :title="`还有 ${sample.removable.length} 个没开始学`"
+          :label="
+            sample.learned
+              ? `已开始学的 ${sample.learned} 个会保留`
+              : '清掉后词库回到空白，也可以再导入自己的词库'
+          "
+        />
+        <div class="acts">
+          <van-button size="small" plain type="danger" @click="askClearSample">
+            清空没学的示例词
+          </van-button>
+        </div>
       </van-cell-group>
 
       <!-- 语音：自动播放总开关。「设置这台设备怎么工作」，

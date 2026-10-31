@@ -11,7 +11,7 @@ import MorePage from './pages/MorePage.vue'
 import AuditPage from './pages/AuditPage.vue'
 import PromptsPage from './pages/PromptsPage.vue'
 import { VANT_COMPONENTS } from './vant'
-import { ensureSeeded } from './seed'
+import { shouldAskSeed } from './seed'
 import { sweepTrash, verifySchema, warmTables } from './db'
 import { initPwa, registerSW } from './pwa'
 import { toast } from './toast'
@@ -123,7 +123,8 @@ app.config.errorHandler = (err, _inst, info) => {
 window.addEventListener('error', (e) => console.error('[window]', e.message))
 window.addEventListener('unhandledrejection', (e) => console.error('[promise]', String(e.reason)))
 
-// 种子必须在挂载前灌完，否则词库页会先闪一下「空」。
+// 首启引导：空库且还没选过时弹欢迎层（挂载前定好，避免首页空态闪一下）。
+// 有内容的老用户直接跳过；选过「示例」但库空了的，这里会补灌一次。
 // 包在 async IIFE 里而不是用顶层 await —— esbuild 的默认 target
 // （chrome87/safari14）不支持顶层 await，直接 await 会构建失败。
 ;(async () => {
@@ -133,7 +134,7 @@ window.addEventListener('unhandledrejection', (e) => console.error('[promise]', 
     console.error('[boot] 库结构与应用不匹配 —— 下列功能会不可用：', check.error)
     toast('数据库结构不匹配，请清数据重装或联系维护者', 8000)
   }
-  await ensureSeeded()
+  await shouldAskSeed()
   // 回收站里的东西只留 30 天：超期自动清掉（连例句与熟练度）。
   // 不做的话「30 天可还原」就只是句安慰话。
   try {

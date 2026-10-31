@@ -9,6 +9,8 @@ import { computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { incomingFile } from './bridge'
 import { watchKeyboard } from './keyboard'
+import { seedWelcomeOpen } from './seed'
+import SeedWelcome from './components/SeedWelcome.vue'
 import { toastMsg, toastCenter } from './toast'
 
 const route = useRoute()
@@ -114,6 +116,10 @@ const active = computed(() => activeTab(route.path))
       <component :is="Component" />
     </KeepAlive>
   </RouterView>
+
+  <!-- 首启欢迎层：只在「空库 + 还没做过选择」时出现（main.ts 挂载前判定）。
+       放在 RouterView 之后，盖住首页的空态，避免用户先看到「没有可练的」再被问。 -->
+  <SeedWelcome v-if="seedWelcomeOpen" @done="seedWelcomeOpen = false" />
 
   <!-- ★ 不用 placeholder：它会往 body 里塞一个占位块，高度由 JS 算。
        一旦占位块高度与实际 tabbar 高度对不上（安全区在 WebView 里常常是 0），

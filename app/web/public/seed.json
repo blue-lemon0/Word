@@ -1,1 +1,193 @@
-{"format":"word-bundle","schemaVersion":1,"version":"20261005-a75edd1e","stats":{"words":18,"senses":66,"cards":66,"withSentences":6,"sentences":33,"glossPool":66,"withGlossEn":56,"noSentence":60,"mode":"PARTIAL"},"glossPool":["能力","才干，才能，本领","采纳（方针、理论、政策）","采纳为做法；正式通过","收养","优点，优势","占先分，优势分（网球）","好处，裨益","使占优势（动词）","一桩事，事件","事务，公务","风流韵事，私情","允许，准许；同意给予","承认；考虑到","折让，给（折扣）","容许（存在/进行）","二选一的，必须取舍的","供选择的；另类的","供替代的选择（名词）","适用，切合","申请，请求","应用；称作","专心于，致力于","军队，陆军","大批人；大军","方面；面貌","（语法）时、体","出席，参加","照料，处理","伴随，随之而来","专心于","听众，观众","读者，观众（某内容的受众）","作家（著作的作者）","创始人","撰写，著作（动词）","资本","首都","大写字母","首都的；首要的，重要的","版本，版次","一版（同一时间发行的全套相同副本）","报纸的一次发行","翻版","蜂后（蜂群中唯一产卵的雌性）","女王，女君主","王后","同类之最（拟人化的杰出女性）","立为女王；做女王","答复，回答，答辩","回击，反驳","社会的","群居的","社交的，上流的","喜爱交际的","群居习性的（同类成群而居）","友善的，合群的","联欢会","石头","英石（重量单位，14 磅）","果核","宝石","纪念碑","麻木不仁的（stone-hearted）","以石击毙","灰褐色的"],"cards":[{"id":"ability#s1","word":"ability","senseId":"s1","pos":"n.","ipa":"əbˈɪlətˌi","gloss":"能力","glossEn":"the quality of being able to perform; a quality that permits or facilitates achievement or accomplishment","trap":0,"tier":"T1","sentences":[]},{"id":"ability#s2","word":"ability","senseId":"s2","pos":"n.","ipa":"əbˈɪlətˌi","gloss":"才干，才能，本领","glossEn":"possession of the qualities (especially mental qualities) required to do something or get something done","trap":0,"tier":"T1","sentences":[]},{"id":"adopt#s1","word":"adopt","senseId":"s1","pos":"v.","ipa":"ədˈɑpt","gloss":"采纳（方针、理论、政策）","glossEn":"choose and follow; as of theories, ideas, policies, strategies or plans","trap":0,"tier":"T1","sentences":[]},{"id":"adopt#s2","word":"adopt","senseId":"s2","pos":"v.","ipa":"ədˈɑpt","gloss":"采纳为做法；正式通过","glossEn":"take up and practice as one's own","trap":0,"tier":"T1","sentences":[]},{"id":"adopt#s3","word":"adopt","senseId":"s3","pos":"v.","ipa":"ədˈɑpt","gloss":"收养","glossEn":"take into one's family","trap":0,"tier":"T1","sentences":[]},{"id":"advantage#s1","word":"advantage","senseId":"s1","pos":"n.","ipa":"ædvˈæntɪdʒ","gloss":"优点，优势","glossEn":"the quality of having a superior or more favorable position","trap":0,"tier":"T1","sentences":[]},{"id":"advantage#s2","word":"advantage","senseId":"s2","pos":"n.","ipa":"ædvˈæntɪdʒ","gloss":"占先分，优势分（网球）","glossEn":"(tennis) first point scored after deuce","trap":0,"tier":"T1","sentences":[]},{"id":"advantage#s3","word":"advantage","senseId":"s3","pos":"n.","ipa":"ædvˈæntɪdʒ","gloss":"好处，裨益","glossEn":"benefit resulting from some event or action","trap":0,"tier":"T1","sentences":[]},{"id":"advantage#s4","word":"advantage","senseId":"s4","pos":"v.","ipa":"ædvˈæntɪdʒ","gloss":"使占优势（动词）","glossEn":"give an advantage to","trap":0,"tier":"T1","sentences":[]},{"id":"affair#s1","word":"affair","senseId":"s1","pos":"n.","ipa":"əfˈɛɹ","gloss":"一桩事，事件","glossEn":"a vaguely specified social event","trap":0,"tier":"T1","sentences":[]},{"id":"affair#s2","word":"affair","senseId":"s2","pos":"n.","ipa":"əfˈɛɹ","gloss":"事务，公务","glossEn":"","trap":0,"tier":"T1","sentences":[]},{"id":"affair#s3","word":"affair","senseId":"s3","pos":"n.","ipa":"əfˈɛɹ","gloss":"风流韵事，私情","glossEn":"a usually secretive or illicit sexual relationship","trap":0,"tier":"T1","sentences":[]},{"id":"allow#s1","word":"allow","senseId":"s1","pos":"v.","ipa":"əlˈaʊ","gloss":"允许，准许；同意给予","glossEn":"give or assign a resource to a particular person or cause","trap":0,"tier":"T1","sentences":[]},{"id":"allow#s2","word":"allow","senseId":"s2","pos":"v.","ipa":"əlˈaʊ","gloss":"承认；考虑到","glossEn":"allow or plan for a certain possibility; concede the truth or validity of something","trap":0,"tier":"T1","sentences":[]},{"id":"allow#s3","word":"allow","senseId":"s3","pos":"v.","ipa":"əlˈaʊ","gloss":"折让，给（折扣）","glossEn":"grant as a discount or in exchange","trap":0,"tier":"T1","sentences":[]},{"id":"allow#s4","word":"allow","senseId":"s4","pos":"v.","ipa":"əlˈaʊ","gloss":"容许（存在/进行）","glossEn":"allow the presence of or allow (an activity) without opposing or prohibiting","trap":0,"tier":"T1","sentences":[]},{"id":"alternative#s1","word":"alternative","senseId":"s1","pos":"a.","ipa":"ɔltˈɜɹnətɪv","gloss":"二选一的，必须取舍的","glossEn":"necessitating a choice between mutually exclusive possibilities","trap":0,"tier":"T1","sentences":[]},{"id":"alternative#s2","word":"alternative","senseId":"s2","pos":"a.","ipa":"ɔltˈɜɹnətɪv","gloss":"供选择的；另类的","glossEn":"pertaining to unconventional choices","trap":0,"tier":"T1","sentences":[]},{"id":"alternative#s3","word":"alternative","senseId":"s3","pos":"n.","ipa":"ɔltˈɜɹnətɪv","gloss":"供替代的选择（名词）","glossEn":"","trap":0,"tier":"T1","sentences":[]},{"id":"apply#s1","word":"apply","senseId":"s1","pos":"v.","ipa":"əplˈaɪ","gloss":"适用，切合","glossEn":"be pertinent or relevant or applicable","trap":0,"tier":"T1","sentences":[]},{"id":"apply#s2","word":"apply","senseId":"s2","pos":"v.","ipa":"əplˈaɪ","gloss":"申请，请求","glossEn":"ask (for something)","trap":0,"tier":"T1","sentences":[]},{"id":"apply#s3","word":"apply","senseId":"s3","pos":"v.","ipa":"əplˈaɪ","gloss":"应用；称作","glossEn":"refer (a word or name) to a person or thing","trap":0,"tier":"T1","sentences":[]},{"id":"apply#s4","word":"apply","senseId":"s4","pos":"v.","ipa":"əplˈaɪ","gloss":"专心于，致力于","glossEn":"apply oneself to","trap":0,"tier":"T1","sentences":[]},{"id":"army#s1","word":"army","senseId":"s1","pos":"n.","ipa":"ˈɑɹmi","gloss":"军队，陆军","glossEn":"a permanent organization of the military land forces of a nation or state","trap":0,"tier":"T1","sentences":[{"text":"An army of volunteers cleaned the whole beach.","form":"army","clue":"volunteers","spanStart":3,"spanLen":4,"translation":"一大批志愿者清理了整片海滩。","note":"军队，引申义 —— 一大批人为同一目的聚集。线索是 volunteers，不是军事语境。","source":"GENERATED"},{"text":"The army marched through the capital city.","form":"army","clue":"marched","spanStart":4,"spanLen":4,"translation":"军队穿过首都行进。","note":"军队，陆军。线索是 marched 与 capital city（首都/首都军区），军事语境明确。","source":"GENERATED"},{"text":"He joined the army when he was eighteen.","form":"army","clue":"joined","spanStart":14,"spanLen":4,"translation":"他十八岁时参了军。","note":"军队。线索是 joined + 十八岁，是入伍的说法。","source":"GENERATED"},{"text":"The army of ants marched across the path.","form":"army","clue":"ants","spanStart":4,"spanLen":4,"translation":"蚁群穿过小路行进。","note":"军队，引申义 —— 一大批。线索是 ants（蚂蚁），说明这是「大批」而非军队。","source":"GENERATED"},{"text":"A huge army of fans waited outside the stadium.","form":"army","clue":"fans","spanStart":7,"spanLen":4,"translation":"一大批球迷在场馆外等候。","note":"军队，引申义。线索是 fans + waited outside stadium，人群而非部队。","source":"GENERATED"}]},{"id":"army#s2","word":"army","senseId":"s2","pos":"n.","ipa":"ˈɑɹmi","gloss":"大批人；大军","glossEn":"a large number of people united for some specific purpose","trap":0,"tier":"T1","sentences":[{"text":"He kept an army of assistants at his company.","form":"army","clue":"assistants","spanStart":11,"spanLen":4,"translation":"他在公司里配了一批助手。","note":"大批人（雇员）。线索是 assistants + at his company，是雇员群体。","source":"GENERATED"},{"text":"A whole army of workers joined the strike.","form":"army","clue":"workers","spanStart":8,"spanLen":4,"translation":"整整一大批工人加入了罢工。","note":"大批人。线索是 workers + strike（罢工），是劳工群体。","source":"GENERATED"},{"text":"She has an army of siblings to support her.","form":"army","clue":"siblings","spanStart":11,"spanLen":4,"translation":"她有一大群兄弟姐妹支持她。","note":"大批人。线索是 siblings，是家族群体。","source":"GENERATED"},{"text":"The army of bicycles filled the parking lot.","form":"army","clue":"bicycles","spanStart":4,"spanLen":4,"translation":"大批自行车塞满了停车场。","note":"大批人/物。线索是 bicycles，说明是「大批自行车」而非人群。","source":"GENERATED"},{"text":"Facing the task, he felt like an army of one.","form":"army","clue":"one","spanStart":33,"spanLen":4,"translation":"面对这项任务，他觉得自己孤军奋战。","note":"大批人（引申为一大群）。线索是 like an army of one（孤军一人），强调「一个人也算一支队伍」。","source":"GENERATED"}]},{"id":"aspect#s1","word":"aspect","senseId":"s1","pos":"n.","ipa":"ˈæspˌɛkt","gloss":"方面；面貌","glossEn":"a distinct feature or element in a problem a characteristic to be considered","trap":0,"tier":"T1","sentences":[{"text":"The financial aspect of the plan worries him most.","form":"aspect","clue":"financial","spanStart":14,"spanLen":6,"translation":"这个计划的财务方面最让他担心。","note":"方面；面貌（看待某问题的一个要素）。线索是 financial + of the plan，指计划里的一个考量维度。","source":"GENERATED"},{"text":"We should consider every aspect of the problem.","form":"aspect","clue":"every","spanStart":25,"spanLen":6,"translation":"我们应该考虑这个问题的每个方面。","note":"方面。线索是 consider every aspect of，是固定搭配。","source":"GENERATED"},{"text":"One aspect of the design still looks unfinished to me.","form":"aspect","clue":"design","spanStart":4,"spanLen":6,"translation":"这个设计有一处让我觉得还没完成。","note":"方面。线索是 One aspect of the design，指设计里的某一处。","source":"GENERATED"},{"text":"The legal aspect was completely new to us.","form":"aspect","clue":"legal","spanStart":10,"spanLen":6,"translation":"法律这一方面对我们来说完全是新的。","note":"方面。线索是 legal（法律的）+ was new to us，指知识领域。","source":"GENERATED"},{"text":"From a practical aspect, the plan seems workable.","form":"aspect","clue":"practical","spanStart":17,"spanLen":6,"translation":"从实际角度看，这个方案似乎可行。","note":"方面。线索是 From a ... aspect，是介词短语引出视角。","source":"GENERATED"},{"text":"Nobody studied the political aspect of the case.","form":"aspect","clue":"political","spanStart":29,"spanLen":6,"translation":"没有人研究过这个案件的政治层面。","note":"方面。线索是 political + of the case，指案件的一个维度。","source":"GENERATED"},{"text":"The worst aspect was the long waiting time.","form":"aspect","clue":"worst","spanStart":10,"spanLen":6,"translation":"最糟糕的方面是漫长的等待时间。","note":"方面。线索是 the worst aspect was，指其中最差的一项。","source":"GENERATED"},{"text":"She questioned one aspect of his argument carefully.","form":"aspect","clue":"argument","spanStart":19,"spanLen":6,"translation":"她仔细质疑了他论证中的一个方面。","note":"方面。线索是 one aspect of his argument，指论证里的某一环。","source":"GENERATED"}]},{"id":"aspect#s2","word":"aspect","senseId":"s2","pos":"n.","ipa":"ˈæspˌɛkt","gloss":"（语法）时、体","glossEn":"the beginning or duration or completion or repetition of the action of a verb","trap":0,"tier":"T1","sentences":[{"text":"His face showed a different aspect after years abroad.","form":"aspect","clue":"face","spanStart":28,"spanLen":6,"translation":"在国外多年后，他的脸显出另一种神采。","note":"面貌，外观。线索是 face showed a ... aspect，指人的神情外貌。","source":"GENERATED"},{"text":"We must see both sides of the problem, not just one aspect.","form":"aspect","clue":"sides","spanStart":52,"spanLen":6,"translation":"我们必须看到问题的两面，而不只是一个方面。","note":"方面。线索是 not just one aspect，强调片面性。","source":"GENERATED"},{"text":"The verb \"was\" has a past aspect and a present one.","form":"aspect","clue":"past","spanStart":26,"spanLen":6,"translation":"动词 was 有过去体和现在体两种。","note":"（语法）时、体。线索是 verb + past/present aspect，是语法学的时态体貌术语。","source":"GENERATED"},{"text":"In that grammar book each tense has four aspects.","form":"aspects","clue":"tense","spanStart":41,"spanLen":7,"translation":"那本语法书里每个时态有四个体。","note":"（语法）时、体。线索是 tense（时态）+ four aspects，指时态系统。","source":"GENERATED"},{"text":"The verb \"run\" carries the aspect of motion.","form":"aspect","clue":"motion","spanStart":27,"spanLen":6,"translation":"动词 run 带有动作体的特征。","note":"（语法）时、体。线索是 the aspect of motion（动作体），语法学术语。","source":"GENERATED"}]},{"id":"attend#s1","word":"attend","senseId":"s1","pos":"v.","ipa":"ətˈɛnd","gloss":"出席，参加","glossEn":"be present at (meetings, church services, university), etc.","trap":0,"tier":"T1","sentences":[]},{"id":"attend#s2","word":"attend","senseId":"s2","pos":"v.","ipa":"ətˈɛnd","gloss":"照料，处理","glossEn":"take charge of or deal with","trap":0,"tier":"T1","sentences":[]},{"id":"attend#s3","word":"attend","senseId":"s3","pos":"v.","ipa":"ətˈɛnd","gloss":"伴随，随之而来","glossEn":"to accompany as a circumstance or follow as a result","trap":0,"tier":"T1","sentences":[]},{"id":"attend#s4","word":"attend","senseId":"s4","pos":"v.","ipa":"ətˈɛnd","gloss":"专心于","glossEn":"give heed (to)","trap":0,"tier":"T1","sentences":[]},{"id":"audience#s1","word":"audience","senseId":"s1","pos":"n.","ipa":"ˈɑdiəns","gloss":"听众，观众","glossEn":"a gathering of spectators or listeners at a (usually public) performance","trap":0,"tier":"T1","sentences":[{"text":"The audience clapped for ten minutes after the show.","form":"audience","clue":"clapped","spanStart":4,"spanLen":8,"translation":"演出结束后观众鼓掌了十分钟。","note":"听众，观众（在场）。线索是 clapped + after the show，是演出散场时的反应者。","source":"GENERATED"},{"text":"She spoke to the audience without notes.","form":"audience","clue":"spoke","spanStart":17,"spanLen":8,"translation":"她不看讲稿地对听众讲话。","note":"听众，观众。线索是 spoke to + without notes，是当众讲话。","source":"GENERATED"},{"text":"His lecture drew a small but quiet audience.","form":"audience","clue":"drew","spanStart":35,"spanLen":8,"translation":"他的讲座吸引了一小群安静的听众。","note":"听众，观众。线索是 lecture（讲座）+ quiet，说明是小规模听讲者。","source":"GENERATED"},{"text":"The audience at the concert hall was mostly elderly.","form":"audience","clue":"concert","spanStart":4,"spanLen":8,"translation":"音乐厅的听众大多是老年人。","note":"听众，观众。线索是 concert hall（音乐厅），是演出场所。","source":"GENERATED"},{"text":"Never talk back to the audience, the director said.","form":"audience","clue":"talk","spanStart":23,"spanLen":8,"translation":"导演说：永远不要跟观众顶嘴。","note":"听众，观众。线索是 talk back to + director 的告诫语气。","source":"GENERATED"}]},{"id":"audience#s2","word":"audience","senseId":"s2","pos":"n.","ipa":"ˈɑdiəns","gloss":"读者，观众（某内容的受众）","glossEn":"the part of the general public interested in a source of information or entertainment","trap":0,"tier":"T1","sentences":[{"text":"Her book found a wide audience among young readers.","form":"audience","clue":"wide","spanStart":22,"spanLen":8,"translation":"她的书在年轻读者中拥有广泛的读者群。","note":"受众（某内容的接受者）。线索是 among young readers，指阅读这本书的人，不是在场听看。","source":"GENERATED"},{"text":"The show was written for a family audience.","form":"audience","clue":"family","spanStart":34,"spanLen":8,"translation":"这场演出是为家庭观众写的。","note":"受众。线索是 for a + 某类人群（family），指目标观众群体而非在场者。","source":"GENERATED"},{"text":"His technical papers reach a narrow academic audience.","form":"audience","clue":"narrow","spanStart":45,"spanLen":8,"translation":"他的技术论文读者群很窄。","note":"受众。线索是 technical papers + academic（学术），指专业读者。","source":"GENERATED"},{"text":"The advertisement targets a young male audience.","form":"audience","clue":"targets","spanStart":39,"spanLen":8,"translation":"这则广告瞄准的是年轻男性受众。","note":"受众。线索是 advertisement + targets，指广告投放的目标人群。","source":"GENERATED"},{"text":"Sorry, this film contains violence not suitable for young audience.","form":"audience","clue":"contains","spanStart":58,"spanLen":8,"translation":"抱歉，本片含有不适合年轻观众的暴力内容。","note":"受众。线索是 not suitable for + 某类观众，是内容分级用语。","source":"GENERATED"}]},{"id":"author#s1","word":"author","senseId":"s1","pos":"n.","ipa":"ˈɔθɜɹ","gloss":"作家（著作的作者）","glossEn":"","trap":0,"tier":"T1","sentences":[]},{"id":"author#s2","word":"author","senseId":"s2","pos":"n.","ipa":"ˈɔθɜɹ","gloss":"创始人","glossEn":"","trap":0,"tier":"T1","sentences":[]},{"id":"author#s3","word":"author","senseId":"s3","pos":"v.","ipa":"ˈɔθɜɹ","gloss":"撰写，著作（动词）","glossEn":"be the author of","trap":0,"tier":"T1","sentences":[]},{"id":"capital#s1","word":"capital","senseId":"s1","pos":"n.","ipa":"kˈæpətəl","gloss":"资本","glossEn":"assets available for use in the production of further assets wealth in the form of money or property owned by a person or business and human resources of economic value","trap":0,"tier":"T1","sentences":[]},{"id":"capital#s2","word":"capital","senseId":"s2","pos":"n.","ipa":"kˈæpətəl","gloss":"首都","glossEn":"a seat of government","trap":0,"tier":"T1","sentences":[]},{"id":"capital#s3","word":"capital","senseId":"s3","pos":"n.","ipa":"kˈæpətəl","gloss":"大写字母","glossEn":"one of the large alphabetic characters used as the first letter in writing or printing proper names and sometimes for emphasis; capitals were kept in the upper half of the type case and so became known as upper-case letters\"","trap":0,"tier":"T1","sentences":[]},{"id":"capital#s4","word":"capital","senseId":"s4","pos":"n.","ipa":"kˈæpətəl","gloss":"首都的；首要的，重要的","glossEn":"a center that is associated more than any other with some activity or product the upper part of a column that supports the entablature","trap":0,"tier":"T1","sentences":[]},{"id":"edition#s1","word":"edition","senseId":"s1","pos":"n.","ipa":"ədˈɪʃən","gloss":"版本，版次","glossEn":"the form in which a text (especially a printed book) is published","trap":0,"tier":"T1","sentences":[]},{"id":"edition#s2","word":"edition","senseId":"s2","pos":"n.","ipa":"ədˈɪʃən","gloss":"一版（同一时间发行的全套相同副本）","glossEn":"all of the identical copies of something offered to the public at the same time","trap":0,"tier":"T1","sentences":[]},{"id":"edition#s3","word":"edition","senseId":"s3","pos":"n.","ipa":"ədˈɪʃən","gloss":"报纸的一次发行","glossEn":"an issue of a newspaper","trap":0,"tier":"T1","sentences":[]},{"id":"edition#s4","word":"edition","senseId":"s4","pos":"n.","ipa":"ədˈɪʃən","gloss":"翻版","glossEn":"","trap":0,"tier":"T1","sentences":[]},{"id":"queen#s1","word":"queen","senseId":"s1","pos":"n.","ipa":"kwˈin","gloss":"蜂后（蜂群中唯一产卵的雌性）","glossEn":"the only fertile female in a colony of social insects such as bees and ants and termites; its function is to lay eggs","trap":0,"tier":"T1","sentences":[]},{"id":"queen#s2","word":"queen","senseId":"s2","pos":"n.","ipa":"kwˈin","gloss":"女王，女君主","glossEn":"a female sovereign ruler","trap":0,"tier":"T1","sentences":[]},{"id":"queen#s3","word":"queen","senseId":"s3","pos":"n.","ipa":"kwˈin","gloss":"王后","glossEn":"the wife or widow of a king","trap":0,"tier":"T1","sentences":[]},{"id":"queen#s4","word":"queen","senseId":"s4","pos":"n.","ipa":"kwˈin","gloss":"同类之最（拟人化的杰出女性）","glossEn":"something personified as a woman who is considered the best or most important of her kind","trap":0,"tier":"T1","sentences":[]},{"id":"queen#s5","word":"queen","senseId":"s5","pos":"vt.","ipa":"kwˈin","gloss":"立为女王；做女王","glossEn":"","trap":0,"tier":"T1","sentences":[]},{"id":"reply#s1","word":"reply","senseId":"s1","pos":"n.","ipa":"ɹɪplˈaɪ","gloss":"答复，回答，答辩","glossEn":"the speech act of continuing a conversational exchange","trap":0,"tier":"T1","sentences":[]},{"id":"reply#s2","word":"reply","senseId":"s2","pos":"vi.","ipa":"ɹiplˈaɪ","gloss":"回击，反驳","glossEn":"","trap":0,"tier":"T1","sentences":[]},{"id":"social#s1","word":"social","senseId":"s1","pos":"a.","ipa":"sˈoʊʃəl","gloss":"社会的","glossEn":"relating to human society and its members","trap":0,"tier":"T1","sentences":[]},{"id":"social#s2","word":"social","senseId":"s2","pos":"a.","ipa":"sˈoʊʃəl","gloss":"群居的","glossEn":"living together or enjoying life in communities or organized groups","trap":0,"tier":"T1","sentences":[]},{"id":"social#s3","word":"social","senseId":"s3","pos":"a.","ipa":"sˈoʊʃəl","gloss":"社交的，上流的","glossEn":"relating to or belonging to or characteristic of high society","trap":0,"tier":"T1","sentences":[]},{"id":"social#s4","word":"social","senseId":"s4","pos":"a.","ipa":"sˈoʊʃəl","gloss":"喜爱交际的","glossEn":"composed of sociable people or formed for the purpose of sociability","trap":0,"tier":"T1","sentences":[]},{"id":"social#s5","word":"social","senseId":"s5","pos":"a.","ipa":"sˈoʊʃəl","gloss":"群居习性的（同类成群而居）","glossEn":"tending to move or live together in groups or colonies of the same kind","trap":0,"tier":"T1","sentences":[]},{"id":"social#s6","word":"social","senseId":"s6","pos":"a.","ipa":"sˈoʊʃəl","gloss":"友善的，合群的","glossEn":"marked by friendly companionship with others","trap":0,"tier":"T1","sentences":[]},{"id":"social#s7","word":"social","senseId":"s7","pos":"n.","ipa":"sˈoʊʃəl","gloss":"联欢会","glossEn":"","trap":0,"tier":"T1","sentences":[]},{"id":"stone#s1","word":"stone","senseId":"s1","pos":"n.","ipa":"stˈoʊn","gloss":"石头","glossEn":"building material consisting of a piece of rock hewn in a definite shape for a special purpose","trap":0,"tier":"T1","sentences":[]},{"id":"stone#s2","word":"stone","senseId":"s2","pos":"n.","ipa":"stˈoʊn","gloss":"英石（重量单位，14 磅）","glossEn":"an avoirdupois unit used to measure the weight of a human body; equal to 14 pounds","trap":0,"tier":"T1","sentences":[]},{"id":"stone#s3","word":"stone","senseId":"s3","pos":"n.","ipa":"stˈoʊn","gloss":"果核","glossEn":"the hard inner (usually woody) layer of the pericarp of some fruits (as peaches or plums or cherries or olives) that contains the seed","trap":0,"tier":"T1","sentences":[]},{"id":"stone#s4","word":"stone","senseId":"s4","pos":"n.","ipa":"stˈoʊn","gloss":"宝石","glossEn":"","trap":0,"tier":"T1","sentences":[]},{"id":"stone#s5","word":"stone","senseId":"s5","pos":"n.","ipa":"stˈoʊn","gloss":"纪念碑","glossEn":"","trap":0,"tier":"T1","sentences":[]},{"id":"stone#s6","word":"stone","senseId":"s6","pos":"n.","ipa":"stˈoʊn","gloss":"麻木不仁的（stone-hearted）","glossEn":"a lack of feeling or expression or movement","trap":0,"tier":"T1","sentences":[]},{"id":"stone#s7","word":"stone","senseId":"s7","pos":"v.","ipa":"stˈoʊn","gloss":"以石击毙","glossEn":"kill by throwing stones at","trap":0,"tier":"T1","sentences":[]},{"id":"stone#s8","word":"stone","senseId":"s8","pos":"a.","ipa":"stˈoʊn","gloss":"灰褐色的","glossEn":"of any of various dull tannish or grey colors","trap":0,"tier":"T1","sentences":[]}]}
+{
+  "format": "word-bundle",
+  "schemaVersion": 1,
+  "version": "20261030-starter5",
+  "stats": {
+    "words": 3,
+    "senses": 7,
+    "cards": 7,
+    "withSentences": 7,
+    "sentences": 14,
+    "glossPool": 7,
+    "withGlossEn": 0,
+    "noSentence": 0,
+    "mode": "STARTER"
+  },
+  "cards": [
+    {
+      "id": "bank#s1",
+      "word": "bank",
+      "senseId": "s1",
+      "pos": "n.",
+      "ipa": "bæŋk",
+      "gloss": "银行",
+      "tier": "T1",
+      "sentences": [
+        {
+          "text": "I need to go to the bank to withdraw some money.",
+          "form": "bank",
+          "clue": "withdraw",
+          "translation": "我得去银行取点钱。",
+          "note": "银行。线索是 withdraw money，办的是存取款业务。"
+        },
+        {
+          "text": "The bank refused to lend him the money.",
+          "form": "bank",
+          "clue": "lend",
+          "translation": "银行拒绝借钱给他。",
+          "note": "银行。线索是 lend，金融机构放贷。"
+        }
+      ]
+    },
+    {
+      "id": "bank#s2",
+      "word": "bank",
+      "senseId": "s2",
+      "pos": "n.",
+      "ipa": "bæŋk",
+      "gloss": "河岸，堤岸",
+      "tier": "T1",
+      "sentences": [
+        {
+          "text": "They sat on the bank of the river and watched the boats.",
+          "form": "bank",
+          "clue": "river",
+          "translation": "他们坐在河岸边看船。",
+          "note": "河岸。线索是 river + watched the boats，是水边而不是金融机构。"
+        },
+        {
+          "text": "The house stands on the opposite bank of the lake.",
+          "form": "bank",
+          "clue": "lake",
+          "translation": "那栋房子坐落在湖的对岸。",
+          "note": "河岸，堤岸。线索是 opposite bank of the lake。"
+        }
+      ]
+    },
+    {
+      "id": "figure#s1",
+      "word": "figure",
+      "senseId": "s1",
+      "pos": "n.",
+      "ipa": "ˈfɪɡjər",
+      "gloss": "数字",
+      "tier": "T2",
+      "sentences": [
+        {
+          "text": "The sales figures for last month were better than expected.",
+          "form": "figures",
+          "clue": "sales",
+          "translation": "上个月的销售数字好于预期。",
+          "note": "数字。线索是 sales figures，指统计数据。"
+        },
+        {
+          "text": "Please write the final figure in this box.",
+          "form": "figure",
+          "clue": "box",
+          "translation": "请把最终数字写在这个方框里。",
+          "note": "数字。线索是 write the final figure，填的是数值。"
+        }
+      ]
+    },
+    {
+      "id": "figure#s2",
+      "word": "figure",
+      "senseId": "s2",
+      "pos": "n.",
+      "ipa": "ˈfɪɡjər",
+      "gloss": "人物",
+      "tier": "T2",
+      "sentences": [
+        {
+          "text": "She became a public figure after the election.",
+          "form": "figure",
+          "clue": "public",
+          "translation": "选举后她成了公众人物。",
+          "note": "人物。线索是 public figure，指被公众认识的人。"
+        },
+        {
+          "text": "He is a key figure in the local music scene.",
+          "form": "figure",
+          "clue": "music scene",
+          "translation": "他是当地音乐圈的关键人物。",
+          "note": "人物。线索是 key figure + music scene，指群体里举足轻重的人。"
+        }
+      ]
+    },
+    {
+      "id": "figure#s3",
+      "word": "figure",
+      "senseId": "s3",
+      "pos": "n.",
+      "ipa": "ˈfɪɡjər",
+      "gloss": "身材，体型",
+      "tier": "T2",
+      "sentences": [
+        {
+          "text": "She watches her diet to keep a slim figure.",
+          "form": "figure",
+          "clue": "slim",
+          "translation": "她注意饮食以保持苗条的身材。",
+          "note": "身材。线索是 slim figure，指体型。"
+        },
+        {
+          "text": "The dress shows off her figure.",
+          "form": "figure",
+          "clue": "dress",
+          "translation": "这条裙子凸显了她的身材。",
+          "note": "身材，体型。线索是 dress + shows off，指衣服衬托身形。"
+        }
+      ]
+    },
+    {
+      "id": "sophisticated#s1",
+      "word": "sophisticated",
+      "senseId": "s1",
+      "pos": "a.",
+      "ipa": "səˈfɪstɪkeɪtɪd",
+      "gloss": "复杂精密的，先进的",
+      "tier": "T4",
+      "sentences": [
+        {
+          "text": "The lab uses sophisticated equipment to analyze the samples.",
+          "form": "sophisticated",
+          "clue": "equipment",
+          "translation": "实验室使用精密的设备分析样本。",
+          "note": "复杂精密的。线索是 equipment + analyze，指技术含量高的设备。"
+        },
+        {
+          "text": "This is a sophisticated system that learns from user behavior.",
+          "form": "sophisticated",
+          "clue": "system",
+          "translation": "这是一个能从用户行为中学习的复杂系统。",
+          "note": "先进的，复杂的。线索是 system + learns，指功能复杂、技术先进。"
+        }
+      ]
+    },
+    {
+      "id": "sophisticated#s2",
+      "word": "sophisticated",
+      "senseId": "s2",
+      "pos": "a.",
+      "ipa": "səˈfɪstɪkeɪtɪd",
+      "gloss": "老练的，见多识广的",
+      "tier": "T4",
+      "sentences": [
+        {
+          "text": "She is a sophisticated traveler who has visited over forty countries.",
+          "form": "sophisticated",
+          "clue": "traveler",
+          "translation": "她是一位见多识广的旅行者，去过四十多个国家。",
+          "note": "见多识广的。线索是 traveler + forty countries，强调阅历丰富。"
+        },
+        {
+          "text": "He has a sophisticated taste in art and music.",
+          "form": "sophisticated",
+          "clue": "taste",
+          "translation": "他在艺术和音乐方面很有品味。",
+          "note": "老练的。线索是 taste in art and music，指审美成熟、有见识。"
+        }
+      ]
+    }
+  ]
+}

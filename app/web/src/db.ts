@@ -319,6 +319,30 @@ export async function purgeSense(id: string): Promise<void> {
   })
 }
 
+/** 按词硬删除：词条 + 它的全部义项（含软删）+ 例句 + 进度。
+ *  只给「清空示例词库」用 —— 用户自己的词走逐条删除，不提供整词一键清。 */
+export async function purgeWords(words: string[]): Promise<{ words: number; senses: number }> {
+  if (!words.length) return { words: 0, senses: 0 }
+  let wordsN = 0
+  let sensesN = 0
+  await db.transaction('rw', db.words, db.senses, db.sentences, db.progress, async () => {
+    for (const w of words) {
+      const rows = await db.senses.where('word').equals(w).toArray()
+      for (const s of rows) {
+        await db.sentences.where('senseId').equals(s.id).delete()
+        await db.progress.delete(s.id)
+        await db.senses.delete(s.id)
+        sensesN++
+      }
+      if (await db.words.get(w)) {
+        await db.words.delete(w)
+        wordsN++
+      }
+    }
+  })
+  return { words: wordsN, senses: sensesN }
+}
+
 /** 回收站清理：软删除超过 maxAgeDays 的彻底删掉，连例句与进度一起。
  *  设计稿说「30 天可还原」—— 没有清理的话那 30 天只是句安慰话，
  *  所以启动时跑一次（见 main.ts），用户也可以在「更多」里手动清空。 */

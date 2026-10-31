@@ -174,28 +174,28 @@ ok(formBad.length === 0, 'spanStart/spanLen 与 form 逐句对齐（高亮不会
 }
 
 /* ── 3. 编辑义项：id 永不变 ── */
-const army = await db.senses.where('word').equals('army').first()
-const before = await db.senses.where('word').equals('army').toArray()
+const bank = await db.senses.where('word').equals('bank').first()
+const before = await db.senses.where('word').equals('bank').toArray()
 const maxSlot = Math.max(...before.map((s) => s.slot))
-const newId = await edit.addSense('army', '临时意思')
-const armyAfter = await db.senses.where('word').equals('army').toArray()
-ok(armyAfter.some((s) => s.id === army.id && s.slot === army.slot),
+const newId = await edit.addSense('bank', '临时意思')
+const bankAfter = await db.senses.where('word').equals('bank').toArray()
+ok(bankAfter.some((s) => s.id === bank.id && s.slot === bank.slot),
    '新增义项不改动已有义项的 id 与 slot')
-ok(armyAfter.length === before.length + 1, '义项数 +1')
+ok(bankAfter.length === before.length + 1, '义项数 +1')
 
 await edit.updateSense(newId, { gloss: '改过的意思', pos: 'n.' })
 ok((await db.senses.get(newId)).gloss === '改过的意思', '就地编辑落库')
 
 /* slot 重排后 id 不变 */
-await dbApi.reorderSenses('army', [...armyAfter].reverse())
-const armyReordered = await db.senses.where('word').equals('army').toArray()
+await dbApi.reorderSenses('bank', [...bankAfter].reverse())
+const bankReordered = await db.senses.where('word').equals('bank').toArray()
 const sameIds = new Set(before.map((s) => s.id))
-ok(armyReordered.filter((s) => sameIds.has(s.id)).every((s) => s.slot !== undefined),
+ok(bankReordered.filter((s) => sameIds.has(s.id)).every((s) => s.slot !== undefined),
    '重排后老义项仍在（进度锚点没丢）')
-ok((await db.progress.get(army.id)) != null, '重排不影响挂在 id 上的进度行')
+ok((await db.progress.get(bank.id)) != null, '重排不影响挂在 id 上的进度行')
 
 /* ── 4. 合并：例句与熟练度都并过去 ── */
-const withSents = (await db.senses.where('word').equals('army').toArray())
+const withSents = (await db.senses.where('word').equals('bank').toArray())
   .sort((a, b) => a.slot - b.slot)
 const a1 = withSents[0]
 const a2 = withSents[1]
@@ -217,7 +217,7 @@ ok((await db.progress.get(a2.id)) == null, '被合并者的进度行已并入，
 const conflict = {
   format: 'word.import',
   schemaVersion: 2,
-  word: 'army',
+  word: 'bank',
   senses: [
     { slot: 1, gloss: 'AI 给的释义', sentences: [{ en: 'A brand new sentence here.', zh: '新句子。' }] },
     { slot: 9, gloss: '本地没有的意思', glossEn: 'a meaning only AI knows', sentences: [] },
@@ -235,13 +235,13 @@ ok(d.adopt[plan.senses[1].key] === true, '新义项默认采纳')
 ok(plan.senses[0].newSentences.length === 1, '算出了 1 句新增（按英文原文去重，不按 idx）')
 
 /* 校验不过的整份拒绝 */
-const badPlan = await importer.planImport({ word: 'army', senses: [{ slot: 1, gloss: '' }] })
+const badPlan = await importer.planImport({ word: 'bank', senses: [{ slot: 1, gloss: '' }] })
 ok(badPlan.errors.length > 0 && badPlan.senses.length === 0, 'gloss 为空 → 整份拒绝')
 
 const glossBefore = (await db.senses.get(a1.id)).gloss
 const msg = await importer.applyPlan(plan, d)
 ok((await db.senses.get(a1.id)).gloss === glossBefore, '按默认决策写入后，本地释义没被覆盖')
-ok((await db.senses.where('word').equals('army').toArray()).some((s) => s.gloss === '本地没有的意思'),
+ok((await db.senses.where('word').equals('bank').toArray()).some((s) => s.gloss === '本地没有的意思'),
    '新义项已采纳')
 
 /* ── 6. 出题：4 个选项含正解 + 落库 ── */
@@ -434,20 +434,20 @@ ok((await db.sentences.get(afterTake[0].sentenceId)).en === flagged.sentence.en,
   ok(seq('stopped').includes('stop'), 'stopped → stop（去双写）', seq('stopped').join(','))
   ok(seq('making').includes('make'), 'making → make（补 e）', seq('making').join(','))
   ok(seq('boxes')[1] === 'box', 'boxes → box（去 es；以 x 结尾先试去 es）', seq('boxes').join(','))
-  ok(seq('Army,')[0] === 'army', '大小写与标点先规范化', seq('Army,').join(','))
+  ok(seq('Bank,')[0] === 'bank', '大小写与标点先规范化', seq('Bank,').join(','))
 
   // 命中：原形直接查得到
-  const p1 = await lookup.peekWord('army')
-  ok(p1.exact && p1.word?.word === 'army' && p1.senses.length > 0,
+  const p1 = await lookup.peekWord('bank')
+  ok(p1.exact && p1.word?.word === 'bank' && p1.senses.length > 0,
      `库里有的词直接命中（${p1.senses.length} 个义项）`)
-  ok(p1.senses.every((s) => s.word === 'army'), '只给这个词自己的义项，不混别的词')
+  ok(p1.senses.every((s) => s.word === 'bank'), '只给这个词自己的义项，不混别的词')
   ok(p1.senses.every((s) => p1.sentenceCounts.has(s.id)),
      '每个义项都带例句条数（浮层要让人知道点进去有没有东西看）')
 
-  // 命中：屈折形式落到原形（armies → army）
-  const p2 = await lookup.peekWord('armies')
-  ok(!p2.exact && p2.word?.word === 'army', 'armies 命中原形 army（exact=false）')
-  ok(p2.lemma === 'army' && p2.token === 'armies', '浮层要能说清「句子里的是 X、原形是 Y」')
+  // 命中：屈折形式落到原形（banks → bank）
+  const p2 = await lookup.peekWord('banks')
+  ok(!p2.exact && p2.word?.word === 'bank', 'banks 命中原形 bank（exact=false）')
+  ok(p2.lemma === 'bank' && p2.token === 'banks', '浮层要能说清「句子里的是 X、原形是 Y」')
 
   // 未入库：不假装命中，也不把规则候选当原形
   const p3 = await lookup.peekWord('blorping')
@@ -978,11 +978,11 @@ ok((await db.sentences.get(afterTake[0].sentenceId)).en === flagged.sentence.en,
      '只差 query 的两条路由算同一屏（否则返回是空操作）')
 
   // 14) 拼写练习的比对口径（纯函数）
-  ok(spell.spellMatched('Army', 'army'), '拼写比对忽略大小写')
-  ok(spell.spellMatched('  army ', 'army'), '拼写比对忽略首尾空白')
+  ok(spell.spellMatched('Bank', 'bank'), '拼写比对忽略大小写')
+  ok(spell.spellMatched('  bank ', 'bank'), '拼写比对忽略首尾空白')
   ok(spell.spellMatched('in   the  end', 'in the end'), '词内多余空格压成一个')
-  ok(!spell.spellMatched('armi', 'army'), '拼错就是不通过')
-  ok(spell.spellHint('army') === '首字母 a · 共 4 个字母', `提示给首字母与字母数（${spell.spellHint('army')}）`)
+  ok(!spell.spellMatched('banc', 'bank'), '拼错就是不通过')
+  ok(spell.spellHint('bank') === '首字母 b · 共 4 个字母', `提示给首字母与字母数（${spell.spellHint('bank')}）`)
   ok(spell.spellHint('in the end') === '首字母 i · 共 8 个字母', '多词短语的字母数不含空格')
 
   // 收尾
@@ -1103,15 +1103,15 @@ ok(
   backup.importLine({ ts: 1, word: 'a,b,c', summary: '词+18 义+66 改0 句+33 冲突0' }),
 )
 ok(
-  backup.importLine({ ts: 1, word: 'army', summary: '新增义项0 例句10' }) === 'army · 新增义项0 例句10',
+  backup.importLine({ ts: 1, word: 'bank', summary: '新增义项0 例句10' }) === 'bank · 新增义项0 例句10',
   'AI 单词那套本来就是人话，原样用（不重译成空）',
-  backup.importLine({ ts: 1, word: 'army', summary: '新增义项0 例句10' }),
+  backup.importLine({ ts: 1, word: 'bank', summary: '新增义项0 例句10' }),
 )
 ok(
-  backup.importLine({ ts: 1, word: 'army', summary: '词+1 义+2 改3 句+5 冲突4' }) ===
-    'army · 1 词 · 2 义项 · 5 句 · 3 改 · 4 冲突',
+  backup.importLine({ ts: 1, word: 'bank', summary: '词+1 义+2 改3 句+5 冲突4' }) ===
+    'bank · 1 词 · 2 义项 · 5 句 · 3 改 · 4 冲突',
   '「改」「冲突」后面没有加号，也要读得出来',
-  backup.importLine({ ts: 1, word: 'army', summary: '词+1 义+2 改3 句+5 冲突4' }),
+  backup.importLine({ ts: 1, word: 'bank', summary: '词+1 义+2 改3 句+5 冲突4' }),
 )
 
 /* ── 8. 回收站 ── */
